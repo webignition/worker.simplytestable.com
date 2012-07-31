@@ -1,6 +1,6 @@
 {
-    "name": "symfony/framework-standard-edition",
-    "description": "The \"Symfony Standard Edition\" distribution",
+    "name": "webignition/worker.simplytestable.com",
+    "description": "Source for workers to which tasks for http://app.simplytestable.com are assigned",
     "autoload": {
         "psr-0": { "": "src/" }
     },
