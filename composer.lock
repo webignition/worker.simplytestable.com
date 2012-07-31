@@ -1,11 +1,11 @@
 {
-    "hash": "2c0ad4beaacc810752764681fc5067a8",
+    "hash": "c5cf563470f7a28e77f92ebdd17efd23",
     "packages": [
         {
             "package": "doctrine/common",
             "version": "2.3.x-dev",
-            "source-reference": "1ba1f944c174db5ea2320fab3f49a6ca0ea79b9b",
-            "commit-date": "1343558692"
+            "source-reference": "2fccdb2a4dee54e620793f3e4294ffd8f0eea68d",
+            "commit-date": "1343765518"
         },
         {
             "package": "doctrine/dbal",
@@ -18,6 +18,12 @@
             "version": "dev-master",
             "source-reference": "ed8d02b491512f947fdb2f8b665dc8fd72b5879c",
             "commit-date": "1343657020"
+        },
+        {
+            "package": "doctrine/migrations",
+            "version": "dev-master",
+            "source-reference": "b86b4cc0a39714f0aa53b908d495beacfa0e4011",
+            "commit-date": "1343202693"
         },
         {
             "package": "doctrine/orm",
@@ -154,6 +160,18 @@
             "version": "dev-master",
             "source-reference": "51c866f415bbee670cd9ba13591307bce8dabdca",
             "commit-date": "1343464333"
+        },
+        {
+            "package": "webignition/container-aware-migration",
+            "version": "dev-master",
+            "source-reference": "658ae0ede07cc7f280e288b8b92cb0eeb3ded82b",
+            "commit-date": "1342268854"
+        },
+        {
+            "package": "webignition/doctrine-migrations-bundle",
+            "version": "dev-master",
+            "source-reference": "3eaffb25b31c1f232b99904ac3bceba2991762d4",
+            "commit-date": "1342272594"
         }
     ],
     "packages-dev": null,
