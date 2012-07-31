@@ -42,8 +42,8 @@
         {
             "package": "jms/di-extra-bundle",
             "version": "dev-master",
-            "source-reference": "19c78ddeb222b0e911eb87c9b3c07d5dc0f9f9ea",
-            "commit-date": "1343655179"
+            "source-reference": "912519a3dafc6318c781bd00a9ef7ff790b2c321",
+            "commit-date": "1343737883"
         },
         {
             "package": "jms/metadata",
@@ -156,9 +156,7 @@
             "commit-date": "1343464333"
         }
     ],
-    "packages-dev": [
-
-    ],
+    "packages-dev": null,
     "aliases": [
 
     ],
