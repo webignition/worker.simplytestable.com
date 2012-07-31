@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="simplytestable.com" default="build:refresh">
+    
+    <property name="environments" value="dev,prod" />
+    <property name="dir.app" value="${project.basedir}/app" />
+    <property name="dir.app.config" value="${dir.app}/config" />
+    <property name="dir.src" value="${project.basedir}/src" />
+    <property name="dir.cache" value="${dir.app}/cache" />
+    <property name="dir.logs" value="${dir.app}/logs" /> 
+    <property name="dir.symfony2.web" value="web" />
+    <property name="file.config.parameters" value="${dir.app.config}/parameters.yml" />
+    <property name="file.config.parameters.travis" value="${file.config.parameters}.travis" />
+    <property name="file.config.travis" value="${dir.app.config}/config_travis.yml" />
+    <property name="file.config.test" value="${dir.app.config}/config_test.yml" />
+    
+    <!-- Installation -->    
+    <target name="build:install" depends="build:prepare">       
+        <echo message="Installing app.simplytestable.com" />
+        <phingcall target="install:database:create" />
+        <phingcall target="install:database:migrate" />
+     
+        <exec command="php composer.phar install" passthru="true" />
+    </target>
+    
+    <target name="build:install:ci:travis">
+        <copy file="${file.config.parameters.travis}" tofile="${file.config.parameters}" overwrite="true"/>
+        <copy file="${file.config.travis}" tofile="${file.config.test}" overwrite="true"/>
+        <exec command="php composer.phar install" passthru="true" />
+        <phingcall target="build:prepare" />
+        <exec command="printf 'y\n\' | php app/console doctrine:migrations:migrate" passthru="true" />
+    </target>
+    
+    <target name="install:database:create">
+        <echo message="Creating database from configuration in ${dir.app}/config/parameters.yml" />
+        <exec command="php app/console doctrine:database:create" passthru="true" />  
+    </target>
+    
+    <target name="install:database:migrate">        
+        <exec command="php app/console doctrine:migrations:migrate" passthru="true" />  
+    </target>    
+    
+    <!-- Building -->
+    <target name="build:update" depends="build:prepare">
+        <exec command="composer.phar update" passthru="true" />
+    </target>
+    
+    <target name="build:refresh" depends="build:prepare,symfony:assets:install,symfony:cache:warmup">        
+    </target>
+    
+    <target name="build:prepare" depends="prepare:clear-cache,prepare:set-log-permissions">        
+        <exec command="chmod -R 0777 ${dir.cache}" />
+    </target>    
+    
+    <!-- Preparation -->
+    <target name="prepare:set-log-permissions">
+        <chmod file="${dir.logs}" mode="0777" />
+    </target>
+    
+    <target name="prepare:clear-cache" depends="prepare:delete-cache,prepare:create-cache" />
+    
+    <target name="prepare:delete-cache">
+        <foreach list="${environments}" param="environment" target="prepare:delete-cache-environment-directory" />
+    </target>    
+    
+    <target name="prepare:delete-cache-environment-directory">
+        <delete dir="${dir.cache}/${environment}" includeemptydirs="true" quiet="true" />
+    </target>    
+    
+    <target name="prepare:create-cache">
+        <foreach list="${environments}" param="environment" target="prepare:create-cache-environment-directory" />
+        <exec command="chmod -R 0777 ${dir.cache}" />
+    </target>
+    
+    <target name="prepare:create-cache-environment-directory">
+        <mkdir dir="${dir.cache}/${environment}" />
+    </target>
+    
+    <!-- Testing -->
+    <target name="test" depends="build:prepare">
+        <exec command="phpunit -c ${dir.app}" passthru="true" />
+    </target>   
+    
+    
+    <!-- Symfony tasks -->    
+    <target name="symfony:assets:install">
+        <foreach list="${environments}" param="environment" target="symfony:assets:install-for-environment" />        
+    </target> 
+    
+    <target name="symfony:assets:install-for-environment">
+        <SymfonyConsole command="assets:install ${dir.symfony2.web} --env=${environment}"/>
+    </target>
+    
+    <target name="symfony:cache:warmup">
+        <foreach list="${environments}" param="environment" target="symfony:cache:warmup-for-environment" />
+    </target>
+    
+    <target name="symfony:cache:warmup-for-environment">
+        <SymfonyConsole command="cache:warmup --env=${environment}"/>
+    </target>
+        
+</project>
