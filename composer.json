@@ -20,7 +20,8 @@
         "jms/di-extra-bundle": "1.1.*",
         "doctrine/migrations": "*",        
         "webignition/doctrine-migrations-bundle": "*",
-        "webignition/container-aware-migration": "*"
+        "webignition/container-aware-migration": "*",
+        "webignition/simplytestable-base-migrations-bundle":"1.0"        
     },
     "scripts": {
         "post-install-cmd": [
