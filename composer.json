@@ -22,7 +22,8 @@
         "webignition/doctrine-migrations-bundle": "*",
         "webignition/container-aware-migration": "*",
         "webignition/simplytestable-base-migrations-bundle":"1.1",
-        "webignition/http-client":"*"
+        "webignition/http-client":"*",
+        "jms/serializer-bundle": "dev-master"
     },
     "scripts": {
         "post-install-cmd": [
