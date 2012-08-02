@@ -21,7 +21,8 @@
         "doctrine/migrations": "*",        
         "webignition/doctrine-migrations-bundle": "*",
         "webignition/container-aware-migration": "*",
-        "webignition/simplytestable-base-migrations-bundle":"1.1"        
+        "webignition/simplytestable-base-migrations-bundle":"1.1",
+        "webignition/http-client":"*"
     },
     "scripts": {
         "post-install-cmd": [
