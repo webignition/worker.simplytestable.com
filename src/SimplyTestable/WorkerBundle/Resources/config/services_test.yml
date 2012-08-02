@@ -1,0 +1,4 @@
+services:
+  simplytestable.services.httpClient:
+    class:  webignition\Http\Client\Client
+    public: false

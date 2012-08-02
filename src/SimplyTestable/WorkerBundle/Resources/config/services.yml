@@ -1,0 +1,20 @@
+services:
+  simplytestable.services.httpClient:
+    class:  webignition\Http\Client\Client
+    public: false
+    
+  simplytestable.services.coreApplicationService:
+    class:  SimplyTestable\WorkerBundle\Services\CoreApplicationService
+    arguments: 
+        entityManager: "@doctrine.orm.entity_manager"
+        
+  simplytestable.services.workerService:
+    class:  SimplyTestable\WorkerBundle\Services\WorkerService
+    arguments:
+        coreApplicationService: "@simplytestable.services.coreApplicationService"        
+        httpClient: "@simplytestable.services.httpClient"
+        
+  simplytestable.services.stateservice:
+    class:  SimplyTestable\ApiBundle\Services\StateService
+    arguments: 
+        entityManager: "@doctrine.orm.entity_manager"        
