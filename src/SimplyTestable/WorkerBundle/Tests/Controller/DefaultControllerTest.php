@@ -4,10 +4,12 @@ namespace SimplyTestable\WorkerBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class DefaultControllerTest extends WebTestCase
+class DefaultControllerTest  extends BaseControllerJsonTestCase
 {
     public function testIndex()
     {
+        $this->setupDatabase();
+        
         $client = static::createClient();
 
         $crawler = $client->request('GET', '/hello/Fabien');

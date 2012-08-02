@@ -1,3 +1,7 @@
+SimplyTestableWorkerBundle_verify:
+    pattern:  /verify/
+    defaults: { _controller: SimplyTestableWorkerBundle:Verify:index }
+
 SimplyTestableWorkerBundle_homepage:
     pattern:  /hello/{name}
     defaults: { _controller: SimplyTestableWorkerBundle:Default:index }
