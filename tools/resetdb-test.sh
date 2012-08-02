@@ -1,3 +1,3 @@
-php app/console doctrine:database:drop -e dev --force
-php app/console doctrine:database:create -e dev
-php app/console doctrine:migrations:migrate -e dev --no-interaction
+php app/console doctrine:database:drop -e test --force
+php app/console doctrine:database:create -e test
+php app/console doctrine:migrations:migrate -e test --no-interaction
