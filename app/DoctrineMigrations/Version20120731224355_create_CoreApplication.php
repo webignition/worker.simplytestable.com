@@ -3,7 +3,7 @@
 namespace Application\Migrations;
 
 use SimplyTestable\BaseMigrationsBundle\Migration\EntityModificationMigration,
- SimplyTestable\WorkerBundle\Entity\CoreApplication,
+    SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication,
     Doctrine\DBAL\Schema\Schema;
 
 /**

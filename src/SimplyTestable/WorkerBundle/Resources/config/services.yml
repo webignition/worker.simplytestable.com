@@ -8,13 +8,18 @@ services:
     arguments: 
         entityManager: "@doctrine.orm.entity_manager"
         
+  simplytestable.services.stateservice:
+    class:  SimplyTestable\WorkerBundle\Services\StateService
+    arguments: 
+        entityManager: "@doctrine.orm.entity_manager"         
+        
   simplytestable.services.workerService:
     class:  SimplyTestable\WorkerBundle\Services\WorkerService
     arguments:
-        coreApplicationService: "@simplytestable.services.coreApplicationService"        
+        entityManager: "@doctrine.orm.entity_manager"
+        url: %url%
+        coreApplicationService: "@simplytestable.services.coreApplicationService"
+        stateService: "@simplytestable.services.stateservice"
         httpClient: "@simplytestable.services.httpClient"
         
-  simplytestable.services.stateservice:
-    class:  SimplyTestable\ApiBundle\Services\StateService
-    arguments: 
-        entityManager: "@doctrine.orm.entity_manager"        
+       

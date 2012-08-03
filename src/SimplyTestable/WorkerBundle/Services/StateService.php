@@ -7,7 +7,7 @@ use SimplyTestable\WorkerBundle\Entity\State;
 
 class StateService extends EntityService {
     
-    const ENTITY_NAME = 'SimplyTestable\ApiBundle\Entity\State';
+    const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\State';
     
     /**
      *
@@ -20,7 +20,7 @@ class StateService extends EntityService {
     
     /**
      * @param string $name
-     * @return \SimplyTestable\ApiBundle\Entity\State
+     * @return \SimplyTestable\WorkerBundle\Entity\State
      */
     public function fetch($name) {        
         if (!$this->has($name)) {
@@ -34,7 +34,7 @@ class StateService extends EntityService {
     /**
      *
      * @param string $name
-     * @return \SimplyTestable\ApiBundle\Entity\State 
+     * @return \SimplyTestable\WorkerBundle\Entity\State 
      */
     public function find($name) {
         return $this->getEntityRepository()->findOneByName($name);
@@ -54,7 +54,7 @@ class StateService extends EntityService {
     /**
      *
      * @param string $name
-     * @return \SimplyTestable\ApiBundle\Entity\State
+     * @return \SimplyTestable\WorkerBundle\Entity\State
      */
     public function create($name) {
         $state = new State();
