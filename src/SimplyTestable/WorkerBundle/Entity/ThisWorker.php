@@ -41,6 +41,15 @@ class ThisWorker
      * @SerializerAnnotation\Accessor(getter="getPublicSerializedState")
      */    
     protected $state;
+    
+    
+    /**
+     *
+     * @var string
+     * 
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $activationToken;
 
     /**
      * Get id
@@ -96,5 +105,28 @@ class ThisWorker
     public function getState()
     {
         return $this->state;
+    }
+
+    /**
+     * Set activationToken
+     *
+     * @param string $activationToken
+     * @return ThisWorker
+     */
+    public function setActivationToken($activationToken)
+    {
+        $this->activationToken = $activationToken;
+    
+        return $this;
+    }
+
+    /**
+     * Get activationToken
+     *
+     * @return string 
+     */
+    public function getActivationToken()
+    {
+        return $this->activationToken;
     }
 }
