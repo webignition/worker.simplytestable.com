@@ -7,18 +7,35 @@ use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Model\RemoteEndpoint;
+use webignition\Http\Client\Client as HttpClient;
+use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
 
 class WorkerService extends EntityService {
     
     const WORKER_NEW_STATE = 'worker-new';
     const WORKER_ACTIVATE_REMOTE_ENDPOINT_IDENTIFIER = 'worker-activate';    
-    const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\ThisWorker';   
+    const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\ThisWorker';
+    
+    
+    /**
+     *
+     * @var Logger
+     */
+    private $logger;
+    
     
     /**
      *
      * @var string
      */
-    private $hostname;
+    private $salt;
+
+    
+    /**
+     *
+     * @var string
+     */
+    private $hostname;    
     
     
     /**
@@ -39,12 +56,14 @@ class WorkerService extends EntityService {
      *
      * @var \webignition\Http\Client\Client
      */
-    private $httpClient;  
+    private $httpClient; 
     
 
     /**
      *
      * @param \Doctrine\ORM\EntityManager $entityManager
+     * @param Logger $logger
+     * @param string $salt
      * @param string $hostname
      * @param \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService 
      * @param \SimplyTestable\WorkerBundle\Services\StateService $stateService
@@ -52,6 +71,8 @@ class WorkerService extends EntityService {
      */
     public function __construct(
             EntityManager $entityManager,
+            Logger $logger,
+            $salt,
             $hostname,
             \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService,
             \SimplyTestable\WorkerBundle\Services\StateService $stateService,
@@ -59,6 +80,8 @@ class WorkerService extends EntityService {
     {    
         parent::__construct($entityManager);
         
+        $this->logger = $logger;
+        $this->salt = $salt;
         $this->hostname = $hostname;
         $this->coreApplicationService = $coreApplicationService;
         $this->stateService = $stateService;
@@ -112,8 +135,8 @@ class WorkerService extends EntityService {
     private function create() {        
         $thisWorker = new ThisWorker();
         $thisWorker->setHostname($this->hostname);
-        $thisWorker->setState($this->stateService->fetch('worker-new'));
-        $thisWorker->setActivationToken(md5(microtime(true) . $this->hostname));
+        $thisWorker->setState($this->stateService->fetch('worker-new'));        
+        $thisWorker->setActivationToken(md5($this->salt . $this->hostname));
         
         return $this->persistAndFlush($thisWorker);        
     }
@@ -131,35 +154,46 @@ class WorkerService extends EntityService {
     }     
     
     
+    /**
+     * Issue activation request to core application
+     * Activation is completed when core application verifies
+     * 
+     * @return boolean 
+     */
     public function activate() {
-        if ($this->isNew()) {
-            $coreApplications = $this->coreApplicationService->findAll();
+        $this->logger->info("WorkerService::activate: Initialising");
+        
+        if (!$this->isNew()) {
+            $this->logger->info("WorkerService::activate: This worker is not new and cannot be activated");
+            return true;
+        }        
 
-            foreach ($coreApplications as $coreApplication) {
-                /* @var $coreApplication \SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication */
-                $this->coreApplicationService->populateRemoteEndpoints($coreApplication);
+        /* @var $coreApplication \SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication */
+        $coreApplication = $this->coreApplicationService->get();
+        $this->coreApplicationService->populateRemoteEndpoints($coreApplication);
+        
+        $thisWorker = $this->get();
+ 
+        $remoteEndpoint = $this->getWorkerActivateRemoteEndpoint($coreApplication);
 
-                $remoteEndpoint = $this->getWorkerActivateRemoteEndpoint($coreApplication);
+        $httpRequest = $remoteEndpoint->getHttpRequest();
+        $httpRequest->setPostFields(array(
+            'hostname' => $thisWorker->getHostname(),
+            'token' => $thisWorker->getActivationToken()
+        ));
 
+        $this->logger->info("WorkerService::activate: Requesting activation with " . $remoteEndpoint->getHttpRequest()->getUrl());
 
+        $response = $this->httpClient->getResponse($httpRequest);
 
-                //$httpRequest = new \HttpRequest($remoteEndpoint->getUrl(), HTTP_METH_GET);
+        $this->logger->info("WorkerService::activate: " . $remoteEndpoint->getHttpRequest()->getUrl() . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
 
-                //$httpRequest->send();
-
-                //$response = $this->httpClient->getResponse($httpRequest);
-
-                var_dump($remoteEndpoint);
-                exit();
-
-            }            
+        if ($response->getResponseCode() !== 200) {
+            $this->logger->warn("WorkerService::activate: Activation request failed");
+            return false;
         }
-        
-        
 
-//        
-        //var_dump($core);
-        exit();
+        return true;
     }
     
     

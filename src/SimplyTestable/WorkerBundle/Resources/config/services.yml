@@ -16,6 +16,8 @@ services:
     class:  SimplyTestable\WorkerBundle\Services\WorkerService
     arguments:
         entityManager: "@doctrine.orm.entity_manager"
+        logger: "@logger"
+        salt: %secret%
         hostname: %hostname%
         coreApplicationService: "@simplytestable.services.coreApplicationService"
         stateService: "@simplytestable.services.stateservice"

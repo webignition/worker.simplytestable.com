@@ -27,10 +27,10 @@ class CoreApplicationService extends EntityService {
     
     /**
      *
-     * @return array
+     * @return CoreApplication
      */
-    public function findAll() {
-        return $this->getEntityRepository()->findAll();
+    public function get() {
+        return $this->getEntityRepository()->find(1);
     }
     
     /**
