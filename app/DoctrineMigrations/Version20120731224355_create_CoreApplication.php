@@ -33,7 +33,7 @@ class Version20120731224355_create_CoreApplication extends EntityModificationMig
     
     public function postUp(Schema $schema) {
         $coreApplication = new CoreApplication();
-        $coreApplication->setUrl('http://app.simplytestable.com');
+        $coreApplication->setUrl($this->container->getParameter('core_url'));
         $this->getEntityManager()->persist($coreApplication);
         $this->getEntityManager()->flush();        
     }    

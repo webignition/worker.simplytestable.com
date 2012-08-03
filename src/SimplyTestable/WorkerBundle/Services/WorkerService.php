@@ -10,6 +10,7 @@ use SimplyTestable\WorkerBundle\Model\RemoteEndpoint;
 
 class WorkerService extends EntityService {
     
+    const WORKER_NEW_STATE = 'worker-new';
     const WORKER_ACTIVATE_REMOTE_ENDPOINT_IDENTIFIER = 'worker-activate';    
     const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\ThisWorker';   
     
@@ -17,7 +18,7 @@ class WorkerService extends EntityService {
      *
      * @var string
      */
-    private $url;
+    private $hostname;
     
     
     /**
@@ -44,7 +45,7 @@ class WorkerService extends EntityService {
     /**
      *
      * @param \Doctrine\ORM\EntityManager $entityManager
-     * @param string $url
+     * @param string $hostname
      * @param \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService 
      * @param \SimplyTestable\WorkerBundle\Services\StateService $stateService
      * @param \webignition\Http\Client\Client $httpClient 
@@ -58,7 +59,7 @@ class WorkerService extends EntityService {
     {    
         parent::__construct($entityManager);
         
-        $this->url = $url;
+        $this->hostname = $hostname;
         $this->coreApplicationService = $coreApplicationService;
         $this->stateService = $stateService;
         $this->httpClient = $httpClient;
@@ -110,7 +111,7 @@ class WorkerService extends EntityService {
      */
     private function create() {        
         $thisWorker = new ThisWorker();
-        $thisWorker->setUrl($this->url);
+        $thisWorker->setHostname($this->hostname);
         $thisWorker->setState($this->stateService->fetch('worker-new'));
         
         return $this->persistAndFlush($thisWorker);        
@@ -165,6 +166,15 @@ class WorkerService extends EntityService {
         $remoteEndpoint->setIdentifier(self::WORKER_ACTIVATE_REMOTE_ENDPOINT_IDENTIFIER);
         
         return $coreApplication->getRemoteEndpoint($remoteEndpoint);
-    }    
+    } 
+    
+    
+    /**
+     *
+     * @return boolean
+     */
+    public function isNew() {
+        return $this->get()->getState()->equals($this->stateService->fetch(self::WORKER_NEW_STATE));
+    }
     
 }

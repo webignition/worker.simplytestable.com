@@ -28,7 +28,7 @@ class ThisWorker
      * 
      * @ORM\Column(type="string", unique=true, nullable=false)
      */
-    protected $url;
+    protected $hostname;
     
     
     /**
@@ -55,12 +55,12 @@ class ThisWorker
     /**
      * Set url
      *
-     * @param string $url
+     * @param string $hostname
      * @return ThisWorker
      */
-    public function setUrl($url)
+    public function setHostname($hostname)
     {
-        $this->url = $url;
+        $this->hostname = $hostname;
     
         return $this;
     }
@@ -70,9 +70,9 @@ class ThisWorker
      *
      * @return string 
      */
-    public function getUrl()
+    public function getHostname()
     {
-        return $this->url;
+        return $this->hostname;
     }
 
     /**

@@ -1,2 +1,3 @@
 parameters:
-    url: dev.worker.simplytestable.com
+  hostname: hydrogen.worker.simplytestable.com
+  core_url: http://app.simplytestable.com
