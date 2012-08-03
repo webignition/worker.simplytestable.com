@@ -113,6 +113,7 @@ class WorkerService extends EntityService {
         $thisWorker = new ThisWorker();
         $thisWorker->setHostname($this->hostname);
         $thisWorker->setState($this->stateService->fetch('worker-new'));
+        $thisWorker->setActivationToken(md5(microtime(true) . $this->hostname));
         
         return $this->persistAndFlush($thisWorker);        
     }
@@ -130,28 +131,34 @@ class WorkerService extends EntityService {
     }     
     
     
-    public function activate() {        
-//        $coreApplications = $this->coreApplicationService->findAll();
-//        foreach ($coreApplications as $coreApplication) {
-//            /* @var $coreApplication \SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication */
-//            $this->coreApplicationService->populateRemoteEndpoints($coreApplication);
-//            
-//            $remoteEndpoint = $this->getWorkerActivateRemoteEndpoint($coreApplication);
-//            
-//
-//           
-//            $httpRequest = new \HttpRequest($remoteEndpoint->getUrl(), HTTP_METH_GET);
-//            
-//            //$httpRequest->send();
-//            
-//            $response = $this->httpClient->getResponse($httpRequest);
-//            
-//            var_dump($httpRequest);
-//            exit();
-//
-//        }
+    public function activate() {
+        if ($this->isNew()) {
+            $coreApplications = $this->coreApplicationService->findAll();
+
+            foreach ($coreApplications as $coreApplication) {
+                /* @var $coreApplication \SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication */
+                $this->coreApplicationService->populateRemoteEndpoints($coreApplication);
+
+                $remoteEndpoint = $this->getWorkerActivateRemoteEndpoint($coreApplication);
+
+
+
+                //$httpRequest = new \HttpRequest($remoteEndpoint->getUrl(), HTTP_METH_GET);
+
+                //$httpRequest->send();
+
+                //$response = $this->httpClient->getResponse($httpRequest);
+
+                var_dump($remoteEndpoint);
+                exit();
+
+            }            
+        }
+        
+        
+
 //        
-        var_dump("cp01");
+        //var_dump($core);
         exit();
     }
     
@@ -173,7 +180,7 @@ class WorkerService extends EntityService {
      *
      * @return boolean
      */
-    public function isNew() {
+    private function isNew() {
         return $this->get()->getState()->equals($this->stateService->fetch(self::WORKER_NEW_STATE));
     }
     
