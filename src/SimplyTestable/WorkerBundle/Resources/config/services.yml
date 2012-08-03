@@ -1,7 +1,6 @@
 services:
   simplytestable.services.httpClient:
     class:  webignition\Http\Client\Client
-    public: false
     
   simplytestable.services.coreApplicationService:
     class:  SimplyTestable\WorkerBundle\Services\CoreApplicationService
