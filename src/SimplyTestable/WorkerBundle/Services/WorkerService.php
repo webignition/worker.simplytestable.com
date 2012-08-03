@@ -52,7 +52,7 @@ class WorkerService extends EntityService {
      */
     public function __construct(
             EntityManager $entityManager,
-            $url,
+            $hostname,
             \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService,
             \SimplyTestable\WorkerBundle\Services\StateService $stateService,
             \webignition\Http\Client\Client $httpClient)
