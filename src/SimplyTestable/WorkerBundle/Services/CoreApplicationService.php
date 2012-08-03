@@ -10,7 +10,10 @@ class CoreApplicationService extends EntityService {
     const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication';     
     
     private $remoteEndpoints = array(
-        'worker-activate' => '/worker/activate/'
+        'worker-activate' => array(
+            'url' => '/worker/activate/',
+            'method' => HTTP_METH_POST
+        )
     );
     
     /**
@@ -36,12 +39,13 @@ class CoreApplicationService extends EntityService {
      * @return \SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication 
      */
     public function populateRemoteEndpoints(CoreApplication $coreApplication) {
-        foreach ($this->remoteEndpoints as $identifier => $url) {
-            $url = $coreApplication->getUrl() . $url;
+        foreach ($this->remoteEndpoints as $identifier => $properties) {
+            $url = $coreApplication->getUrl() . $properties['url'];
             
             $remoteEndpoint = new RemoteEndpoint();
             $remoteEndpoint->setIdentifier($identifier);
             $remoteEndpoint->setUrl($url);
+            $remoteEndpoint->setMethod($properties['method']);
             $coreApplication->addRemoteEndpoint($remoteEndpoint);
         }
         

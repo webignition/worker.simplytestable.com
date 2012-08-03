@@ -22,6 +22,13 @@ class RemoteEndpoint
      */
     private $url;
     
+    
+    /**
+     *
+     * @var int
+     */
+    private $method = HTTP_METH_GET;
+    
 
     /**
      * Set url
@@ -66,5 +73,26 @@ class RemoteEndpoint
     public function getIdentifier()
     {
         return $this->identifier;
-    }    
+    } 
+    
+    
+    /**
+     *
+     * @param int $method
+     * @return \SimplyTestable\WorkerBundle\Model\RemoteEndpoint 
+     */
+    public function setMethod($method)
+    {
+        $this->method = $method;
+        return $this;                
+    }
+    
+    /**
+     *
+     * @return int
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
 }
