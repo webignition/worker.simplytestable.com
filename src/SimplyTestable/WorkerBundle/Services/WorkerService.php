@@ -9,6 +9,7 @@ use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Model\RemoteEndpoint;
 use webignition\Http\Client\Client as HttpClient;
 use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
+use webignition\Http\Client\CurlException;
 
 class WorkerService extends EntityService {
     
@@ -183,17 +184,22 @@ class WorkerService extends EntityService {
         ));
 
         $this->logger->info("WorkerService::activate: Requesting activation with " . $remoteEndpoint->getHttpRequest()->getUrl());
+        
+        try {
+            $response = $this->httpClient->getResponse($httpRequest);
+            $this->logger->info("WorkerService::activate: " . $remoteEndpoint->getHttpRequest()->getUrl() . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
+            
+            if ($response->getResponseCode() !== 200) {
+                $this->logger->warn("WorkerService::activate: Activation request failed");
+                return false;
+            }
 
-        $response = $this->httpClient->getResponse($httpRequest);
-
-        $this->logger->info("WorkerService::activate: " . $remoteEndpoint->getHttpRequest()->getUrl() . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
-
-        if ($response->getResponseCode() !== 200) {
-            $this->logger->warn("WorkerService::activate: Activation request failed");
+            return true;            
+            
+        } catch (CurlException $curlException) {
+            $this->logger->info("WorkerService::activate: " . $remoteEndpoint->getHttpRequest()->getUrl() . ": " . $curlException->getMessage());            
             return false;
         }
-
-        return true;
     }
     
     
