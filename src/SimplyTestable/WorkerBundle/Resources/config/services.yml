@@ -10,7 +10,7 @@ services:
   simplytestable.services.stateservice:
     class:  SimplyTestable\WorkerBundle\Services\StateService
     arguments: 
-        entityManager: "@doctrine.orm.entity_manager"         
+        entityManager: "@doctrine.orm.entity_manager"     
         
   simplytestable.services.workerService:
     class:  SimplyTestable\WorkerBundle\Services\WorkerService
@@ -22,6 +22,7 @@ services:
         coreApplicationService: "@simplytestable.services.coreApplicationService"
         stateService: "@simplytestable.services.stateservice"
         httpClient: "@simplytestable.services.httpClient"
+        urlService: "@simplytestable.services.urlService"
         
   simplytestable.services.urlService:
     class:  SimplyTestable\WorkerBundle\Services\UrlService     
