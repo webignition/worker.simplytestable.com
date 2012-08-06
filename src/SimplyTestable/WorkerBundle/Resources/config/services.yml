@@ -23,4 +23,6 @@ services:
         stateService: "@simplytestable.services.stateservice"
         httpClient: "@simplytestable.services.httpClient"
         
+  simplytestable.services.urlService:
+    class:  SimplyTestable\WorkerBundle\Services\UrlService     
        
