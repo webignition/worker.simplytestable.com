@@ -29,7 +29,10 @@ class WorkerActivateCommand extends ContainerAwareCommand
     {        
         if ($input->hasArgument('http-fixture-path')) {
             $httpClient = $this->getContainer()->get('simplytestable.services.httpClient');
-            $httpClient->getStoredResponseList()->setFixturesPath($input->getArgument('http-fixture-path'));
+            
+            if ($httpClient instanceof \webignition\Http\Mock\Client\Client) {
+                $httpClient->getStoredResponseList()->setFixturesPath($input->getArgument('http-fixture-path'));
+            }            
         }
         
         if ($this->getWorkerService()->activate() === false) {
