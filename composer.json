@@ -24,6 +24,8 @@
         "webignition/simplytestable-base-migrations-bundle":"1.1",
         "webignition/http-client":"*",
         "jms/serializer-bundle": "dev-master",
+        "webignition/url":"*",
+        "webignition/json-pretty-print":"dev-master",
         "webignition/url":"*"
     },
     "scripts": {
