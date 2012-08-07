@@ -1,3 +1,6 @@
 services:
   simplytestable.services.httpClient:
     class:  webignition\Http\Mock\Client\Client
+    
+  simplytestable.services.requestservice:
+    class:   SimplyTestable\WorkerBundle\Services\TestRequestService    

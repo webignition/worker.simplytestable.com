@@ -14,6 +14,7 @@ use webignition\Http\Client\CurlException;
 class WorkerService extends EntityService {
     
     const WORKER_NEW_STATE = 'worker-new';
+    const WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE = 'worker-awaiting-activation-verification';
     const WORKER_ACTIVATE_REMOTE_ENDPOINT_IDENTIFIER = 'worker-activate';    
     const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\ThisWorker';
     
@@ -59,6 +60,13 @@ class WorkerService extends EntityService {
      */
     private $httpClient; 
     
+    
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Service\UrlService $urlService
+     */
+    private $urlService;
+    
 
     /**
      *
@@ -68,7 +76,8 @@ class WorkerService extends EntityService {
      * @param string $hostname
      * @param \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService 
      * @param \SimplyTestable\WorkerBundle\Services\StateService $stateService
-     * @param \webignition\Http\Client\Client $httpClient 
+     * @param \webignition\Http\Client\Client $httpClient
+     * @param \SimplyTestable\WorkerBundle\Services\UrlService $urlService
      */
     public function __construct(
             EntityManager $entityManager,
@@ -77,7 +86,8 @@ class WorkerService extends EntityService {
             $hostname,
             \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService,
             \SimplyTestable\WorkerBundle\Services\StateService $stateService,
-            \webignition\Http\Client\Client $httpClient)
+            \webignition\Http\Client\Client $httpClient,
+            \SimplyTestable\WorkerBundle\Services\UrlService $urlService)
     {    
         parent::__construct($entityManager);
         
@@ -87,7 +97,8 @@ class WorkerService extends EntityService {
         $this->coreApplicationService = $coreApplicationService;
         $this->stateService = $stateService;
         $this->httpClient = $httpClient;
-        $this->httpClient->redirectHandler()->enable();        
+        $this->httpClient->redirectHandler()->enable();  
+        $this->urlService = $urlService;
     }  
     
     
@@ -176,30 +187,50 @@ class WorkerService extends EntityService {
         $thisWorker = $this->get();
  
         $remoteEndpoint = $this->getWorkerActivateRemoteEndpoint($coreApplication);
-
+        
         $httpRequest = $remoteEndpoint->getHttpRequest();
+        $requestUrl = $this->urlService->prepare($remoteEndpoint->getHttpRequest()->getUrl());
+        $httpRequest->setUrl($requestUrl);
+        
         $httpRequest->setPostFields(array(
             'hostname' => $thisWorker->getHostname(),
             'token' => $thisWorker->getActivationToken()
         ));
 
-        $this->logger->info("WorkerService::activate: Requesting activation with " . $remoteEndpoint->getHttpRequest()->getUrl());
+        $this->logger->info("WorkerService::activate: Requesting activation with " . $requestUrl);
         
         try {
             $response = $this->httpClient->getResponse($httpRequest);
-            $this->logger->info("WorkerService::activate: " . $remoteEndpoint->getHttpRequest()->getUrl() . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
+            $this->logger->info("WorkerService::activate: " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
             
             if ($response->getResponseCode() !== 200) {
                 $this->logger->warn("WorkerService::activate: Activation request failed");
                 return false;
             }
+            
+            $thisWorker->setNextState();
+            $this->persistAndFlush($thisWorker);
 
             return true;            
             
         } catch (CurlException $curlException) {
-            $this->logger->info("WorkerService::activate: " . $remoteEndpoint->getHttpRequest()->getUrl() . ": " . $curlException->getMessage());            
+            $this->logger->info("WorkerService::activate: " . $requestUrl . ": " . $curlException->getMessage());            
             return false;
         }
+    }
+    
+    
+    public function verify() {        
+        if (!$this->isAwaitingActivationVerification()) {
+            $this->logger->info("WorkerService::verify: This worker is not awaiting activation verification");
+            return true;
+        }          
+        
+        $thisWorker = $this->get();        
+        $thisWorker->setNextState();
+        $this->persistAndFlush($thisWorker);
+        
+        return true;
     }
     
     
@@ -222,6 +253,14 @@ class WorkerService extends EntityService {
      */
     private function isNew() {
         return $this->get()->getState()->equals($this->stateService->fetch(self::WORKER_NEW_STATE));
+    }
+    
+    /**
+     *
+     * @return boolean
+     */
+    private function isAwaitingActivationVerification() {
+        return $this->get()->getState()->equals($this->stateService->fetch(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE));
     }
     
 }

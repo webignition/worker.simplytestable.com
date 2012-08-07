@@ -1,6 +1,6 @@
 SimplyTestableWorkerBundle_verify:
     pattern:  /verify/
-    defaults: { _controller: SimplyTestableWorkerBundle:Verify:index }
+    defaults: { _controller: SimplyTestableWorkerBundle:Verify:index, _format: json }   
 
 SimplyTestableWorkerBundle_homepage:
     pattern:  /hello/{name}

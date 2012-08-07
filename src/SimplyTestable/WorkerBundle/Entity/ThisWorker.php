@@ -129,4 +129,14 @@ class ThisWorker
     {
         return $this->activationToken;
     }
+    
+    
+    /**
+     *
+     * @return \SimplyTestable\ApiBundle\Entity\ThisWorker
+     */
+    public function setNextState() {
+        $this->state = $this->getState()->getNextState();
+        return $this;
+    }    
 }

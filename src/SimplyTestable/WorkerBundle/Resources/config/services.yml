@@ -26,4 +26,14 @@ services:
         
   simplytestable.services.urlService:
     class:  SimplyTestable\WorkerBundle\Services\UrlService     
+    
+  simplytestable.services.requestservice:
+    class:   SimplyTestable\WorkerBundle\Services\RequestService    
+    
+  simplytestable.controller.action_listener:
+    class: SimplyTestable\WorkerBundle\EventListener\BeforeListener    
+    arguments:
+        logger: "@logger"
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }  
        
