@@ -201,7 +201,11 @@ class WorkerService extends EntityService {
         
         try {
             $response = $this->httpClient->getResponse($httpRequest);
-            $this->logger->info("WorkerService:activate: response fixture path: " . $this->httpClient->getStoredResponseList()->getRequestFixturePath($httpRequest));
+            
+            if ($this->httpClient instanceof \webignition\Http\Mock\Client\Client) {
+                $this->logger->info("WorkerService:activate: response fixture path: " . $this->httpClient->getStoredResponseList()->getRequestFixturePath($httpRequest));
+            }            
+            
             $this->logger->info("WorkerService::activate: " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
             
             if ($response->getResponseCode() !== 200) {
