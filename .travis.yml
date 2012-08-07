@@ -24,3 +24,7 @@ before_script:
   
 script:
   - phpunit -c app
+  
+  
+after_script:
+  - cat app/logs/test.log
