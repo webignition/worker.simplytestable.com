@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use SimplyTestable\WorkerBundle\Services\RequestService;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-abstract class WorkerController extends Controller
+abstract class BaseController extends Controller
 {      
     
     /**

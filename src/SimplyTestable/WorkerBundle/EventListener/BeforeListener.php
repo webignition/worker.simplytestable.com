@@ -5,7 +5,7 @@ namespace SimplyTestable\WorkerBundle\EventListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Console\Input\InputArgument;
-use SimplyTestable\WorkerBundle\Controller\WorkerController;
+use SimplyTestable\WorkerBundle\Controller\BaseController;
 use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
 
 class BeforeListener
@@ -43,7 +43,7 @@ class BeforeListener
         $controller = $controllerCallable[0];
         $methodName = $controllerCallable[1];
         
-        if ($controller instanceof WorkerController) {
+        if ($controller instanceof BaseController) {
             /* @var $controller ApiController */            
             $methodArguments = $controller->getArguments($methodName);            
             foreach ($controller->getInputDefinition($methodName)->getArguments() as $inputArgument) {

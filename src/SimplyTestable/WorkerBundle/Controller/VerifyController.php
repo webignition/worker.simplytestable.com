@@ -6,7 +6,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputArgument;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 
-class VerifyController extends WorkerController
+class VerifyController extends BaseController
 {
     public function __construct() {
         $this->setInputDefinitions(array(
