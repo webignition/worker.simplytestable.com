@@ -28,12 +28,12 @@ class Version20120809143640_create_TaskType extends BaseMigration
         $this->statements['sqlite'] = array(
             "CREATE TABLE TaskType (
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                name VARCHAR(255) NOT NULL,
+                name VARCHAR(255) NOT NULL COLLATE NOCASE,
                 tasktypeclass_id INT NOT NULL,
                 description LONGTEXT NOT NULL,
                 selectable TINYINT(1) NOT NULL,
                 FOREIGN KEY(tasktypeclass_id) REFERENCES TaskTypeClass (id))",
-            "CREATE UNIQUE INDEX UNIQ_F7737B3C5E237E06 ON TaskType (name)",
+            "CREATE UNIQUE INDEX UNIQ_F7737B3C5E237E06 ON TaskType (name COLLATE NOCASE)",
             "CREATE INDEX IDX_F7737B3CAEA19A54 ON TaskType (tasktypeclass_id)"
         ); 
         
