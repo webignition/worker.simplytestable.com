@@ -47,13 +47,41 @@ class TaskService extends EntityService {
      * @param TaskType $type
      * @return \SimplyTestable\WorkerBundle\Entity\Task\Task
      */
-    public function create($url, TaskType $type) {
+    public function create($url, TaskType $type) {        
         $task = new Task();
         $task->setState($this->getStartingState());
         $task->setType($type);
         $task->setUrl($url);
         
+        if ($this->has($task)) {
+            return $this->fetch($task);
+        }
+        
         return $this->persistAndFlush($task);
+    }
+    
+    
+    /**
+     *
+     * @param Task $task
+     * @return Task
+     */
+    private function fetch(Task $task) {
+        return $this->getEntityRepository()->findOneBy(array(
+            'state' => $task->getState(),
+            'type' => $task->getType(),
+            'url' => $task->getUrl()
+        ));        
+    }
+    
+    
+    /**
+     *
+     * @param Task $task
+     * @return boolean
+     */
+    private function has(Task $task) {        
+        return !is_null($this->fetch($task));
     }
     
     /**
