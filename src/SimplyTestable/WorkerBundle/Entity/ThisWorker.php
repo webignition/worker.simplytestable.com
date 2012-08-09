@@ -133,7 +133,7 @@ class ThisWorker
     
     /**
      *
-     * @return \SimplyTestable\ApiBundle\Entity\ThisWorker
+     * @return \SimplyTestable\WorkerBundle\Entity\ThisWorker
      */
     public function setNextState() {
         $this->state = $this->getState()->getNextState();
