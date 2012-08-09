@@ -257,7 +257,7 @@ class WorkerService extends EntityService {
      * @return boolean
      */
     private function isNew() {
-        return $this->get()->getState()->equals($this->stateService->fetch(self::WORKER_NEW_STATE));
+        return $this->get()->getState()->equals($this->getStartingState());
     }
     
     /**
@@ -265,7 +265,22 @@ class WorkerService extends EntityService {
      * @return boolean
      */
     private function isAwaitingActivationVerification() {
-        return $this->get()->getState()->equals($this->stateService->fetch(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE));
+        return $this->get()->getState()->equals($this->getAwaitingActivationVerificationState());
     }
     
+    /**
+     *
+     * @return \SimplyTestable\ApiBundle\Entity\State
+     */
+    public function getAwaitingActivationVerificationState() {
+        return $this->stateService->fetch(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE);
+    }
+
+    /**
+     *
+     * @return \SimplyTestable\ApiBundle\Entity\State
+     */    
+    private function getStartingState() {
+        return $this->stateService->fetch(self::WORKER_NEW_STATE);
+    }
 }
