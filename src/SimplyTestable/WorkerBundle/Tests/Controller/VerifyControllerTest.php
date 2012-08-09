@@ -6,12 +6,15 @@ namespace SimplyTestable\WorkerBundle\Tests\Controller;
 class VerifyControllerTest extends BaseControllerJsonTestCase {
     
     const WORKER_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\VerifyController';
+    
+    public function setUp() {
+        parent::setUp();
+        $this->setupDatabase();
+        $this->getWorkerService()->get()->setNextState();
+    }
 
     public function testIndexAction() {
-        $this->setupDatabase();
-        
         $thisWorker = $this->getWorkerService()->get();
-        $thisWorker->setNextState();
     
         $_POST = array(
             'hostname' => $thisWorker->getHostname(),
