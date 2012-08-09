@@ -66,7 +66,7 @@ class StateService extends EntityService {
     
     /**
      *
-     * @param State $job
+     * @param State $state
      * @return State
      */
     public function persistAndFlush(State $state) {
