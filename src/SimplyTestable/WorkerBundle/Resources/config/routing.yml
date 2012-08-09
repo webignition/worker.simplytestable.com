@@ -1,6 +1,10 @@
 SimplyTestableWorkerBundle_verify:
     pattern:  /verify/
     defaults: { _controller: SimplyTestableWorkerBundle:Verify:index, _format: json }   
+    
+SimplyTestableWorkerBundle_task_create:
+    pattern:  /task/create/
+    defaults: { _controller: SimplyTestableWorkerBundle:Task:create, _format: json }       
 
 SimplyTestableWorkerBundle_homepage:
     pattern:  /hello/{name}

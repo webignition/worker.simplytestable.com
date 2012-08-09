@@ -35,7 +35,13 @@ services:
     arguments:
         logger: "@logger"
     tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }        
+      - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }  
+      
+  simplytestable.services.taskservice:
+    class:   SimplyTestable\WorkerBundle\Services\TaskService
+    arguments:
+        entityManager: "@doctrine.orm.entity_manager"        
+        stateService: "@simplytestable.services.stateservice"
 
   simplytestable.services.tasktypeservice:
     class:   SimplyTestable\WorkerBundle\Services\TaskTypeService

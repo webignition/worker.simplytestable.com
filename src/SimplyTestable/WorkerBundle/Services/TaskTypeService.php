@@ -2,12 +2,12 @@
 namespace SimplyTestable\WorkerBundle\Services;
 
 use Doctrine\ORM\EntityManager;
-use SimplyTestable\WorkerBundle\Entity\Task\Type;
+use SimplyTestable\WorkerBundle\Entity\Task\Type\Type;
 
 
 class TaskTypeService extends EntityService {
     
-    const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\Task\Type';
+    const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\Task\Type\Type';
     
     /**
      *
