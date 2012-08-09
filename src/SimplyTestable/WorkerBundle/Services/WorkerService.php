@@ -14,6 +14,7 @@ use webignition\Http\Client\CurlException;
 class WorkerService extends EntityService {
     
     const WORKER_NEW_STATE = 'worker-new';
+    const WORKER_ACTIVATE_STATE = 'worker-active';
     const WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE = 'worker-awaiting-activation-verification';
     const WORKER_ACTIVATE_REMOTE_ENDPOINT_IDENTIFIER = 'worker-activate';    
     const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\ThisWorker';
@@ -267,14 +268,6 @@ class WorkerService extends EntityService {
     private function isAwaitingActivationVerification() {
         return $this->get()->getState()->equals($this->getAwaitingActivationVerificationState());
     }
-    
-    /**
-     *
-     * @return \SimplyTestable\ApiBundle\Entity\State
-     */
-    public function getAwaitingActivationVerificationState() {
-        return $this->stateService->fetch(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE);
-    }
 
     /**
      *
@@ -282,5 +275,21 @@ class WorkerService extends EntityService {
      */    
     private function getStartingState() {
         return $this->stateService->fetch(self::WORKER_NEW_STATE);
+    }
+    
+    /**
+     *
+     * @return \SimplyTestable\ApiBundle\Entity\State
+     */
+    public function getAwaitingActivationVerificationState() {
+        return $this->stateService->fetch(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE);
+    }    
+    
+    /**
+     *
+     * @return \SimplyTestable\ApiBundle\Entity\State
+     */       
+    public function getActiveState() {
+        return $this->stateService->fetch(self::WORKER_ACTIVATE_STATE);
     }
 }
