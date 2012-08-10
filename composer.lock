@@ -1,5 +1,5 @@
 {
-    "hash": "4e0cb6569a4cf0f3b393c639c7c1eed0",
+    "hash": "b556de5d42119206d8da5d43990ff9bb",
     "packages": [
         {
             "package": "doctrine/common",
@@ -16,8 +16,14 @@
         {
             "package": "doctrine/doctrine-bundle",
             "version": "dev-master",
-            "source-reference": "ed8d02b491512f947fdb2f8b665dc8fd72b5879c",
-            "commit-date": "1343657020"
+            "alias-pretty-version": "1.0.x-dev",
+            "alias-version": "1.0.9999999.9999999-dev"
+        },
+        {
+            "package": "doctrine/doctrine-bundle",
+            "version": "dev-master",
+            "source-reference": "4d9bb0f3af470556983eb41a7d19ede23401ef0b",
+            "commit-date": "1344549563"
         },
         {
             "package": "doctrine/migrations",
@@ -30,6 +36,24 @@
             "version": "2.3.x-dev",
             "source-reference": "17862d9a2a38bf801e564d09a26eea8503621ae0",
             "commit-date": "1343850025"
+        },
+        {
+            "package": "glit/resque",
+            "version": "dev-master",
+            "source-reference": "d677b0558d27e0c0405c3a54ce73b39db50b136f",
+            "commit-date": "1341416027"
+        },
+        {
+            "package": "glit/resque-bundle",
+            "version": "dev-master",
+            "alias-pretty-version": "1.0.x-dev",
+            "alias-version": "1.0.9999999.9999999-dev"
+        },
+        {
+            "package": "glit/resque-bundle",
+            "version": "dev-master",
+            "source-reference": "b839c8099e9d9bbac57295da408314c9aef4b682",
+            "commit-date": "1344245875"
         },
         {
             "package": "jms/aop-bundle",
@@ -82,8 +106,8 @@
         {
             "package": "kriswallsmith/assetic",
             "version": "dev-master",
-            "source-reference": "ce9c557989f95abffe792c63f84f404a2f019ef8",
-            "commit-date": "1344261272"
+            "source-reference": "d1d5066d9071a76d771993081ee23137e96216b7",
+            "commit-date": "1344507381"
         },
         {
             "package": "monolog/monolog",
@@ -122,8 +146,14 @@
         {
             "package": "symfony/assetic-bundle",
             "version": "dev-master",
-            "source-reference": "0c09207be07b044e06d28a4111f554f071e5b658",
-            "commit-date": "1343812720"
+            "alias-pretty-version": "2.1.x-dev",
+            "alias-version": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/assetic-bundle",
+            "version": "dev-master",
+            "source-reference": "ec3a65d3eab342af9e93a3c21af0ac7b78e01c17",
+            "commit-date": "1344507386"
         },
         {
             "package": "symfony/monolog-bundle",
@@ -146,8 +176,8 @@
         {
             "package": "symfony/symfony",
             "version": "dev-master",
-            "source-reference": "842b599c50552125f1ae1e0463ea2b102254d701",
-            "commit-date": "1344264516"
+            "source-reference": "31536c36ec8875aee1406aa7d7a0b5e38a04af66",
+            "commit-date": "1344599303"
         },
         {
             "package": "twig/extensions",
@@ -164,8 +194,8 @@
         {
             "package": "twig/twig",
             "version": "dev-master",
-            "source-reference": "51c866f415bbee670cd9ba13591307bce8dabdca",
-            "commit-date": "1343464333"
+            "source-reference": "f2f698c820d4396f519ef4175ad6fe79fcfb9ecf",
+            "commit-date": "1344328685"
         },
         {
             "package": "webignition/absolute-url-deriver",

@@ -1,2 +1,5 @@
+glit_resque:
+  prefix: "SimplyTestable\WorkerBundle"
+
 parameters:
   core_url: http://ci.app.simplytestable.com

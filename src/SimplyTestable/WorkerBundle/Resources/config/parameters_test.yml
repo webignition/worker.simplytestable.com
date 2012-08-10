@@ -1,3 +1,6 @@
 parameters:
   hostname: test.worker.simplytestable.com
   core_url: http://test.app.simplytestable.com
+  
+glit_resque:
+  prefix: "SimplyTestable\WorkerBundle"  

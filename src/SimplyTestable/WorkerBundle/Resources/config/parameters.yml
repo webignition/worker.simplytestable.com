@@ -1,3 +1,6 @@
 parameters:
   hostname: hydrogen.worker.simplytestable.com
   core_url: http://app.simplytestable.com
+  
+glit_resque:
+  prefix: "SimplyTestable\WorkerBundle"
