@@ -53,6 +53,6 @@ services:
   simplytestable.services.taskdriverfactoryservice:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService
     arguments:
-        engines: %engines%        
+        drivers: %drivers%        
         taskTypeService: "@simplytestable.services.tasktypeservice"
         stateService: "@simplytestable.services.stateservice"

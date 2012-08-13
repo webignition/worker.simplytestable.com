@@ -1,7 +1,7 @@
 parameters:
   hostname: hydrogen.worker.simplytestable.com
   core_url: http://app.simplytestable.com
-  engines:
+  drivers:
     html-validation:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver      
       task-types:

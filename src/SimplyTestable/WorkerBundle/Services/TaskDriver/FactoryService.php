@@ -29,19 +29,19 @@ class FactoryService {
      * @param type $engines
      * @param TaskTypeService $taskTypeService 
      */
-    public function __construct($engines, TaskTypeService $taskTypeService, StateService $stateService) {
+    public function __construct($drivers, TaskTypeService $taskTypeService, StateService $stateService) {
         $this->taskTypeService = $taskTypeService;
         
-        foreach ($engines as $identifier => $properties) {
-            /* @var $engine TaskDriver */
-            $engine = new $properties['class'];
-            $engine->setStateService($stateService);
+        foreach ($drivers as $identifier => $properties) {
+            /* @var $driver TaskDriver */
+            $driver = new $properties['class'];
+            $driver->setStateService($stateService);
             
             foreach ($properties['task-types'] as $taskTypeName) {
-                $engine->addTaskType($this->taskTypeService->fetch($taskTypeName));                
+                $driver->addTaskType($this->taskTypeService->fetch($taskTypeName));                
             }
             
-            $this->registerTaskDriver($engine);
+            $this->registerTaskDriver($driver);
         }
     }
     

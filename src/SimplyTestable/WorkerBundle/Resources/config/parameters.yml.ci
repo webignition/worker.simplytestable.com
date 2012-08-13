@@ -3,3 +3,8 @@ glit_resque:
 
 parameters:
   core_url: http://ci.app.simplytestable.com
+  drivers:
+    html-validation:
+      class: SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver      
+      task-types:
+        - "HTML validation"
