@@ -60,9 +60,18 @@ class Task
      *
      * @var SimplyTestable\WorkerBundle\Entity\TimePeriod
      * 
-     * @ORM\ManyToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\TimePeriod", inversedBy="tasks")
+     * @ORM\OneToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\TimePeriod", cascade={"persist"})
      */
     protected $timePeriod;
+    
+    
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Entity\Task\Output
+     * 
+     * @ORM\OneToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\Task\Output", cascade={"persist"})
+     */
+    protected $output;
     
     /**
      *
@@ -181,4 +190,39 @@ class Task
     {
         return $this->timePeriod;
     }
+    
+    /**
+     * Set output
+     *
+     * @param \SimplyTestable\WorkerBundle\Entity\Task\Output $output
+     * @return Task
+     */
+    public function setOutput(\SimplyTestable\WorkerBundle\Entity\Task\Output $output)
+    {
+        $this->output = $output;
+    
+        return $this;
+    }
+
+    /**
+     * Get output
+     *
+     * @return SimplyTestable\WorkerBundle\Entity\Task\Output 
+     */
+    public function getOutput()
+    {
+        return $this->output;
+    }    
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Entity\Task\Task
+     */
+    public function setNextState() {
+        if (!is_null($this->getState()->getNextState())) {
+            $this->state = $this->getState()->getNextState();
+        }        
+        
+        return $this;
+    }   
 }

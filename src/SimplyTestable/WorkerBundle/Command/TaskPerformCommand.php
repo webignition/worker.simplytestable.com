@@ -39,19 +39,37 @@ EOF
             }            
         }
         
-        var_dump("cp01");
-        exit();
+        $task = $this->getTaskService()->getById($input->getArgument('id'));                
         
-//        if ($this->getWorkerService()->activate() === false) {
-//            throw new \LogicException('Worker activation failed, check log for details');
-//        }        
+        if ($this->getTaskService()->perform($task) === false) {
+            throw new \LogicException('Task execution failed, check log for details');
+        }        
     } 
+    
     
     /**
      *
-     * @return SimplyTestable\WorkerBundle\Services\WorkerService
+     * @return \SimplyTestable\WorkerBundle\Services\TaskService
+     */
+    private function getTaskService() {
+        return $this->getContainer()->get('simplytestable.services.taskservice');
+    }
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Services\WorkerService
      */
     private function getWorkerService() {
         return $this->getContainer()->get('simplytestable.services.workerservice');
+    }
+    
+    
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService
+     */
+    private function getTaskDriverFactoryService() {
+        return $this->getContainer()->get('simplytestable.services.taskdriverfactoryservice');
     }
 }

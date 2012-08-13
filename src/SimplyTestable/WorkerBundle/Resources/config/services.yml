@@ -41,9 +41,18 @@ services:
     class:   SimplyTestable\WorkerBundle\Services\TaskService
     arguments:
         entityManager: "@doctrine.orm.entity_manager"        
+        logger: "@logger"
         stateService: "@simplytestable.services.stateservice"
+        taskDriverFactoryService: "@simplytestable.services.taskdriverfactoryservice"
 
   simplytestable.services.tasktypeservice:
     class:   SimplyTestable\WorkerBundle\Services\TaskTypeService
     arguments:
-        entityManager: "@doctrine.orm.entity_manager"         
+        entityManager: "@doctrine.orm.entity_manager"        
+        
+  simplytestable.services.taskdriverfactoryservice:
+    class:   SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService
+    arguments:
+        engines: %engines%        
+        taskTypeService: "@simplytestable.services.tasktypeservice"
+        stateService: "@simplytestable.services.stateservice"

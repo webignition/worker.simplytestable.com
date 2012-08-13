@@ -1,26 +1,58 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Services\TaskEngine;
+namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
+use SimplyTestable\WorkerBundle\Services\StateService;
 
-abstract class TaskEngine {
+abstract class TaskDriver {
+    
+    const OUTPUT_STARTING_STATE = 'taskoutput-queued';
     
     /**
      * Collection of task types that this task engine can handle
      * 
      * @var array
      */
-    private $taskTypes;
+    private $taskTypes = array();
+    
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Services\StateService 
+     */
+    private $stateService;
+    
+    
+    /**
+     *
+     * @param StateService $stateService 
+     */
+    public function setStateService(StateService $stateService) {
+        $this->stateService = $stateService;
+    }
     
     
     /**
      * @param Task $task
+     * @return \SimplyTestable\WorkerBundle\Entity\Task\Output 
+     */
+    public function perform(Task $task) {
+        $rawOutput = $this->execute($task);
+        $output = new \SimplyTestable\WorkerBundle\Entity\Task\Output();
+        $output->setOutput($rawOutput);
+        $output->setState($this->stateService->fetch(self::OUTPUT_STARTING_STATE));
+        
+        return $output;
+    }
+    
+    
+    /**
      * @return string 
      */
-    abstract public function perform(Task $task);   
-    
+    abstract protected function execute(Task $task);
+
+
     
     /**
      *
