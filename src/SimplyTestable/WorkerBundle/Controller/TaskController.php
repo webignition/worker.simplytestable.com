@@ -35,6 +35,14 @@ class TaskController extends BaseController
             $taskType
         );
         
+        $this->container->get('simplytestable.services.resqueQueueService')->add(
+            'SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob',
+            'task-perform',
+            array(
+                'id' => $task->getId()
+            )                
+        );
+        
         return $this->sendResponse($task);
     }
     

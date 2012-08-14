@@ -60,3 +60,9 @@ services:
         drivers: %drivers%        
         taskTypeService: "@simplytestable.services.tasktypeservice"
         stateService: "@simplytestable.services.stateservice"
+        
+  simplytestable.services.resqueQueueService:
+    class:   SimplyTestable\WorkerBundle\Services\ResqueQueueService
+    arguments:
+      queueManager: "@glit_resque.queue_manager"
+      logger: "@logger"        
