@@ -43,7 +43,15 @@ EOF
         
         if ($this->getTaskService()->perform($task) === false) {
             throw new \LogicException('Task execution failed, check log for details');
-        }        
+        }
+        
+        $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(
+            'SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob',
+            'task-report-completion',
+            array(
+                'id' => $task->getId()
+            )                
+        );        
     } 
     
     
@@ -53,16 +61,7 @@ EOF
      */
     private function getTaskService() {
         return $this->getContainer()->get('simplytestable.services.taskservice');
-    }
-    
-    /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\WorkerService
-     */
-    private function getWorkerService() {
-        return $this->getContainer()->get('simplytestable.services.workerservice');
-    }
-    
+    }    
     
     
     /**
