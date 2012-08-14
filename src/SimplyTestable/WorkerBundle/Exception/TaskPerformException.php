@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\ApiBundle\Exception;
+namespace SimplyTestable\WorkerBundle\Exception;
 use \Exception as BaseException;
 
 class TaskPerformException extends BaseException {    

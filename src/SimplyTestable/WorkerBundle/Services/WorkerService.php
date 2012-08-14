@@ -271,7 +271,7 @@ class WorkerService extends EntityService {
 
     /**
      *
-     * @return \SimplyTestable\ApiBundle\Entity\State
+     * @return \SimplyTestable\WorkerBundle\Entity\State
      */    
     private function getStartingState() {
         return $this->stateService->fetch(self::WORKER_NEW_STATE);
@@ -279,7 +279,7 @@ class WorkerService extends EntityService {
     
     /**
      *
-     * @return \SimplyTestable\ApiBundle\Entity\State
+     * @return \SimplyTestable\WorkerBundle\Entity\State
      */
     public function getAwaitingActivationVerificationState() {
         return $this->stateService->fetch(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE);
@@ -287,7 +287,7 @@ class WorkerService extends EntityService {
     
     /**
      *
-     * @return \SimplyTestable\ApiBundle\Entity\State
+     * @return \SimplyTestable\WorkerBundle\Entity\State
      */       
     public function getActiveState() {
         return $this->stateService->fetch(self::WORKER_ACTIVATE_STATE);
