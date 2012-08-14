@@ -38,6 +38,34 @@ class TaskService extends EntityService {
     
     /**
      *
+     * @var \SimplyTestable\WorkerBundle\Service\UrlService $urlService
+     */
+    private $urlService;
+    
+    
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Service\CoreApplicationService $coreApplicationService
+     */
+    private $coreApplicationService;   
+    
+    
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Service\WorkerService $workerService
+     */
+    private $workerService;
+    
+    
+    /**
+     *
+     * @var \webignition\Http\Client\Client
+     */
+    private $httpClient; 
+    
+    
+    /**
+     *
      * @return string
      */
     protected function getEntityName() {
@@ -51,18 +79,30 @@ class TaskService extends EntityService {
      * @param Logger $logger
      * @param \SimplyTestable\WorkerBundle\Services\StateService $stateService
      * @param \SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService $taskDriverFactoryService
+     * @param \SimplyTestable\WorkerBundle\Services\UrlService $urlService
+     * @param \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService
+     * @param \SimplyTestable\WorkerBundle\Services\WorkerService $workerService
+     * @param \webignition\Http\Client\Client $httpClient
      */
     public function __construct(
             EntityManager $entityManager,
             Logger $logger,
             \SimplyTestable\WorkerBundle\Services\StateService $stateService,
-            \SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService $taskDriverFactoryService)
+            \SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService $taskDriverFactoryService,
+            \SimplyTestable\WorkerBundle\Services\UrlService $urlService,
+            \SimplyTestable\WorkerBundle\Services\CoreApplicationService$coreApplicationService,
+            \SimplyTestable\WorkerBundle\Services\WorkerService $workerService,
+            \webignition\Http\Client\Client $httpClient)
     {    
         parent::__construct($entityManager);
         
         $this->logger = $logger;
         $this->stateService = $stateService;
         $this->taskDriverFactoryService = $taskDriverFactoryService;
+        $this->urlService = $urlService;
+        $this->coreApplicationService = $coreApplicationService;
+        $this->workerService = $workerService;
+        $this->httpClient = $httpClient;
     }     
   
 
@@ -216,5 +256,54 @@ class TaskService extends EntityService {
         
         return $this->persistAndFlush($task);        
     }
+    
+    
+    /**
+     *
+     * @param Task $task
+     * @return boolean 
+     */
+    public function reportCompletion(Task $task) {        
+        $this->logger->info("TaskService::reportCompletion: Initialising");        
+        
+        if (!$task->getState()->equals($this->getCompletedState())) {            
+            $this->logger->info("TaskService::reportCompletion: Task is not completed, we can't report back just yet");
+            return true;
+        }
+        
+        $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/task/'.$this->workerService->get()->getHostname().'/'.$task->getId().'/complete/');
+        
+        $httpRequest = new \HttpRequest($requestUrl, HTTP_METH_POST);
+        $httpRequest->setPostFields(array(
+            'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
+            'output' => $task->getOutput()->getOutput()
+        ));        
+        
+        $this->logger->info("TaskService::reportCompletion: Reporting completion state to " . $requestUrl);
+        
+        try {
+            $response = $this->httpClient->getResponse($httpRequest);
+            
+            if ($this->httpClient instanceof \webignition\Http\Mock\Client\Client) {
+                $this->logger->info("TaskService::reportCompletion: response fixture path: " . $this->httpClient->getStoredResponseList()->getRequestFixturePath($httpRequest));
+            }            
+            
+            $this->logger->info("TaskService::reportCompletion: " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
+            
+            if ($response->getResponseCode() !== 200) {
+                $this->logger->warn("TaskService::reportCompletion: Completion reporting failed");
+                return false;
+            }
+            
+            $task->setNextState();        
+            $this->persistAndFlush($task);
+
+            return true;            
+            
+        } catch (CurlException $curlException) {
+            $this->logger->info("TaskService::reportCompletion: " . $requestUrl . ": " . $curlException->getMessage());            
+            return false;
+        }
+    }    
   
 }

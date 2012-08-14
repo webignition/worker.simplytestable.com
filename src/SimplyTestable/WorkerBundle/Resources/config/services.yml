@@ -44,6 +44,10 @@ services:
         logger: "@logger"
         stateService: "@simplytestable.services.stateservice"
         taskDriverFactoryService: "@simplytestable.services.taskdriverfactoryservice"
+        urlService: "@simplytestable.services.urlservice"
+        coreApplicationService: "@simplytestable.services.coreapplicationservice"
+        workerService: "@simplytestable.services.workerservice"
+        httpClient: "@simplytestable.services.httpClient"
 
   simplytestable.services.tasktypeservice:
     class:   SimplyTestable\WorkerBundle\Services\TaskTypeService
