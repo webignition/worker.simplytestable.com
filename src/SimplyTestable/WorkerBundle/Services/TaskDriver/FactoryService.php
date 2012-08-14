@@ -7,6 +7,7 @@ use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\StateService;
+use SimplyTestable\WorkerBundle\Services\WebResourceService;
 
 class FactoryService {
     
@@ -23,14 +24,27 @@ class FactoryService {
      */
     private $taskTypeService;
     
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Services\WebResourceService
+     */    
+    private $webResourceService;
+    
     
     /**
      *
      * @param type $engines
      * @param TaskTypeService $taskTypeService 
      */
-    public function __construct($drivers, TaskTypeService $taskTypeService, StateService $stateService) {
+    public function __construct(
+            $drivers,
+            TaskTypeService $taskTypeService,
+            StateService $stateService,
+            WebResourceService $webResourceService
+        ) {
+        
         $this->taskTypeService = $taskTypeService;
+        $this->webResourceService = $webResourceService;
         
         foreach ($drivers as $identifier => $properties) {
             /* @var $driver TaskDriver */
