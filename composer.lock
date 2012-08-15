@@ -1,5 +1,5 @@
 {
-    "hash": "b9fa369a9acefd41a896051c1c9e675e",
+    "hash": "29b7cc6e99d73cf207998395b9403e50",
     "packages": [
         {
             "package": "doctrine/common",
@@ -102,10 +102,10 @@
             "version": "1.1.0"
         },
         {
-            "package": "sensio/distribution-bundle",
+            "package": "querypath/QueryPath",
             "version": "dev-master",
-            "alias-pretty-version": "2.1.x-dev",
-            "alias-version": "2.1.9999999.9999999-dev"
+            "source-reference": "4f7e4ab5f540f128214c66e87bbf072ad7e146ef",
+            "commit-date": "1340643808"
         },
         {
             "package": "sensio/distribution-bundle",
@@ -142,12 +142,6 @@
             "version": "dev-master",
             "source-reference": "ec3a65d3eab342af9e93a3c21af0ac7b78e01c17",
             "commit-date": "1344507386"
-        },
-        {
-            "package": "symfony/monolog-bundle",
-            "version": "dev-master",
-            "alias-pretty-version": "2.1.x-dev",
-            "alias-version": "2.1.9999999.9999999-dev"
         },
         {
             "package": "symfony/monolog-bundle",
