@@ -27,7 +27,8 @@
         "webignition/url":"*",
         "webignition/json-pretty-print":"dev-master",
         "webignition/url":"*",
-        "glit/resque-bundle":"*"
+        "glit/resque-bundle":"*",
+        "webignition/internet-media-type":">=0.1,<2.0"
     },
     "scripts": {
         "post-install-cmd": [
