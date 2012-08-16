@@ -1,5 +1,5 @@
 {
-    "hash": "f330aae4bc8b707c91d25967ef3f31e0",
+    "hash": "3d0141d359fcc7ab94c4fe9c69e02cb2",
     "packages": [
         {
             "package": "doctrine/common",
@@ -211,7 +211,7 @@
         },
         {
             "package": "webignition/internet-media-type",
-            "version": "0.3"
+            "version": "0.4"
         },
         {
             "package": "webignition/json-pretty-print",
@@ -238,12 +238,16 @@
             "commit-date": "1342614896"
         },
         {
+            "package": "webignition/web-json-model",
+            "version": "0.1.1"
+        },
+        {
             "package": "webignition/web-page-model",
-            "version": "0.1"
+            "version": "0.2.1"
         },
         {
             "package": "webignition/web-resource-model",
-            "version": "0.2"
+            "version": "0.4"
         }
     ],
     "packages-dev": null,
