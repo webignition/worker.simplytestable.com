@@ -1,5 +1,7 @@
+glit_resque:
+  prefix: "SimplyTestable\WorkerBundle"
+
 parameters:
-  hostname: hydrogen.worker.simplytestable.com
   core_url: http://app.simplytestable.com
   drivers:
     html-validation:
@@ -13,6 +15,4 @@ parameters:
     text/html: webignition\WebResource\WebPage\WebPage
     application/xhtml+xml: webignition\WebResource\WebPage\WebPage
     application/json: webignition\WebResource\JsonDocument\JsonDocument
-  
-glit_resque:
-  prefix: "SimplyTestable\WorkerBundle"
+  hostname: hydrogen.worker.simplytestable.com
