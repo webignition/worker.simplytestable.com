@@ -8,6 +8,7 @@ use SimplyTestable\WorkerBundle\Entity\Task\Type\Type;
 class TaskTypeService extends EntityService {
     
     const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\Task\Type\Type';
+    const HTML_VALIDATION_NAME = 'HTML Validation';
     
     /**
      *
@@ -34,5 +35,10 @@ class TaskTypeService extends EntityService {
      */
     public function has($name) {
         return !is_null($this->fetch($name));
-    }   
+    }
+    
+    
+    public function getHtmlValidationTaskType() {
+        return $this->fetch(self::HTML_VALIDATION_NAME);
+    }
 }

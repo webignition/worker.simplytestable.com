@@ -2,8 +2,8 @@
 
 namespace SimplyTestable\WorkerBundle\Services;
 
-use SimplyTestable\WorkerBundle\Model\WebResource;
-use SimplyTestable\WorkerBundle\Model\WebPage;
+use webignition\WebResource\WebResource;
+use webignition\InternetMediaType\Parser\Parser as InternetMediaTypeParser;
 
 class WebResourceService {
     
@@ -15,29 +15,59 @@ class WebResourceService {
     
     
     /**
-     *
-     * @param \webignition\Http\Client\Client $httpClient
+     * Maps content types to WebResource subclasses
+     * 
+     * @var array
      */
-    public function __construct(
-            \webignition\Http\Client\Client $httpClient)
-    {    
-
-        $this->httpClient = $httpClient;
-    }  
+    private $contentTypeWebResourceMap = array();
     
     
     /**
      *
-     * @param string $url
-     * @return \SimplyTestable\WorkerBundle\Model\WebResource 
+     * @param \webignition\Http\Client\Client $httpClient
+     * @param array $contentTypeWebResourceMap
      */
-    public function get($url) {
-        $resource = new WebResource();
-        $resource->setContentType('text/plain');
-        $resource->setContent('');
-        $resource->setUrl($url);
+    public function __construct(
+            \webignition\Http\Client\Client $httpClient,
+            $contentTypeWebResourceMap)
+    {
+        $this->httpClient = $httpClient;
+        $this->httpClient->redirectHandler()->enable();        
+        
+        $this->contentTypeWebResourceMap = $contentTypeWebResourceMap;        
+    }
+    
+    
+    /**
+     *
+     * @param \HttpRequest $request
+     * @return \webignition\WebResource\WebResource 
+     */
+    public function get($request) {        
+        $response = $this->httpClient->getResponse($request);
+        
+        $mediaTypeParser = new InternetMediaTypeParser();
+        $contentType = $mediaTypeParser->parse($response->getHeader('content-type'));
+        
+        $webResourceClassName = $this->getWebResourceClassName($contentType->getTypeSubtypeString());
+
+        $resource = new $webResourceClassName;
+        $resource->setContent($response->getBody());
+        $resource->setContentType($response->getHeader('content-type'));
+        $resource->setUrl($request->getUrl());       
         
         return $resource;
+    }
+    
+
+    /**
+     * Get the WebResource subclass name for a given content type
+     * 
+     * @param string $contentType
+     * @return string
+     */
+    private function getWebResourceClassName($contentType) {
+        return (isset($this->contentTypeWebResourceMap[$contentType])) ? $this->contentTypeWebResourceMap[$contentType] : $this->contentTypeWebResourceMap['default'];
     }
     
 }

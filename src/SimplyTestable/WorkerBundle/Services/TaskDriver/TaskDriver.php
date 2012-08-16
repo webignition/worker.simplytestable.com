@@ -4,7 +4,9 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
+use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\StateService;
+use SimplyTestable\WorkerBundle\Services\WebResourceService;
 
 abstract class TaskDriver {
     
@@ -23,6 +25,47 @@ abstract class TaskDriver {
      */
     private $stateService;
     
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Services\WebResource\Service 
+     */    
+    private $webResourceService;
+    
+    
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Services\TaskTypeService
+     */    
+    private $taskTypeService;
+    
+    
+    /**
+     * Arbitrary properties to be used by a concrete implementation
+     * 
+     * @var array
+     */
+    private $properties;
+    
+    
+    /**
+     *
+     * @param array $properties 
+     */
+    public function setProperties($properties) {
+        $this->properties = $properties;
+    }
+    
+    
+    /**
+     *
+     * @param string $propertyName
+     * @return mixed
+     */
+    public function getProperty($propertyName) {
+        return (isset($this->properties[$propertyName])) ? $this->properties[$propertyName] : null;
+    }
+    
+    
     
     /**
      *
@@ -34,10 +77,45 @@ abstract class TaskDriver {
     
     
     /**
+     *
+     * @param WebResourceService $webResourceService 
+     */
+    public function setWebResourceService(WebResourceService $webResourceService) {
+        $this->webResourceService = $webResourceService;
+    } 
+    
+    
+    /**
+     *
+     * @param TaskTypeService $taskTypeService 
+     */
+    public function setTaskTypeService(TaskTypeService $taskTypeService) {
+        $this->taskTypeService = $taskTypeService;
+    }    
+    
+    
+    /**
+     * @return \SimplyTestable\WorkerBundle\Services\WebResourceService
+     */
+    public function getWebResourceService() {
+        return $this->webResourceService;
+    }
+    
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Services\TaskTypeService 
+     */
+    public function getTaskTypeService() {
+        return $this->taskTypeService;
+    }
+    
+    
+    /**
      * @param Task $task
      * @return \SimplyTestable\WorkerBundle\Entity\Task\Output 
      */
-    public function perform(Task $task) {
+    public function perform(Task $task) {        
         $rawOutput = $this->execute($task);
         $output = new \SimplyTestable\WorkerBundle\Entity\Task\Output();
         $output->setOutput($rawOutput);

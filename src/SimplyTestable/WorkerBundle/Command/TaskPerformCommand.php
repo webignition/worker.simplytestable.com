@@ -39,7 +39,7 @@ EOF
             }            
         }
         
-        $task = $this->getTaskService()->getById($input->getArgument('id'));                
+        $task = $this->getTaskService()->getById($input->getArgument('id'));
         
         if ($this->getTaskService()->perform($task) === false) {
             throw new \LogicException('Task execution failed, check log for details');
@@ -61,14 +61,5 @@ EOF
      */
     private function getTaskService() {
         return $this->getContainer()->get('simplytestable.services.taskservice');
-    }    
-    
-    
-    /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService
-     */
-    private function getTaskDriverFactoryService() {
-        return $this->getContainer()->get('simplytestable.services.taskdriverfactoryservice');
     }
 }

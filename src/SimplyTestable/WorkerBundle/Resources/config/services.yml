@@ -60,7 +60,7 @@ services:
         drivers: %drivers%        
         taskTypeService: "@simplytestable.services.tasktypeservice"
         stateService: "@simplytestable.services.stateservice"
-        webResourceService: "@simplytestable.services.webresourceservice"
+        webResourceService: "@simplytestable.services.webresourceservice"        
         
   simplytestable.services.resqueQueueService:
     class:   SimplyTestable\WorkerBundle\Services\ResqueQueueService
@@ -72,3 +72,4 @@ services:
     class:   SimplyTestable\WorkerBundle\Services\WebResourceService
     arguments:
         httpClient: "@simplytestable.services.httpClient"
+        contentTypeWebResourceMap: %content_type_web_resource_map%

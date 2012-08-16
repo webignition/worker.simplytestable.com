@@ -5,9 +5,11 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
+use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\WebResourceService;
+use SimplyTestable\WorkerBundle\Services\HttpServiceInterface;
 
 class FactoryService {
     
@@ -24,12 +26,6 @@ class FactoryService {
      */
     private $taskTypeService;
     
-    /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\WebResourceService
-     */    
-    private $webResourceService;
-    
     
     /**
      *
@@ -43,13 +39,18 @@ class FactoryService {
             WebResourceService $webResourceService
         ) {
         
-        $this->taskTypeService = $taskTypeService;
-        $this->webResourceService = $webResourceService;
+        $this->taskTypeService = $taskTypeService;        
         
         foreach ($drivers as $identifier => $properties) {
             /* @var $driver TaskDriver */
             $driver = new $properties['class'];
             $driver->setStateService($stateService);
+            $driver->setWebResourceService($webResourceService);
+            $driver->setTaskTypeService($taskTypeService);
+            
+            if (isset($properties['properties'])) {
+                $driver->setProperties($properties['properties']);
+            }
             
             foreach ($properties['task-types'] as $taskTypeName) {
                 $driver->addTaskType($this->taskTypeService->fetch($taskTypeName));                
