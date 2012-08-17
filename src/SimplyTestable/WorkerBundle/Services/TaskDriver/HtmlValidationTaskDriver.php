@@ -72,7 +72,9 @@ class HtmlValidationTaskDriver extends TaskDriver {
         $outputObjectMessage = new \stdClass;
         
         foreach ($requiredProperties as $requiredPropertyName) {
-            $outputObjectMessage->$requiredPropertyName = $validationMessageObject->$requiredPropertyName;
+            if (isset($validationMessageObject->$requiredPropertyName)) {
+                $outputObjectMessage->$requiredPropertyName = $validationMessageObject->$requiredPropertyName;
+            }
         }
         
         return $outputObjectMessage;
