@@ -1,1 +1,4 @@
   hostname: hydrogen.ci.worker.simplytestable.com
+
+glit_resque:
+  prefix: "SimplyTestable\WorkerBundle\Hydrogen"

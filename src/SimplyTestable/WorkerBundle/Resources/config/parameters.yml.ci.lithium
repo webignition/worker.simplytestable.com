@@ -1,1 +1,4 @@
   hostname: lithium.ci.worker.simplytestable.com
+
+glit_resque:
+  prefix: "SimplyTestable\WorkerBundle\Lithium"
