@@ -40,6 +40,7 @@ EOF
         }
         
         $task = $this->getTaskService()->getById($input->getArgument('id'));
+        $this->getContainer()->get('logger')->info("TaskPerformCommand::execute: [".$task->getId()."] [".$task->getState()->getName()."]");
         
         if ($this->getTaskService()->perform($task) === false) {
             throw new \LogicException('Task execution failed, check log for details');

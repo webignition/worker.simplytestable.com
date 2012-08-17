@@ -208,7 +208,7 @@ class TaskService extends EntityService {
      * @return boolean 
      */
     public function perform(Task $task) {        
-        $this->logger->info("TaskService::perform: [".$task->getId()."] Initialising");        
+        $this->logger->info("TaskService::perform: [".$task->getId()."] [".$task->getState()->getName()."] Initialising");        
         
         if (!$task->getState()->equals($this->getStartingState())) {            
             $this->logger->info("TaskService::perform: [".$task->getId()."] Task state is [".$task->getState()->getName()."] and cannot be performed");
