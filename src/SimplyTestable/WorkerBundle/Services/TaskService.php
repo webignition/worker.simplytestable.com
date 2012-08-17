@@ -204,10 +204,10 @@ class TaskService extends EntityService {
      * @return boolean 
      */
     public function perform(Task $task) {        
-        $this->logger->info("TaskService::perform: Initialising");        
+        $this->logger->info("TaskService::perform: Initialising [".$task->getId()."]");        
         
         if (!$task->getState()->equals($this->getStartingState())) {            
-            $this->logger->info("TaskService::perform: Task is not queued and cannot be performed");
+            $this->logger->info("TaskService::perform: Task state is [".$task->getState()->getName()."] and cannot be performed");
             return true;
         }           
         
@@ -264,10 +264,10 @@ class TaskService extends EntityService {
      * @return boolean 
      */
     public function reportCompletion(Task $task) {        
-        $this->logger->info("TaskService::reportCompletion: Initialising");        
+        $this->logger->info("TaskService::reportCompletion: Initialising [".$task->getId()."]");        
         
         if (!$task->getState()->equals($this->getCompletedState())) {            
-            $this->logger->info("TaskService::reportCompletion: Task is not completed, we can't report back just yet");
+            $this->logger->info("TaskService::reportCompletion: Task state is [".$task->getState()->getName()."], we can't report back just yet");
             return true;
         }
         
