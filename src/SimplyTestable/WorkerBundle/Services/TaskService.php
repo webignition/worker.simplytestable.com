@@ -122,7 +122,11 @@ class TaskService extends EntityService {
             return $this->fetch($task);
         }
         
-        return $this->persistAndFlush($task);
+        $task = $this->persistAndFlush($task);
+        
+        $this->logger->info("TaskService::reportCompletion: Created [".$task->getId()."]");
+        
+        return $task;
     }
     
     
