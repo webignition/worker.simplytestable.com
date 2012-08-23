@@ -40,6 +40,18 @@ class HtmlValidationTaskDriver extends TaskDriver {
     
     /**
      *
+     * @return \webignition\InternetMediaType\InternetMediaType 
+     */
+    protected function getOutputContentType()
+    {
+        $mediaTypeParser = new \webignition\InternetMediaType\Parser\Parser();
+        return $mediaTypeParser->parse('application/json');
+    }
+
+
+    
+    /**
+     *
      * @param \stdClass $validationResponseObject
      * @return \stdClass 
      */

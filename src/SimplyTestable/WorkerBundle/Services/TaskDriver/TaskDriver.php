@@ -119,6 +119,7 @@ abstract class TaskDriver {
         $rawOutput = $this->execute($task);
         $output = new \SimplyTestable\WorkerBundle\Entity\Task\Output();
         $output->setOutput($rawOutput);
+        $output->setContentType($this->getOutputContentType());
         $output->setState($this->stateService->fetch(self::OUTPUT_STARTING_STATE));
         
         return $output;
@@ -129,6 +130,12 @@ abstract class TaskDriver {
      * @return string 
      */
     abstract protected function execute(Task $task);
+    
+    
+    /**
+     * @return \webignition\InternetMediaType\InternetMediaType
+     */
+    abstract protected function getOutputContentType();
 
 
     

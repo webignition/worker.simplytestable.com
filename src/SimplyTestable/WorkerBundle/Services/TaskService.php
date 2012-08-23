@@ -280,7 +280,8 @@ class TaskService extends EntityService {
         $httpRequest = new \HttpRequest($requestUrl, HTTP_METH_POST);
         $httpRequest->setPostFields(array(
             'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
-            'output' => $task->getOutput()->getOutput()
+            'output' => $task->getOutput()->getOutput(),
+            'contentType' => (string)$task->getOutput()->getContentType()
         ));        
         
         $this->logger->info("TaskService::reportCompletion: Reporting completion state to " . $requestUrl);
