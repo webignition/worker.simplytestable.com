@@ -210,8 +210,8 @@ class TaskService extends EntityService {
      */
     public function getCancelledState() {
         return $this->stateService->fetch(self::TASK_CANCELLED_STATE);
-    }     
-    
+    }   
+
     
     /**
      *
@@ -221,7 +221,7 @@ class TaskService extends EntityService {
     public function perform(Task $task) {        
         $this->logger->info("TaskService::perform: [".$task->getId()."] [".$task->getState()->getName()."] Initialising");        
         
-        if (!$task->getState()->equals($this->getStartingState())) {            
+        if (!$this->isQueued($task)) {
             $this->logger->info("TaskService::perform: [".$task->getId()."] Task state is [".$task->getState()->getName()."] and cannot be performed");
             return true;
         }           
@@ -278,15 +278,45 @@ class TaskService extends EntityService {
      * @return Task 
      */
     public function cancel(Task $task) {
-        if ($task->getState()->equals($this->getCompletedState())) {
+        if ($this->isCancelled($task)) {
             return $task;
         }
         
-        if ($task->getState()->equals($this->getCancelledState())) {
+        if  ($this->isCompleted($task)) {
             return $task;
         }
         
         return $this->finish($task, $this->getCancelledState());
+    }
+    
+    
+    /**
+     *
+     * @param Task $task
+     * @return boolean 
+     */
+    private function isCancelled(Task $task) {
+        return $task->getState()->equals($this->getCancelledState());
+    }
+    
+    
+    /**
+     *
+     * @param Task $task
+     * @return boolean 
+     */
+    private function isCompleted(Task $task) {
+        return $task->getState()->equals($this->getCompletedState());
+    }
+        
+
+    /**
+     *
+     * @param Task $task
+     * @return boolean 
+     */
+    private function isQueued(Task $task) {
+        return $task->getState()->equals($this->getStartingState());
     }
     
     
@@ -310,7 +340,7 @@ class TaskService extends EntityService {
     public function reportCompletion(Task $task) {        
         $this->logger->info("TaskService::reportCompletion: Initialising [".$task->getId()."]");        
         
-        if (!$task->getState()->equals($this->getCompletedState())) {            
+        if (!$this->isCompleted($task)) {
             $this->logger->info("TaskService::reportCompletion: Task state is [".$task->getState()->getName()."], we can't report back just yet");
             return true;
         }
