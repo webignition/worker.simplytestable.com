@@ -297,7 +297,7 @@ class TaskService extends EntityService {
      * @return Task 
      */
     private function finish(Task $task, State $state) {
-        $task->setState();
+        $task->setState($state);
         return $this->persistAndFlush($task);
     }
     
