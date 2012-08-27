@@ -14,21 +14,25 @@ class TaskController extends BaseController
             'createAction' => new InputDefinition(array(
                 new InputArgument('type', InputArgument::REQUIRED, 'Name of task type, case insensitive'),
                 new InputArgument('url', InputArgument::REQUIRED, 'URL of web page against which the task is to be performed')
-            ))
+            )),
+            'cancelAction' => new InputDefinition(array(
+                new InputArgument('id', InputArgument::REQUIRED, 'ID of task to be cancelled')
+            ))            
         ));
         
         $this->setRequestTypes(array(
-            'createAction' => HTTP_METH_POST
+            'createAction' => HTTP_METH_POST,
+            'cancelAction' => HTTP_METH_POST            
         ));
     }    
     
     public function createAction()
     {        
-        if (!$this->getTaskTypeService()->has($this->getArguments('activateAction')->get('type'))) {
+        if (!$this->getTaskTypeService()->has($this->getArguments('createAction')->get('type'))) {
             throw new \Symfony\Component\HttpKernel\Exception\HttpException(400);
         }  
         
-        $taskType = $this->getTaskTypeService()->fetch($this->getArguments('activateAction')->get('type'));
+        $taskType = $this->getTaskTypeService()->fetch($this->getArguments('createAction')->get('type'));
         
         $task = $this->getTaskService()->create(
             $this->getArguments('activateAction')->get('url'),
@@ -44,6 +48,19 @@ class TaskController extends BaseController
         );
         
         return $this->sendResponse($task);
+    }
+    
+    
+    public function cancelAction()
+    {
+        if (!$this->getTaskTypeService()->has($this->getArguments('cancelAction')->get('type'))) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(400);
+        }
+        
+        $task = $this->getTaskService()->getById($this->getArguments('cancelAction')->get('id'));
+        $this->getTaskService()->cancel($task);
+        
+        return $this->sendResponse($task);        
     }
     
     
