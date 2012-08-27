@@ -14,6 +14,7 @@ class TaskService extends EntityService {
     const TASK_STARTING_STATE = 'task-queued';
     const TASK_IN_PROGRESS_STATE = 'task-in-progress';
     const TASK_COMPLETED_STATE = 'task-completed';
+    const TASK_CANCELLED_STATE = 'task-cancelled';
     
     /**
      *
@@ -204,6 +205,15 @@ class TaskService extends EntityService {
     
     /**
      *
+     * @return \SimplyTestable\WorkerBundle\Entity\State 
+     */
+    public function getCancelledState() {
+        return $this->stateService->fetch(self::TASK_CANCELLED_STATE);
+    }     
+    
+    
+    /**
+     *
      * @param Task $task
      * @return boolean 
      */
@@ -256,9 +266,30 @@ class TaskService extends EntityService {
     private function complete(Task $task, TaskOutput $output) {
         $task->getTimePeriod()->setEndDateTime(new \DateTime());
         $task->setOutput($output);
-        $task->setState($this->getCompletedState());
         
-        return $this->persistAndFlush($task);        
+        return $this->finish($task, $this->getCompletedState());     
+    }
+    
+    
+    /**
+     *
+     * @param Task $task
+     * @return Task 
+     */
+    public function cancel(Task $task) {
+        return $this->finish($task, $this->getCancelledState());
+    }
+    
+    
+    /**
+     *
+     * @param Task $task
+     * @param State $state
+     * @return Task 
+     */
+    private function finish(Task $task, State $state) {
+        $task->setState();
+        return $this->persistAndFlush($task);
     }
     
     
