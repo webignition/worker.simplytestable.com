@@ -3,6 +3,7 @@ namespace SimplyTestable\WorkerBundle\Services;
 
 use Doctrine\ORM\EntityManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Entity\State;
 use SimplyTestable\WorkerBundle\Entity\Task\Output as TaskOutput;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
