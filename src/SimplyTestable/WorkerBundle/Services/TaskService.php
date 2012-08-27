@@ -277,6 +277,14 @@ class TaskService extends EntityService {
      * @return Task 
      */
     public function cancel(Task $task) {
+        if ($task->getState()->equals($this->getCompletedState())) {
+            return $task;
+        }
+        
+        if ($task->getState()->equals($this->getCancelledState())) {
+            return $task;
+        }
+        
         return $this->finish($task, $this->getCancelledState());
     }
     
