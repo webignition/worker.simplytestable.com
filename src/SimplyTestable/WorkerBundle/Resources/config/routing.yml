@@ -8,7 +8,7 @@ SimplyTestableWorkerBundle_task_create:
     
 SimplyTestableWorkerBundle_task_create:
     pattern:  /task/cancel/
-    defaults: { _controller: SimplyTestableWorkerBundle:Task:create, _format: json }
+    defaults: { _controller: SimplyTestableWorkerBundle:Task:cancel, _format: json }
 
 SimplyTestableWorkerBundle_homepage:
     pattern:  /hello/{name}
