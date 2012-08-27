@@ -13,6 +13,11 @@ class Version20120809165436_create_task_states extends EntityModificationMigrati
 {
     public function postUp(Schema $schema)
     {
+        $state_cancelled = new State();
+        $state_cancelled->setName('task-cancelled');        
+        $this->getEntityManager()->persist($state_cancelled);
+        $this->getEntityManager()->flush();        
+        
         $state_completed = new State();
         $state_completed->setName('task-completed');        
         $this->getEntityManager()->persist($state_completed);
@@ -36,7 +41,8 @@ class Version20120809165436_create_task_states extends EntityModificationMigrati
         $stateNames = array(
             'task-queued',
             'task-in-progress',
-            'task-completed'
+            'task-completed',
+            'task-cancelled'            
         );
         
         foreach ($stateNames as $stateName) {
