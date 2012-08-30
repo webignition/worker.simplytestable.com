@@ -8,6 +8,7 @@ use JMS\SerializerBundle\Annotation as SerializerAnnotation;
 /**
  * 
  * @ORM\Entity
+ * @SerializerAnnotation\ExclusionPolicy("all")
  */
 class ThisWorker
 {    
@@ -27,6 +28,7 @@ class ThisWorker
      * @var string
      * 
      * @ORM\Column(type="string", unique=true, nullable=false)
+     * @SerializerAnnotation\Expose
      */
     protected $hostname;
     
@@ -39,6 +41,7 @@ class ThisWorker
      * @ORM\JoinColumn(name="state_id", referencedColumnName="id", nullable=false)
      * 
      * @SerializerAnnotation\Accessor(getter="getPublicSerializedState")
+     * @SerializerAnnotation\Expose
      */    
     protected $state;
     
@@ -139,4 +142,12 @@ class ThisWorker
         $this->state = $this->getState()->getNextState();
         return $this;
     }    
+    
+    /**
+     *
+     * @return string
+     */
+    public function getPublicSerializedState() {
+        return str_replace('worker-', '', (string)$this->getState());
+    }     
 }
