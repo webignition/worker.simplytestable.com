@@ -53,6 +53,13 @@ class TaskController extends BaseController
     
     public function cancelAction()
     {
+        ob_start();
+        var_dump($_GET);
+        $test = ob_get_contents();
+        ob_end_clean();
+        
+        $this->get('logger')->info('TaskController::cancelAction: ' . $test);
+        
         if (!$this->getTaskTypeService()->has($this->getArguments('cancelAction')->get('id'))) {
             throw new \Symfony\Component\HttpKernel\Exception\HttpException(400);
         }
