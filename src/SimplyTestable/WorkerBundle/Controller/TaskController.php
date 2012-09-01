@@ -17,12 +17,17 @@ class TaskController extends BaseController
             )),
             'cancelAction' => new InputDefinition(array(
                 new InputArgument('id', InputArgument::REQUIRED, 'ID of task to be cancelled')
-            ))            
+            )),
+            'cancelCollectionAction' => new InputDefinition(array(
+                new InputArgument('ids', InputArgument::REQUIRED, 'IDs of tasks to be cancelled')
+            ))  
+            
         ));
         
         $this->setRequestTypes(array(
             'createAction' => HTTP_METH_POST,
-            'cancelAction' => HTTP_METH_POST            
+            'cancelAction' => HTTP_METH_POST,
+            'cancelCollectionAction' => HTTP_METH_POST   
         ));
     }    
     
@@ -61,6 +66,21 @@ class TaskController extends BaseController
         $this->getTaskService()->cancel($task);        
         return $this->sendResponse($task);
     }
+    
+    public function cancelCollectionAction()
+    {
+        $taskIds = explode(',', $this->getArguments('cancelCollectionAction')->get('ids'));
+        foreach ($taskIds as $taskId) {
+            $task = $this->getTaskService()->getById($taskId);
+            if (!is_null($task)) {
+                $this->getTaskService()->cancel($task);
+            }                          
+        }
+        
+        return $this->sendSuccessResponse();
+    }
+    
+    
     
     
     /**

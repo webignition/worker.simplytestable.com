@@ -10,6 +10,10 @@ SimplyTestableWorkerBundle_task_cancel:
     pattern:  /task/cancel/
     defaults: { _controller: SimplyTestableWorkerBundle:Task:cancel, _format: json }
     
+SimplyTestableWorkerBundle_task_cancel_collection:
+    pattern:  /task/cancel/collection/
+    defaults: { _controller: SimplyTestableWorkerBundle:Task:cancelCollection, _format: json }    
+    
 SimplyTestableWorkerBundle_status:
     pattern:  /status/
     defaults: { _controller: SimplyTestableWorkerBundle:Status:index, _format: json }    
