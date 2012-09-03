@@ -1,5 +1,5 @@
 glit_resque:
-  prefix: "SimplyTestable\WorkerBundle"
+  prefix: "SimplyTestable\WorkerBundle"    
 
 parameters:
   core_url: http://app.simplytestable.com
@@ -18,4 +18,5 @@ parameters:
   resque-job-class-map:
     "task-perform": "SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob"
     "task-report-completion": "SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob"  
+  resque_pid: "simplytestable_workerbundle"
   hostname: hydrogen.worker.simplytestable.com  
