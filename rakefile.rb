@@ -1,6 +1,7 @@
 task :default do  
   commands = [
     "git pull",
+    "composer.phar install",
     "rm -Rf app/cache/prod/*",
     "export SYMFONY_ENV=prod && php app/console assets:install web",
     "export SYMFONY_ENV=prod && php app/console cache:warmup"
