@@ -66,11 +66,8 @@ abstract class BaseController extends Controller
             return $response;            
         }
         
-        $output = $this->container->get('serializer')->serialize($object, 'json');   
-        $formatter = new \webignition\JsonPrettyPrinter\JsonPrettyPrinter(); 
-        
         $response = new Response($formatter->format($output)); 
-        $response->setStatusCode($statusCode);
+        $response->setStatusCode($this->container->get('serializer')->serialize($object, 'json'));
         
         return $response;
     }
