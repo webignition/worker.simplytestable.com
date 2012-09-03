@@ -66,10 +66,17 @@ services:
     class:   SimplyTestable\WorkerBundle\Services\ResqueQueueService
     arguments:
       queueManager: "@glit_resque.queue_manager"
-      logger: "@logger"        
+      logger: "@logger"     
+      resqueJobFactoryService: "@simplytestable.services.ResqueJobFactoryService"
+      resquePrefix: "%glit_resque.prefix%"      
       
   simplytestable.services.webresourceservice:
     class:   SimplyTestable\WorkerBundle\Services\WebResourceService
     arguments:
         httpClient: "@simplytestable.services.httpClient"
         contentTypeWebResourceMap: %content_type_web_resource_map%
+        
+  simplytestable.services.ResqueJobFactoryService:
+    class:  SimplyTestable\ApiBundle\Services\ResqueJobFactoryService
+    arguments:
+      jobClassMap: "%resque-job-class-map%"        

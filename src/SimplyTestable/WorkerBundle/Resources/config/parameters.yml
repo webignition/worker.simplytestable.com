@@ -15,4 +15,7 @@ parameters:
     text/html: webignition\WebResource\WebPage\WebPage
     application/xhtml+xml: webignition\WebResource\WebPage\WebPage
     application/json: webignition\WebResource\JsonDocument\JsonDocument
-  hostname: hydrogen.worker.simplytestable.com
+  resque-job-class-map:
+    "task-perform": "SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob"
+    "task-report-completion": "SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob"  
+  hostname: hydrogen.worker.simplytestable.com  

@@ -1,3 +1,21 @@
+glit_resque:
+  prefix: "SimplyTestable\WorkerBundle"
+
 parameters:
-  hostname: hydrogen.worker.simplytestable.com
   core_url: http://app.simplytestable.com
+  drivers:
+    html-validation:
+      class: SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver
+      task-types:
+        - "HTML validation"
+      properties:
+        validator-url: http://%hostname%/w3c-validator/check
+  content_type_web_resource_map:
+    default: webignition\WebResource\WebResource
+    text/html: webignition\WebResource\WebPage\WebPage
+    application/xhtml+xml: webignition\WebResource\WebPage\WebPage
+    application/json: webignition\WebResource\JsonDocument\JsonDocument
+  resque-job-class-map:
+    "task-perform": "SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob"
+    "task-report-completion": "SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob"  
+  hostname: hydrogen.worker.simplytestable.com  
