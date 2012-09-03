@@ -18,5 +18,5 @@ parameters:
   resque-job-class-map:
     "task-perform": "SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob"
     "task-report-completion": "SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob"  
-  resque_pid: "simplytestable_workerbundle"
+  resque_pid: "simplytestable_workerbundle_hydrogen"
   hostname: hydrogen.worker.simplytestable.com  
