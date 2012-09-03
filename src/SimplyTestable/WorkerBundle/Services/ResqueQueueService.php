@@ -31,7 +31,7 @@ class ResqueQueueService {
     
     /**
      *
-     * @var \SimplyTestable\ApiBundle\Services\ResqueJobFactoryService 
+     * @var \SimplyTestable\WorkerBundle\Services\ResqueJobFactoryService 
      */
     private $resqueJobFactoryService;
     
@@ -53,7 +53,7 @@ class ResqueQueueService {
     public function __construct(
             \Glit\ResqueBundle\Resque\Queue $queueManager,
             \Symfony\Component\HttpKernel\Log\LoggerInterface $logger,
-            \SimplyTestable\ApiBundle\Services\ResqueJobFactoryService $resqueJobFactoryService,
+            \SimplyTestable\WorkerBundle\Services\ResqueJobFactoryService $resqueJobFactoryService,
             $resquePrefix
             
     ) {
