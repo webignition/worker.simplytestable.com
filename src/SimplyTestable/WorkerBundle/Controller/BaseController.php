@@ -66,8 +66,8 @@ abstract class BaseController extends Controller
             return $response;            
         }
         
-        $response = new Response($formatter->format($output)); 
-        $response->setStatusCode($this->container->get('serializer')->serialize($object, 'json'));
+        $response = new Response($this->container->get('serializer')->serialize($object, 'json')); 
+        $response->setStatusCode($statusCode);
         
         return $response;
     }
