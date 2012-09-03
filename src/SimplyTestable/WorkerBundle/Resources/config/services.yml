@@ -77,6 +77,6 @@ services:
         contentTypeWebResourceMap: %content_type_web_resource_map%
         
   simplytestable.services.ResqueJobFactoryService:
-    class:  SimplyTestable\ApiBundle\Services\ResqueJobFactoryService
+    class:  SimplyTestable\WorkerBundle\Services\ResqueJobFactoryService
     arguments:
       jobClassMap: "%resque-job-class-map%"        
