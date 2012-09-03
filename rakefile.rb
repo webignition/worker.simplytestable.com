@@ -1,13 +1,25 @@
+require 'fileutils'
+
 task :default do  
-  commands = [
+  get_composer  
+  run_commands([
     "git pull",
-    "composer.phar install",
-    "rm -Rf app/cache/prod/*",
-    "export SYMFONY_ENV=prod && php app/console assets:install web",
+    "export SYMFONY_ENV=prod && ./composer.phar install",
+    "rm -Rf app/cache/prod/*",    
     "export SYMFONY_ENV=prod && php app/console cache:warmup"
-  ]
-  
-  run_commands(commands)
+  ])
+end
+
+def get_composer
+  if File.file?("composer.phar")
+    run_commands([
+        "./composer.phar self-update"
+    ])
+  else
+    run_commands([
+        "curl -s https://getcomposer.org/installer | php"
+    ])
+  end
 end
 
 def run_commands(commands)
