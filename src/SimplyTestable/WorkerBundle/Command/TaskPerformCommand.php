@@ -47,7 +47,6 @@ EOF
         }
         
         $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(
-            'SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob',
             'task-report-completion',
             array(
                 'id' => $task->getId()
