@@ -7,6 +7,7 @@ vendor
 composer.phar
 app/config/parameters.yml
 src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
+/bin
 
 # IDE meta
 /nbproject
