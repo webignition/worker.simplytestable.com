@@ -9,6 +9,8 @@ use webignition\WebResource\JsonDocument\JsonDocument;
 
 class HtmlValidationTaskDriver extends TaskDriver {
     
+    const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
+    
     public function execute(Task $task) {
         if (!$task->getType()->equals($this->getTaskTypeService()->getHtmlValidationTaskType())) {
             return false;
@@ -16,28 +18,23 @@ class HtmlValidationTaskDriver extends TaskDriver {
         
         $resourceRequest = new \HttpRequest($task->getUrl(), HTTP_METH_GET);
         
-        $this->getLogger()->info('HtmlValidationTaskDriver: validating ['.$task->getUrl().']');
-        
         /* @var $webResource WebPage */
         $webResource = $this->getWebResourceService()->get($resourceRequest);
         if (!$webResource instanceof WebPage) {
             return false;
         }
         
-        $this->getLogger()->info('HtmlValidationTaskDriver: fragment to validate ['.$webResource->getContent().']');
-        $this->getLogger()->info('HtmlValidationTaskDriver: charset ['.$webResource->getCharacterEncoding().']'); 
+        $characterEncoding = ($webResource->getIsDocumentCharacterEncodingValid()) ? $webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;
         
         $validationRequest = new \HttpRequest($this->getProperty('validator-url'), HTTP_METH_POST);
         $validationRequest->setPostFields(array(
             'fragment' => $webResource->getContent(),
-            'charset' => $webResource->getCharacterEncoding(),
+            'charset' => $characterEncoding,
             'output' => 'json'
         ));
         
         /* @var $validationResponse JsonDocument */
         $validationResponse = $this->getWebResourceService()->get($validationRequest);
-        
-        $this->getLogger()->info('HtmlValidationTaskDriver: validationResponse type ['.get_class($validationResponse).']'); 
         
         $outputObject = $this->getOutputOject($validationResponse->getContentObject());
         

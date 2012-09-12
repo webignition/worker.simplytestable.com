@@ -37,7 +37,8 @@ class FactoryService {
             $drivers,
             TaskTypeService $taskTypeService,
             StateService $stateService,
-            WebResourceService $webResourceService
+            WebResourceService $webResourceService,
+            Logger $logger
         ) {
         
         $this->taskTypeService = $taskTypeService;        
@@ -48,6 +49,7 @@ class FactoryService {
             $driver->setStateService($stateService);
             $driver->setWebResourceService($webResourceService);
             $driver->setTaskTypeService($taskTypeService);
+            $driver->setLogger($logger);
             
             if (isset($properties['properties'])) {
                 $driver->setProperties($properties['properties']);
