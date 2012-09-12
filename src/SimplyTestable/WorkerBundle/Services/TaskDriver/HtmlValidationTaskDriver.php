@@ -16,11 +16,16 @@ class HtmlValidationTaskDriver extends TaskDriver {
         
         $resourceRequest = new \HttpRequest($task->getUrl(), HTTP_METH_GET);
         
+        $this->getLogger()->info('HtmlValidationTaskDriver: validating ['.$task->getUrl().']');
+        
         /* @var $webResource WebPage */
         $webResource = $this->getWebResourceService()->get($resourceRequest);
         if (!$webResource instanceof WebPage) {
             return false;
-        }        
+        }
+        
+        $this->getLogger()->info('HtmlValidationTaskDriver: fragment to validate ['.$webResource->getContent().']');
+        $this->getLogger()->info('HtmlValidationTaskDriver: charset ['.$webResource->getCharacterEncoding().']'); 
         
         $validationRequest = new \HttpRequest($this->getProperty('validator-url'), HTTP_METH_POST);
         $validationRequest->setPostFields(array(
@@ -31,6 +36,8 @@ class HtmlValidationTaskDriver extends TaskDriver {
         
         /* @var $validationResponse JsonDocument */
         $validationResponse = $this->getWebResourceService()->get($validationRequest);
+        
+        $this->getLogger()->info('HtmlValidationTaskDriver: validationResponse type ['.get_class($validationResponse).']'); 
         
         $outputObject = $this->getOutputOject($validationResponse->getContentObject());
         

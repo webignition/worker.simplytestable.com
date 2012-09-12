@@ -7,6 +7,7 @@ use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\WebResourceService;
+use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
 
 abstract class TaskDriver {
     
@@ -37,6 +38,12 @@ abstract class TaskDriver {
      * @var \SimplyTestable\WorkerBundle\Services\TaskTypeService
      */    
     private $taskTypeService;
+    
+    /**
+     *
+     * @var Logger 
+     */
+    private $logger;
     
     
     /**
@@ -108,6 +115,23 @@ abstract class TaskDriver {
      */
     public function getTaskTypeService() {
         return $this->taskTypeService;
+    }
+    
+    
+    /**
+     *
+     * @param Logger $logger 
+     */
+    public function setLogger(Logger $logger) {
+        $this->logger = $logger;
+    }
+    
+    /**
+     *
+     * @return Logger
+     */
+    public function getLogger() {
+        return $this->logger;
     }
     
     

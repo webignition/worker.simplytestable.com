@@ -10,6 +10,7 @@ use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\WebResourceService;
 use SimplyTestable\WorkerBundle\Services\HttpServiceInterface;
+use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
 
 class FactoryService {
     
