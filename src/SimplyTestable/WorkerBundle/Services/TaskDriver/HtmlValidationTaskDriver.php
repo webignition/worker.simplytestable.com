@@ -24,15 +24,21 @@ class HtmlValidationTaskDriver extends TaskDriver {
             return false;
         }
         
-        $characterEncoding = ($webResource->getIsDocumentCharacterEncodingValid()) ? $webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;
+        $characterEncoding = ($webResource->getIsDocumentCharacterEncodingValid()) ? $webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;                
         
         $validationRequest = new \HttpRequest($this->getProperty('validator-url'), HTTP_METH_POST);
-        $validationRequest->setPostFields(array(
-            'fragment' => $webResource->getContent(),
-            'charset' => $characterEncoding,
-            'output' => 'json'
-        ));
         
+        $requestPostFields = array(
+            'fragment' => $webResource->getContent(),
+            'output' => 'json'
+        );
+        
+        if (!is_null($characterEncoding)) {
+            $requestPostFields['charset'] = $characterEncoding;
+        }
+        
+        $validationRequest->setPostFields($requestPostFields);
+
         /* @var $validationResponse JsonDocument */
         $validationResponse = $this->getWebResourceService()->get($validationRequest);
         
