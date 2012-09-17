@@ -224,5 +224,13 @@ class Task
         }        
         
         return $this;
-    }   
+    }  
+    
+    /**
+     *
+     * @return boolean
+     */
+    public function hasOutput() {
+        return !is_null($this->output);
+    }
 }

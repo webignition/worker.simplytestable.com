@@ -352,8 +352,7 @@ class TaskService extends EntityService {
      */
     private function isCompleted(Task $task) {
         return $task->getState()->equals($this->getCompletedState());
-    }
-        
+    }        
 
     /**
      *
@@ -385,7 +384,7 @@ class TaskService extends EntityService {
     public function reportCompletion(Task $task) {        
         $this->logger->info("TaskService::reportCompletion: Initialising [".$task->getId()."]");        
         
-        if (!$this->isCompleted($task)) {
+        if (!$task->hasOutput()) {
             $this->logger->info("TaskService::reportCompletion: Task state is [".$task->getState()->getName()."], we can't report back just yet");
             return true;
         }
@@ -396,7 +395,8 @@ class TaskService extends EntityService {
         $httpRequest->setPostFields(array(
             'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
             'output' => $task->getOutput()->getOutput(),
-            'contentType' => (string)$task->getOutput()->getContentType()
+            'contentType' => (string)$task->getOutput()->getContentType(),
+            'state' => $task->getState()->getName()
         ));        
         
         $this->logger->info("TaskService::reportCompletion: Reporting completion state to " . $requestUrl);
