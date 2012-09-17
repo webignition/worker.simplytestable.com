@@ -9,40 +9,31 @@ use SimplyTestable\BaseMigrationsBundle\Migration\EntityModificationMigration,
 /**
  * Auto-generated Migration: Please modify to your need!
  */
-class Version20120809165436_create_task_states extends EntityModificationMigration
+class Version20120809165438_add_task_failed_states extends EntityModificationMigration
 {
     public function postUp(Schema $schema)
     {
-        $state_cancelled = new State();
-        $state_cancelled->setName('task-cancelled');        
-        $this->getEntityManager()->persist($state_cancelled);
-        $this->getEntityManager()->flush();        
+        $stateNames = array(
+            'task-failed-no-retry-available',
+            'task-failed-retry-available',
+            'task-failed-retry-limit-reached'
+        );
         
-        $state_completed = new State();
-        $state_completed->setName('task-completed');        
-        $this->getEntityManager()->persist($state_completed);
+        foreach ($stateNames as $stateName) {
+            $state = new State();
+            $state->setName($stateName);
+            $this->getEntityManager()->persist($state);              
+        }
+        
         $this->getEntityManager()->flush();
-        
-        $state_in_progress = new State();
-        $state_in_progress->setName('task-in-progress');
-        $state_in_progress->setNextState($state_completed);        
-        $this->getEntityManager()->persist($state_in_progress);
-        $this->getEntityManager()->flush();        
-        
-        $state_queued = new State();
-        $state_queued->setName('task-queued');
-        $state_queued->setNextState($state_in_progress);        
-        $this->getEntityManager()->persist($state_queued);
-        $this->getEntityManager()->flush();      
     }
 
     public function postDown(Schema $schema)
     {
         $stateNames = array(
-            'task-queued',
-            'task-in-progress',
-            'task-completed',
-            'task-cancelled'            
+            'task-failed-no-retry-available',
+            'task-failed-retry-available',
+            'task-failed-retry-limit-reached'
         );
         
         foreach ($stateNames as $stateName) {

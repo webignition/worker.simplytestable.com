@@ -8,6 +8,8 @@ use SimplyTestable\WorkerBundle\Entity\Task\Output as TaskOutput;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
+use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
+use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 
 class TaskService extends EntityService {
     
@@ -16,6 +18,10 @@ class TaskService extends EntityService {
     const TASK_IN_PROGRESS_STATE = 'task-in-progress';
     const TASK_COMPLETED_STATE = 'task-completed';
     const TASK_CANCELLED_STATE = 'task-cancelled';
+    const TASK_FAILED_NO_RETRY_AVAILABLE_STATE = 'task-failed-no-retry-available';
+    const TASK_FAILED_RETRY_AVAILABLE_STATE = 'task-failed-retry-available';
+    const TASK_FAILED_RETRY_LIMIT_REACHED_STATE = 'task-failed-retry-limit-reached';
+
     
     /**
      *
@@ -210,7 +216,33 @@ class TaskService extends EntityService {
      */
     public function getCancelledState() {
         return $this->stateService->fetch(self::TASK_CANCELLED_STATE);
+    }  
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Entity\State 
+     */
+    public function getFailedNoRetryAvailableState() {
+        return $this->stateService->fetch(self::TASK_FAILED_NO_RETRY_AVAILABLE_STATE);
+    }      
+    
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Entity\State 
+     */
+    public function getFailedRetryAvailableState() {
+        return $this->stateService->fetch(self::TASK_FAILED_RETRY_AVAILABLE_STATE);
     }   
+    
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Entity\State 
+     */
+    public function getFailedRetryLimitReachedState() {
+        return $this->stateService->fetch(self::TASK_FAILED_RETRY_LIMIT_REACHED_STATE);
+    }       
 
     
     /**
@@ -226,6 +258,7 @@ class TaskService extends EntityService {
             return true;
         }           
         
+        /*  @var $taskDriver TaskDriver */
         $taskDriver = $this->taskDriverFactoryService->getTaskDriver($task);
 
         if ($taskDriver === false) {
@@ -236,9 +269,9 @@ class TaskService extends EntityService {
         $this->start($task);
        
         /* @var $output \SimplyTestable\WorkerBundle\Entity\Task\Output */
-        $output = $taskDriver->perform($task);       
+        $taskDriverResponse = $taskDriver->perform($task);
         
-        $this->complete($task, $output);
+        $this->complete($task, $taskDriverResponse);
         return true;
     }
     
@@ -261,14 +294,26 @@ class TaskService extends EntityService {
     /**
      *
      * @param Task $task
-     * @param TaskOutput $output
+     * @param TaskDriverResponse $taskDriverResponse
      * @return Task 
      */
-    private function complete(Task $task, TaskOutput $output) {
+    private function complete(Task $task, TaskDriverResponse $taskDriverResponse) {
         $task->getTimePeriod()->setEndDateTime(new \DateTime());
-        $task->setOutput($output);
+        $task->setOutput($taskDriverResponse->getTaskOutput());        
         
-        return $this->finish($task, $this->getCompletedState());     
+        if ($taskDriverResponse->hasSucceeded()) {
+            $completionState = $this->getCompletedState();
+        } else {
+            if ($taskDriverResponse->isRetryLimitReached()) {
+                $completionState = $this->getFailedRetryLimitReachedState();
+            } elseif ($taskDriverResponse->isRetryable()) {
+                $completionState = $this->getFailedRetryAvailableState();
+            } else {
+                $completionState = $this->getFailedNoRetryAvailableState();
+            }
+        }
+        
+        return $this->finish($task, $completionState);
     }
     
     

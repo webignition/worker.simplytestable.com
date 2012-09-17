@@ -2,105 +2,94 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
-use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
+//use SimplyTestable\WorkerBundle\Entity\Task\Task;
+//use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
+//use webignition\WebResource\WebPage\WebPage;
+//use webignition\WebResource\JsonDocument\JsonDocument;
 use webignition\WebResource\WebPage\WebPage;
-use webignition\WebResource\JsonDocument\JsonDocument;
 
-class HtmlValidationTaskDriver extends TaskDriver {
-    
-    const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
-    
-    public function execute(Task $task) {
-        if (!$task->getType()->equals($this->getTaskTypeService()->getHtmlValidationTaskType())) {
-            return false;
-        }
-        
-        $resourceRequest = new \HttpRequest($task->getUrl(), HTTP_METH_GET);
-        
-        /* @var $webResource WebPage */
-        $webResource = $this->getWebResourceService()->get($resourceRequest);
-        if (!$webResource instanceof WebPage) {
-            return false;
-        }
-        
-        $characterEncoding = ($webResource->getIsDocumentCharacterEncodingValid()) ? $webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;                
-        
-        $validationRequest = new \HttpRequest($this->getProperty('validator-url'), HTTP_METH_POST);
-        
-        $requestPostFields = array(
-            'fragment' => $webResource->getContent(),
-            'output' => 'json'
-        );
-        
-        if (!is_null($characterEncoding)) {
-            $requestPostFields['charset'] = $characterEncoding;
-        }
-        
-        $validationRequest->setPostFields($requestPostFields);
+class W3cValidatorErrorCollectionParser {
 
-        /* @var $validationResponse JsonDocument */
-        $validationResponse = $this->getWebResourceService()->get($validationRequest);
-        
-        $outputObject = $this->getOutputOject($validationResponse->getContentObject());
-        
-        return json_encode($outputObject);
-    }
+    /**
+     *
+     * @var WebPage
+     */
+    private $webpage;
     
     
     /**
      *
-     * @return \webignition\InternetMediaType\InternetMediaType 
+     * @var string
      */
-    protected function getOutputContentType()
-    {
-        $mediaTypeParser = new \webignition\InternetMediaType\Parser\Parser();
-        return $mediaTypeParser->parse('application/json');
+    private $errorParserClass = null;
+    
+    /**
+     *
+     * @var SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser 
+     */
+    private $errorParser = null;
+    
+    
+    /**
+     *
+     * @param string $errorParserClass 
+     */
+    public function setErrorParserClass($errorParserClass) {
+        $this->errorParserClass = $errorParserClass;
     }
-
-
+    
     
     /**
      *
      * @param \stdClass $validationResponseObject
      * @return \stdClass 
      */
-    private function getOutputOject(\stdClass $validationResponseObject) {
+    public function getOutputObject(WebPage $webpage) {
+        $this->webpage = $webpage;
+        
         $outputObject = new \stdClass();
         $outputObject->messages = array();
+
+        $validatorErrors = array();
+
+        $this->webpage->find('#fatal-errors li')->each(function ($index, \DOMElement $domElement) use (&$validatorErrors) {            
+            $validatorErrorContent = '';
+            
+            /* @var $domElement DOMElement */
+            $paragraphs = $domElement->getElementsByTagName('p');
+            
+            for ($paragraphIndex = 0; $paragraphIndex < $paragraphs->length; $paragraphIndex++) {
+                $paragraph = $paragraphs->item($paragraphIndex);
+                
+                $document = new \DOMDocument();
+                $cloned = $paragraph->cloneNode(true);
+                $document->appendChild($document->importNode($cloned,true));
+                
+                $validatorErrorContent .= $document->saveHTML();
+            }
+            
+            $validatorErrors[] = $validatorErrorContent;
+        }); 
         
-        foreach ($validationResponseObject->messages as $validationMessageObject) {
-            $outputObject->messages[] = $this->getOutputObjectMessage($validationMessageObject);
+        foreach ($validatorErrors as $validatorError) {
+            $this->getErrorParser()->setValidatorError($validatorError);
+            $outputObject->messages[] = $this->getErrorParser()->getOutputObjectMessage();
         }
         
-        return $outputObject;
+        return $outputObject;        
     }
     
     
     /**
      *
-     * @param \stdClass $validationMessageObject
-     * @return \stdClass 
+     * @return SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser  
      */
-    private function getOutputObjectMessage(\stdClass $validationMessageObject) {
-        $requiredProperties = array(
-            'lastLine',
-            'lastColumn',
-            'message',
-            'messageid',            
-            'type'
-        );
-        
-        $outputObjectMessage = new \stdClass;
-        
-        foreach ($requiredProperties as $requiredPropertyName) {
-            if (isset($validationMessageObject->$requiredPropertyName)) {
-                $outputObjectMessage->$requiredPropertyName = $validationMessageObject->$requiredPropertyName;
-            }
+    private function getErrorParser() {
+        if (is_null($this->errorParser)) {
+            $this->errorParser = new $this->errorParserClass;
         }
         
-        return $outputObjectMessage;
+        return $this->errorParser;
     }
-    
     
 }

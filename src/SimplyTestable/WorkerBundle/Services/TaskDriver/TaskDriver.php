@@ -8,6 +8,7 @@ use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\WebResourceService;
 use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
+use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 
 abstract class TaskDriver {
     
@@ -51,7 +52,13 @@ abstract class TaskDriver {
      * 
      * @var array
      */
-    private $properties;
+    private $properties;  
+    
+    /**
+     *
+     * @var TaskDriverResponse
+     */
+    protected $response = null;
     
     
     /**
@@ -137,16 +144,21 @@ abstract class TaskDriver {
     
     /**
      * @param Task $task
-     * @return \SimplyTestable\WorkerBundle\Entity\Task\Output 
+     * @return TaskDriverResponse
      */
     public function perform(Task $task) {        
+        $this->response = new TaskDriverResponse();
+        
         $rawOutput = $this->execute($task);
+        
         $output = new \SimplyTestable\WorkerBundle\Entity\Task\Output();
         $output->setOutput($rawOutput);
         $output->setContentType($this->getOutputContentType());
         $output->setState($this->stateService->fetch(self::OUTPUT_STARTING_STATE));
         
-        return $output;
+        $this->response->setTaskOutput($output);       
+        
+        return $this->response;
     }
     
     

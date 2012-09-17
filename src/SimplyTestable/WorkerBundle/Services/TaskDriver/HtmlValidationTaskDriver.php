@@ -6,11 +6,24 @@ use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\JsonDocument\JsonDocument;
+use SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser;
 
-class HtmlValidationTaskDriver extends TaskDriver {
+class HtmlValidationTaskDriver extends TaskDriver {    
     
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
     
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser 
+     */
+    private $validatorErrorCollectionParser = null;
+    
+    
+    /**
+     *
+     * @param Task $task
+     * @return string 
+     */
     public function execute(Task $task) {
         if (!$task->getType()->equals($this->getTaskTypeService()->getHtmlValidationTaskType())) {
             return false;
@@ -42,7 +55,16 @@ class HtmlValidationTaskDriver extends TaskDriver {
         /* @var $validationResponse JsonDocument */
         $validationResponse = $this->getWebResourceService()->get($validationRequest);
         
-        $outputObject = $this->getOutputOject($validationResponse->getContentObject());
+        if ($validationResponse->getContentType()->getTypeSubtypeString() == 'text/html') {
+            // HTML response, the validator failed to validate
+            $outputObject = $this->getW3cValidatorErrorCollectionParser()->getOutputObject($validationResponse);
+            $this->response->setHasFailed();
+            $this->response->setIsRetryable(false);
+        } else {
+            // Regular JSON output
+            $outputObject = $this->getOutputOject($validationResponse->getContentObject());
+            $this->response->setHasSucceeded();
+        }        
         
         return json_encode($outputObject);
     }
@@ -102,5 +124,19 @@ class HtmlValidationTaskDriver extends TaskDriver {
         return $outputObjectMessage;
     }
     
+    
+    /**
+     *
+     * @return SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser
+     */
+    private function getW3cValidatorErrorCollectionParser() {
+        if (is_null($this->validatorErrorCollectionParser)) {            
+            $className = $this->getProperty('validator-error-collection-parser-class');
+            $this->validatorErrorCollectionParser = new $className;
+            $this->validatorErrorCollectionParser->setErrorParserClass($this->getProperty('validator-error-parser-class'));
+        }
+        
+        return $this->validatorErrorCollectionParser;
+    }
     
 }

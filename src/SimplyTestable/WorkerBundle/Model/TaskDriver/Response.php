@@ -1,118 +1,122 @@
 <?php
-namespace SimplyTestable\WorkerBundle\Model;
+namespace SimplyTestable\WorkerBundle\Model\TaskDriver;
+
+use SimplyTestable\WorkerBundle\Entity\Task\Output as TaskOutput;
 
 /**
  * 
  */
-class RemoteEndpoint
+class Response
 {
     /**
-     * Unique identifier for this remote endpoint, could be a string, integer, whatever you prefer
-     * 
-     * @var mixed
+     *
+     * @var boolean
      */
-    private $identifier;
-    
-    
-    /**
-     * Full absolute URL to the remote endpoint
-     * 
-     * @var string
-     * 
-     */
-    private $url;
+    private $hasSucceeded = true;
     
     
     /**
      *
-     * @var int
+     * @var boolean
      */
-    private $method = HTTP_METH_GET;
+    private $isRetryable = true;
     
     
     /**
      *
-     * @var \HttpRequest
+     * @var boolean
      */
-    private $httpRequest = null;
+    private $isRetryLimitReached = false;
     
+    
+    /**
+     *
+     * @var TaskOutput
+     */
+    private $taskOutput = null;    
 
     /**
-     * Set url
-     *
-     * @param string $url
-     * @return RemoteEndpoint
+     * State that task performance succeeded
+     *  
      */
-    public function setUrl($url)
-    {
-        $this->url = $url;    
-        return $this;
+    public function setHasSucceeded() {
+        $this->hasSucceeded = true;
+    }
+    
+    
+    /**
+     * State that task performance failed
+     *  
+     */
+    public function setHasFailed() {
+        $this->hasSucceeded = false;
+    }
+    
+    
+    /**
+     * Has the task performance succeeded?
+     * 
+     * @return boolean
+     */
+    public function hasSucceeded() {
+        return $this->hasSucceeded;
+    }     
+    
+    
+    /**
+     * State whether task performance can be retried
+     *
+     * @param boolean $retryable 
+     */
+    public function setIsRetryable($retryable = true) {
+        $this->isRetryable = $retryable;
+    }
+    
+    
+    /**
+     * Can task performance be retried?
+     * 
+     * @return boolean
+     */
+    public function isRetryable() {
+        return $this->isRetryable;
+    }
+    
+    
+    /**
+     * State whether the retry limit has been reached
+     * 
+     * @param boolean $isRetryLimitReached 
+     */
+    public function setIsRetryLimitReached($isRetryLimitReached) {
+        $this->isRetryLimitReached = $isRetryLimitReached;
+    }   
+    
+    
+    /**
+     * Has the retry limit been reached?
+     * 
+     * @return boolean
+     */
+    public function isRetryLimitReached() {
+        return $this->isRetryLimitReached;
     }
 
-    /**
-     * Get url
-     *
-     * @return string 
-     */
-    public function getUrl()
-    {
-        return $this->url;
-    }
-    
-    
-    /**
-     * Set identifier
-     *
-     * @param mixed $identifier
-     * @return RemoteEndpoint
-     */
-    public function setIdentifier($identifier)
-    {
-        $this->identifier = $identifier;    
-        return $this;
-    }
-
-    /**
-     * Get identifier
-     *
-     * @return string 
-     */
-    public function getIdentifier()
-    {
-        return $this->identifier;
-    } 
-    
     
     /**
      *
-     * @param int $method
-     * @return \SimplyTestable\WorkerBundle\Model\RemoteEndpoint 
+     * @param TaskOutput $taskOutput 
      */
-    public function setMethod($method)
-    {
-        $this->method = $method;
-        return $this;                
-    }
-    
-    /**
-     *
-     * @return int
-     */
-    public function getMethod()
-    {
-        return $this->method;
+    public function setTaskOutput(TaskOutput $taskOutput) {
+        $this->taskOutput = $taskOutput;
     }
     
     
     /**
      *
-     * @return \HttpRequest
+     * @return TaskOutput 
      */
-    public function getHttpRequest() {
-        if (is_null($this->httpRequest)) {
-            $this->httpRequest = new \HttpRequest($this->getUrl(), $this->getMethod());
-        }
-        
-        return $this->httpRequest;
+    public function getTaskOutput() {
+        return $this->taskOutput;
     }
 }
