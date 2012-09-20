@@ -39,8 +39,8 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     protected function getWebResourceExceptionOutput() {        
         $outputObjectMessage = new \stdClass();
         $outputObjectMessage->message = $this->getOutputMessage();
-        $outputObjectMessage->messageId = 'http-retrieval';
-        $outputObjectMessage->type = $this->getOutputType();
+        $outputObjectMessage->messageId = 'http-retrieval-' . $this->getOutputMessageId();
+        $outputObjectMessage->type = 'error';
         
         $outputObject = new \stdClass();
         $outputObject->messages = array($outputObjectMessage);        
@@ -73,14 +73,14 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      *
      * @return string 
      */
-    private function getOutputType() {
+    private function getOutputMessageId() {
         if (!$this->httpClientException instanceof \webignition\Http\Client\Exception) {
             return '';
         }
         
         switch ($this->httpClientException->getCode()) {
             case 310:
-                return 'redirect-limit';                
+                return 'redirect-limit-reached';                
             
             case 311:
                 return 'redirect-loop';
