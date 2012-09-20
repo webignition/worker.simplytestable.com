@@ -8,7 +8,7 @@ use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\JsonDocument\JsonDocument;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser;
 
-class HtmlValidationTaskDriver extends TaskDriver {    
+class HtmlValidationTaskDriver extends WebResourceTaskDriver {    
     
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
     
@@ -29,10 +29,12 @@ class HtmlValidationTaskDriver extends TaskDriver {
             return false;
         }
         
-        $resourceRequest = new \HttpRequest($task->getUrl(), HTTP_METH_GET);
-        
         /* @var $webResource WebPage */
-        $webResource = $this->getWebResourceService()->get($resourceRequest);
+        $webResource = $this->getWebResource($task);
+        
+        if (!$this->response->hasSucceeded()) {
+            return json_encode($this->getWebResourceExceptionOutput());
+        }   
         if (!$webResource instanceof WebPage) {
             return false;
         }
@@ -127,7 +129,7 @@ class HtmlValidationTaskDriver extends TaskDriver {
     
     /**
      *
-     * @return SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser
+     * @return SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorCollectionParser
      */
     private function getW3cValidatorErrorCollectionParser() {
         if (is_null($this->validatorErrorCollectionParser)) {            

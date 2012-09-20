@@ -33,6 +33,7 @@ class WebResourceService {
     {
         $this->httpClient = $httpClient;
         $this->httpClient->redirectHandler()->enable();        
+        $this->httpClient->redirectHandler()->setLimit(10);      
         
         $this->contentTypeWebResourceMap = $contentTypeWebResourceMap;        
     }
@@ -43,7 +44,7 @@ class WebResourceService {
      * @param \HttpRequest $request
      * @return \webignition\WebResource\WebResource 
      */
-    public function get($request) {        
+    public function get($request) {
         $response = $this->httpClient->getResponse($request);
         
         $mediaTypeParser = new InternetMediaTypeParser();
@@ -57,6 +58,15 @@ class WebResourceService {
         $resource->setUrl($request->getUrl());       
         
         return $resource;
+    }
+    
+    
+    /**
+     *
+     * @return \webignition\Http\Client\Client
+     */
+    public function getHttpClient() {
+        return $this->httpClient;
     }
     
 

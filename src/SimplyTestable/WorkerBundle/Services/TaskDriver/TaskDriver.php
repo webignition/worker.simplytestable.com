@@ -29,7 +29,7 @@ abstract class TaskDriver {
     
     /**
      *
-     * @var \SimplyTestable\WorkerBundle\Services\WebResource\Service 
+     * @var \SimplyTestable\WorkerBundle\Services\WebResourceService 
      */    
     private $webResourceService;
     
