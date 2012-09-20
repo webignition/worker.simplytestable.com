@@ -142,8 +142,8 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/DoctrineBundle/zipball/v1.0.0",
-                "reference": "v1.0.0",
+                "url": "https://github.com/doctrine/DoctrineBundle/zipball/d3c930599723c8343472a5791b0f5909a4111a73",
+                "reference": "d3c930599723c8343472a5791b0f5909a4111a73",
                 "shasum": ""
             },
             "require": {
@@ -172,7 +172,32 @@
                 "psr-0": {
                     "Doctrine\\Bundle\\DoctrineBundle": ""
                 }
-            }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                }
+            ],
+            "description": "Symfony DoctrineBundle",
+            "homepage": "http://www.doctrine-project.org",
+            "keywords": [
+                "database",
+                "orm",
+                "persistence",
+                "dbal"
+            ]
         },
         {
             "name": "doctrine/migrations",
@@ -325,9 +350,7 @@
             "authors": [
                 {
                     "name": "William POTTIER",
-                    "email": "wpottier@allprogrammic.com",
-                    "homepage": null,
-                    "role": null
+                    "email": "wpottier@allprogrammic.com"
                 }
             ],
             "description": "PHP port of the ruby resque library. And some enhancement to delegate instanciation of job (usefull to work with the Symfony2 DIC for exemple). ",
@@ -346,8 +369,8 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/glit/ResqueBundle/zipball/b839c8099e9d9bbac57295da408314c9aef4b682",
-                "reference": "b839c8099e9d9bbac57295da408314c9aef4b682",
+                "url": "https://github.com/glit/ResqueBundle/zipball/e80844924d9f4f914e44a14c9d6fb601a93a9ab4",
+                "reference": "e80844924d9f4f914e44a14c9d6fb601a93a9ab4",
                 "shasum": ""
             },
             "require": {
@@ -373,9 +396,7 @@
             "authors": [
                 {
                     "name": "William POTTIER",
-                    "email": "wpottier@allprogrammic.com",
-                    "homepage": null,
-                    "role": null
+                    "email": "wpottier@allprogrammic.com"
                 }
             ],
             "description": "Adds php-resque to Symfony2",
@@ -418,7 +439,7 @@
                     "name": "Johannes M. Schmitt",
                     "email": "schmittjoh@gmail.com",
                     "homepage": "http://jmsyst.com",
-                    "role": null
+                    "role": "Developer of wrapped JMSSerializerBundle"
                 }
             ],
             "description": "Adds AOP capabilities to Symfony2",
@@ -460,7 +481,7 @@
                     "name": "Johannes M. Schmitt",
                     "email": "schmittjoh@gmail.com",
                     "homepage": "http://jmsyst.com",
-                    "role": null
+                    "role": "Developer of wrapped JMSSerializerBundle"
                 }
             ],
             "description": "Toolset for generating PHP code",
@@ -562,7 +583,7 @@
                     "name": "Johannes M. Schmitt",
                     "email": "schmittjoh@gmail.com",
                     "homepage": "http://jmsyst.com",
-                    "role": null
+                    "role": "Developer of wrapped JMSSerializerBundle"
                 }
             ],
             "description": "Class/method/property metadata management in PHP",
@@ -609,9 +630,9 @@
                 "symfony/form": "*",
                 "symfony/validator": "*"
             },
-            "time": "2012-09-06 13:12:03",
+            "time": "2012-09-06 16:12:03",
             "type": "symfony-bundle",
-            "installation-source": "source",
+            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "JMS\\SecurityExtraBundle": ""
@@ -624,7 +645,7 @@
                 {
                     "name": "Johannes M. Schmitt",
                     "email": "schmittjoh@gmail.com",
-                    "homepage": "https://github.com/schmittjoh",
+                    "homepage": "http://jmsyst.com",
                     "role": "Developer of wrapped JMSSerializerBundle"
                 }
             ],
@@ -864,27 +885,27 @@
         },
         {
             "name": "sensio/distribution-bundle",
-            "version": "dev-master",
+            "version": "2.1.x-dev",
             "target-dir": "Sensio/Bundle/DistributionBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensio/SensioDistributionBundle",
-                "reference": "4e86595e02c6e3d76971f790d7c06ec434e1b513"
+                "reference": "v2.1.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/sensio/SensioDistributionBundle/zipball/4e86595e02c6e3d76971f790d7c06ec434e1b513",
-                "reference": "4e86595e02c6e3d76971f790d7c06ec434e1b513",
+                "url": "https://github.com/sensio/SensioDistributionBundle/zipball/v2.1.1",
+                "reference": "v2.1.1",
                 "shasum": ""
             },
             "require": {
-                "symfony/framework-bundle": "2.2.*"
+                "symfony/framework-bundle": "2.1.*"
             },
-            "time": "1347635342",
+            "time": "1347340208",
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.2.x-dev"
+                    "dev-master": "2.1.x-dev"
                 }
             },
             "installation-source": "source",
@@ -910,28 +931,28 @@
         },
         {
             "name": "sensio/framework-extra-bundle",
-            "version": "dev-master",
+            "version": "2.1.x-dev",
             "target-dir": "Sensio/Bundle/FrameworkExtraBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensio/SensioFrameworkExtraBundle",
-                "reference": "03e32da3fd1bb37e4c6f3c77f1b4cb8a3a78e0a8"
+                "reference": "86a68df44eb50a64042d05a3f09548d2c21d4456"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/sensio/SensioFrameworkExtraBundle/zipball/03e32da3fd1bb37e4c6f3c77f1b4cb8a3a78e0a8",
-                "reference": "03e32da3fd1bb37e4c6f3c77f1b4cb8a3a78e0a8",
+                "url": "https://github.com/sensio/SensioFrameworkExtraBundle/zipball/86a68df44eb50a64042d05a3f09548d2c21d4456",
+                "reference": "86a68df44eb50a64042d05a3f09548d2c21d4456",
                 "shasum": ""
             },
             "require": {
-                "doctrine/common": ">=2.1,<2.4-dev",
-                "symfony/framework-bundle": "2.2.*"
+                "symfony/framework-bundle": "2.1.*",
+                "doctrine/common": ">=2.1,<2.4-dev"
             },
-            "time": "1347340790",
+            "time": "1348064274",
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.2.x-dev"
+                    "dev-master": "2.1.x-dev"
                 }
             },
             "installation-source": "source",
@@ -957,36 +978,33 @@
         },
         {
             "name": "sensio/generator-bundle",
-            "version": "dev-master",
+            "version": "2.1.x-dev",
             "target-dir": "Sensio/Bundle/GeneratorBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensio/SensioGeneratorBundle",
-                "reference": "f5bda1014f5f124a0fd881644664493e36a09ad0"
+                "reference": "3a65c9bf7d31aecacffc15a48f5eb2ece3615ef0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/sensio/SensioGeneratorBundle/zipball/f5bda1014f5f124a0fd881644664493e36a09ad0",
-                "reference": "f5bda1014f5f124a0fd881644664493e36a09ad0",
+                "url": "https://github.com/sensio/SensioGeneratorBundle/zipball/3a65c9bf7d31aecacffc15a48f5eb2ece3615ef0",
+                "reference": "3a65c9bf7d31aecacffc15a48f5eb2ece3615ef0",
                 "shasum": ""
             },
             "require": {
-                "symfony/framework-bundle": "2.2.*",
-                "symfony/console": "2.2.*"
+                "symfony/framework-bundle": "2.1.*",
+                "symfony/console": "2.1.*"
             },
             "require-dev": {
+                "symfony/doctrine-bridge": "2.1.*",
                 "doctrine/orm": ">=2.1,<2.4-dev",
-                "twig/twig": ">=1.8,<2.0-dev",
-                "symfony/doctrine-bridge": "2.2.*"
+                "twig/twig": ">=1.8,<2.0-dev"
             },
-            "suggest": {
-                "doctrine/doctrine-bundle": "to generate entities and their crud controller"
-            },
-            "time": "1348070473",
+            "time": "1348030981",
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.2.x-dev"
+                    "dev-master": "2.1.x-dev"
                 }
             },
             "installation-source": "source",
@@ -1350,7 +1368,23 @@
                 "psr-0": {
                     "Twig_Extensions_": "lib/"
                 }
-            }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Common additional features for Twig that do not directly belong in core",
+            "homepage": "https://github.com/fabpot/Twig-extensions",
+            "keywords": [
+                "debug",
+                "i18n",
+                "text"
+            ]
         },
         {
             "name": "twig/twig",
@@ -1433,9 +1467,7 @@
             "authors": [
                 {
                     "name": "Jon Cram",
-                    "email": "jon@webignition.net",
-                    "homepage": null,
-                    "role": null
+                    "email": "jon@webignition.net"
                 }
             ],
             "description": "Derives an absolute URL from relative and source URLs",
@@ -1478,9 +1510,7 @@
             "authors": [
                 {
                     "name": "Jon Cram",
-                    "email": "jon@webignition.net",
-                    "homepage": null,
-                    "role": null
+                    "email": "jon@webignition.net"
                 }
             ],
             "description": "A Doctrine migration that's Symfony-container aware",
@@ -1526,21 +1556,15 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com",
-                    "homepage": null,
-                    "role": null
+                    "email": "fabien@symfony.com"
                 },
                 {
                     "name": "Symfony Community",
-                    "email": null,
-                    "homepage": "http://symfony.com/contributors",
-                    "role": null
+                    "homepage": "http://symfony.com/contributors"
                 },
                 {
                     "name": "Doctrine Project",
-                    "email": null,
-                    "homepage": "http://www.doctrine-project.org",
-                    "role": null
+                    "homepage": "http://www.doctrine-project.org"
                 }
             ],
             "description": "Symfony DoctrineMigrationsBundle",
@@ -1557,12 +1581,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/http-client",
-                "reference": "0ba57b80fb47b7fc0a09b62a9c2110a2b307660e"
+                "reference": "c99807e0e74559c9ddf77e526ae1f28a7301baf6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/http-client/zipball/0ba57b80fb47b7fc0a09b62a9c2110a2b307660e",
-                "reference": "0ba57b80fb47b7fc0a09b62a9c2110a2b307660e",
+                "url": "https://github.com/webignition/http-client/zipball/c99807e0e74559c9ddf77e526ae1f28a7301baf6",
+                "reference": "c99807e0e74559c9ddf77e526ae1f28a7301baf6",
                 "shasum": ""
             },
             "require": {
@@ -1571,7 +1595,7 @@
                 "webignition/absolute-url-deriver": ">=1.1",
                 "webignition/url": ">1.0"
             },
-            "time": "1348144944",
+            "time": "1348147907",
             "type": "library",
             "installation-source": "source",
             "autoload": {
@@ -1614,7 +1638,7 @@
                 "webignition/quoted-string": ">=0.1,<2.0",
                 "webignition/string-parser": ">=0.1, <2.0"
             },
-            "time": "2012-08-15 20:14:02",
+            "time": "2012-08-16 15:14:02",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1628,9 +1652,7 @@
             "authors": [
                 {
                     "name": "Jon Cram",
-                    "email": "jon@webignition.net",
-                    "homepage": null,
-                    "role": null
+                    "email": "jon@webignition.net"
                 }
             ],
             "description": "PHP model of an http://en.wikipedia.org/wiki/Internet_media_type",
@@ -1661,7 +1683,7 @@
                 "php": ">=5.3.0",
                 "webignition/string-parser": "0.1"
             },
-            "time": "2012-08-14 18:44:56",
+            "time": "2012-08-15 19:44:56",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1675,9 +1697,7 @@
             "authors": [
                 {
                     "name": "Jon Cram",
-                    "email": "jon@webignition.net",
-                    "homepage": null,
-                    "role": null
+                    "email": "jon@webignition.net"
                 }
             ],
             "description": "A parser for string values that are encapsulated in double quotes (ASCII 34)",
@@ -1711,7 +1731,7 @@
                 "webignition/doctrine-migrations-bundle": "*",
                 "webignition/container-aware-migration": "*"
             },
-            "time": "2012-07-31 19:45:05",
+            "time": "2012-08-02 09:45:05",
             "type": "symfony-bundle",
             "installation-source": "dist",
             "autoload": {
@@ -1725,9 +1745,7 @@
             "authors": [
                 {
                     "name": "Jon Cram",
-                    "email": "jon@webignition.net",
-                    "homepage": null,
-                    "role": null
+                    "email": "jon@webignition.net"
                 }
             ],
             "description": "Symfony bundle for base Doctrine migrations common to app.simplytestable.com and worker.simplytestable.com",
@@ -1753,7 +1771,7 @@
             "require": {
                 "php": ">=5.3.0"
             },
-            "time": "2012-08-14 18:36:12",
+            "time": "2012-08-15 19:36:12",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1767,9 +1785,7 @@
             "authors": [
                 {
                     "name": "Jon Cram",
-                    "email": "jon@webignition.net",
-                    "homepage": null,
-                    "role": null
+                    "email": "jon@webignition.net"
                 }
             ],
             "description": "Abstract state-based string parser",
@@ -1789,8 +1805,8 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/url/zipball/1.1",
-                "reference": "1.1",
+                "url": "https://github.com/webignition/url/zipball/c5adb2d25bc3ced3fede8a9835dc1d2b80c793b6",
+                "reference": "c5adb2d25bc3ced3fede8a9835dc1d2b80c793b6",
                 "shasum": ""
             },
             "require": {
@@ -1810,9 +1826,7 @@
             "authors": [
                 {
                     "name": "Jon Cram",
-                    "email": "jon@webignition.net",
-                    "homepage": null,
-                    "role": null
+                    "email": "jon@webignition.net"
                 }
             ],
             "description": "Represents a URL, a library to be used in many other places. Applies semantically-lossless normalisation for comparisons.",
@@ -1839,7 +1853,7 @@
                 "php": ">=5.3.0",
                 "webignition/web-resource-model": ">=0.1,<2.0"
             },
-            "time": "2012-08-15 20:18:52",
+            "time": "2012-08-16 15:18:52",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1853,9 +1867,7 @@
             "authors": [
                 {
                     "name": "Jon Cram",
-                    "email": "jon@webignition.net",
-                    "homepage": null,
-                    "role": null
+                    "email": "jon@webignition.net"
                 }
             ],
             "description": "PHP model of a web-based JSON resource, based on webignition/web-resource-model",
@@ -1884,7 +1896,7 @@
                 "webignition/web-resource-model": ">=0.1,<2.0",
                 "querypath/querypath": ">=3.0.0"
             },
-            "time": "2012-09-17 14:10:59",
+            "time": "2012-09-17 15:10:59",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1926,7 +1938,7 @@
                 "php": ">=5.3.0",
                 "webignition/internet-media-type": ">=0.1,<2.0"
             },
-            "time": "2012-08-15 20:16:06",
+            "time": "2012-08-16 15:16:06",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1940,9 +1952,7 @@
             "authors": [
                 {
                     "name": "Jon Cram",
-                    "email": "jon@webignition.net",
-                    "homepage": null,
-                    "role": null
+                    "email": "jon@webignition.net"
                 }
             ],
             "description": "Model of a web-based resource",
