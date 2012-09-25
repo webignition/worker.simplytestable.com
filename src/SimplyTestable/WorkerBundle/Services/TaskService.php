@@ -396,7 +396,8 @@ class TaskService extends EntityService {
             'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
             'output' => $task->getOutput()->getOutput(),
             'contentType' => (string)$task->getOutput()->getContentType(),
-            'state' => $task->getState()->getName()
+            'state' => $task->getState()->getName(),
+            'errorCount' => $task->getOutput()->getErrorCount()
         ));        
         
         $this->logger->info("TaskService::reportCompletion: Reporting completion state to " . $requestUrl);

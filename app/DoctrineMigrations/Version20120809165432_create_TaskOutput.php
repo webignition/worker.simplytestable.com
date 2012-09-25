@@ -13,7 +13,14 @@ class Version20120809165432_create_TaskOutput extends BaseMigration
     public function up(Schema $schema)
     {        
         $this->statements['mysql'] = array(
-            "CREATE TABLE TaskOutput (id INT AUTO_INCREMENT NOT NULL, state_id INT NOT NULL, output LONGTEXT DEFAULT NULL, contentType LONGTEXT DEFAULT NULL, INDEX IDX_C9B3E5C45D83CC1 (state_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE = InnoDB",
+            "CREATE TABLE TaskOutput (
+                id INT AUTO_INCREMENT NOT NULL,
+                state_id INT NOT NULL,
+                output LONGTEXT DEFAULT NULL,
+                contentType LONGTEXT DEFAULT NULL,
+                errorCount INT NOT NULL,
+                INDEX IDX_C9B3E5C45D83CC1 (state_id),
+                PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE = InnoDB",
             "ALTER TABLE TaskOutput ADD CONSTRAINT FK_C9B3E5C45D83CC1 FOREIGN KEY (state_id) REFERENCES State (id)"
         );
         
@@ -23,6 +30,7 @@ class Version20120809165432_create_TaskOutput extends BaseMigration
                 state_id INT NOT NULL,
                 output LONGTEXT DEFAULT NULL COLLATE NOCASE,
                 contentType LONGTEXT DEFAULT NULL COLLATE NOCASE,
+                errorCount INT NOT NULL,
                 FOREIGN KEY(state_id) REFERENCES State (id))",
             "CREATE INDEX IDX_C9B3E5C45D83CC1 ON TaskOutput (state_id)"
         ); 

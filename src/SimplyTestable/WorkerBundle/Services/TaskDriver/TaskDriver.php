@@ -155,6 +155,7 @@ abstract class TaskDriver {
         $output->setOutput($rawOutput);
         $output->setContentType($this->getOutputContentType());
         $output->setState($this->stateService->fetch(self::OUTPUT_STARTING_STATE));
+        $output->setErrorCount($this->response->getErrorCount());
         
         $this->response->setTaskOutput($output);       
         

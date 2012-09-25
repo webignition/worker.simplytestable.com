@@ -33,7 +33,14 @@ class Response
      *
      * @var TaskOutput
      */
-    private $taskOutput = null;    
+    private $taskOutput = null;  
+    
+    
+    /**
+     *
+     * @var int
+     */
+    private $errorCount = null;
 
     /**
      * State that task performance succeeded
@@ -118,5 +125,21 @@ class Response
      */
     public function getTaskOutput() {
         return $this->taskOutput;
+    }
+    
+    /**
+     *
+     * @param int $errorCount 
+     */
+    public function setErrorCount($errorCount) {
+        $this->errorCount = $errorCount;        
+    }
+    
+    /**
+     *
+     * @return int
+     */
+    public function getErrorCount() {
+        return $this->errorCount;
     }
 }

@@ -66,7 +66,16 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
             // Regular JSON output
             $outputObject = $this->getOutputOject($validationResponse->getContentObject());
             $this->response->setHasSucceeded();
-        }        
+            
+            $errorCount = 0;
+            foreach ($validationResponse->getContentObject()->messages as $message) {
+                if ($message->type == 'error') {
+                    $errorCount++;
+                }
+            }
+            
+            $this->response->setErrorCount($errorCount);
+        }
         
         return json_encode($outputObject);
     }
