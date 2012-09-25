@@ -33,6 +33,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         $webResource = $this->getWebResource($task);
         
         if (!$this->response->hasSucceeded()) {
+            $this->response->setErrorCount(1);
             return json_encode($this->getWebResourceExceptionOutput());
         }   
         if (!$webResource instanceof WebPage) {
@@ -62,6 +63,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
             $outputObject = $this->getW3cValidatorErrorCollectionParser()->getOutputObject($validationResponse);
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
+            $this->response->setErrorCount(1);
         } else {
             // Regular JSON output
             $outputObject = $this->getOutputOject($validationResponse->getContentObject());
