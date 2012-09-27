@@ -31,13 +31,16 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         
         /* @var $webResource WebPage */
         $webResource = $this->getWebResource($task);
-        
+
         if (!$this->response->hasSucceeded()) {
             $this->response->setErrorCount(1);
             return json_encode($this->getWebResourceExceptionOutput());
-        }   
-        if (!$webResource instanceof WebPage) {
-            return false;
+        }         
+        
+        if (!$webResource instanceof WebPage) {            
+            $this->response->setHasBeenSkipped();
+            $this->response->setErrorCount(0);
+            return true;
         }
         
         $characterEncoding = ($webResource->getIsDocumentCharacterEncodingValid()) ? $webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;                

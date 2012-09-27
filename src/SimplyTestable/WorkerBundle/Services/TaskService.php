@@ -21,6 +21,7 @@ class TaskService extends EntityService {
     const TASK_FAILED_NO_RETRY_AVAILABLE_STATE = 'task-failed-no-retry-available';
     const TASK_FAILED_RETRY_AVAILABLE_STATE = 'task-failed-retry-available';
     const TASK_FAILED_RETRY_LIMIT_REACHED_STATE = 'task-failed-retry-limit-reached';
+    const TASK_SKIPPED_STATE = 'task-skipped';
 
     
     /**
@@ -243,6 +244,15 @@ class TaskService extends EntityService {
     public function getFailedRetryLimitReachedState() {
         return $this->stateService->fetch(self::TASK_FAILED_RETRY_LIMIT_REACHED_STATE);
     }       
+    
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Entity\State 
+     */
+    public function getSkippedState() {
+        return $this->stateService->fetch(self::TASK_SKIPPED_STATE);
+    }     
 
     
     /**
@@ -297,11 +307,13 @@ class TaskService extends EntityService {
      * @param TaskDriverResponse $taskDriverResponse
      * @return Task 
      */
-    private function complete(Task $task, TaskDriverResponse $taskDriverResponse) {
+    private function complete(Task $task, TaskDriverResponse $taskDriverResponse) {        
         $task->getTimePeriod()->setEndDateTime(new \DateTime());
-        $task->setOutput($taskDriverResponse->getTaskOutput());        
+        $task->setOutput($taskDriverResponse->getTaskOutput());
         
-        if ($taskDriverResponse->hasSucceeded()) {
+        if ($taskDriverResponse->hasBeenSkipped()) {
+            $completionState = $this->getSkippedState();
+        } elseif ($taskDriverResponse->hasSucceeded()) {
             $completionState = $this->getCompletedState();
         } else {
             if ($taskDriverResponse->isRetryLimitReached()) {
@@ -398,7 +410,7 @@ class TaskService extends EntityService {
             'contentType' => (string)$task->getOutput()->getContentType(),
             'state' => $task->getState()->getName(),
             'errorCount' => $task->getOutput()->getErrorCount()
-        ));        
+        ));
         
         $this->logger->info("TaskService::reportCompletion: Reporting completion state to " . $requestUrl);
         

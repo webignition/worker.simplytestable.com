@@ -41,6 +41,14 @@ class Response
      * @var int
      */
     private $errorCount = null;
+    
+    
+    /**
+     *
+     * @var boolean
+     */
+    private $hasBeenSkipped = false;
+    
 
     /**
      * State that task performance succeeded
@@ -48,6 +56,27 @@ class Response
      */
     public function setHasSucceeded() {
         $this->hasSucceeded = true;
+    }
+    
+    
+    /**
+     * State that task performance was skipped
+     * Most commonly used when the type of content being tested
+     * is not relevant for the type of test being performed
+     *  
+     */
+    public function setHasBeenSkipped() {
+        $this->hasBeenSkipped = true;
+    }
+    
+    
+    /**
+     * Was task performance skipped?
+     * 
+     * @return boolean
+     */
+    public function hasBeenSkipped() {
+        return $this->hasBeenSkipped;
     }
     
     
