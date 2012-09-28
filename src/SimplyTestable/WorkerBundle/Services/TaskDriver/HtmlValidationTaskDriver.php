@@ -43,6 +43,12 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
             return true;
         }
         
+        if ($webResource->getContent() == '') {
+            $this->response->setHasBeenSkipped();
+            $this->response->setErrorCount(0);
+            return true;
+        }
+        
         $characterEncoding = ($webResource->getIsDocumentCharacterEncodingValid()) ? $webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;                
         
         $validationRequest = new \HttpRequest($this->getProperty('validator-url'), HTTP_METH_POST);
