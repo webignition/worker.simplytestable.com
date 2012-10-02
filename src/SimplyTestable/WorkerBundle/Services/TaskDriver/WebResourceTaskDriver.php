@@ -13,6 +13,12 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      */
     protected $httpClientException;
     
+    /**
+     *
+     * @var \webignition\Http\Client\CurlException  
+     */
+    protected $curlException;
+    
     
     /**
      *
@@ -28,7 +34,23 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             $this->response->setIsRetryable(false);
             
             $this->httpClientException = $httpClientException;
-        }        
+        } catch (\webignition\Http\Client\CurlException $curlException) {
+            $this->response->setHasFailed();
+            
+            if ($curlException->isTimeoutException()) {
+                $this->response->setIsRetryable(false);
+            }
+            
+            if ($curlException->isDnsLookupFailureException()) {
+                $this->response->setIsRetryable(false);
+            }            
+            
+            if ($curlException->isInvalidUrlException()) {
+                $this->response->setIsRetryable(false);
+            }              
+            
+            $this->curlException = $curlException;
+        }
     } 
     
     
@@ -54,18 +76,32 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      * @return string 
      */
     private function getOutputMessage() {
-        if (!$this->httpClientException instanceof \webignition\Http\Client\Exception) {
-            return '';
+        if ($this->httpClientException instanceof \webignition\Http\Client\Exception) {
+            switch ($this->httpClientException->getCode()) {
+                case 310:
+                    return 'Redirect limit of ' . $this->getWebResourceService()->getHttpClient()->redirectHandler()->limit().' redirects reached';                
+
+                case 311:
+                    return 'Redirect loop deteted';
+                    break;
+            }
         }
         
-        switch ($this->httpClientException->getCode()) {
-            case 310:
-                return 'Redirect limit of ' . $this->getWebResourceService()->getHttpClient()->redirectHandler()->limit().' redirects reached';                
+        if ($this->curlException instanceof \webignition\Http\Client\CurlException) {
+            if ($this->curlException->isTimeoutException()) {
+                return 'Timeout reached retrieving resource';
+            }
             
-            case 311:
-                return 'Redirect loop deteted';
-                break;
+            if ($this->curlException->isDnsLookupFailureException()) {
+                return 'DNS lookup failure resolving resource domain name';
+            }            
+            
+            if ($this->curlException->isInvalidUrlException()) {
+                return 'Invalid resource URL';
+            }                        
         }
+        
+        return '';
     }
 
     
@@ -73,19 +109,23 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      *
      * @return string 
      */
-    private function getOutputMessageId() {
-        if (!$this->httpClientException instanceof \webignition\Http\Client\Exception) {
-            return '';
+    private function getOutputMessageId() {        
+        if ($this->httpClientException instanceof \webignition\Http\Client\Exception) {
+            switch ($this->httpClientException->getCode()) {
+                case 310:
+                    return 'redirect-limit-reached';                
+
+                case 311:
+                    return 'redirect-loop';
+                    break;
+            }
         }
         
-        switch ($this->httpClientException->getCode()) {
-            case 310:
-                return 'redirect-limit-reached';                
-            
-            case 311:
-                return 'redirect-loop';
-                break;
+        if ($this->curlException instanceof \webignition\Http\Client\CurlException) {
+            return 'curl-code-' . $this->curlException->getCode();                     
         }
+        
+        return '';        
     }   
     
 }
