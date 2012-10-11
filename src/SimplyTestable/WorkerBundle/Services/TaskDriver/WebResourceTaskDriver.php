@@ -4,8 +4,15 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use webignition\WebResource\WebResource;
+use SimplyTestable\WorkerBundle\Exception\WebResourceException;
 
 abstract class WebResourceTaskDriver extends TaskDriver {        
+    
+    /**
+     *
+     * @var WebResourceException
+     */
+    protected $webResourceException;
     
     /**
      *
@@ -28,7 +35,12 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     protected function getWebResource(Task $task) {
         try {
             $resourceRequest = new \HttpRequest($task->getUrl(), HTTP_METH_GET);
-            return $this->getWebResourceService()->get($resourceRequest);
+            return $this->getWebResourceService()->get($resourceRequest);            
+        } catch (WebResourceException $webResourceException) {
+            $this->response->setHasFailed();
+            $this->response->setIsRetryable(false);
+            
+            $this->webResourceException = $webResourceException;           
         } catch (\webignition\Http\Client\Exception $httpClientException) {
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
@@ -101,6 +113,10 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             }                        
         }
         
+        if ($this->webResourceException instanceof WebResourceException) {
+            return $this->webResourceException->getHttpResponse()->getResponseStatus();
+        }
+        
         return '';
     }
 
@@ -123,7 +139,11 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         
         if ($this->curlException instanceof \webignition\Http\Client\CurlException) {
             return 'curl-code-' . $this->curlException->getCode();                     
-        }
+        }        
+        
+        if ($this->webResourceException instanceof WebResourceException) {
+            return $this->webResourceException->getHttpResponse()->getResponseCode();
+        }        
         
         return '';        
     }   

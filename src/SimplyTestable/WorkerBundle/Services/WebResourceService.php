@@ -2,10 +2,16 @@
 
 namespace SimplyTestable\WorkerBundle\Services;
 
-use webignition\WebResource\WebResource;
 use webignition\InternetMediaType\Parser\Parser as InternetMediaTypeParser;
+use SimplyTestable\WorkerBundle\Exception\WebResourceException;
 
 class WebResourceService {
+    
+    const RESPONSE_CLASS_INFORMATIONAL = 1;
+    const RESPONSE_CLASS_SUCCESS = 2;
+    const RESPONSE_CLASS_REDIRECTION = 3;
+    const RESPONSE_CLASS_CLIENT_ERROR = 4;
+    const RESPONSE_CLASS_SERVER_ERROR = 5;    
     
     /**
      *
@@ -47,17 +53,45 @@ class WebResourceService {
     public function get($request) {
         $response = $this->httpClient->getResponse($request);
         
-        $mediaTypeParser = new InternetMediaTypeParser();
-        $contentType = $mediaTypeParser->parse($response->getHeader('content-type'));
-        
-        $webResourceClassName = $this->getWebResourceClassName($contentType->getTypeSubtypeString());
+        switch ($this->getResponseClass($response)) {
+            case self::RESPONSE_CLASS_INFORMATIONAL:
+                // Interesting to see what makes this happen
+                break;
+            
+            case self::RESPONSE_CLASS_SUCCESS:
+                $mediaTypeParser = new InternetMediaTypeParser();
+                $contentType = $mediaTypeParser->parse($response->getHeader('content-type'));
 
-        $resource = new $webResourceClassName;
-        $resource->setContent($response->getBody());
-        $resource->setContentType($response->getHeader('content-type'));
-        $resource->setUrl($request->getUrl());       
-        
-        return $resource;
+                $webResourceClassName = $this->getWebResourceClassName($contentType->getTypeSubtypeString());
+
+                $resource = new $webResourceClassName;
+                $resource->setContent($response->getBody());
+                $resource->setContentType($response->getHeader('content-type'));
+                $resource->setUrl($request->getUrl());       
+
+                return $resource;
+            
+            case self::RESPONSE_CLASS_REDIRECTION:
+                // Shouldn't happen, HTTP client should have the redirect handler
+                // enabled, redirects should be followed
+                break;
+            
+            case self::RESPONSE_CLASS_CLIENT_ERROR:          
+            case self::RESPONSE_CLASS_SERVER_ERROR:
+                // Both client and server errors intentionally handled together
+                throw new WebResourceException($response, $request);                
+                break;
+        }
+    }
+    
+    
+    /**
+     * 
+     * @param \HttpMessage $response
+     * @return int
+     */
+    private function getResponseClass(\HttpMessage $response) {
+        return (int)substr($response->getResponseCode(), 0, 1);
     }
     
     
