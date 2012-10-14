@@ -1,5 +1,5 @@
 glit_resque:
-  prefix: "SimplyTestable\WorkerBundle"
+  prefix: "SimplyTestable\WorkerBundle"    
 
 parameters:
   core_url: http://app.simplytestable.com
@@ -10,6 +10,8 @@ parameters:
         - "HTML validation"
       properties:
         validator-url: http://%hostname%/w3c-validator/check
+        validator-error-collection-parser-class: SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorCollectionParser
+        validator-error-parser-class: SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser
   content_type_web_resource_map:
     default: webignition\WebResource\WebResource
     text/html: webignition\WebResource\WebPage\WebPage
@@ -18,5 +20,5 @@ parameters:
   resque-job-class-map:
     "task-perform": "SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob"
     "task-report-completion": "SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob"  
-  resque_pid: "simplytestable_workerbundle_hydrogen"
+  resque_pid: "simplytestable_workerbundle"
   hostname: hydrogen.worker.simplytestable.com  
