@@ -15,6 +15,9 @@ class TaskController extends BaseController
                 new InputArgument('type', InputArgument::REQUIRED, 'Name of task type, case insensitive'),
                 new InputArgument('url', InputArgument::REQUIRED, 'URL of web page against which the task is to be performed')
             )),
+            'createCollectionAction' => new InputDefinition(array(
+                new InputArgument('tasks', InputArgument::REQUIRED, 'Collection of task urls and test types')
+            )),            
             'cancelAction' => new InputDefinition(array(
                 new InputArgument('id', InputArgument::REQUIRED, 'ID of task to be cancelled')
             )),
@@ -26,6 +29,7 @@ class TaskController extends BaseController
         
         $this->setRequestTypes(array(
             'createAction' => HTTP_METH_POST,
+            'createCollectionAction' => HTTP_METH_POST,
             'cancelAction' => HTTP_METH_POST,
             'cancelCollectionAction' => HTTP_METH_POST   
         ));
@@ -44,6 +48,9 @@ class TaskController extends BaseController
             $taskType
         );
         
+        $this->getTaskService()->getEntityManager()->persist($task);
+        $this->getTaskService()->getEntityManager()->flush();
+        
         $this->container->get('simplytestable.services.resqueQueueService')->add(
             'task-perform',
             array(
@@ -52,6 +59,38 @@ class TaskController extends BaseController
         );
         
         return $this->sendResponse($task);
+    }
+    
+    
+    public function createCollectionAction() {        
+        $rawRequestTasks = $this->getArguments('createCollectionAction')->get('tasks');
+        $tasks = array();
+        
+        foreach ($rawRequestTasks as $taskDetails) {
+            if ($this->getTaskTypeService()->has($taskDetails['type'])) {
+                $task = $this->getTaskService()->create(
+                    $taskDetails['url'],
+                    $this->getTaskTypeService()->fetch($taskDetails['type'])
+                ); 
+                
+                $tasks[] = $task;                
+                
+                $this->getTaskService()->getEntityManager()->persist($task);               
+            }              
+        }
+        
+        $this->getTaskService()->getEntityManager()->flush();
+        
+        foreach ($tasks as $task) {
+            $this->container->get('simplytestable.services.resqueQueueService')->add(
+                'task-perform',
+                array(
+                    'id' => $task->getId()
+                )                
+            );            
+        }
+
+        return $this->sendResponse($tasks); 
     }
     
     

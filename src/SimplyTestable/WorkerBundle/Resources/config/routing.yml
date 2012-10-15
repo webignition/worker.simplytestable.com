@@ -6,6 +6,10 @@ SimplyTestableWorkerBundle_task_create:
     pattern:  /task/create/
     defaults: { _controller: SimplyTestableWorkerBundle:Task:create, _format: json }       
     
+SimplyTestableWorkerBundle_task_create_collection:
+    pattern:  /task/create/collection/
+    defaults: { _controller: SimplyTestableWorkerBundle:Task:createCollection, _format: json }     
+    
 SimplyTestableWorkerBundle_task_cancel:
     pattern:  /task/cancel/
     defaults: { _controller: SimplyTestableWorkerBundle:Task:cancel, _format: json }
