@@ -420,8 +420,8 @@ class TaskService extends EntityService {
             $this->logger->info("TaskService::reportCompletion: " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
             
             if ($response->getResponseCode() !== 200) {
-                $this->logger->error("TaskService::reportCompletion: Completion reporting failed for [".$task->getId()."] [".$task->getUrl()."]");
-                $this->logger->error("TaskService::reportCompletion: [".$task->getId()."] " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
+                $this->logger->err("TaskService::reportCompletion: Completion reporting failed for [".$task->getId()."] [".$task->getUrl()."]");
+                $this->logger->err("TaskService::reportCompletion: [".$task->getId()."] " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
                 return false;
             }
             
