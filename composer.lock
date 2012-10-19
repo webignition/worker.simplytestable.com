@@ -1557,12 +1557,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/http-client",
-                "reference": "c99807e0e74559c9ddf77e526ae1f28a7301baf6"
+                "reference": "1.2.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/http-client/zipball/c99807e0e74559c9ddf77e526ae1f28a7301baf6",
-                "reference": "c99807e0e74559c9ddf77e526ae1f28a7301baf6",
+                "url": "https://github.com/webignition/http-client/zipball/1.2.1",
+                "reference": "1.2.1",
                 "shasum": ""
             },
             "require": {
@@ -1571,7 +1571,7 @@
                 "webignition/absolute-url-deriver": ">=1.1",
                 "webignition/url": ">1.0"
             },
-            "time": "1348147907",
+            "time": "1350636361",
             "type": "library",
             "installation-source": "source",
             "autoload": {
@@ -1785,18 +1785,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/url",
-                "reference": "c5adb2d25bc3ced3fede8a9835dc1d2b80c793b6"
+                "reference": "038ed7ab3b7b6fc5f7cffc2367044181a7e71011"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/url/zipball/1.1",
-                "reference": "1.1",
+                "url": "https://github.com/webignition/url/zipball/038ed7ab3b7b6fc5f7cffc2367044181a7e71011",
+                "reference": "038ed7ab3b7b6fc5f7cffc2367044181a7e71011",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
-            "time": "1345673270",
+            "time": "1350557668",
             "type": "library",
             "installation-source": "source",
             "autoload": {
@@ -1810,9 +1810,7 @@
             "authors": [
                 {
                     "name": "Jon Cram",
-                    "email": "jon@webignition.net",
-                    "homepage": null,
-                    "role": null
+                    "email": "jon@webignition.net"
                 }
             ],
             "description": "Represents a URL, a library to be used in many other places. Applies semantically-lossless normalisation for comparisons.",

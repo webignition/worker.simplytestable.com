@@ -30,7 +30,9 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         }
         
         /* @var $webResource WebPage */
+        $this->getWebResourceService()->getHttpClient()->setUserAgent('SimplyTestable HTML Validator/0.1 (http://simplytestable.com/)');
         $webResource = $this->getWebResource($task);
+        $this->getWebResourceService()->getHttpClient()->clearUserAgent();
 
         if (!$this->response->hasSucceeded()) {
             $this->response->setErrorCount(1);
