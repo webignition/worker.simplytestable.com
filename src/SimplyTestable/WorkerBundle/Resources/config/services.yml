@@ -62,6 +62,7 @@ services:
         stateService: "@simplytestable.services.stateservice"
         webResourceService: "@simplytestable.services.webresourceservice"        
         logger: "@logger"
+        webResourceTaskOutputService: "@simplytestable.services.webresourcetaskoutputservice"
         
   simplytestable.services.resqueQueueService:
     class:   SimplyTestable\WorkerBundle\Services\ResqueQueueService
@@ -80,4 +81,9 @@ services:
   simplytestable.services.ResqueJobFactoryService:
     class:  SimplyTestable\WorkerBundle\Services\ResqueJobFactoryService
     arguments:
-      jobClassMap: "%resque-job-class-map%"        
+      jobClassMap: "%resque-job-class-map%"   
+      
+  simplytestable.services.webresourcetaskoutputservice:
+    class:   SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService
+    arguments:
+        entityManager: "@doctrine.orm.entity_manager"       

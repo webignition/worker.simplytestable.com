@@ -29,6 +29,96 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     
     /**
      *
+     * @var webignition\WebResource\WebResource 
+     */
+    protected $webResource;
+    
+    
+    /**
+     *
+     * @var boolean
+     */
+    protected $canCacheValidationOutput = false;
+    
+    
+    public function execute(Task $task) {        
+        if (!$this->isCorrectTaskType($task)) {
+            return false;
+        }             
+                
+        /* @var $webResource WebPage */
+        $this->getWebResourceService()->getHttpClient()->setUserAgent('SimplyTestable HTML Validator/0.1 (http://simplytestable.com/)');
+        $this->webResource = $this->getWebResource($task);
+        $this->getWebResourceService()->getHttpClient()->clearUserAgent();
+
+        if (!$this->response->hasSucceeded()) {
+            return $this->hasNotSucceedHandler();
+        }
+        
+        if (!$this->isCorrectWebResourceType()) {
+            return $this->isNotCorrectWebResourceTypeHandler();
+        }
+        
+        if ($this->webResource->getContent() == '') {
+            return $this->isBlankWebResourceHandler();
+        }
+        
+        $hash = md5($this->webResource->getContent());                
+        if ($this->getWebResourceTaskOutputService()->has($hash)) {
+            $webResourceTaskOutput = $this->getWebResourceTaskOutputService()->find($hash);
+            $this->response->setErrorCount($webResourceTaskOutput->getErrorCount());
+            return $webResourceTaskOutput->getOutput();
+        }
+        
+        $validationOutput = $this->performValidation();
+        
+        if ($this->canCacheValidationOutput()) {
+            $this->getWebResourceTaskOutputService()->create($hash, $validationOutput, $this->response->getErrorCount());
+        }
+        
+        return $validationOutput;
+    }
+    
+    
+    /**
+     * @return boolean
+     */
+    protected function canCacheValidationOutput() {
+        return $this->canCacheValidationOutput;
+    }
+    
+    
+    /**
+     * @return boolean
+     */
+    abstract protected function isCorrectTaskType(Task $task);
+
+    
+    /**
+     * @return string
+     */
+    abstract protected function hasNotSucceedHandler();
+    
+    
+    /**
+     * @return boolean
+     */
+    abstract protected function isCorrectWebResourceType();
+    
+    
+    /**
+     * @return mixed
+     */
+    abstract protected function isNotCorrectWebResourceTypeHandler();
+    
+    
+    abstract protected function isBlankWebResourceHandler();
+    
+    
+    abstract protected function performValidation();
+    
+    /**
+     *
      * @param Task $task
      * @return WebResource 
      */
@@ -146,6 +236,6 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         }        
         
         return '';        
-    }   
+    }
     
 }

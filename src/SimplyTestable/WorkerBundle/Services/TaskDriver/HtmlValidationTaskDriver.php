@@ -5,6 +5,7 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use webignition\WebResource\WebPage\WebPage;
+use webignition\WebResource\WebResource;
 use webignition\WebResource\JsonDocument\JsonDocument;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser;
 
@@ -20,43 +21,45 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
     
     
     /**
-     *
-     * @param Task $task
-     * @return string 
+     * 
+     * @param \SimplyTestable\WorkerBundle\Entity\Task\Task $task
+     * @return boolean
      */
-    public function execute(Task $task) {
-        if (!$task->getType()->equals($this->getTaskTypeService()->getHtmlValidationTaskType())) {
-            return false;
-        }
-        
-        /* @var $webResource WebPage */
-        $this->getWebResourceService()->getHttpClient()->setUserAgent('SimplyTestable HTML Validator/0.1 (http://simplytestable.com/)');
-        $webResource = $this->getWebResource($task);
-        $this->getWebResourceService()->getHttpClient()->clearUserAgent();
-
-        if (!$this->response->hasSucceeded()) {
-            $this->response->setErrorCount(1);
-            return json_encode($this->getWebResourceExceptionOutput());
-        }         
-        
-        if (!$webResource instanceof WebPage) {            
-            $this->response->setHasBeenSkipped();
-            $this->response->setErrorCount(0);
-            return true;
-        }
-        
-        if ($webResource->getContent() == '') {
-            $this->response->setHasBeenSkipped();
-            $this->response->setErrorCount(0);
-            return true;
-        }
-        
-        $characterEncoding = ($webResource->getIsDocumentCharacterEncodingValid()) ? $webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;                
-        
+    protected function isCorrectTaskType(Task $task) {        
+        return $task->getType()->equals($this->getTaskTypeService()->getHtmlValidationTaskType());
+    }
+    
+    
+    /**
+     * 
+     * @return string
+     */
+    protected function hasNotSucceedHandler() {
+        $this->response->setErrorCount(1);
+        return json_encode($this->getWebResourceExceptionOutput());        
+    }
+    
+    protected function isNotCorrectWebResourceTypeHandler() {
+        $this->response->setHasBeenSkipped();
+        $this->response->setErrorCount(0);
+        return true;
+    }
+    
+    
+    protected function isBlankWebResourceHandler() {
+        $this->response->setHasBeenSkipped();
+        $this->response->setErrorCount(0);
+        return true;        
+    }
+    
+    
+    protected function performValidation() {
+        $characterEncoding = ($this->webResource->getIsDocumentCharacterEncodingValid()) ? $this->webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;
+       
         $validationRequest = new \HttpRequest($this->getProperty('validator-url'), HTTP_METH_POST);
         
         $requestPostFields = array(
-            'fragment' => $webResource->getContent(),
+            'fragment' => $this->webResource->getContent(),
             'output' => 'json'
         );
         
@@ -65,7 +68,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         }
         
         $validationRequest->setPostFields($requestPostFields);
-
+        
         /* @var $validationResponse JsonDocument */
         $validationResponse = $this->getWebResourceService()->get($validationRequest);
         
@@ -74,7 +77,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
             $outputObject = $this->getW3cValidatorErrorCollectionParser()->getOutputObject($validationResponse);
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
-            $this->response->setErrorCount(1);
+            $this->response->setErrorCount(1);            
         } else {
             // Regular JSON output
             $outputObject = $this->getOutputOject($validationResponse->getContentObject());
@@ -88,9 +91,19 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
             }
             
             $this->response->setErrorCount($errorCount);
+            $this->canCacheValidationOutput = true;
         }
         
-        return json_encode($outputObject);
+        return json_encode($outputObject);         
+    }
+    
+    
+    /**
+     * 
+     * @return boolean
+     */
+    protected function isCorrectWebResourceType() {
+        return $this->webResource instanceof WebPage;
     }
     
     

@@ -11,6 +11,7 @@ use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\WebResourceService;
 use SimplyTestable\WorkerBundle\Services\HttpServiceInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
+use SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService;
 
 class FactoryService {
     
@@ -38,7 +39,8 @@ class FactoryService {
             TaskTypeService $taskTypeService,
             StateService $stateService,
             WebResourceService $webResourceService,
-            Logger $logger
+            Logger $logger,
+            WebResourceTaskOutputService $webResourceTaskOutputService
         ) {
         
         $this->taskTypeService = $taskTypeService;        
@@ -50,6 +52,7 @@ class FactoryService {
             $driver->setWebResourceService($webResourceService);
             $driver->setTaskTypeService($taskTypeService);
             $driver->setLogger($logger);
+            $driver->setWebResourceTaskoutputService($webResourceTaskOutputService);
             
             if (isset($properties['properties'])) {
                 $driver->setProperties($properties['properties']);
