@@ -12,7 +12,9 @@ parameters:
     css-validation:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
       task-types:
-        - "CSS validation"   
+        - "CSS validation"        
+      properties:
+        validator-output-parser: SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationOutputParser    
   content_type_web_resource_map:
     default: webignition\WebResource\WebResource
     text/html: webignition\WebResource\WebPage\WebPage
