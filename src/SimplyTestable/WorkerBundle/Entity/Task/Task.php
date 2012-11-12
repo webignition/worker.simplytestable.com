@@ -161,7 +161,7 @@ class Task
     /**
      * Get type
      *
-     * @return SimplyTestable\WorkerBundle\Entity\Task\Type\Type 
+     * @return \SimplyTestable\WorkerBundle\Entity\Task\Type\Type 
      */
     public function getType()
     {

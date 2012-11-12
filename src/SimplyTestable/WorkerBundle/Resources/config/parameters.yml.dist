@@ -12,6 +12,10 @@ parameters:
         validator-url: http://%hostname%/w3c-validator/check
         validator-error-collection-parser-class: SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorCollectionParser
         validator-error-parser-class: SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser
+    css-validation:
+      class: SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
+      task-types:
+        - "CSS validation"   
   content_type_web_resource_map:
     default: webignition\WebResource\WebResource
     text/html: webignition\WebResource\WebPage\WebPage

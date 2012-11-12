@@ -172,7 +172,7 @@ abstract class TaskDriver {
      * @param Task $task
      * @return TaskDriverResponse
      */
-    public function perform(Task $task) {        
+    public function perform(Task $task) {                
         $this->response = new TaskDriverResponse();
         
         $rawOutput = $this->execute($task);
@@ -199,6 +199,14 @@ abstract class TaskDriver {
      * @return \webignition\InternetMediaType\InternetMediaType
      */
     abstract protected function getOutputContentType();
+    
+    
+    /**
+     * 
+     * @param \SimplyTestable\WorkerBundle\Entity\Task\Task $task
+     * @return boolean
+     */
+    abstract protected function isCorrectTaskType(Task $task); 
 
 
     

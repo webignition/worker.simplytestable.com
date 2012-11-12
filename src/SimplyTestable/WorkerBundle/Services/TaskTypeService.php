@@ -9,6 +9,7 @@ class TaskTypeService extends EntityService {
     
     const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\Task\Type\Type';
     const HTML_VALIDATION_NAME = 'HTML Validation';
+    const CSS_VALIDATION_NAME = 'CSS Validation';
     
     /**
      *
@@ -21,7 +22,7 @@ class TaskTypeService extends EntityService {
     
     /**
      * @param string $name
-     * @return \SimplyTestable\WorkerBundle\Entity\Task\Type
+     * @return \SimplyTestable\WorkerBundle\Entity\Task\Type\Type
      */
     public function fetch($name) {        
         return $this->getEntityRepository()->findOneByName($name);
@@ -37,8 +38,20 @@ class TaskTypeService extends EntityService {
         return !is_null($this->fetch($name));
     }
     
-    
+
+    /**
+     * 
+     * @return \SimplyTestable\WorkerBundle\Entity\Task\Type\Type
+     */
     public function getHtmlValidationTaskType() {
         return $this->fetch(self::HTML_VALIDATION_NAME);
     }
+    
+    /**
+     * 
+     * @return \SimplyTestable\WorkerBundle\Entity\Task\Type\Type
+     */
+    public function getCssValidationTaskType() {
+        return $this->fetch(self::CSS_VALIDATION_NAME);
+    }    
 }

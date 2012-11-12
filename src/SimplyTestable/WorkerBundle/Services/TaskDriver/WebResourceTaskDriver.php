@@ -29,9 +29,16 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     
     /**
      *
-     * @var webignition\WebResource\WebResource 
+     * @var \webignition\WebResource\WebResource 
      */
     protected $webResource;
+    
+    
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Entity\Task\Task  
+     */
+    protected $task;
     
     
     /**
@@ -41,10 +48,19 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     protected $canCacheValidationOutput = false;
     
     
-    public function execute(Task $task) {        
+    /**
+     *
+     * @var string
+     */
+    private $webResourceTaskHash = null;
+    
+    
+    public function execute(Task $task) {                
         if (!$this->isCorrectTaskType($task)) {
             return false;
-        }             
+        }
+        
+        $this->task = $task;
                 
         /* @var $webResource WebPage */
         $this->getWebResourceService()->getHttpClient()->setUserAgent('SimplyTestable HTML Validator/0.1 (http://simplytestable.com/)');
@@ -63,7 +79,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             return $this->isBlankWebResourceHandler();
         }
         
-        $hash = md5($this->webResource->getContent());                
+        $hash = $this->getWebResourceTaskHash();                
         if ($this->getWebResourceTaskOutputService()->has($hash)) {
             $webResourceTaskOutput = $this->getWebResourceTaskOutputService()->find($hash);
             $this->response->setErrorCount($webResourceTaskOutput->getErrorCount());
@@ -81,17 +97,26 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     
     
     /**
-     * @return boolean
+     * 
+     * @return string
      */
-    protected function canCacheValidationOutput() {
-        return $this->canCacheValidationOutput;
+    protected function getWebResourceTaskHash() {
+        if (is_null($this->webResourceTaskHash)) {
+            if (!is_null($this->webResource) && !is_null($this->task)) {
+                $this->webResourceTaskHash = md5($this->webResource->getContent() . $this->task->getType()->getName());
+            }
+        }
+        
+        return $this->webResourceTaskHash;
     }
     
     
     /**
      * @return boolean
      */
-    abstract protected function isCorrectTaskType(Task $task);
+    protected function canCacheValidationOutput() {
+        return $this->canCacheValidationOutput;
+    }
 
     
     /**
