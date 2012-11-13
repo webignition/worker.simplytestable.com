@@ -74,7 +74,7 @@ class TaskController extends BaseController
         
         foreach ($rawRequestTasks as $taskDetails) {
             if ($this->getTaskTypeService()->has($taskDetails['type'])) {
-                $parameters = (isset($taskDetails['parameters'])) ? '' : $taskDetails['parameters'];
+                $parameters = (!isset($taskDetails['parameters'])) ? '' : $taskDetails['parameters'];
                 
                 $task = $this->getTaskService()->create(
                     $taskDetails['url'],
