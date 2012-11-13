@@ -39,10 +39,14 @@ class TaskController extends BaseController
     {        
         if (!$this->getTaskTypeService()->has($this->getArguments('createAction')->get('type'))) {
             throw new \Symfony\Component\HttpKernel\Exception\HttpException(400);
-        }  
+        } 
+        
+        $this->get('logger')->info('TaskController::createAction: request parameters: ['.$this->get('request')->request->get('parameters').']');
         
         $taskType = $this->getTaskTypeService()->fetch($this->getArguments('createAction')->get('type'));
         $parameters = (is_null($this->get('request')->request->get('parameters'))) ? '' : $this->get('request')->request->get('parameters');
+        
+        $this->get('logger')->info('TaskController::createAction: parameters: ['.$parameters.']');
         
         $task = $this->getTaskService()->create(
             $this->getArguments('activateAction')->get('url'),

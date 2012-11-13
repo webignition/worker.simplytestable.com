@@ -20,4 +20,14 @@ doctrine:
     connections:
       default:
         driver: pdo_sqlite
-        path: /run/shm/app.simplytestable.com.db    
+        path: /run/shm/app.simplytestable.com.db
+        
+monolog:
+    handlers:
+        main:
+            type:  stream
+            path:  %kernel.logs_dir%/%kernel.environment%.log
+            level: debug
+        firephp:
+            type:  firephp
+            level: info        
