@@ -26,10 +26,13 @@ class CssValidationTaskDriver extends TaskDriver {
         
         $validationOutputLines = array();
         
-        exec("java -jar ".$this->getProperty('jar-path')." -output ucn " .$task->getUrl(), $validationOutputLines);
+        exec("java -jar ".$this->getProperty('jar-path')." -output ucn " .$task->getUrl(), $validationOutputLines);        
         
         $this->getValidatorOutputParser()->setOutputLines($validationOutputLines);
         
+        if ($task->hasParameter('ref-domains-to-ignore')) {
+            $this->getValidatorOutputParser()->setRefDomainsToIgnore($task->getParameter('ref-domains-to-ignore'));
+        }
         
         $validatorOutput = $this->getValidatorOutputParser()->getOutput();
         

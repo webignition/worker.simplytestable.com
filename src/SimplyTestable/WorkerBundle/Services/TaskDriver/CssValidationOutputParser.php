@@ -19,6 +19,13 @@ class CssValidationOutputParser {
     
     
     /**
+     *
+     * @var array
+     */
+    private $refDomainsToIgnore = array();
+    
+    
+    /**
      * 
      * @param array $outputLines
      */
@@ -31,7 +38,7 @@ class CssValidationOutputParser {
      * 
      * @return array
      */
-    public function getOutput() {
+    public function getOutput() {        
         if (!is_array($this->outputLines)) {
             return array();
         }
@@ -40,17 +47,23 @@ class CssValidationOutputParser {
         
         $output = array();
         
-        foreach ($outputMessages as $messageNode) {
-            $contextNode = $messageNode->getElementsByTagName('context')->item(0);
-            
-            $error = new \stdClass();
-            
-            $error->context = $contextNode->nodeValue;
-            $error->lineNumber = (int)$contextNode->getAttribute('line');
-            $error->message = trim($messageNode->getElementsByTagName('title')->item(0)->nodeValue);
-            $error->ref = $messageNode->getAttribute('ref');
-            
-            $output[] = $error;
+        foreach ($outputMessages as $messageNode) {            
+            $type = $messageNode->getAttribute('type');
+            if ($type == 'error') {
+                $contextNode = $messageNode->getElementsByTagName('context')->item(0);
+                $ref = $messageNode->getAttribute('ref');
+
+                if (!$this->isRefToBeIgnored($ref)) {
+                    $error = new \stdClass();
+
+                    $error->context = $contextNode->nodeValue;
+                    $error->lineNumber = (int)$contextNode->getAttribute('line');
+                    $error->message = trim($messageNode->getElementsByTagName('title')->item(0)->nodeValue);
+                    $error->ref = $ref;                
+
+                    $output[] = $error;
+                }                
+            }
         }
         
         return $output;
@@ -65,4 +78,40 @@ class CssValidationOutputParser {
         
         return $this->outputDom;
     }
-}
+    
+    
+    /**
+     * 
+     * @param array $refDomainsToIgnore
+     */
+    public function setRefDomainsToIgnore($refDomainsToIgnore) {
+        $this->refDomainsToIgnore = $refDomainsToIgnore;                
+    }
+    
+    
+    /**
+     * 
+     * @return array
+     */
+    public function getRefDomainsToIgnore() {
+        return $this->refDomainsToIgnore;
+    }
+    
+    
+    /**
+     * 
+     * @param string $ref
+     * @return boolean
+     */
+    private function isRefToBeIgnored($ref) {
+        $refUrl = new \webignition\Url\Url($ref);
+        
+        foreach ($this->getRefDomainsToIgnore() as $refDomainToIgnore) {                       
+            if ($refUrl->getHost()->isEquivalentTo(new \webignition\Url\Host\Host($refDomainToIgnore))) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+} 
