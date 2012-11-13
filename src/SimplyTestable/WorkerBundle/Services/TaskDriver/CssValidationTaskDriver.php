@@ -26,7 +26,7 @@ class CssValidationTaskDriver extends TaskDriver {
         
         $validationOutputLines = array();
         
-        exec("java -jar /home/jon/css-validator-source/2002/css-validator/css-validator.jar -output ucn " .$task->getUrl(), $validationOutputLines);
+        exec("java -jar ".$this->getProperty('jar-path')." -output ucn " .$task->getUrl(), $validationOutputLines);
         
         $this->getValidatorOutputParser()->setOutputLines($validationOutputLines);
         
