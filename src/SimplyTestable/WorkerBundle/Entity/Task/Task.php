@@ -75,6 +75,15 @@ class Task
     
     /**
      *
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $parameters;    
+    
+    
+    
+    /**
+     *
      * @return string
      */
     public function getPublicSerializedState() {
@@ -233,4 +242,35 @@ class Task
     public function hasOutput() {
         return !is_null($this->output);
     }
+    
+    /**
+     * Set parameters
+     *
+     * @param string $parameters
+     * @return Task
+     */
+    public function setParameters($parameters)
+    {
+        $this->parameters = $parameters;
+    
+        return $this;
+    }
+
+    /**
+     * Get parameters
+     *
+     * @return string
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }  
+    
+    /**
+     * 
+     * @return boolean
+     */
+    public function hasParameters() {
+        return $this->getParameters() != '';
+    }    
 }

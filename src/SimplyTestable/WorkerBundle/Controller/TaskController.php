@@ -42,10 +42,12 @@ class TaskController extends BaseController
         }  
         
         $taskType = $this->getTaskTypeService()->fetch($this->getArguments('createAction')->get('type'));
+        $parameters = (is_null($this->get('request')->request->get('parameters'))) ? '' : $this->get('request')->request->get('parameters');
         
         $task = $this->getTaskService()->create(
             $this->getArguments('activateAction')->get('url'),
-            $taskType
+            $taskType,
+            $parameters
         );
         
         $this->getTaskService()->getEntityManager()->persist($task);
@@ -68,9 +70,12 @@ class TaskController extends BaseController
         
         foreach ($rawRequestTasks as $taskDetails) {
             if ($this->getTaskTypeService()->has($taskDetails['type'])) {
+                $parameters = (isset($taskDetails['parameters'])) ? '' : $taskDetails['parameters'];
+                
                 $task = $this->getTaskService()->create(
                     $taskDetails['url'],
-                    $this->getTaskTypeService()->fetch($taskDetails['type'])
+                    $this->getTaskTypeService()->fetch($taskDetails['type']),
+                    $parameters
                 ); 
                 
                 $tasks[] = $task;                

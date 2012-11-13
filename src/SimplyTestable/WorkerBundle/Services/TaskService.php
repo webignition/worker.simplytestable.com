@@ -119,13 +119,15 @@ class TaskService extends EntityService {
      *
      * @param string $url
      * @param TaskType $type
+     * @param string $parameters
      * @return \SimplyTestable\WorkerBundle\Entity\Task\Task
      */
-    public function create($url, TaskType $type) {        
+    public function create($url, TaskType $type, $parameters) {        
         $task = new Task();
         $task->setState($this->getStartingState());
         $task->setType($type);
         $task->setUrl($url);
+        $task->setParameters($parameters);
         
         if ($this->has($task)) {
             return $this->fetch($task);
