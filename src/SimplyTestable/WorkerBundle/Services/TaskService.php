@@ -261,10 +261,10 @@ class TaskService extends EntityService {
     public function perform(Task $task) {        
         $this->logger->info("TaskService::perform: [".$task->getId()."] [".$task->getState()->getName()."] Initialising");        
         
-//        if (!$this->isQueued($task)) {
-//            $this->logger->info("TaskService::perform: [".$task->getId()."] Task state is [".$task->getState()->getName()."] and cannot be performed");
-//            return true;
-//        }           
+        if (!$this->isQueued($task)) {
+            $this->logger->info("TaskService::perform: [".$task->getId()."] Task state is [".$task->getState()->getName()."] and cannot be performed");
+            return true;
+        }           
         
         /*  @var $taskDriver TaskDriver */
         $taskDriver = $this->taskDriverFactoryService->getTaskDriver($task);
