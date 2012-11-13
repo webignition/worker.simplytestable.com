@@ -51,7 +51,7 @@ class CssValidationOutputParser {
             $type = $messageNode->getAttribute('type');
             if ($type == 'error') {
                 $contextNode = $messageNode->getElementsByTagName('context')->item(0);
-                $ref = $messageNode->getAttribute('ref');
+                $ref = trim($messageNode->getAttribute('ref'));
 
                 if (!$this->isRefToBeIgnored($ref)) {
                     $error = new \stdClass();
@@ -103,7 +103,11 @@ class CssValidationOutputParser {
      * @param string $ref
      * @return boolean
      */
-    private function isRefToBeIgnored($ref) {
+    private function isRefToBeIgnored($ref) {               
+        if ($ref == '') {
+            return false;
+        }
+        
         $refUrl = new \webignition\Url\Url($ref);
         
         foreach ($this->getRefDomainsToIgnore() as $refDomainToIgnore) {                       
