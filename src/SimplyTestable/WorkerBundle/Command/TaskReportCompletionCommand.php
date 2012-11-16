@@ -43,7 +43,14 @@ EOF
         
         if ($this->getTaskService()->reportCompletion($task) === false) {
             throw new \LogicException('Task execution failed, check log for details');
-        }        
+        }
+        
+        /* @var $entityManager \Doctrine\ORM\EntityManager */        
+        $entityManager = $this->getContainer()->get('doctrine')->getEntityManager();
+        $entityManager->remove($task);
+        $entityManager->remove($task->getOutput());
+        $entityManager->flush();
+      
     } 
     
     
