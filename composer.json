@@ -29,7 +29,9 @@
         "webignition/internet-media-type":">=0.1,<2.0",
         "querypath/QueryPath": ">=3.0.0",
         "webignition/web-page-model":">=0.1,<2.0",
-        "webignition/web-json-model":">=0.1,<2.0"
+        "webignition/web-json-model":">=0.1,<2.0",
+        "webignition/absolute-url-deriver":"*",
+        "webignition/node-jslint-output-parser":"*"
     },
     "scripts": {
         "post-install-cmd": [
