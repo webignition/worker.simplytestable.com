@@ -10,6 +10,7 @@ class TaskTypeService extends EntityService {
     const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\Task\Type\Type';
     const HTML_VALIDATION_NAME = 'HTML Validation';
     const CSS_VALIDATION_NAME = 'CSS Validation';
+    const JS_STATIC_ANALYSIS_NAME = 'JS static analysis';
     
     /**
      *
@@ -54,4 +55,13 @@ class TaskTypeService extends EntityService {
     public function getCssValidationTaskType() {
         return $this->fetch(self::CSS_VALIDATION_NAME);
     }    
+    
+
+    /**
+     * 
+     * @return \SimplyTestable\WorkerBundle\Entity\Task\Type\Type
+     */
+    public function getJavaScriptStatisAnalysisTaskType() {
+        return $this->fetch(self::JS_STATIC_ANALYSIS_NAME);
+    }        
 }

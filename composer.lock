@@ -1649,19 +1649,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/node-jslint-output-parser.git",
-                "reference": "78dcfd386c53fda8713706f7cc1074116e982f25"
+                "reference": "f4bbfdb753708fb683b830b56da71c22c5b22db6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/node-jslint-output-parser/archive/78dcfd386c53fda8713706f7cc1074116e982f25.zip",
-                "reference": "78dcfd386c53fda8713706f7cc1074116e982f25",
+                "url": "https://github.com/webignition/node-jslint-output-parser/archive/f4bbfdb753708fb683b830b56da71c22c5b22db6.zip",
+                "reference": "f4bbfdb753708fb683b830b56da71c22c5b22db6",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0",
                 "webignition/string-parser": "*"
             },
-            "time": "2012-12-01 13:14:37",
+            "time": "2012-12-03 19:10:48",
             "type": "library",
             "installation-source": "source",
             "autoload": {
