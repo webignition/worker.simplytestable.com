@@ -13,11 +13,11 @@ class Version20121211115635_add_Task_warningCount extends BaseMigration
     public function up(Schema $schema)
     {
         $this->statements['mysql'] = array(
-            "ALTER TABLE TaskOutput ADD warningCount INT DEFAULT 0 NOT NULL"
+            "ALTER TABLE TaskOutput ADD warningCount INT NOT NULL"
         );
         
         $this->statements['sqlite'] = array(
-            "ALTER TABLE TaskOutput ADD warningCount INT DEFAULT 0 NOT NULL"
+            "ALTER TABLE TaskOutput ADD warningCount INT NOT NULL"
         );
         
         parent::up($schema);
