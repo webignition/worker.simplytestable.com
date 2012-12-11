@@ -17,7 +17,7 @@ class Version20121211115635_add_Task_warningCount extends BaseMigration
         );
         
         $this->statements['sqlite'] = array(
-            "ALTER TABLE TaskOutput ADD warningCount INT NOT NULL"
+            "ALTER TABLE TaskOutput ADD warningCount INT NOT NULL DEFAULT 0"
         );
         
         parent::up($schema);
