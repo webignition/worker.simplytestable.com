@@ -40,14 +40,14 @@ class Response
      *
      * @var int
      */
-    private $errorCount = null;
+    private $errorCount = 0;
     
     
     /**
      *
      * @var int
      */
-    private $warningCount = null;
+    private $warningCount = 0;
     
     
     /**
