@@ -407,7 +407,8 @@ class TaskService extends EntityService {
             'output' => $task->getOutput()->getOutput(),
             'contentType' => (string)$task->getOutput()->getContentType(),
             'state' => $task->getState()->getName(),
-            'errorCount' => $task->getOutput()->getErrorCount()
+            'errorCount' => $task->getOutput()->getErrorCount(),
+            'warningCount' => $task->getOutput()->getWarningCount()
         ));
         
         $this->logger->info("TaskService::reportCompletion: Reporting completion state to " . $requestUrl);

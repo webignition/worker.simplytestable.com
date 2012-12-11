@@ -310,4 +310,18 @@ class Task
         
         return $this->getParametersObject()->$name;
     }
+    
+    
+    /**
+     * 
+     * @param string $parameterName
+     * @return boolean
+     */
+    public function isTrue($parameterName) {
+        if (!$this->hasParameter($parameterName)) {
+            return false;
+        }
+        
+        return filter_var($task->getParameter('ignore-warnings'), FILTER_VALIDATE_BOOLEAN);
+    }
 }

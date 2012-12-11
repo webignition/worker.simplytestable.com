@@ -23,10 +23,28 @@ class CssValidationTaskDriver extends TaskDriver {
         if (!$this->isCorrectTaskType($task)) {
             return false;
         }
-        
+
         $validationOutputLines = array();
         
-        exec("java -jar ".$this->getProperty('jar-path')." -output ucn " .$task->getUrl(), $validationOutputLines);        
+        $commandOptions = array(
+            'output' => 'ucn'
+        );
+        
+        if ($task->getParameter('vendor-extensions') == 'warn') {
+            $commandOptions['vextwarning'] = 'true';
+        }
+        
+        if ($task->getParameter('vendor-extensions') == 'error') {
+            $commandOptions['vextwarning'] = 'false';
+        }        
+        
+        $commandOptionsStrings = '';
+        foreach ($commandOptions as $key => $value) {
+            $commandOptionsStrings[] = '-'.$key.' '.$value;
+        }  
+        
+        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." " .$task->getUrl();        
+        exec($command, $validationOutputLines);        
         
         $this->getValidatorOutputParser()->setOutputLines($validationOutputLines);
         
@@ -34,9 +52,18 @@ class CssValidationTaskDriver extends TaskDriver {
             $this->getValidatorOutputParser()->setRefDomainsToIgnore($task->getParameter('ref-domains-to-ignore'));
         }
         
+        if ($task->isTrue('ignore-warnings')) {
+            $this->getValidatorOutputParser()->setIgnoreWarnings(true);
+        }
+        
+        if ($task->getParameter('vendor-extensions') == 'ignore') {
+            $this->getValidatorOutputParser()->setIgnoreVendorExtensions(true);
+        }
+        
         $validatorOutput = $this->getValidatorOutputParser()->getOutput();
         
-        $this->response->setErrorCount(count($validatorOutput));
+        $this->response->setErrorCount($this->getValidatorOutputParser()->getErrorCount());
+        $this->response->setWarningCount($this->getValidatorOutputParser()->getWarningCount());
         
         return json_encode($validatorOutput);
     }    
