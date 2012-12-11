@@ -45,6 +45,13 @@ class Response
     
     /**
      *
+     * @var int
+     */
+    private $warningCount = null;
+    
+    
+    /**
+     *
      * @var boolean
      */
     private $hasBeenSkipped = false;
@@ -171,4 +178,21 @@ class Response
     public function getErrorCount() {
         return $this->errorCount;
     }
+    
+    
+    /**
+     *
+     * @param int $warningCount 
+     */
+    public function setWarningCount($warningCount) {
+        $this->warningCount = $warningCount;        
+    }
+    
+    /**
+     *
+     * @return int
+     */
+    public function getWarningCount() {
+        return $this->warningCount;
+    }   
 }

@@ -61,6 +61,14 @@ class Output
      */
     private $errorCount;
     
+
+    /**
+     *
+     * @var int 
+     * @ORM\Column(type="integer", nullable=false, options={"default" = 0})
+     */    
+    private $warningCount = 0;
+    
     
     /**
      *
@@ -179,4 +187,27 @@ class Output
     {
         return $this->errorCount;
     }     
+
+    /**
+     * Set warningCount
+     *
+     * @param integer $warningCount
+     * @return Output
+     */
+    public function setWarningCount($warningCount)
+    {
+        $this->warningCount = $warningCount;
+    
+        return $this;
+    }
+
+    /**
+     * Get warningCount
+     *
+     * @return integer 
+     */
+    public function getWarningCount()
+    {
+        return $this->warningCount;
+    }
 }
