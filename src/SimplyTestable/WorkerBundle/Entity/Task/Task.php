@@ -320,8 +320,8 @@ class Task
     public function isTrue($parameterName) {
         if (!$this->hasParameter($parameterName)) {
             return false;
-        }
-        
-        return filter_var($task->getParameter('ignore-warnings'), FILTER_VALIDATE_BOOLEAN);
+        }        
+                
+        return filter_var($this->getParameter($parameterName), FILTER_VALIDATE_BOOLEAN);
     }
 }
