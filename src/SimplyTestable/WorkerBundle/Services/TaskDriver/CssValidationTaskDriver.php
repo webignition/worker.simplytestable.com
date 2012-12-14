@@ -60,6 +60,10 @@ class CssValidationTaskDriver extends TaskDriver {
             $this->getValidatorOutputParser()->setIgnoreVendorExtensions(true);
         }
         
+        if ($task->getParameter('vendor-extensions') == 'warn' && $task->isTrue('ignore-warnings')) {
+            $this->getValidatorOutputParser()->setIgnoreVendorExtensions(true);
+        }
+        
         $validatorOutput = $this->getValidatorOutputParser()->getOutput();
         
         $this->response->setErrorCount($this->getValidatorOutputParser()->getErrorCount());
