@@ -81,6 +81,10 @@ class CssValidationOutputParser {
         foreach ($outputMessages as $messageNode) {            
             $type = $messageNode->getAttribute('type');
             
+            if ($type == 'info') {
+                continue;
+            }
+            
             if ($this->getIgnoreWarnings() == true && $type == 'warning') {
                 continue;
             }
@@ -89,8 +93,8 @@ class CssValidationOutputParser {
             
             if ($this->isRefToBeIgnored($ref)) {
                 continue;
-            } 
-            
+            }
+                  
             $contextNode = $messageNode->getElementsByTagName('context')->item(0);
                   
             $message = new \stdClass();
