@@ -70,6 +70,10 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $errorCount = 0;
         
         foreach ($scriptUrls as $scriptUrl) {
+            if ($this->isScriptDomainIgnored($scriptUrl)) {
+                continue;
+            }
+            
             try {
                 $nodeJsLintOutput = $this->validateScriptFromUrl($scriptUrl);
                 
@@ -124,7 +128,26 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $this->response->setErrorCount($errorCount);
         
         return json_encode($jsLintOutput);
-    }  
+    }
+    
+    
+    /**
+     * 
+     * @param \webignition\Url\Url $scriptUrl
+     * @return boolean
+     */
+    private function isScriptDomainIgnored(Url $scriptUrl) {
+        if (!$this->task->hasParameter('domains-to-ignore')) {
+            return false;
+        }
+        
+        $domainsToIgnore = $this->task->getParameter('domains-to-ignore');
+        if (!is_array($domainsToIgnore)) {
+            return false;
+        }        
+        
+        return in_array($scriptUrl->getHost(), $domainsToIgnore);
+    }
     
     
     private function validateScriptFromUrl(Url $url) {        
@@ -133,7 +156,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    private function validateJsContent($js) {   
+    private function validateJsContent($js) {           
         $localPath = $this->getLocalJavaScriptResourcePathFromContent($js);
         
         file_put_contents($localPath, $js);
