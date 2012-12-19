@@ -48,8 +48,8 @@ class CssValidationTaskDriver extends TaskDriver {
         
         $this->getValidatorOutputParser()->setOutputLines($validationOutputLines);
         
-        if ($task->hasParameter('ref-domains-to-ignore')) {
-            $this->getValidatorOutputParser()->setRefDomainsToIgnore($task->getParameter('ref-domains-to-ignore'));
+        if ($task->hasParameter('domains-to-ignore')) {
+            $this->getValidatorOutputParser()->setRefDomainsToIgnore($task->getParameter('domains-to-ignore'));
         }
         
         if ($task->isTrue('ignore-warnings')) {
