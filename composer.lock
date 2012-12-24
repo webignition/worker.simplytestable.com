@@ -1,5 +1,5 @@
 {
-    "hash": "5ef898a19afb3eff8d59bcfb84a16902",
+    "hash": "d24b69425bcb4db608620a85e4dddfc7",
     "packages": [
         {
             "name": "doctrine/common",
@@ -1549,6 +1549,46 @@
                 "dbal",
                 "migrations",
                 "schema"
+            ]
+        },
+        {
+            "name": "webignition/html-document-type-identifier",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/html-document-type-identifier",
+                "reference": "0.1.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/webignition/html-document-type-identifier/archive/0.1.1.zip",
+                "reference": "0.1.1",
+                "shasum": ""
+            },
+            "time": "2012-12-21 19:36:10",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Given the source of an HTML document, identify the document type",
+            "homepage": "https://github.com/webignition/html-document-type-identifier",
+            "keywords": [
+                "html",
+                "document",
+                "doctype"
             ]
         },
         {
