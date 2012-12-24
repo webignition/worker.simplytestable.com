@@ -57,7 +57,10 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
     protected function performValidation() {        
         $characterEncoding = ($this->webResource->getIsDocumentCharacterEncodingValid()) ? $this->webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;
        
-        $validationRequest = new \HttpRequest($this->getProperty('validator-url'), HTTP_METH_POST);
+        $validationRequest = new \HttpRequest($this->getProperty('validator-url'), HTTP_METH_POST, array(
+            'timeout' => 300
+        ));
+        
         $fragment = $this->webResource->getContent();
         
         $htmlDocumentTypeIdentifier = new HtmlDocumentTypeIdentifier();
