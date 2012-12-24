@@ -66,6 +66,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         if (!$htmlDocumentTypeIdentifier->hasValidDocumentType()) {            
             $this->response->setErrorCount(1);
             $this->response->setHasFailed();
+            $this->response->setIsRetryable(false);
             return json_encode($this->getInvalidDocumentTypeOutput($htmlDocumentTypeIdentifier->getDocumentTypeString()));             
         }
         
