@@ -8,6 +8,7 @@ use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\WebResource;
 use webignition\WebResource\JsonDocument\JsonDocument;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser;
+use webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier;
 
 class HtmlValidationTaskDriver extends WebResourceTaskDriver {    
     
@@ -53,13 +54,23 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    protected function performValidation() {
+    protected function performValidation() {        
         $characterEncoding = ($this->webResource->getIsDocumentCharacterEncodingValid()) ? $this->webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;
        
         $validationRequest = new \HttpRequest($this->getProperty('validator-url'), HTTP_METH_POST);
+        $fragment = $this->webResource->getContent();
+        
+        $htmlDocumentTypeIdentifier = new HtmlDocumentTypeIdentifier();
+        $htmlDocumentTypeIdentifier->setHtml($fragment);
+        
+        if (!$htmlDocumentTypeIdentifier->hasValidDocumentType()) {            
+            $this->response->setErrorCount(1);
+            $this->response->setHasFailed();
+            return json_encode($this->getInvalidDocumentTypeOutput($htmlDocumentTypeIdentifier->getDocumentTypeString()));             
+        }
         
         $requestPostFields = array(
-            'fragment' => $this->webResource->getContent(),
+            'fragment' => $fragment,
             'output' => 'json'
         );
         
@@ -96,6 +107,19 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         
         return json_encode($outputObject);         
     }
+    
+    
+    protected function getInvalidDocumentTypeOutput($documentType) {        
+        $outputObjectMessage = new \stdClass();
+        $outputObjectMessage->message = $documentType;
+        $outputObjectMessage->messageId = 'invalid-document-type';
+        $outputObjectMessage->type = 'error';
+        
+        $outputObject = new \stdClass();
+        $outputObject->messages = array($outputObjectMessage);        
+        
+        return $outputObject;
+    }    
     
     
     /**
