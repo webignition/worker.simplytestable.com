@@ -1553,19 +1553,19 @@
         },
         {
             "name": "webignition/html-document-type-identifier",
-            "version": "0.3",
+            "version": "0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-type-identifier",
-                "reference": "0.3"
+                "reference": "0.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/html-document-type-identifier/archive/0.3.zip",
-                "reference": "0.3",
+                "url": "https://github.com/webignition/html-document-type-identifier/archive/0.4.zip",
+                "reference": "0.4",
                 "shasum": ""
             },
-            "time": "2012-12-27 10:21:08",
+            "time": "2012-12-27 13:27:34",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
