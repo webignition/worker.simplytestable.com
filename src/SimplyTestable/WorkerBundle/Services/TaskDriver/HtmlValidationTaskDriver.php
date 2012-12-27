@@ -66,6 +66,13 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         $htmlDocumentTypeIdentifier = new HtmlDocumentTypeIdentifier();
         $htmlDocumentTypeIdentifier->setHtml($fragment);
         
+        if (!$htmlDocumentTypeIdentifier->hasDocumentType()) {
+            $this->response->setErrorCount(1);
+            $this->response->setHasFailed();
+            $this->response->setIsRetryable(false);
+            return json_encode($this->getMissingDocumentTypeOutput($htmlDocumentTypeIdentifier->getDocumentTypeString()));             
+        }
+        
         if (!$htmlDocumentTypeIdentifier->hasValidDocumentType()) {            
             $this->response->setErrorCount(1);
             $this->response->setHasFailed();
@@ -111,12 +118,23 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         
         return json_encode($outputObject);         
     }
-    
+
+    protected function getMissingDocumentTypeOutput() {        
+        $outputObjectMessage = new \stdClass();
+        $outputObjectMessage->message = 'No doctype';
+        $outputObjectMessage->messageId = 'document-type-missing';
+        $outputObjectMessage->type = 'error';
+        
+        $outputObject = new \stdClass();
+        $outputObject->messages = array($outputObjectMessage);        
+        
+        return $outputObject;
+    }      
     
     protected function getInvalidDocumentTypeOutput($documentType) {        
         $outputObjectMessage = new \stdClass();
         $outputObjectMessage->message = $documentType;
-        $outputObjectMessage->messageId = 'invalid-document-type';
+        $outputObjectMessage->messageId = 'document-type-invalid';
         $outputObjectMessage->type = 'error';
         
         $outputObject = new \stdClass();
