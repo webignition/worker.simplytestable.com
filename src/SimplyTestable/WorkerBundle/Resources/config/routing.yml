@@ -22,6 +22,9 @@ SimplyTestableWorkerBundle_status:
     pattern:  /status/
     defaults: { _controller: SimplyTestableWorkerBundle:Status:index, _format: json }    
 
-SimplyTestableWorkerBundle_homepage:
-    pattern:  /hello/{name}
-    defaults: { _controller: SimplyTestableWorkerBundle:Default:index }
+SimplyTestableWorkerBundle_default:
+    pattern:  / 
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: SimplyTestableWorkerBundle_status
+        permanent: true
