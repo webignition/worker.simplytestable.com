@@ -2,7 +2,7 @@
 namespace SimplyTestable\WorkerBundle\Entity\Task\Type;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\SerializerBundle\Annotation as SerializerAnnotation;
+use JMS\Serializer\Annotation as SerializerAnnotation;
 
 /**
  * 

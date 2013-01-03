@@ -2,7 +2,7 @@
 namespace SimplyTestable\WorkerBundle\Entity\Task;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\SerializerBundle\Annotation as SerializerAnnotation;
+use JMS\Serializer\Annotation as SerializerAnnotation;
 
 /**
  * 
@@ -10,6 +10,7 @@ use JMS\SerializerBundle\Annotation as SerializerAnnotation;
  * @ORM\Table(
  *     name="Task"
  * )
+ * @SerializerAnnotation\ExclusionPolicy("all")
  * 
  */
 class Task
@@ -21,6 +22,8 @@ class Task
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @SerializerAnnotation\Expose
+     * 
      */
     protected $id;
 
@@ -29,6 +32,8 @@ class Task
      *
      * @var string
      * @ORM\Column(type="text", nullable=false)
+     * @SerializerAnnotation\Expose
+     * 
      */
     protected $url;
     
@@ -41,6 +46,8 @@ class Task
      * @ORM\JoinColumn(name="state_id", referencedColumnName="id", nullable=false)
      * 
      * @SerializerAnnotation\Accessor(getter="getPublicSerializedState")
+     * @SerializerAnnotation\Expose
+     * @SerializerAnnotation\Type("string")
      */
     protected $state;
     
@@ -53,6 +60,8 @@ class Task
      * @ORM\JoinColumn(name="tasktype_id", referencedColumnName="id", nullable=false)
      * 
      * @SerializerAnnotation\Accessor(getter="getPublicSerializedType")
+     * @SerializerAnnotation\Expose
+     * @SerializerAnnotation\Type("string")
      */
     protected $type;
     
@@ -61,6 +70,8 @@ class Task
      * @var SimplyTestable\WorkerBundle\Entity\TimePeriod
      * 
      * @ORM\OneToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\TimePeriod", cascade={"persist"})
+     * @SerializerAnnotation\Expose
+     * 
      */
     protected $timePeriod;
     
@@ -70,6 +81,8 @@ class Task
      * @var \SimplyTestable\WorkerBundle\Entity\Task\Output
      * 
      * @ORM\OneToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\Task\Output", cascade={"persist"})
+     * @SerializerAnnotation\Expose
+     * 
      */
     protected $output;
     
@@ -77,6 +90,8 @@ class Task
      *
      * @var string
      * @ORM\Column(type="text", nullable=true)
+     * @SerializerAnnotation\Expose
+     * 
      */
     protected $parameters;    
     
