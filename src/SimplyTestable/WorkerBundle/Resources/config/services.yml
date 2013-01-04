@@ -63,6 +63,7 @@ services:
         webResourceService: "@simplytestable.services.webresourceservice"        
         logger: "@logger"
         webResourceTaskOutputService: "@simplytestable.services.webresourcetaskoutputservice"
+        serializer: "@serializer"
         
   simplytestable.services.resqueQueueService:
     class:   SimplyTestable\WorkerBundle\Services\ResqueQueueService

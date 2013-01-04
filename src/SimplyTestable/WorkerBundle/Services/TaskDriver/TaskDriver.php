@@ -71,6 +71,13 @@ abstract class TaskDriver {
     
     /**
      *
+     * @var \JMS\Serializer\Serializer 
+     */
+    private $serializer;    
+    
+    
+    /**
+     *
      * @param array $properties 
      */
     public function setProperties($properties) {
@@ -245,6 +252,23 @@ abstract class TaskDriver {
         }
         
         return false;
+    }
+    
+    
+    /**
+     * 
+     * @param \JMS\Serializer\Serializer $serializer
+     */
+    public function setSerializer(\JMS\Serializer\Serializer $serializer) {
+        $this->serializer = $serializer;
+    }
+    
+    /**
+     * 
+     * @return \JMS\Serializer\Serializer 
+     */
+    public function getSerializer() {
+        return $this->serializer;
     }
     
     

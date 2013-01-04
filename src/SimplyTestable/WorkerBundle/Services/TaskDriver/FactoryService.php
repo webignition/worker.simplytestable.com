@@ -40,8 +40,9 @@ class FactoryService {
             StateService $stateService,
             WebResourceService $webResourceService,
             Logger $logger,
-            WebResourceTaskOutputService $webResourceTaskOutputService
-        ) {
+            WebResourceTaskOutputService $webResourceTaskOutputService,
+            \JMS\Serializer\Serializer $serializer
+        ) {       
         
         $this->taskTypeService = $taskTypeService;        
         
@@ -53,6 +54,7 @@ class FactoryService {
             $driver->setTaskTypeService($taskTypeService);
             $driver->setLogger($logger);
             $driver->setWebResourceTaskoutputService($webResourceTaskOutputService);
+            $driver->setSerializer($serializer);
             
             if (isset($properties['properties'])) {
                 $driver->setProperties($properties['properties']);

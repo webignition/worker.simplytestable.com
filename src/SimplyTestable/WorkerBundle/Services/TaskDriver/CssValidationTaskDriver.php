@@ -4,15 +4,9 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use webignition\WebResource\WebPage\WebPage;
+use webignition\CssValidatorOutput\Parser as CssValidatorOutputParser;
 
-class CssValidationTaskDriver extends TaskDriver {    
-    
-    /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationOutputParser
-     */
-    private $validatorOutputParser = null; 
-    
+class CssValidationTaskDriver extends TaskDriver {
     
     /**
      * 
@@ -23,8 +17,6 @@ class CssValidationTaskDriver extends TaskDriver {
         if (!$this->isCorrectTaskType($task)) {
             return false;
         }
-
-        $validationOutputLines = array();
         
         $commandOptions = array(
             'output' => 'ucn'
@@ -41,35 +33,43 @@ class CssValidationTaskDriver extends TaskDriver {
         $commandOptionsStrings = '';
         foreach ($commandOptions as $key => $value) {
             $commandOptionsStrings[] = '-'.$key.' '.$value;
-        }  
+        }
         
-        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." " .$task->getUrl();        
-        exec($command, $validationOutputLines);        
+        $validationOutputLines = array();
+        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." \"" .$task->getUrl()."\" 2>&1";        
+        exec($command, $validationOutputLines);
         
-        $this->getValidatorOutputParser()->setOutputLines($validationOutputLines);
+        $cssValidatorOutputParser = new CssValidatorOutputParser();
+        $cssValidatorOutputParser->setRawOutput(implode("\n", $validationOutputLines));
         
         if ($task->hasParameter('domains-to-ignore')) {
-            $this->getValidatorOutputParser()->setRefDomainsToIgnore($task->getParameter('domains-to-ignore'));
+            $cssValidatorOutputParser->setRefDomainsToIgnore($task->getParameter('domains-to-ignore'));
         }
         
         if ($task->isTrue('ignore-warnings')) {
-            $this->getValidatorOutputParser()->setIgnoreWarnings(true);
+            $cssValidatorOutputParser->setIgnoreWarnings(true);
         }
         
-        if ($task->getParameter('vendor-extensions') == 'ignore') {
-            $this->getValidatorOutputParser()->setIgnoreVendorExtensions(true);
+        if ($task->getParameter('vendor-extensions') == 'ignore') {    
+            $cssValidatorOutputParser->setIgnoreVendorExtensionIssues(true);
         }
         
         if ($task->getParameter('vendor-extensions') == 'warn' && $task->isTrue('ignore-warnings')) {
-            $this->getValidatorOutputParser()->setIgnoreVendorExtensions(true);
+            $cssValidatorOutputParser->setIgnoreVendorExtensionIssues(true);
+        }        
+        
+        $cssValidatorOutput = $cssValidatorOutputParser->getOutput();
+        
+        if ($cssValidatorOutput->getIsUnknownMimeTypeError()) {
+            $this->response->setHasBeenSkipped();
+            $this->response->setErrorCount(0);
+            return true;            
         }
         
-        $validatorOutput = $this->getValidatorOutputParser()->getOutput();
+        $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
+        $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
         
-        $this->response->setErrorCount($this->getValidatorOutputParser()->getErrorCount());
-        $this->response->setWarningCount($this->getValidatorOutputParser()->getWarningCount());
-        
-        return json_encode($validatorOutput);
+        return json_encode($this->getSerializer()->serialize($cssValidatorOutput->getMessages(), 'json'));
     }    
     
     
@@ -100,22 +100,6 @@ class CssValidationTaskDriver extends TaskDriver {
     {
         $mediaTypeParser = new \webignition\InternetMediaType\Parser\Parser();
         return $mediaTypeParser->parse('application/json');
-    }    
-    
-    
-    /**
-     * 
-     * @return SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationOutputParser   
-     */
-    private function getValidatorOutputParser() {
-        if (is_null($this->validatorOutputParser)) {
-            $className = $this->getProperty('validator-output-parser');
-            $this->validatorOutputParser = new $className;        
-        }
-        
-        return $this->validatorOutputParser;
-    }
-    
-    
+    }   
     
 }
