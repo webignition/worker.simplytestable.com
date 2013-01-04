@@ -69,7 +69,7 @@ class CssValidationTaskDriver extends TaskDriver {
         $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
         $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
         
-        return json_encode($this->getSerializer()->serialize($cssValidatorOutput->getMessages(), 'json'));
+        return $this->getSerializer()->serialize($cssValidatorOutput->getMessages(), 'json');
     }    
     
     
