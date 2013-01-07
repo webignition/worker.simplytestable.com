@@ -40,8 +40,9 @@ class ThisWorker
      * @ORM\ManyToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\State")
      * @ORM\JoinColumn(name="state_id", referencedColumnName="id", nullable=false)
      * 
-     * @SerializerAnnotation\Accessor(getter="getPublicSerializedState")
      * @SerializerAnnotation\Expose
+     * @SerializerAnnotation\Accessor(getter="getPublicSerializedState")
+     * @SerializerAnnotation\Type("string")
      */    
     protected $state;
     
