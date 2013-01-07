@@ -66,10 +66,33 @@ class CssValidationTaskDriver extends TaskDriver {
             return true;            
         }
         
+        if ($cssValidatorOutput->getIsUnknownExceptionError()) {
+            $this->response->setHasFailed();
+            $this->response->setErrorCount(1);            
+            return json_encode($this->getUnknownExceptionErrorOutput());
+        }
+        
         $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
         $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
         
         return $this->getSerializer()->serialize($cssValidatorOutput->getMessages(), 'json');
+    } 
+    
+    
+    /**
+     *
+     * @return \stdClass 
+     */
+    protected function getUnknownExceptionErrorOutput() {        
+        $outputObjectMessage = new \stdClass();
+        $outputObjectMessage->message = 'Unknown error';
+        $outputObjectMessage->messageId = 'css-validation-exception-unknown';
+        $outputObjectMessage->type = 'error';
+        
+        $outputObject = new \stdClass();
+        $outputObject->messages = array($outputObjectMessage);        
+        
+        return $outputObject;
     }    
     
     
