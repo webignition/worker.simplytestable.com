@@ -8,6 +8,7 @@ use webignition\Url\Url;
 use webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver;
 use webignition\WebResource\WebResource;
 use webignition\NodeJslintOutput\Parser;
+use SimplyTestable\WorkerBundle\Exception\WebResourceException;
 
 class JsLintTaskDriver extends WebResourceTaskDriver {  
     
@@ -81,8 +82,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                 
                 $jsLintOutput[(string)$scriptUrl] = $nodeJsLintOutput->__toArray();            
             } catch (WebResourceException $webResourceException) {
-                var_dump("WebResourceException");
-                exit();
+                $errorCount++;
+                $jsLintOutput[(string)$scriptUrl] = $webResourceException->getCode(); 
                 
 //                $this->response->setHasFailed();
 //                $this->response->setIsRetryable(false);
