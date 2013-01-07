@@ -68,7 +68,8 @@ class CssValidationTaskDriver extends TaskDriver {
         
         if ($cssValidatorOutput->getIsUnknownExceptionError()) {
             $this->response->setHasFailed();
-            $this->response->setErrorCount(1);            
+            $this->response->setErrorCount(1); 
+            $this->response->setIsRetryable(false);
             return json_encode($this->getUnknownExceptionErrorOutput($task));
         }
         
