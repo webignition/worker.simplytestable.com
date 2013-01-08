@@ -7,13 +7,13 @@ use Doctrine\ORM\Mapping as ORM;
  * 
  * @ORM\Entity
  * @ORM\Table(
- *     name="WebResourceTaskOutput",
+ *     name="TimeCachedTaskOutput",
  *     indexes={
  *         @ORM\Index(name="hash_index", columns={"hash"})
  *     }
  * )
  */
-class WebResourceTaskOutput
+class TimeCachedTaskOutput
 {    
     /**
      * 
@@ -50,7 +50,35 @@ class WebResourceTaskOutput
      * 
      * @ORM\Column(type="integer")
      */
-    protected $errorCount;
+    protected $errorCount = 0;
+    
+    
+    /**
+     *
+     * @var int
+     * 
+     * @ORM\Column(type="integer")
+     */
+    protected $warningCount = 0;
+    
+    
+    /**
+     * 
+     * 
+     * @var int
+     * 
+     * @ORM\Column(type="integer")
+     */
+    protected $maxAge = 0;
+    
+    
+    /**
+     *
+     * @var \DateTime
+     * 
+     * @ORM\Column(type="datetime")
+     */
+    protected $lastModified;
   
 
     /**
@@ -132,4 +160,76 @@ class WebResourceTaskOutput
     {
         return $this->errorCount;
     }
+    
+    
+    /**
+     * Set warningCount
+     *
+     * @param integer $warningCount
+     * @return WebResourceTaskOutput
+     */
+    public function setWarningCount($warningCount)
+    {
+        $this->warningCount = $warningCount;
+    
+        return $this;
+    }
+
+    /**
+     * Get warningCount
+     *
+     * @return integer 
+     */
+    public function getWarningCount()
+    {
+        return $this->warningCount;
+    } 
+    
+    
+    /**
+     * Set maxAge
+     *
+     * @param integer $maxAge
+     * @return WebResourceTaskOutput
+     */
+    public function setMaxAge($maxAge)
+    {
+        $this->maxAge = $maxAge;
+    
+        return $this;
+    }
+
+    /**
+     * Get maxAge
+     *
+     * @return integer 
+     */
+    public function getMaxAge()
+    {
+        return $this->maxAge;
+    }
+    
+    
+    /**
+     * Set lastModified
+     *
+     * @param \DateTime $lastModified
+     * @return TimePeriod
+     */
+    public function setLastModified($lastModified)
+    {
+        $this->lastModified = $lastModified;
+    
+        return $this;
+    }
+
+    /**
+     * Get lastModified
+     *
+     * @return \DateTime 
+     */
+    public function getLastModified()
+    {
+        return $this->lastModified;
+    }    
 }
