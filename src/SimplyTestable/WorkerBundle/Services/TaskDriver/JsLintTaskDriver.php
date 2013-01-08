@@ -163,7 +163,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    private function validateJsContent($js) {           
+    private function validateJsContent($js) {               
         $localPath = $this->getLocalJavaScriptResourcePathFromContent($js);
         
         file_put_contents($localPath, $js);
@@ -192,7 +192,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return string
      */
     private function getLocalJavaScriptResourcePathFromContent($content) {
-        return sys_get_temp_dir() . '/' . md5($content);
+        return sys_get_temp_dir() . '/' . md5($content) . ':' . $this->task->getId() . ':' . microtime(true);
     }    
     
     
