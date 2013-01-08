@@ -80,10 +80,16 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                 
                 $errorCount += $nodeJsLintOutput->getEntryCount();
                 
-                $jsLintOutput[(string)$scriptUrl] = $nodeJsLintOutput->__toArray();            
+                $jsLintOutput[(string)$scriptUrl] = $nodeJsLintOutput->__toArray();                            
             } catch (WebResourceException $webResourceException) {
                 $errorCount++;
-                $jsLintOutput[(string)$scriptUrl] = $webResourceException->getCode(); 
+                $jsLintOutput[(string)$scriptUrl] = array(
+                    'statusLine' => 'failed',
+                    'errorReport' => array(
+                        'reason' => 'webResourceException',
+                        'statusCode' => $webResourceException->getCode()
+                    )
+                ); 
                 
 //                $this->response->setHasFailed();
 //                $this->response->setIsRetryable(false);
