@@ -10,6 +10,7 @@ use SimplyTestable\WorkerBundle\Services\WebResourceService;
 use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService;
+use SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService;
 
 abstract class TaskDriver {
     
@@ -74,6 +75,14 @@ abstract class TaskDriver {
      * @var \JMS\Serializer\Serializer 
      */
     private $serializer;    
+    
+    
+    
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService  
+     */
+    private $timeCachedTaskOutputService;    
     
     
     /**
@@ -147,6 +156,24 @@ abstract class TaskDriver {
     public function getWebResourceTaskOutputService() {
         return $this->webResourceTaskOutputService;
     }
+    
+    
+    /**
+     * 
+     * @param \SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService $timeCachedTaskOutputService
+     */
+    public function setTimeCachedTaskoutputService(TimeCachedTaskOutputService $timeCachedTaskOutputService) {
+        $this->timeCachedTaskOutputService = $timeCachedTaskOutputService;
+    }
+    
+    
+    /**
+     * 
+     * @return \SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService
+     */
+    public function getTimeCachedTaskOutputService() {
+        return $this->timeCachedTaskOutputService;
+    }    
     
     
     /**

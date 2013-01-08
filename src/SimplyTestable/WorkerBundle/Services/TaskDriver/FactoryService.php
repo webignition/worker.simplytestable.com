@@ -12,6 +12,7 @@ use SimplyTestable\WorkerBundle\Services\WebResourceService;
 use SimplyTestable\WorkerBundle\Services\HttpServiceInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
 use SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService;
+use SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService;
 
 class FactoryService {
     
@@ -41,7 +42,8 @@ class FactoryService {
             WebResourceService $webResourceService,
             Logger $logger,
             WebResourceTaskOutputService $webResourceTaskOutputService,
-            \JMS\Serializer\Serializer $serializer
+            \JMS\Serializer\Serializer $serializer,
+            TimeCachedTaskOutputService $timeCachedTaskOutputService
         ) {       
         
         $this->taskTypeService = $taskTypeService;        
@@ -55,6 +57,7 @@ class FactoryService {
             $driver->setLogger($logger);
             $driver->setWebResourceTaskoutputService($webResourceTaskOutputService);
             $driver->setSerializer($serializer);
+            $driver->setTimeCachedTaskoutputService($timeCachedTaskOutputService);
             
             if (isset($properties['properties'])) {
                 $driver->setProperties($properties['properties']);

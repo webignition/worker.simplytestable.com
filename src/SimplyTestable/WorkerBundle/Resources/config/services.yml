@@ -64,6 +64,7 @@ services:
         logger: "@logger"
         webResourceTaskOutputService: "@simplytestable.services.webresourcetaskoutputservice"
         serializer: "@serializer"
+        timeCachedTaskOutputService: "@simplytestable.services.timecachedtaskoutputservice"
         
   simplytestable.services.resqueQueueService:
     class:   SimplyTestable\WorkerBundle\Services\ResqueQueueService
@@ -88,3 +89,8 @@ services:
     class:   SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService
     arguments:
         entityManager: "@doctrine.orm.entity_manager"       
+        
+  simplytestable.services.timecachedtaskoutputservice:
+    class:   SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService
+    arguments:
+        entityManager: "@doctrine.orm.entity_manager"         

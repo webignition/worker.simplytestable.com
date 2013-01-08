@@ -12,12 +12,6 @@ use SimplyTestable\WorkerBundle\Exception\WebResourceException;
 
 class JsLintTaskDriver extends WebResourceTaskDriver {  
     
-    /**
-     *
-     * @var int
-     */
-    private $errorCount = 0;
-    
     
     /**
      * 
@@ -74,45 +68,67 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $jsLintOutput = array();
         $scriptUrls = $this->getScriptUrls();              
         
-        $this->errorCount = 0;
+        $errorCount = 0;
         
         foreach ($scriptUrls as $scriptUrl) {
             if ($this->isScriptDomainIgnored($scriptUrl)) {
                 continue;
             }
             
-            $jsLintOutput[(string)$scriptUrl] = $this->getJsLintOutputForUrl($scriptUrl);
+            $output = $this->getJsLintOutputForUrl($scriptUrl);
+            $jsLintOutput[(string)$scriptUrl] = $output['output'];
+            $errorCount += $output['errorCount'];
         }
         
         $scriptValues = $this->getScriptValues();
-        foreach ($scriptValues as $scriptValue) {
-            $nodeJsLintOutput = $this->validateJsContent($scriptValue); 
-            
-            $this->errorCount += $nodeJsLintOutput->getEntryCount();
-            
+        foreach ($scriptValues as $scriptValue) {            
+            $nodeJsLintOutput = $this->validateJsContent($scriptValue);             
+            $errorCount += $nodeJsLintOutput->getEntryCount();            
             $jsLintOutput[md5($scriptValue)] = $nodeJsLintOutput->__toArray();  
         }
         
-        $this->response->setErrorCount($this->errorCount);
+        $this->response->setErrorCount($errorCount);
         
         return json_encode($jsLintOutput);
     }
     
     
-    private function getJsLintOutputForUrl($scriptUrl) {
+    private function getJsLintOutputForUrl($scriptUrl) {        
+        $hash = md5($scriptUrl);
+        
+        if ($this->getTimeCachedTaskOutputService()->isStale($hash)) {
+            $output = $this->getSourceJsLintOutputForUrl($scriptUrl);                        
+            $this->getTimeCachedTaskOutputService()->set($hash, serialize($output['output']), $output['errorCount'], 0);
+        }
+        
+        $timeCachedOutput = $this->getTimeCachedTaskOutputService()->find($hash);
+        
+        return array(
+            'errorCount' => $timeCachedOutput->getErrorCount(),
+            'output' => unserialize($timeCachedOutput->getOutput())
+        );
+    }   
+    
+    
+    private function getSourceJsLintOutputForUrl($scriptUrl) {        
         try {
             $nodeJsLintOutput = $this->validateScriptFromUrl($scriptUrl);
-
-            $this->errorCount += $nodeJsLintOutput->getEntryCount();
-
-            return $nodeJsLintOutput->__toArray();                            
+            
+            return array(
+                'errorCount' => $nodeJsLintOutput->getEntryCount(),
+                'output' => $nodeJsLintOutput->__toArray()
+            );                            
         } catch (WebResourceException $webResourceException) {
             $this->errorCount++;
+            
             return array(
-                'statusLine' => 'failed',
-                'errorReport' => array(
-                    'reason' => 'webResourceException',
-                    'statusCode' => $webResourceException->getCode()
+                'errorCount' => 1,
+                'output' => array(
+                    'statusLine' => 'failed',
+                    'errorReport' => array(
+                        'reason' => 'webResourceException',
+                        'statusCode' => $webResourceException->getCode()
+                    )
                 )
             );        
         } catch (\webignition\Http\Client\Exception $httpClientException) {
@@ -140,7 +156,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
 //                }              
 //
 //                $this->curlException = $curlException;
-        }        
+        }         
     }
     
     
@@ -169,7 +185,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    private function validateJsContent($js) {               
+    private function validateJsContent($js) {        
         $localPath = $this->getLocalJavaScriptResourcePathFromContent($js);
         
         file_put_contents($localPath, $js);
@@ -190,6 +206,9 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         return $nodeJsLintOutput;         
     }
+    
+    
+    
     
     
     /**
@@ -260,8 +279,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         }); 
         
         return $scriptValues;
-    }  
-    
+    } 
     
     
 }
