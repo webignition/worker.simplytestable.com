@@ -12,6 +12,12 @@ use SimplyTestable\WorkerBundle\Exception\WebResourceException;
 
 class JsLintTaskDriver extends WebResourceTaskDriver {  
     
+    /**
+     *
+     * @var int
+     */
+    private $errorCount = 0;
+    
     
     /**
      * 
@@ -68,43 +74,57 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $jsLintOutput = array();
         $scriptUrls = $this->getScriptUrls();              
         
-        $errorCount = 0;
+        $this->errorCount = 0;
         
         foreach ($scriptUrls as $scriptUrl) {
             if ($this->isScriptDomainIgnored($scriptUrl)) {
                 continue;
             }
             
-            try {
-                $nodeJsLintOutput = $this->validateScriptFromUrl($scriptUrl);
-                
-                $errorCount += $nodeJsLintOutput->getEntryCount();
-                
-                $jsLintOutput[(string)$scriptUrl] = $nodeJsLintOutput->__toArray();                            
-            } catch (WebResourceException $webResourceException) {
-                $errorCount++;
-                $jsLintOutput[(string)$scriptUrl] = array(
-                    'statusLine' => 'failed',
-                    'errorReport' => array(
-                        'reason' => 'webResourceException',
-                        'statusCode' => $webResourceException->getCode()
-                    )
-                ); 
-                
-//                $this->response->setHasFailed();
-//                $this->response->setIsRetryable(false);
-//
-//                $this->webResourceException = $webResourceException;           
-            } catch (\webignition\Http\Client\Exception $httpClientException) {
-                var_dump("HttpClientException");
-                exit();                
+            $jsLintOutput[(string)$scriptUrl] = $this->getJsLintOutputForUrl($scriptUrl);
+        }
+        
+        $scriptValues = $this->getScriptValues();
+        foreach ($scriptValues as $scriptValue) {
+            $nodeJsLintOutput = $this->validateJsContent($scriptValue); 
+            
+            $this->errorCount += $nodeJsLintOutput->getEntryCount();
+            
+            $jsLintOutput[md5($scriptValue)] = $nodeJsLintOutput->__toArray();  
+        }
+        
+        $this->response->setErrorCount($this->errorCount);
+        
+        return json_encode($jsLintOutput);
+    }
+    
+    
+    private function getJsLintOutputForUrl($scriptUrl) {
+        try {
+            $nodeJsLintOutput = $this->validateScriptFromUrl($scriptUrl);
+
+            $this->errorCount += $nodeJsLintOutput->getEntryCount();
+
+            return $nodeJsLintOutput->__toArray();                            
+        } catch (WebResourceException $webResourceException) {
+            $this->errorCount++;
+            return array(
+                'statusLine' => 'failed',
+                'errorReport' => array(
+                    'reason' => 'webResourceException',
+                    'statusCode' => $webResourceException->getCode()
+                )
+            );        
+        } catch (\webignition\Http\Client\Exception $httpClientException) {
+            var_dump("HttpClientException");
+            exit();                
 //                $this->response->setHasFailed();
 //                $this->response->setIsRetryable(false);
 //
 //                $this->httpClientException = $httpClientException;
-            } catch (\webignition\Http\Client\CurlException $curlException) {
-                var_dump("CurlException");
-                exit();                
+        } catch (\webignition\Http\Client\CurlException $curlException) {
+            var_dump("CurlException");
+            exit();                
 //                $this->response->setHasFailed();
 //
 //                if ($curlException->isTimeoutException()) {
@@ -120,21 +140,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
 //                }              
 //
 //                $this->curlException = $curlException;
-            }
-        }
-        
-        $scriptValues = $this->getScriptValues();
-        foreach ($scriptValues as $scriptValue) {
-            $nodeJsLintOutput = $this->validateJsContent($scriptValue); 
-            
-            $errorCount += $nodeJsLintOutput->getEntryCount();
-            
-            $jsLintOutput[md5($scriptValue)] = $nodeJsLintOutput->__toArray();  
-        }
-        
-        $this->response->setErrorCount($errorCount);
-        
-        return json_encode($jsLintOutput);
+        }        
     }
     
     
