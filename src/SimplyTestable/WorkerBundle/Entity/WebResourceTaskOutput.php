@@ -7,13 +7,13 @@ use Doctrine\ORM\Mapping as ORM;
  * 
  * @ORM\Entity
  * @ORM\Table(
- *     name="TimeCachedTaskOutput",
+ *     name="WebResourceTaskOutput",
  *     indexes={
  *         @ORM\Index(name="hash_index", columns={"hash"})
  *     }
  * )
  */
-class TimeCachedTaskOutput
+class WebResourceTaskOutput
 {    
     /**
      * 
@@ -51,23 +51,6 @@ class TimeCachedTaskOutput
      * @ORM\Column(type="integer")
      */
     protected $errorCount;
-    
-    
-    /**
-     *
-     * @var int
-     * 
-     * @ORM\Column(type="integer")
-     */    
-    protected $warningCount;
-    
-    
-    /**
-     * Maximum age of cached output in seconds
-     * 
-     * @var int
-     */
-    private $maxAge = 0;
   
 
     /**
@@ -148,49 +131,5 @@ class TimeCachedTaskOutput
     public function getErrorCount()
     {
         return $this->errorCount;
-    }
-    
-    
-    /**
-     * Set warningCount
-     *
-     * @param integer $warningCount
-     * @return WebResourceTaskOutput
-     */
-    public function setWarningCount($warningCount)
-    {
-        $this->warningCount = $warningCount;
-    
-        return $this;
-    }
-
-    /**
-     * Get warnignCount
-     *
-     * @return integer 
-     */
-    public function getWarningCount()
-    {
-        return $this->warningCount;
-    }  
-    
-    
-    /**
-     * 
-     * @param int $maxAge
-     * @return \SimplyTestable\WorkerBundle\Entity\WebResourceTaskOutput
-     */
-    public function setMaxAge($maxAge) {
-        $this->maxAge = $maxAge;
-        return $this;
-    }
-    
-    
-    /**
-     * 
-     * @return int
-     */
-    public function getMaxAge() {
-        return $this->maxAge;
     }
 }
