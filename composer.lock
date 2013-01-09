@@ -1919,19 +1919,19 @@
         },
         {
             "name": "webignition/html-document-type-identifier",
-            "version": "0.5",
+            "version": "0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-type-identifier",
-                "reference": "0.5"
+                "reference": "0.6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/html-document-type-identifier/archive/0.5.zip",
-                "reference": "0.5",
+                "url": "https://github.com/webignition/html-document-type-identifier/archive/0.6.zip",
+                "reference": "0.6",
                 "shasum": ""
             },
-            "time": "2013-01-09 10:29:39",
+            "time": "2013-01-09 11:57:35",
             "type": "library",
             "autoload": {
                 "psr-0": {
