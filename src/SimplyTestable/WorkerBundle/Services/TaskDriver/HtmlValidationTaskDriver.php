@@ -20,6 +20,10 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
      */
     private $validatorErrorCollectionParser = null;
     
+    public function __construct() {
+        $this->canCacheValidationOutput = true;
+    }
+    
     
     /**
      * 
@@ -100,6 +104,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
             $this->response->setErrorCount(1);            
+            $this->canCacheValidationOutput = false;
         } else {
             // Regular JSON output
             $outputObject = $this->getOutputOject($validationResponse->getContentObject());

@@ -79,7 +79,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             return $this->isBlankWebResourceHandler();
         }
         
-        if ($this->canCacheValidationOutput()) {        
+        if ($this->canCacheValidationOutput()) {            
             $hash = $this->getWebResourceTaskHash();                
             if ($this->getWebResourceTaskOutputService()->has($hash)) {
                 $webResourceTaskOutput = $this->getWebResourceTaskOutputService()->find($hash);
@@ -91,6 +91,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         $validationOutput = $this->performValidation();
         
         if ($this->canCacheValidationOutput()) {
+            $hash = $this->getWebResourceTaskHash();
             $this->getWebResourceTaskOutputService()->create($hash, $validationOutput, $this->response->getErrorCount());
         }
         
