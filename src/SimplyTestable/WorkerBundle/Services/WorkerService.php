@@ -210,7 +210,7 @@ class WorkerService extends EntityService {
             $this->logger->info("WorkerService::activate: " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
             
             if ($response->getResponseCode() !== 200) {
-                $this->logger->warn("WorkerService::activate: Activation request failed");
+                $this->logger->err("WorkerService::activate: Activation request failed");
                 return false;
             }
             
