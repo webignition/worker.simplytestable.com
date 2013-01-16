@@ -220,7 +220,7 @@ class WorkerService extends EntityService {
             return true;            
             
         } catch (CurlException $curlException) {
-            $this->logger->info("WorkerService::activate: " . $requestUrl . ": " . $curlException->getMessage());            
+            $this->logger->err("WorkerService::activate: " . $requestUrl . ": " . $curlException->getMessage());            
             return false;
         }
     }
