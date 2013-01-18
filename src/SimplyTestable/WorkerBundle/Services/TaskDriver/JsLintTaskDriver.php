@@ -114,6 +114,15 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         try {
             $nodeJsLintOutput = $this->validateScriptFromUrl($scriptUrl);
             
+            foreach ($nodeJsLintOutput->getEntries() as $entry) {
+                /* @var $entry \webignition\NodeJslintOutput\Entry\Entry */
+                if (strlen($entry->getFragmentLine()->getFragment()) > 256) {
+                    $truncatedFragmentLine = new \webignition\NodeJslintOutput\Entry\FragmentLine\FragmentLine();
+                    $truncatedFragmentLine->setFragment(substr($entry->getFragmentLine()->getFragment(), 0, 256));                    
+                    $entry->setFragmentLine($truncatedFragmentLine);
+                }             
+            }
+            
             return array(
                 'errorCount' => $nodeJsLintOutput->getEntryCount(),
                 'output' => $nodeJsLintOutput->__toArray()
@@ -192,7 +201,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         $outputLines = array();
         
-        $command = $this->getProperty('node-path') . " ".$this->getProperty('node-jslint-path')."/jslint.js ".$localPath;        
+        $command = $this->getProperty('node-path') . " ".$this->getProperty('node-jslint-path')."/jslint.js ".$localPath;
         exec($command, $outputLines); 
         
         $output = implode("\n", $outputLines);
