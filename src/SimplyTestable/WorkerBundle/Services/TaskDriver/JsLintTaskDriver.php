@@ -117,9 +117,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
             foreach ($nodeJsLintOutput->getEntries() as $entry) {
                 /* @var $entry \webignition\NodeJslintOutput\Entry\Entry */
                 if (strlen($entry->getFragmentLine()->getFragment()) > 256) {
-                    $truncatedFragmentLine = new \webignition\NodeJslintOutput\Entry\FragmentLine\FragmentLine();
-                    $truncatedFragmentLine->setFragment(substr($entry->getFragmentLine()->getFragment(), 0, 256));                    
-                    $entry->setFragmentLine($truncatedFragmentLine);
+                    $entry->getFragmentLine()->setFragment(substr($entry->getFragmentLine()->getFragment(), 0, 256));
                 }             
             }
             
