@@ -209,7 +209,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         $nodeJsLintOutput = $outputParser->getNodeJsLintOutput();
         
-        unlink($localPath);
+        //unlink($localPath);
         
         return $nodeJsLintOutput;         
     }
@@ -224,7 +224,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return string
      */
     private function getLocalJavaScriptResourcePathFromContent($content) {
-        return sys_get_temp_dir() . '/' . md5($content) . ':' . $this->task->getId() . ':' . microtime(true);
+        return sys_get_temp_dir() . '/' . md5($content);
     }    
     
     
