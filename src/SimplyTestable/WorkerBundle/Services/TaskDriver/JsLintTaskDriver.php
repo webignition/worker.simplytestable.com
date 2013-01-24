@@ -195,7 +195,9 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     private function validateJsContent($js) {        
         $localPath = $this->getLocalJavaScriptResourcePathFromContent($js);
         
-        file_put_contents($localPath, $js);
+        if (!file_exists($localPath)) {
+            file_put_contents($localPath, $js);
+        }
         
         $outputLines = array();
         
@@ -209,7 +211,9 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         $nodeJsLintOutput = $outputParser->getNodeJsLintOutput();
         
-        //unlink($localPath);
+        if (time() - filemtime($localPath) > 3600)  {
+            unlink($localPath);
+        }
         
         return $nodeJsLintOutput;         
     }
@@ -224,21 +228,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return string
      */
     private function getLocalJavaScriptResourcePathFromContent($content) {
-        $this->getLocalJavaScriptResourceBasePath() . md5($content);
-    }  
-    
-    
-    /**
-     * 
-     * @return string
-     */
-    private function getLocalJavaScriptResourceBasePath() {
-        $path = sys_get_temp_dir() . '/jslint/';
-        if (!is_dir($path)) {
-            mkdir($path);
-        }
-        
-        return $path;
+        return sys_get_temp_dir() . '/' . md5($content);
     }
     
     
