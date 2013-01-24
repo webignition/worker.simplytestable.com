@@ -195,9 +195,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     private function validateJsContent($js) {        
         $localPath = $this->getLocalJavaScriptResourcePathFromContent($js);
         
-        if (!file_exists($localPath)) {
-            file_put_contents($localPath, $js);
-        }
+        file_put_contents($localPath, $js);
         
         $outputLines = array();
         
