@@ -224,8 +224,22 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return string
      */
     private function getLocalJavaScriptResourcePathFromContent($content) {
-        return sys_get_temp_dir() . '/' . md5($content);
-    }    
+        $this->getLocalJavaScriptResourceBasePath() . md5($content);
+    }  
+    
+    
+    /**
+     * 
+     * @return string
+     */
+    private function getLocalJavaScriptResourceBasePath() {
+        $path = sys_get_temp_dir() . '/jslint/';
+        if (!is_dir($path)) {
+            mkdir($path);
+        }
+        
+        return $path;
+    }
     
     
     /**
