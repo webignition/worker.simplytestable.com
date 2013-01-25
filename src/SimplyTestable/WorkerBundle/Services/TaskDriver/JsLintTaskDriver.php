@@ -89,6 +89,12 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         $this->response->setErrorCount($errorCount);
         
+        foreach ($jsLintOutput as $sourcePath => $sourcePathOutput) {
+            if (preg_match('/^\/tmp\/[a-z0-9]{32}:[0-9]+:[0-9]+\.[0-9]+$/', $sourcePathOutput['statusLine'])) {
+                $jsLintOutput[$sourcePath]['statusLine'] = substr($sourcePathOutput['statusLine'], 0, strpos($sourcePathOutput['statusLine'], ':'));
+            }
+        }
+        
         return json_encode($jsLintOutput);
     }
     
@@ -208,10 +214,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $outputParser->parse($output);
         
         $nodeJsLintOutput = $outputParser->getNodeJsLintOutput();
-        
-        if (time() - filemtime($localPath) > 3600)  {
-            unlink($localPath);
-        }
+        unlink($localPath);
         
         return $nodeJsLintOutput;         
     }
@@ -226,7 +229,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return string
      */
     private function getLocalJavaScriptResourcePathFromContent($content) {
-        return sys_get_temp_dir() . '/' . md5($content);
+        return sys_get_temp_dir() . '/' . md5($content) . ':' . $this->task->getId() . ':' . microtime(true);
     }
     
     
