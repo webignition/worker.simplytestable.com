@@ -21,6 +21,7 @@ before_script:
   # Build!
   #- mkdir app/cache/test  
   - mv app/config/parameters.yml.travis app/config/parameters.yml
+  - cp app/config/security_credentials.yml.dist app/config/security_credentials.yml
   - mv --force app/config/config_travis.yml app/config/config_test.yml
   - cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
   - php composer.phar install
