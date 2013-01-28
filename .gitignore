@@ -6,6 +6,7 @@ build/
 vendor
 composer.phar
 app/config/parameters.yml
+app/config/security_credentials.yml
 src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
 /bin
 
