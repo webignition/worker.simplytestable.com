@@ -28,3 +28,8 @@ SimplyTestableWorkerBundle_default:
         _controller: FrameworkBundle:Redirect:redirect
         route: SimplyTestableWorkerBundle_status
         permanent: true
+        
+SimplyTestableWorkerBundle_set_readonly:
+    pattern: /maintenance/set-read-only/
+    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:setReadOnly, _format: json }       
+  

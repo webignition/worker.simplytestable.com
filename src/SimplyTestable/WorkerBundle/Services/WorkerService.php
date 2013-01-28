@@ -17,6 +17,7 @@ class WorkerService extends EntityService {
     const WORKER_ACTIVATE_STATE = 'worker-active';
     const WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE = 'worker-awaiting-activation-verification';
     const WORKER_ACTIVATE_REMOTE_ENDPOINT_IDENTIFIER = 'worker-activate';    
+    const WORKER_MAINTENANCE_READ_ONLY_STATE = 'worker-maintenance-read-only';
     const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\ThisWorker';
     
     
@@ -291,5 +292,32 @@ class WorkerService extends EntityService {
      */       
     public function getActiveState() {
         return $this->stateService->fetch(self::WORKER_ACTIVATE_STATE);
+    }
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Entity\State
+     */       
+    public function getMaintenanceReadOnlyState() {
+        return $this->stateService->fetch(self::WORKER_MAINTENANCE_READ_ONLY_STATE);
+    }
+    
+    
+    /**
+     * 
+     * @return boolean
+     */
+    public function isMaintenanceReadOnly() {
+        return $this->get()->getState()->equals($this->getMaintenanceReadOnlyState());
+    }
+        
+    
+    /**
+     * 
+     */
+    public function setReadOnly() {
+        $thisWorker = $this->get();
+        $thisWorker->setState($this->getMaintenanceReadOnlyState());
+        $this->persistAndFlush($thisWorker);
     }
 }
