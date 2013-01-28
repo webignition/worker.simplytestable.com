@@ -112,7 +112,11 @@ class TaskController extends BaseController
     
     
     public function cancelAction()
-    {        
+    {          
+        if ($this->isInMaintenanceReadOnlyMode()) {
+            return $this->sendServiceUnavailableResponse();
+        }           
+        
         $task = $this->getTaskService()->getById($this->getArguments('cancelAction')->get('id'));
         if (is_null($task)) {
             throw new \Symfony\Component\HttpKernel\Exception\HttpException(400);
@@ -124,6 +128,10 @@ class TaskController extends BaseController
     
     public function cancelCollectionAction()
     {
+        if ($this->isInMaintenanceReadOnlyMode()) {
+            return $this->sendServiceUnavailableResponse();
+        }           
+        
         $taskIds = explode(',', $this->getArguments('cancelCollectionAction')->get('ids'));
         foreach ($taskIds as $taskId) {
             $task = $this->getTaskService()->getById($taskId);

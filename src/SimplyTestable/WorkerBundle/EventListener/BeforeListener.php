@@ -45,12 +45,12 @@ class BeforeListener
         
         if ($controller instanceof BaseController) {
             /* @var $controller ApiController */            
-            $methodArguments = $controller->getArguments($methodName);            
+            $methodArguments = $controller->getArguments($methodName);
             foreach ($controller->getInputDefinition($methodName)->getArguments() as $inputArgument) {
                 /* @var $inputArgument InputArgument */
                 if ($inputArgument->isRequired()) {
                     if (!$methodArguments->has($inputArgument->getName())) {
-                        $this->logger->warn('BeforeListener' . get_class($controller) . '::' . $methodName.': missing required argument');
+                        $this->logger->warn('BeforeListener' . get_class($controller) . '::' . $methodName.': missing required argument ['.$inputArgument->getName().']');
                         throw new \Symfony\Component\HttpKernel\Exception\HttpException(400);
                     }
                 }

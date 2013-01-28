@@ -302,6 +302,15 @@ class WorkerService extends EntityService {
         return $this->stateService->fetch(self::WORKER_MAINTENANCE_READ_ONLY_STATE);
     }
     
+
+    /**
+     * 
+     * @return boolean
+     */
+    public function isActive() {
+        return $this->get()->getState()->equals($this->getActiveState());
+    }    
+    
     
     /**
      * 

@@ -111,18 +111,18 @@ abstract class BaseController extends Controller
     /**
      * @param string $methodName
      * @return ParameterBag
-     */
+     */    
     public function getArguments($methodName) {        
-        if (is_null($this->arguments)) {            
-            if ($this->getRequestType($methodName) === HTTP_METH_POST) {
-                $this->arguments = $this->getRequestService()->getRequest()->request;
+        if (is_null($this->arguments)) {                                    
+            if ($this->getRequestType($methodName) === HTTP_METH_POST) {                
+                $this->arguments = $this->get('request')->request;
             } else {
-                $this->arguments = $this->getRequestService()->getRequest()->query;
+                $this->arguments = $this->get('request')->query;
             }
-        }
+        }        
         
         return $this->arguments;
-    }
+    }    
     
     
     /**
