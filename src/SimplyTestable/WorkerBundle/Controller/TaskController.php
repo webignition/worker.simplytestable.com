@@ -73,6 +73,10 @@ class TaskController extends BaseController
     
     
     public function createCollectionAction() {        
+        if ($this->isInMaintenanceReadOnlyMode()) {
+            return $this->sendServiceUnavailableResponse();
+        }         
+        
         $rawRequestTasks = $this->getArguments('createCollectionAction')->get('tasks');
         $tasks = array();
         

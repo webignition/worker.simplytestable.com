@@ -83,7 +83,35 @@ class TaskControllerTest extends BaseControllerJsonTestCase {
     
     
     public function testCreateActionInMaintenanceReadOnlyStateReturnsHttp503() {
-        $thisWorker = $this->getWorkerService()->get();
+        $this->getWorkerService()->setReadOnly();
+        
+        $taskData = array(
+                array(
+                    'url' => 'http://example.com/one/',
+                    'type' => 'HTML validation'
+                ),
+                array(
+                    'url' => 'http://example.com/two/',
+                    'type' => 'CSS validation'
+                ),
+                array(
+                    'url' => 'http://example.com/three/',
+                    'type' => 'JS static analysis'
+                ),              
+        );
+        
+        $_POST = array(
+            'tasks' => $taskData
+        );      
+        
+        /* @var $controller \SimplyTestable\WorkerBundle\Controller\TaskController */
+        $controller = $this->createController(self::TASK_CONTROLLER_NAME, 'createCollectionAction');
+        
+        $response = $controller->createCollectionAction();        
+        $this->assertEquals(503, $response->getStatusCode());      
+    }
+    
+    public function testCreateCollectionActionInMaintenanceReadOnlyStateReturnsHttp503() {
         $this->getWorkerService()->setReadOnly();
         
         $url = 'http://example.com/';
@@ -97,12 +125,9 @@ class TaskControllerTest extends BaseControllerJsonTestCase {
         /* @var $controller \SimplyTestable\WorkerBundle\Controller\TaskController */
         $controller = $this->createController(self::TASK_CONTROLLER_NAME, 'createAction');
         
-        $response = $controller->createAction();
-    
-        $responseObject = json_decode($response->getContent());
-        
+        $response = $controller->createAction();        
         $this->assertEquals(503, $response->getStatusCode());      
-    }
+    }    
     
     
     /**
