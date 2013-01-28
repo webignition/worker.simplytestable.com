@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputDefinition;
 use SimplyTestable\WorkerBundle\Services\RequestService;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 
 abstract class BaseController extends Controller
 {      
@@ -181,4 +182,30 @@ abstract class BaseController extends Controller
     public function sendFailureResponse() {
         return $this->sendResponse(null, 400);
     }
+    
+
+    /**
+     * 
+     * @return Response
+     */
+    public function sendServiceUnavailableResponse() {
+        return $this->sendResponse(null, 503);
+    }    
+    
+    
+    /**
+     * 
+     * @return boolean
+     */
+    protected function isInMaintenanceReadOnlyMode() {
+        return $this->getWorkerService()->isMaintenanceReadOnly();
+    }
+    
+    /**
+     *
+     * @return WorkerService
+     */
+    private function getWorkerService() {
+        return $this->container->get('simplytestable.services.workerservice');
+    }    
 }

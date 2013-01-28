@@ -13,7 +13,7 @@ class VerifyControllerTest extends BaseControllerJsonTestCase {
         $this->getWorkerService()->get()->setNextState();
     }
 
-    public function testIndexAction() {
+    public function testVerifyingActivationOfRegularService() {
         $thisWorker = $this->getWorkerService()->get();
     
         $_POST = array(
@@ -28,7 +28,26 @@ class VerifyControllerTest extends BaseControllerJsonTestCase {
        
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertTrue($thisWorker->getState()->equals($this->getWorkerService()->getActiveState()));              
-    }   
+    }
+    
+    
+    public function testVerifyingActivationInMaintenanceReadOnlyStateReturnsHttp503 () {
+        $thisWorker = $this->getWorkerService()->get();
+        $this->getWorkerService()->setReadOnly();
+    
+        $_POST = array(
+            'hostname' => $thisWorker->getHostname(),
+            'token' => $thisWorker->getActivationToken()
+        );        
+        
+        /* @var $controller \SimplyTestable\WorkerBundle\Controller\VerifyController */
+        $controller = $this->createController(self::WORKER_CONTROLLER_NAME, 'indexAction');
+     
+        $response = $controller->indexAction();        
+       
+        $this->assertEquals(503, $response->getStatusCode());
+        $this->assertTrue($thisWorker->getState()->equals($this->getWorkerService()->getMaintenanceReadOnlyState()));          
+    }
     
     
     /**

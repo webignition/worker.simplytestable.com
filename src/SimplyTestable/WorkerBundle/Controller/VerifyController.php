@@ -22,7 +22,11 @@ class VerifyController extends BaseController
     }    
     
     public function indexAction()
-    {
+    {         
+        if ($this->isInMaintenanceReadOnlyMode()) {
+            return $this->sendServiceUnavailableResponse();
+        }
+        
         $thisWorker = $this->getWorkerService()->get();
         if ($thisWorker->getHostname() != $this->getArguments('activateAction')->get('hostname')) {
             return $this->sendFailureResponse();
