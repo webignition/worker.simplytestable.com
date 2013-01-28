@@ -36,7 +36,11 @@ class TaskController extends BaseController
     }    
     
     public function createAction()
-    {        
+    {     
+        if ($this->isInMaintenanceReadOnlyMode()) {
+            return $this->sendServiceUnavailableResponse();
+        }        
+        
         if (!$this->getTaskTypeService()->has($this->getArguments('createAction')->get('type'))) {
             throw new \Symfony\Component\HttpKernel\Exception\HttpException(400);
         } 

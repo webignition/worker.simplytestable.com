@@ -14,7 +14,7 @@ class TaskControllerTest extends BaseControllerJsonTestCase {
         $thisWorker->setState($this->getWorkerService()->getActiveState());
     }
 
-    public function testCreateAction() {
+    public function testCreateActionInNormalState() {
         $thisWorker = $this->getWorkerService()->get();
         $this->assertTrue($thisWorker->getState()->equals($this->getWorkerService()->getActiveState()));
         
@@ -38,7 +38,30 @@ class TaskControllerTest extends BaseControllerJsonTestCase {
         $this->assertEquals($url, $responseObject->url);
         $this->assertEquals('queued', $responseObject->state);
         $this->assertEquals($type, $responseObject->type);          
-    }    
+    }  
+    
+    
+    public function testCreateActionInMaintenanceReadOnlyStateReturnsHttp503() {
+        $thisWorker = $this->getWorkerService()->get();
+        $this->getWorkerService()->setReadOnly();
+        
+        $url = 'http://example.com/';
+        $type = 'HTML validation';
+        
+        $_POST = array(
+            'url' => $url,
+            'type' => $type
+        );       
+        
+        /* @var $controller \SimplyTestable\WorkerBundle\Controller\TaskController */
+        $controller = $this->createController(self::TASK_CONTROLLER_NAME, 'createAction');
+        
+        $response = $controller->createAction();
+    
+        $responseObject = json_decode($response->getContent());
+        
+        $this->assertEquals(503, $response->getStatusCode());      
+    }
     
     
     /**
