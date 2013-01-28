@@ -9,7 +9,7 @@ use SimplyTestable\WorkerBundle\Services\WorkerService;
 class MaintenanceController extends BaseController
 {   
     
-    public function setReadOnlyAction()
+    public function enableReadOnlyAction()
     {
         $this->getWorkerService()->setReadOnly();        
         return $this->sendResponse();
