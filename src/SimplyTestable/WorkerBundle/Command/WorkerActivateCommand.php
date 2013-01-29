@@ -1,20 +1,16 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class WorkerActivateCommand extends ContainerAwareCommand
-{    
-    /**
-     *
-     * @var string
-     */
-    //private $httpFixturePath;    
-    
+class WorkerActivateCommand extends BaseCommand
+{
+    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1; 
+    const RETURN_CODE_UNKNOWN_ERROR = -2;    
+    const RETURN_CODE_FAILED_DUE_TO_WRONG_STATE = -3;
     
     protected function configure()
     {
@@ -35,16 +31,33 @@ class WorkerActivateCommand extends ContainerAwareCommand
             }            
         }
         
-        if ($this->getWorkerService()->activate() === false) {
-            throw new \LogicException('Worker activation failed, check log for details');
-        }        
-    } 
-    
-    /**
-     *
-     * @return SimplyTestable\WorkerBundle\Services\WorkerService
-     */
-    private function getWorkerService() {
-        return $this->getContainer()->get('simplytestable.services.workerservice');
-    }
+        if ($this->getWorkerService()->isMaintenanceReadOnly()) {
+            $output->writeln('Unable to activate, worker application is in maintenance read-only mode');
+            return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
+        }
+        
+        $activationResult = $this->getWorkerService()->activate();
+        if ($activationResult === true) {
+            return 0;
+        }
+        
+        if (is_null($activationResult)) {
+            $output->writeln('Activation failed, unknown error');
+            return self::RETURN_CODE_UNKNOWN_ERROR;
+        }
+        
+        if ($activationResult === false) {            
+            $output->writeln('Activation failed, worker application is not in the correct state (current state:'.$this->getWorkerService()->get()->getState().')');
+            return self::RETURN_CODE_FAILED_DUE_TO_WRONG_STATE;            
+        }
+        
+        if ($this->isHttpStatusCode($activationResult)) {
+            $output->writeln('Activation failed, HTTP response '.$activationResult);
+        } else {
+            $output->writeln('Activation failed, CURL error '.$activationResult);
+        } 
+        
+        return $activationResult;      
+    }     
+  
 }

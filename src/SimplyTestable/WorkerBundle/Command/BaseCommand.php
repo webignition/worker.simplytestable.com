@@ -11,5 +11,14 @@ abstract class BaseCommand extends ContainerAwareCommand
      */
     protected function getWorkerService() {
         return $this->getContainer()->get('simplytestable.services.workerservice');
-    }    
+    } 
+    
+    /**
+     * 
+     * @param int $number
+     * @return boolean
+     */
+    protected function isHttpStatusCode($number) {
+        return strlen($number) == 3;
+    }      
 }

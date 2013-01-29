@@ -179,7 +179,7 @@ class WorkerService extends EntityService {
         
         if (!$this->isNew()) {
             $this->logger->info("WorkerService::activate: This worker is not new and cannot be activated");
-            return true;
+            return false;
         }        
 
         /* @var $coreApplication \SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication */
@@ -212,7 +212,7 @@ class WorkerService extends EntityService {
             
             if ($response->getResponseCode() !== 200) {
                 $this->logger->err("WorkerService::activate: Activation request failed");
-                return false;
+                return $response->getResponseCode();
             }
             
             $thisWorker->setNextState();
@@ -222,8 +222,10 @@ class WorkerService extends EntityService {
             
         } catch (CurlException $curlException) {
             $this->logger->err("WorkerService::activate: " . $requestUrl . ": " . $curlException->getMessage());            
-            return false;
+            return $curlException->getCode();
         }
+        
+        return null;
     }
     
     
