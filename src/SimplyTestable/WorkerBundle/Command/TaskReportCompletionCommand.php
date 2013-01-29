@@ -8,9 +8,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TaskReportCompletionCommand extends TaskCommand
 {    
-    const RETURN_CODE_TASK_DOES_NOT_EXIST = 1;
-    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = 2; 
-    const RETURN_CODE_UNKNOWN_ERROR = 3;    
+    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
+    const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;     
+    const RETURN_CODE_UNKNOWN_ERROR = -3;
     
     protected function configure()
     {
@@ -77,15 +77,5 @@ EOF
         }
         
         return $reportCompletionResult;  
-    }
-    
-    
-    /**
-     * 
-     * @param int $number
-     * @return boolean
-     */
-    private function isHttpStatusCode($number) {
-        return strln($number) == 3;
     }
 }

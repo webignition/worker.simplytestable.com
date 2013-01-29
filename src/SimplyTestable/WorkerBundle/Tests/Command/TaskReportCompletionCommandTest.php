@@ -32,7 +32,7 @@ class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
     }
     
 
-    public function testReportCompletionForInvalidTaskReturnsStatusCode1() {
+    public function testReportCompletionForInvalidTaskReturnsStatusCodeMinus2() {
         $this->setupDatabase();
         $this->getWorkerService()->activate();
         
@@ -41,7 +41,7 @@ class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
         ));
         
-        $this->assertEquals(1, $response);        
+        $this->assertEquals(-2, $response);        
     }
     
     
@@ -70,7 +70,7 @@ class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
     }
     
     
-    public function testReportCompletionInMaintenanceReadOnlyModeReturnsStatusCode2() {
+    public function testReportCompletionInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {
         $this->setupDatabase();
         $this->getWorkerService()->activate();
         
@@ -92,7 +92,7 @@ class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
         ));
         
-        $this->assertEquals(2, $response);
+        $this->assertEquals(-1, $response);
         $this->assertInstanceOf('SimplyTestable\WorkerBundle\Entity\Task\Task', $this->getTaskService()->getById($createdTask->id));
     }
     
