@@ -93,7 +93,16 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         ))->createAction();
         
         return json_decode($response->getContent());
-    }  
+    } 
+    
+    
+    /**
+     * 
+     * @return \Doctrine\ORM\EntityManager
+     */
+    protected function getEntityManager() {
+        return $this->container->get('doctrine.orm.entitymanager');
+    }
     
     
     protected function createCompletedTaskOutputForTask(

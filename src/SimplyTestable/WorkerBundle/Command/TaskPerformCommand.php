@@ -8,8 +8,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TaskPerformCommand extends TaskCommand
 { 
-    const RETURN_CODE_TASK_DOES_NOT_EXIST = 1;
-    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = 2;
+    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
+    const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;
+    const RETURN_CODE_FAILED_DUE_TO_WRONG_STATE = -3;
+    const RETURN_CODE_FAILED_NO_TASK_DRIVER_FOUND = -4;
+    const RETURN_CODE_UNKNOWN_ERROR = -5;
     
     /**
      *
@@ -36,6 +39,7 @@ EOF
         $task = $this->getTaskService()->getById($input->getArgument('id'));
         if (is_null($task)) {
             $this->getContainer()->get('logger')->err("TaskPerformCommand::execute: [".$input->getArgument('id')."] does not exist");            
+            $output->writeln('Unable to execute, task '.$input->getArgument('id').' does not exist');
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
         }
         
@@ -49,6 +53,7 @@ EOF
                 )                
             );
             
+            $output->writeln('Unable to perform task, worker application is in maintenance read-only mode');
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }        
         
@@ -58,19 +63,32 @@ EOF
             if ($httpClient instanceof \webignition\Http\Mock\Client\Client) {
                 $httpClient->getStoredResponseList()->setFixturesPath($input->getArgument('http-fixture-path'));
             }            
-        }        
+        }  
         
-        if ($this->getTaskService()->perform($task) === false) {
-            throw new \LogicException('Task execution failed, check log for details');
+        $performResult = $this->getTaskService()->perform($task);
+        
+        if ($performResult === 0) {
+            $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(
+                'task-report-completion',
+                array(
+                    'id' => $task->getId()
+                )                
+            );        
+
+            return 0; 
         }
         
-        $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(
-            'task-report-completion',
-            array(
-                'id' => $task->getId()
-            )                
-        );        
+        if ($performResult === 1) {
+            $output->writeln('Task perform failed, task is in wrong state (currently:'.$task->getState().')');
+            return self::RETURN_CODE_FAILED_DUE_TO_WRONG_STATE;
+        }
         
-        return 0;        
+        if ($performResult === 2) {
+            $output->writeln('Task perform failed, no driver found for task type ['.$task->getType()->getName().']');
+            return self::RETURN_CODE_FAILED_NO_TASK_DRIVER_FOUND;
+        }
+        
+        $output->writeln('Task perform failed, unknown error');
+        return self::RETURN_CODE_UNKNOWN_ERROR;       
     }
 }

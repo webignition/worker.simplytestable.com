@@ -257,14 +257,14 @@ class TaskService extends EntityService {
     /**
      *
      * @param Task $task
-     * @return boolean 
+     * @return int 
      */
     public function perform(Task $task) {        
         $this->logger->info("TaskService::perform: [".$task->getId()."] [".$task->getState()->getName()."] Initialising");        
         
         if (!$this->isQueued($task)) {
             $this->logger->info("TaskService::perform: [".$task->getId()."] Task state is [".$task->getState()->getName()."] and cannot be performed");
-            return true;
+            return 1;
         }           
         
         /*  @var $taskDriver TaskDriver */
@@ -272,7 +272,7 @@ class TaskService extends EntityService {
 
         if ($taskDriver === false) {
             $this->logger->info("TaskService::perform: [".$task->getId()."] No driver found for task type \"".$task->getType()->getName()."\"");
-            return false;
+            return 2;
         }
         
         $this->start($task);
@@ -281,7 +281,7 @@ class TaskService extends EntityService {
         $taskDriverResponse = $taskDriver->perform($task);
         
         $this->complete($task, $taskDriverResponse);
-        return true;
+        return 0;
     }
     
     
