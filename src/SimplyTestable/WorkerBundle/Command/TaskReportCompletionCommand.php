@@ -38,6 +38,7 @@ EOF
         $task = $this->getTaskService()->getById($input->getArgument('id'));
         if (is_null($task)) {
             $this->getContainer()->get('logger')->err("TaskReportCompletionCommand::execute: [".$input->getArgument('id')."] does not exist");            
+            $output->writeln($input->getArgument('id')."] does not exist");
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
         }
         
@@ -49,6 +50,7 @@ EOF
                 )                
             );
             
+            $output->writeln('Unable to report completion, worker application is in maintenance read-only mode');
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }         
         
@@ -59,14 +61,31 @@ EOF
             $entityManager = $this->getContainer()->get('doctrine')->getEntityManager();
             $entityManager->remove($task);
             $entityManager->remove($task->getOutput());
-            $entityManager->flush();
+            $entityManager->flush();            
             return 0;
         }
         
         if ($reportCompletionResult === false) {
+            $output->writeln('Report completion failed, unknown error');
             return self::RETURN_CODE_UNKNOWN_ERROR;
         }
         
+        if ($this->isHttpStatusCode($reportCompletionResult)) {
+            $output->writeln('Report completion failed, HTTP response '.$reportCompletionResult);
+        } else {
+            $output->writeln('Report completion failed, CURL error '.$reportCompletionResult);
+        }
+        
         return $reportCompletionResult;  
+    }
+    
+    
+    /**
+     * 
+     * @param int $number
+     * @return boolean
+     */
+    private function isHttpStatusCode($number) {
+        return strln($number) == 3;
     }
 }
