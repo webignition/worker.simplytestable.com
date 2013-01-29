@@ -422,6 +422,11 @@ class TaskService extends EntityService {
             
             if ($this->httpClient instanceof \webignition\Http\Mock\Client\Client) {
                 $this->logger->info("TaskService::reportCompletion: response fixture path: " . $this->httpClient->getStoredResponseList()->getRequestFixturePath($httpRequest));
+                if (file_exists($this->httpClient->getStoredResponseList()->getRequestFixturePath($httpRequest))) {
+                    $this->logger->info("TaskService::reportCompletion: response fixture path: found");
+                } else {
+                    $this->logger->info("TaskService::reportCompletion: response fixture path: not found");
+                }
             }            
             
             $this->logger->info("TaskService::reportCompletion: " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
