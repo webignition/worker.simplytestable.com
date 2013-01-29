@@ -90,4 +90,13 @@ class TimePeriod
     {
         return $this->endDateTime;
     }
+    
+    
+    /**
+     * 
+     * @return boolean
+     */
+    public function hasEndDateTime() {
+        return !is_null($this->getEndDateTime());
+    }
 }

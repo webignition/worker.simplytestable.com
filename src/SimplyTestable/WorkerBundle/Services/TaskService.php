@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
+use webignition\Http\Client\CurlException;
 
 class TaskService extends EntityService {
     
@@ -305,8 +306,11 @@ class TaskService extends EntityService {
      * @param TaskDriverResponse $taskDriverResponse
      * @return Task 
      */
-    private function complete(Task $task, TaskDriverResponse $taskDriverResponse) {        
-        $task->getTimePeriod()->setEndDateTime(new \DateTime());
+    public function complete(Task $task, TaskDriverResponse $taskDriverResponse) {
+        if (!$task->getTimePeriod()->hasEndDateTime()) {
+            $task->getTimePeriod()->setEndDateTime(new \DateTime());
+        }        
+        
         $task->setOutput($taskDriverResponse->getTaskOutput());
         
         if ($taskDriverResponse->hasBeenSkipped()) {
@@ -425,7 +429,7 @@ class TaskService extends EntityService {
             if ($response->getResponseCode() !== 200) {
                 $this->logger->err("TaskService::reportCompletion: Completion reporting failed for [".$task->getId()."] [".$task->getUrl()."]");
                 $this->logger->err("TaskService::reportCompletion: [".$task->getId()."] " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
-                return false;
+                return $response->getResponseCode();
             }
             
             $task->setNextState();        
@@ -435,8 +439,10 @@ class TaskService extends EntityService {
             
         } catch (CurlException $curlException) {
             $this->logger->info("TaskService::reportCompletion: " . $requestUrl . ": " . $curlException->getMessage());            
-            return false;
+            return $curlException->getCode();
         }
+        
+        return false;
     }    
   
 }

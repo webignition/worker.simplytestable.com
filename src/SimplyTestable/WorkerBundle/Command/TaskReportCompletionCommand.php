@@ -1,20 +1,16 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TaskReportCompletionCommand extends ContainerAwareCommand
+class TaskReportCompletionCommand extends TaskCommand
 {    
-    /**
-     *
-     * @var string
-     */
-    //private $httpFixturePath;    
-    
+    const RETURN_CODE_TASK_DOES_NOT_EXIST = 1;
+    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = 2; 
+    const RETURN_CODE_UNKNOWN_ERROR = 3;    
     
     protected function configure()
     {
@@ -30,7 +26,7 @@ EOF
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
-    {        
+    {
         if ($input->hasArgument('http-fixture-path')) {
             $httpClient = $this->getContainer()->get('simplytestable.services.httpClient');
             
@@ -40,25 +36,37 @@ EOF
         }
         
         $task = $this->getTaskService()->getById($input->getArgument('id'));
-        
-        if ($this->getTaskService()->reportCompletion($task) === false) {
-            throw new \LogicException('Task execution failed, check log for details');
+        if (is_null($task)) {
+            $this->getContainer()->get('logger')->err("TaskReportCompletionCommand::execute: [".$input->getArgument('id')."] does not exist");            
+            return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
         }
         
-        /* @var $entityManager \Doctrine\ORM\EntityManager */        
-        $entityManager = $this->getContainer()->get('doctrine')->getEntityManager();
-        $entityManager->remove($task);
-        $entityManager->remove($task->getOutput());
-        $entityManager->flush();
-      
-    } 
-    
-    
-    /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\TaskService
-     */
-    private function getTaskService() {
-        return $this->getContainer()->get('simplytestable.services.taskservice');
+        if ($this->getWorkerService()->isMaintenanceReadOnly()) {
+            $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(
+                'task-report-completion',
+                array(
+                    'id' => $task->getId()
+                )                
+            );
+            
+            return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
+        }         
+        
+        $reportCompletionResult = $this->getTaskService()->reportCompletion($task);
+        
+        if ($reportCompletionResult === true) {
+            /* @var $entityManager \Doctrine\ORM\EntityManager */        
+            $entityManager = $this->getContainer()->get('doctrine')->getEntityManager();
+            $entityManager->remove($task);
+            $entityManager->remove($task->getOutput());
+            $entityManager->flush();
+            return 0;
+        }
+        
+        if ($reportCompletionResult === false) {
+            return self::RETURN_CODE_UNKNOWN_ERROR;
+        }
+        
+        return $reportCompletionResult;  
     }
 }
