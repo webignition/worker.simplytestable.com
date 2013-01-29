@@ -27,7 +27,7 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(404, $response);
     }
     
-    public function testActivationInMaintenanceReadOnlyModeReturnsStatusCode2() {
+    public function testActivationInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {
         $this->setupDatabase();
         $this->getWorkerService()->setReadOnly();
         
