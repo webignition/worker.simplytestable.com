@@ -46,7 +46,32 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      */
     protected function getWorkerService() {
         return $this->container->get('simplytestable.services.workerservice');
-    }   
+    }  
+    
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Services\ResqueQueueService
+     */
+    protected function getRequeQueueService() {
+        return $this->container->get('simplytestable.services.resquequeueservice');
+    }    
+    
+    
+    /**
+     * 
+     * @param string $url
+     * @param string $type
+     * @return \stdClass
+     */
+    protected function createTask($url, $type) {
+        $response = $this->getTaskController('createAction', array(
+            'url' => $url,
+            'type' => $type
+        ))->createAction();
+        
+        return json_decode($response->getContent());
+    }    
 
 
 }

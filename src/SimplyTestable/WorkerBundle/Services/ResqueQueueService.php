@@ -8,7 +8,7 @@ namespace SimplyTestable\WorkerBundle\Services;
  * 
  * Exceptions generally occur when trying to establish a socket connection to
  * a redis server that does not exist. This can happen as in some environments
- * the integration with redis is optional.
+ * where the integration with redis is optional.
  * 
  */
 class ResqueQueueService { 
@@ -93,6 +93,17 @@ class ResqueQueueService {
             $this->logger->warn('ResqueQueueService::add: Redis error ['.$exception->getMessage().']');
             return false;
         }
+    }
+    
+    
+    /**
+     * 
+     * @param string $queue_name
+     * @param array $args
+     * @return boolean
+     */
+    public function contains($queue_name, $args = null) {
+        return !is_null($this->findRedisValue($queue_name, $args));
     }
     
     

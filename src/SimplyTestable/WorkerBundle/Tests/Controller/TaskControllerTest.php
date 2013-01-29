@@ -32,20 +32,7 @@ abstract class TaskControllerTest extends BaseControllerJsonTestCase {
     }
     
     
-    /**
-     * 
-     * @param string $url
-     * @param string $type
-     * @return \stdClass
-     */
-    protected function createTask($url, $type) {
-        $response = $this->getTaskController('createAction', array(
-            'url' => $url,
-            'type' => $type
-        ))->createAction();
-        
-        return json_decode($response->getContent());
-    }
+
     
     
     /**
