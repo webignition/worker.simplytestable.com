@@ -45,14 +45,7 @@ EOF
         
         $this->getContainer()->get('logger')->info("TaskPerformCommand::execute: [".$task->getId()."] [".$task->getState()->getName()."]");        
 
-        if ($this->getWorkerService()->isMaintenanceReadOnly()) {
-            $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(
-                'task-perform',
-                array(
-                    'id' => $task->getId()
-                )                
-            );
-            
+        if ($this->getWorkerService()->isMaintenanceReadOnly()) {            
             $output->writeln('Unable to perform task, worker application is in maintenance read-only mode');
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }        

@@ -42,14 +42,7 @@ EOF
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
         }
         
-        if ($this->getWorkerService()->isMaintenanceReadOnly()) {
-            $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(
-                'task-report-completion',
-                array(
-                    'id' => $task->getId()
-                )                
-            );
-            
+        if ($this->getWorkerService()->isMaintenanceReadOnly()) {            
             $output->writeln('Unable to report completion, worker application is in maintenance read-only mode');
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }         

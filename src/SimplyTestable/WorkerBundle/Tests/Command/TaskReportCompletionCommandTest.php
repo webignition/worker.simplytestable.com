@@ -117,11 +117,7 @@ class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->runConsole('simplytestable:task:reportcompletion', array(
             1 => true,
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
-        ));
-        
-        $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
-            'id' => 1
-        )));       
+        ));      
     }
 
 }
