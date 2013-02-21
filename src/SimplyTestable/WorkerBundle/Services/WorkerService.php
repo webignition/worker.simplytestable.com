@@ -338,4 +338,12 @@ class WorkerService extends EntityService {
         $thisWorker->setState($this->getMaintenanceReadOnlyState());
         $this->persistAndFlush($thisWorker);
     }
+    
+    
+    /**
+     * 
+     */
+    public function clearReadOnly() {
+        $this->setActive();
+    }
 }
