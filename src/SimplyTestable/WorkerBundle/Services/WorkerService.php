@@ -229,6 +229,13 @@ class WorkerService extends EntityService {
     }
     
     
+    public function setActive() {
+        $activeState = $this->getActiveState();
+        $thisWorker = $this->get()->setState($activeState);
+        $this->persistAndFlush($thisWorker);
+    }
+    
+    
     public function verify() {        
         if (!$this->isAwaitingActivationVerification()) {
             $this->logger->info("WorkerService::verify: This worker is not awaiting activation verification");
