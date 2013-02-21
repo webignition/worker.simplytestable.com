@@ -33,3 +33,6 @@ SimplyTestableWorkerBundle_set_readonly:
     pattern: /maintenance/enable-read-only/
     defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:enableReadOnly, _format: json }       
   
+SimplyTestableWorkerBundle_unset_readonly:
+    pattern: /maintenance/disable-read-only/
+    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:disableReadOnly, _format: json }    

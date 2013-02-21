@@ -16,6 +16,12 @@ class MaintenanceController extends BaseController
     }
     
     
+    public function disableReadOnlyAction() {
+        $this->getWorkerService()->clearReadOnly();        
+        return $this->sendResponse();        
+    }
+    
+    
     /**
      *
      * @return WorkerService
