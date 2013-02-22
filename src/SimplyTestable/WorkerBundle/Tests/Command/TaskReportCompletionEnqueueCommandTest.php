@@ -4,9 +4,9 @@ namespace SimplyTestable\WorkerBundle\Tests\Command;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
-class TaskPerformEnqueueCommandTest extends ConsoleCommandBaseTestCase {
+class TaskReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
     
-    public function testEnqueueTaskPerformJobs() {
+    public function testEnqueueTaskReportCompletionJobs() {
         $this->setupDatabase(); 
         
         $taskPropertyCollection = array(
@@ -33,15 +33,19 @@ class TaskPerformEnqueueCommandTest extends ConsoleCommandBaseTestCase {
         );
         
         $tasks = array();        
-        foreach ($taskPropertyCollection as $taskProperties) {
+        foreach ($taskPropertyCollection as $taskIndex => $taskProperties) {
             $tasks[] = $this->createTask($taskProperties['url'], $taskProperties['type']);
+            $this->runConsole('simplytestable:task:perform', array(
+                ($taskIndex + 1) => true,
+                $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
+            ));
         }
        
-        $response = $this->runConsole('simplytestable:task:perform:enqueue');        
+        $response = $this->runConsole('simplytestable:task:reportcompletion:enqueue');        
         $this->assertEquals(0, $response);
         
         foreach ($tasks as $task) {
-            $this->assertTrue($this->getRequeQueueService()->contains('task-perform', array(
+            $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
                 'id' => $task->id
             )));             
         }
