@@ -11,7 +11,7 @@ use JMS\Serializer\Annotation as SerializerAnnotation;
  *     name="Task"
  * )
  * @SerializerAnnotation\ExclusionPolicy("all")
- * 
+ * @ORM\Entity(repositoryClass="SimplyTestable\WorkerBundle\Repository\TaskRepository")
  */
 class Task
 {

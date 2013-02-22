@@ -195,6 +195,15 @@ class TaskService extends EntityService {
     /**
      *
      * @return \SimplyTestable\WorkerBundle\Entity\State 
+     */    
+    public function getQueuedState() {
+        return $this->getStartingState();
+    }
+    
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Entity\State 
      */
     public function getInProgressState() {
         return $this->stateService->fetch(self::TASK_IN_PROGRESS_STATE);
@@ -448,6 +457,14 @@ class TaskService extends EntityService {
         }
         
         return false;
-    }    
+    }
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Repository\TaskRepository
+     */
+    public function getEntityRepository() {
+        return parent::getEntityRepository();
+    }      
   
 }
