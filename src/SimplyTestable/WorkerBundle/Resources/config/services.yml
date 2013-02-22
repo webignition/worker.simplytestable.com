@@ -93,4 +93,9 @@ services:
   simplytestable.services.timecachedtaskoutputservice:
     class:   SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService
     arguments:
-        entityManager: "@doctrine.orm.entity_manager"         
+        entityManager: "@doctrine.orm.entity_manager"
+
+  simplytestable.services.commandService:
+    class:   SimplyTestable\WorkerBundle\Services\CommandService
+    arguments:
+      container: "@service_container"    
