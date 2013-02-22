@@ -28,11 +28,19 @@ SimplyTestableWorkerBundle_default:
         _controller: FrameworkBundle:Redirect:redirect
         route: SimplyTestableWorkerBundle_status
         permanent: true
-        
-SimplyTestableWorkerBundle_set_readonly:
-    pattern: /maintenance/enable-read-only/
-    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:enableReadOnly, _format: json }       
-  
-SimplyTestableWorkerBundle_unset_readonly:
+
+SimplyTestableWorkerBundle_disable_readonly:
     pattern: /maintenance/disable-read-only/
-    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:disableReadOnly, _format: json }    
+    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:disableReadOnly, _format: json }            
+        
+SimplyTestableWorkerBundle_enable_readonly:
+    pattern: /maintenance/enable-read-only/
+    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:enableReadOnly, _format: json }         
+    
+SimplyTestableWorkerBundle_task_perform_enqueue:
+    pattern: /maintenance/task-perform-enqueue/
+    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:taskPerformEnqueue, _format: json }        
+    
+SimplyTestableWorkerBundle_leave_readonly:
+    pattern: /maintenance/leave-read-only/
+    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:leaveReadOnly, _format: json }           

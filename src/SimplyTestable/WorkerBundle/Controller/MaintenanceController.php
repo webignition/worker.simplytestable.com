@@ -2,34 +2,50 @@
 
 namespace SimplyTestable\WorkerBundle\Controller;
 
-use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\InputArgument;
-use SimplyTestable\WorkerBundle\Services\WorkerService;
+use SimplyTestable\WorkerBundle\Services\CommandService;
 
 class MaintenanceController extends BaseController
 {   
     
     public function enableReadOnlyAction()
     {
-        $this->getWorkerService()->setReadOnly();        
-        return $this->sendResponse();
-    }
-    
+        return $this->executeCommand('SimplyTestable\WorkerBundle\Command\MaintenanceEnableReadOnlyCommand');
+    }    
     
     public function disableReadOnlyAction() {
-        $this->getWorkerService()->clearReadOnly();        
-        return $this->sendResponse();        
+        return $this->executeCommand('SimplyTestable\WorkerBundle\Command\MaintenanceDisableReadOnlyCommand');      
+    }    
+    
+    public function taskPerformEnqueueAction() {
+        return $this->executeCommand('SimplyTestable\WorkerBundle\Command\TaskPerformEnqueueCommand');         
     }
     
+    public function leaveReadOnlyAction() {
+        $this->executeCommand('SimplyTestable\WorkerBundle\Command\MaintenanceDisableReadOnlyCommand');
+        return $this->executeCommand('SimplyTestable\WorkerBundle\Command\TaskPerformEnqueueCommand');  
+    }
+    
+    
+    private function executeCommand($commandClass, $inputArray = array()) {      
+        $output = new \CoreSphere\ConsoleBundle\Output\StringOutput();
+        $commandResponse =  $this->getCommandService()->execute(
+                $commandClass,
+                $inputArray,
+                $output
+        );
+        
+        $outputLines = explode("\n", trim($output->getBuffer()));
+        
+        return $this->sendResponse($outputLines, $commandResponse === 0 ? 200 : 500);        
+    }
+
     
     /**
      *
-     * @return WorkerService
+     * @return CommandService
      */
-    private function getWorkerService() {
-        return $this->container->get('simplytestable.services.workerservice');
-    }
-    
-    
+    private function getCommandService() {
+        return $this->container->get('simplytestable.services.commandService');
+    }    
     
 }

@@ -20,8 +20,9 @@ EOF
         );
     }    
     
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->getWorkerService()->clearReadOnly();        
+        return 0;
     }     
 }
