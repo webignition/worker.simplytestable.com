@@ -21,9 +21,10 @@ class MaintenanceController extends BaseController
     }
     
     public function leaveReadOnlyAction() {
-        $this->executeCommand('SimplyTestable\WorkerBundle\Command\MaintenanceDisableReadOnlyCommand');
-        $this->executeCommand('SimplyTestable\WorkerBundle\Command\TaskReportCompletionEnqueueCommand');  
-        return $this->executeCommand('SimplyTestable\WorkerBundle\Command\TaskPerformEnqueueCommand');  
+        $output = $this->executeCommand('SimplyTestable\WorkerBundle\Command\MaintenanceDisableReadOnlyCommand');
+        $output .= $this->executeCommand('SimplyTestable\WorkerBundle\Command\TaskReportCompletionEnqueueCommand');  
+        $output .= $this->executeCommand('SimplyTestable\WorkerBundle\Command\TaskPerformEnqueueCommand');  
+        return $output;
     }
     
     
