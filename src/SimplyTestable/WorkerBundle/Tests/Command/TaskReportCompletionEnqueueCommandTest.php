@@ -16,10 +16,6 @@ class TaskReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase 
             ),
             array(
                 'url' => 'http://example.com/1/',
-                'type' => 'CSS validation'
-            ),
-            array(
-                'url' => 'http://example.com/1/',
                 'type' => 'JS static analysis'
             ),
             array(
