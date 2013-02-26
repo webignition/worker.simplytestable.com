@@ -50,13 +50,13 @@ EOF
         $reportCompletionResult = $this->getTaskService()->reportCompletion($task);
         
         if ($reportCompletionResult === true) {
+            $output->writeln('Reported task completion ['.$task->getId().']');
+            
             /* @var $entityManager \Doctrine\ORM\EntityManager */        
             $entityManager = $this->getContainer()->get('doctrine')->getEntityManager();
             $entityManager->remove($task);
             $entityManager->remove($task->getOutput());
-            $entityManager->flush();            
-            
-            $output->writeln('Reported task completion ['.$task->getId().']');
+            $entityManager->flush();
             
             return 0;
         }
