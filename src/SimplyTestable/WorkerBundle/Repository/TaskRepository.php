@@ -29,5 +29,27 @@ class TaskRepository extends EntityRepository
         return $taskIds;        
     }
     
+    
+    public function getIdsWithOutput() {
+        $queryBuilder = $this->createQueryBuilder('Task');
+        $queryBuilder->join('Task.output', 'TaskOutput');
+        $queryBuilder->select('Task.id as TaskId'); 
+        $queryBuilder->where('Task.output IS NOT NULL');
+       
+        $result = $queryBuilder->getQuery()->getResult(); 
+        
+        if (count($result) === 0) {
+            return array();
+        }
+        
+        $ids = array();
+        
+        foreach ($result as $taskOutputIdResult) {
+            $ids[] = $taskOutputIdResult['TaskId'];
+        }
+        
+        return $ids;         
+    }
+    
   
 }

@@ -7,7 +7,7 @@ use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 class TaskReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
     
     public function testEnqueueTaskReportCompletionJobs() {
-        $this->setupDatabase(); 
+        $this->setupDatabase();        
         
         $taskPropertyCollection = array(
             array(
@@ -40,6 +40,8 @@ class TaskReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase 
                 $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
             ));
         }
+        
+        $this->clearRedis();
        
         $response = $this->runConsole('simplytestable:task:reportcompletion:enqueue');        
         $this->assertEquals(0, $response);

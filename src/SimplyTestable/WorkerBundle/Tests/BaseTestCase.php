@@ -70,7 +70,11 @@ abstract class BaseTestCase extends WebTestCase {
         //$this->runConsole("doctrine:database:create");        
         //$this->runConsole("doctrine:migrations:migrate", array("--no-interaction" => true));        
         //exec('php app/console doctrine:migrations:migrate --no-interaction');
-    } 
+    }
+    
+    protected function clearRedis() {
+        exec('redis-cli -r 1 flushall');
+    }    
     
     /**
      * 

@@ -21,8 +21,9 @@ EOF
     }    
     
     public function execute(InputInterface $input, OutputInterface $output)
-    {
-        $taskIds = $this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getCompletedState());
+    {  
+        $taskIds = $this->getTaskService()->getEntityRepository()->getIdsWithOutput();
+
         $output->writeln(count($taskIds).' completed tasks ready to be enqueued');
         
         foreach ($taskIds as $taskId) {
