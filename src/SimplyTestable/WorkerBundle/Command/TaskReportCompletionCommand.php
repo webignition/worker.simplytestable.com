@@ -55,6 +55,9 @@ EOF
             $entityManager->remove($task);
             $entityManager->remove($task->getOutput());
             $entityManager->flush();            
+            
+            $output->writeln('Reported task completion ['.$task->getId().']');
+            
             return 0;
         }
         
