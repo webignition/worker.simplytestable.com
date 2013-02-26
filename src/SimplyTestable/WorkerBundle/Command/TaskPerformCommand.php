@@ -69,6 +69,7 @@ EOF
             );        
             
             $output->writeln('Performed ['.$task->getId().']');
+            $this->getContainer()->get('logger')->info('TaskPerformCommand::Performed ['.$task->getId().'] ['.$task->getState().'] ['.($task->hasOutput() ? 'has output' : 'no output').']');
 
             return 0; 
         }
