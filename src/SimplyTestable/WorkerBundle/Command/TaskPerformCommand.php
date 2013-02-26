@@ -67,6 +67,8 @@ EOF
                     'id' => $task->getId()
                 )                
             );        
+            
+            $output->writeln('Performed ['.$task->getId().']');
 
             return 0; 
         }

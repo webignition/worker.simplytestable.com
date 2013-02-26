@@ -24,13 +24,17 @@ EOF
     {  
         $taskIds = $this->getTaskService()->getEntityRepository()->getIdsWithOutput();
 
+        $this->getContainer()->get('logger')->info('TaskReportCompletionEnqueueCommand::initialise');
+        $this->getContainer()->get('logger')->info('TaskReportCompletionEnqueueCommand::'.count($taskIds).' completed tasks ready to be enqueued');
         $output->writeln(count($taskIds).' completed tasks ready to be enqueued');
         
         foreach ($taskIds as $taskId) {
             if ($this->getResqueQueueService()->contains('task-report-completion', array('id' => $taskId))) {
                 $output->writeln('Task ['.$taskId.'] is already enqueued');
+                $this->getContainer()->get('logger')->info('TaskReportCompletionEnqueueCommand::Task ['.$taskId.'] is already enqueued');
             } else {
                 $output->writeln('Enqueuing task ['.$taskId.']');                
+                $this->getContainer()->get('logger')->info('TaskReportCompletionEnqueueCommand::Enqueuing task ['.$taskId.']');
                 $this->getResqueQueueService()->add(
                     'task-report-completion',
                     array(
