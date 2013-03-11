@@ -6,16 +6,17 @@ use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 
 class TaskPerformCommandTest extends ConsoleCommandBaseTestCase {
+    
+    public static function setUpBeforeClass() {
+        self::setupDatabaseIfNotExists();        
+    }    
 
-    public function testPerformInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {
-        $this->setupDatabase();                    
-        $this->createTask('http://example.com/', 'HTML validation');
-        
+    public function testPerformInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {                 
+        $task = $this->createTask('http://example.com/', 'HTML validation');        
         $this->getWorkerService()->setReadOnly();
         
         $response = $this->runConsole('simplytestable:task:perform', array(
-            1 => true,
-            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
+            $task->id => true
         ));
         
         $this->assertEquals(-1, $response);
@@ -23,26 +24,25 @@ class TaskPerformCommandTest extends ConsoleCommandBaseTestCase {
     
     
     public function testPerformInMaintenanceReadOnlyModeReturnsResqueJobToQueue() {
-        $this->setupDatabase();                    
-        $this->createTask('http://example.com/', 'HTML validation');
+        $this->clearRedis();
+        
+        $task = $this->createTask('http://example.com/', 'HTML validation');
         
         $this->getWorkerService()->setReadOnly();
         
         $this->runConsole('simplytestable:task:perform', array(
-            1 => true,
+            $task->id => true,
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
         ));        
         
         $this->assertTrue($this->getRequeQueueService()->contains('task-perform', array(
-            'id' => 1
+            'id' => $task->id
         )));       
     }    
     
-    public function testPerformInvalidTestReturnsStatusCodeMinus2() {
-        $this->setupDatabase();                    
-        
+    public function testPerformInvalidTestReturnsStatusCodeMinus2() {        
         $response = $this->runConsole('simplytestable:task:perform', array(
-            1 => true,
+            -1 => true,
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
         ));
         
@@ -50,28 +50,25 @@ class TaskPerformCommandTest extends ConsoleCommandBaseTestCase {
     }   
     
     
-    public function testPerformForTestInInvalidStateReturnsStatusCodeMinus3() {
-        $this->setupDatabase();                    
+    public function testPerformForTestInInvalidStateReturnsStatusCodeMinus3() {        
+        $taskObject = $this->createTask('http://example.com/', 'HTML validation');
         
-        $this->createTask('http://example.com/', 'HTML validation');
-        $task = $this->getTaskService()->getById(1);
-        $task->setNextState();
+        $task = $this->getTaskService()->getById($taskObject->id);
+        $task->setState($this->getTaskService()->getCompletedState());
         $this->getEntityManager()->persist($task);
         $this->getEntityManager()->flush();
         
         $response = $this->runConsole('simplytestable:task:perform', array(
-            1 => true,
+            $task->getId() => true,
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
         ));
         
         $this->assertEquals(-3, $response);
     }
     
-    public function testPerformTestWhereNoTaskDriverFoundReturnsStatusCodeMinus4() {
-        $this->setupDatabase();                    
-        
-        $this->createTask('http://example.com/', 'HTML validation');
-        $task = $this->getTaskService()->getById(1);
+    public function testPerformTestWhereNoTaskDriverFoundReturnsStatusCodeMinus4() {        
+        $taskObject = $this->createTask('http://example.com/', 'HTML validation');
+        $task = $this->getTaskService()->getById($taskObject->id);
         
         $unknownTaskType = new TaskType();
         $unknownTaskType->setName('Unknown task type');
@@ -85,7 +82,7 @@ class TaskPerformCommandTest extends ConsoleCommandBaseTestCase {
         $this->getEntityManager()->flush();
         
         $response = $this->runConsole('simplytestable:task:perform', array(
-            1 => true,
+            $task->getId() => true,
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
         ));
         
