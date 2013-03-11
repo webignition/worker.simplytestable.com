@@ -5,8 +5,6 @@ namespace SimplyTestable\WorkerBundle\Tests\Controller;
 
 class TaskControllerCreateTest extends TaskControllerTest {
     
-    const TASK_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TaskController';
-    
     public static function setUpBeforeClass() {
         self::setupDatabaseIfNotExists();        
     }
