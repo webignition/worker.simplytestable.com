@@ -7,9 +7,8 @@ class TaskControllerCreateTest extends TaskControllerTest {
     
     const TASK_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TaskController';
     
-    public function setUp() {
-        parent::setUp();
-        $this->setupDatabase();        
+    public static function setUpBeforeClass() {
+        self::setupDatabaseIfNotExists();        
     }
 
     public function testCreateActionInNormalState() {
