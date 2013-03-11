@@ -7,13 +7,15 @@ use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 
 class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
     
+    public static function setUpBeforeClass() {
+        self::setupDatabaseIfNotExists();        
+    }     
+    
     public function testReportCompletionSuccessfullyReturnsStatusCode0() {
-        $this->setupDatabase();
-        $this->getWorkerService()->activate();
+        $this->setupDatabase();        
+        $taskObject = $createdTask = $this->createTask('http://example.com/', 'HTML validation');                
         
-        $createdTask = $this->createTask('http://example.com/', 'HTML validation');
-        
-        $task = $this->getTaskService()->getById($createdTask->id);
+        $task = $this->getTaskService()->getById($taskObject->id);
         $taskTimePeriod = new TimePeriod();
         $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
         $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-02'));
@@ -23,7 +25,7 @@ class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->createCompletedTaskOutputForTask($task);
         
         $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            1 => true,
+            $task->getId() => true,
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
         ));
         
@@ -32,23 +34,16 @@ class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
     }
     
 
-    public function testReportCompletionForInvalidTaskReturnsStatusCodeMinus2() {
-        $this->setupDatabase();
-        $this->getWorkerService()->activate();
-        
+    public function testReportCompletionForInvalidTaskReturnsStatusCodeMinus2() {        
         $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            1 => true,
-            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
+            -1 => true
         ));
         
         $this->assertEquals(-2, $response);        
     }
     
     
-    public function testReportCompletionWhenNoCoreApplicationReturnsStatusCode404() {
-        $this->setupDatabase();
-        $this->getWorkerService()->activate();
-        
+    public function testReportCompletionWhenNoCoreApplicationReturnsStatusCode404() {        
         $createdTask = $this->createTask('http://example.com/', 'HTML validation');
         
         $task = $this->getTaskService()->getById($createdTask->id);
@@ -61,18 +56,17 @@ class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->createCompletedTaskOutputForTask($task);
         
         $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            1 => true,
+            $task->getId() => true,
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
         ));
         
-        $this->assertEquals(404, $response);
-        $this->assertInstanceOf('SimplyTestable\WorkerBundle\Entity\Task\Task', $this->getTaskService()->getById($createdTask->id));       
+        $this->assertEquals(404, $response);      
     }
     
     
     public function testReportCompletionInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {
-        $this->setupDatabase();
-        $this->getWorkerService()->activate();
+        //$this->setupDatabase();
+        //$this->getWorkerService()->activate();
         
         $createdTask = $this->createTask('http://example.com/', 'HTML validation');
         
@@ -88,36 +82,11 @@ class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->getWorkerService()->setReadOnly();
         
         $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            1 => true,
+            $task->getId() => true,
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
         ));
         
         $this->assertEquals(-1, $response);
-        $this->assertInstanceOf('SimplyTestable\WorkerBundle\Entity\Task\Task', $this->getTaskService()->getById($createdTask->id));
-    }
-    
-    
-    public function testReportCompletionInMaintenanceReadOnlyModeReturnsResqueJobToQueue() {
-        $this->setupDatabase();
-        $this->getWorkerService()->activate();
-        
-        $createdTask = $this->createTask('http://example.com/', 'HTML validation');
-        
-        $task = $this->getTaskService()->getById($createdTask->id);
-        $taskTimePeriod = new TimePeriod();
-        $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
-        $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-02'));
-        
-        $task->setTimePeriod($taskTimePeriod);
-
-        $this->createCompletedTaskOutputForTask($task);
-        
-        $this->getWorkerService()->setReadOnly();
-        
-        $this->runConsole('simplytestable:task:reportcompletion', array(
-            1 => true,
-            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
-        ));      
     }
 
 }

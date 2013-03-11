@@ -10,9 +10,7 @@ class MaintenanceEnableReadOnlyCommandTest extends ConsoleCommandBaseTestCase {
         self::setupDatabaseIfNotExists();        
     }     
 
-    public function testEnableReadOnlyModeCorrectlyChangesState() {
-        $this->getWorkerService()->setActive();      
-     
+    public function testEnableReadOnlyModeCorrectlyChangesState() {     
         $this->assertEquals(0, $this->runConsole('simplytestable:maintenance:enable-read-only'));
         $this->assertEquals('worker-maintenance-read-only', $this->getWorkerService()->get()->getState()->getName());
     }
