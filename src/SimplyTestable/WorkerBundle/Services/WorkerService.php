@@ -283,7 +283,7 @@ class WorkerService extends EntityService {
      *
      * @return \SimplyTestable\WorkerBundle\Entity\State
      */    
-    private function getStartingState() {
+    public function getStartingState() {
         return $this->stateService->fetch(self::WORKER_NEW_STATE);
     }
     

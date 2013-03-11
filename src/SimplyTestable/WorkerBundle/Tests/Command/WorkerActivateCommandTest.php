@@ -5,9 +5,16 @@ namespace SimplyTestable\WorkerBundle\Tests\Command;
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
 class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
+    
+    public static function setUpBeforeClass() {
+        self::setupDatabaseIfNotExists();        
+    }       
 
     public function testSuccessfulActivateWorker() {        
-        $this->setupDatabase();
+        $thisWorker = $this->getWorkerService()->get();
+        $thisWorker->setState($this->getWorkerService()->getStartingState());
+        $this->getWorkerService()->getEntityManager()->persist($thisWorker);
+        $this->getWorkerService()->getEntityManager()->flush();
         
         $response = $this->runConsole('simplytestable:worker:activate', array(
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
@@ -18,7 +25,10 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
     
 
     public function test404FailureActivateWorker() {        
-        $this->setupDatabase();
+        $thisWorker = $this->getWorkerService()->get();
+        $thisWorker->setState($this->getWorkerService()->getStartingState());
+        $this->getWorkerService()->getEntityManager()->persist($thisWorker);
+        $this->getWorkerService()->getEntityManager()->flush();        
         
         $response = $this->runConsole('simplytestable:worker:activate', array(
             '/invalid-fixtures-path-forces-mock-http-client-to-respond-with-404' => true
@@ -28,14 +38,11 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
     }
     
     public function testActivationInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {
-        $this->setupDatabase();
         $this->getWorkerService()->setReadOnly();
         
-        $response = $this->runConsole('simplytestable:worker:activate', array(
+        $this->assertEquals(-1, $this->runConsole('simplytestable:worker:activate', array(
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
-        ));
-        
-        $this->assertEquals(-1, $response);
+        )));
     }
 
 }
