@@ -44,5 +44,16 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
             $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
         )));
     }
+    
+    public function testActivationWithCoreApplicationInMaintenanceReadOnlyModeReturnsStatusCode503() {
+        $thisWorker = $this->getWorkerService()->get();
+        $thisWorker->setState($this->getWorkerService()->getStartingState());
+        $this->getWorkerService()->getEntityManager()->persist($thisWorker);
+        $this->getWorkerService()->getEntityManager()->flush(); 
+        
+        $this->assertEquals(503, $this->runConsole('simplytestable:worker:activate', array(
+            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
+        )));
+    }    
 
 }

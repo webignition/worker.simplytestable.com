@@ -36,17 +36,17 @@ class WorkerActivateCommand extends BaseCommand
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }
         
-        $activationResult = $this->getWorkerService()->activate();
-        if ($activationResult === true) {
+        $activationResult = $this->getWorkerService()->activate();        
+        if ($activationResult === 0) {
             return 0;
         }
         
-        if (is_null($activationResult)) {
+        if ($activationResult === 1) {
             $output->writeln('Activation failed, unknown error');
             return self::RETURN_CODE_UNKNOWN_ERROR;
         }
         
-        if ($activationResult === false) {            
+        if ($activationResult === 0) {            
             $output->writeln('Activation failed, worker application is not in the correct state (current state:'.$this->getWorkerService()->get()->getState().')');
             return self::RETURN_CODE_FAILED_DUE_TO_WRONG_STATE;            
         }

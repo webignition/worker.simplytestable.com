@@ -172,14 +172,14 @@ class WorkerService extends EntityService {
      * Issue activation request to core application
      * Activation is completed when core application verifies
      * 
-     * @return boolean 
+     * @return itn 
      */
     public function activate() {
         $this->logger->info("WorkerService::activate: Initialising");
         
         if (!$this->isNew()) {
             $this->logger->info("WorkerService::activate: This worker is not new and cannot be activated");
-            return false;
+            return 0;
         }        
 
         /* @var $coreApplication \SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication */
@@ -210,6 +210,11 @@ class WorkerService extends EntityService {
             
             $this->logger->info("WorkerService::activate: " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
             
+            if ($response->getResponseCode() === 503) {
+                $this->logger->err("WorkerService::activate: Activation request failed (core application is in read-only mode)");
+                return $response->getResponseCode();
+            }
+            
             if ($response->getResponseCode() !== 200) {
                 $this->logger->err("WorkerService::activate: Activation request failed");
                 return $response->getResponseCode();
@@ -218,14 +223,14 @@ class WorkerService extends EntityService {
             $thisWorker->setNextState();
             $this->persistAndFlush($thisWorker);
 
-            return true;            
+            return 0;            
             
         } catch (CurlException $curlException) {
             $this->logger->err("WorkerService::activate: " . $requestUrl . ": " . $curlException->getMessage());            
             return $curlException->getCode();
         }
         
-        return null;
+        return 1;
     }
     
     
