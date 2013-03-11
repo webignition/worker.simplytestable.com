@@ -206,6 +206,12 @@ class WorkerService extends EntityService {
             
             if ($this->httpClient instanceof \webignition\Http\Mock\Client\Client) {
                 $this->logger->info("WorkerService:activate: response fixture path: " . $this->httpClient->getStoredResponseList()->getRequestFixturePath($httpRequest));
+                
+                if (file_exists($this->httpClient->getStoredResponseList()->getRequestFixturePath($httpRequest))) {
+                    $this->logger->info("WorkerService:activate: response fixture path: found");
+                } else {
+                    $this->logger->info("WorkerService:activate: response fixture path: not found");
+                }                
             }            
             
             $this->logger->info("WorkerService::activate: " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
