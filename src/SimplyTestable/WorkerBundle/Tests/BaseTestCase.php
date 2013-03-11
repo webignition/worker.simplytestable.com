@@ -157,6 +157,11 @@ abstract class BaseTestCase extends WebTestCase {
      */
     protected function getFixturesDataPath($testName) {
         return __DIR__ . self::FIXTURES_DATA_RELATIVE_PATH . '/' . str_replace('\\', DIRECTORY_SEPARATOR, get_class($this)) . '/' . $testName;
+    } 
+    
+    public function tearDown() {
+        $this->container->get('doctrine')->getConnection()->close();
+        parent::tearDown();
     }    
 
 }
