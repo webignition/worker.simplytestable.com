@@ -6,9 +6,11 @@ use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
 class TaskPerformEnqueueCommandTest extends ConsoleCommandBaseTestCase {
     
-    public function testEnqueueTaskPerformJobs() {
-        $this->setupDatabase(); 
-        
+    public static function setUpBeforeClass() {
+        self::setupDatabaseIfNotExists();        
+    }     
+    
+    public function testEnqueueTaskPerformJobs() {        
         $taskPropertyCollection = array(
             array(
                 'url' => 'http://example.com/1/',
