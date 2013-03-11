@@ -2,18 +2,13 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Controller;
 
-class TaskControllerCancelTest extends TaskControllerTest {
+class TaskControllerCancelTest extends TaskControllerTest {    
     
-    const TASK_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TaskController';
-    
-    public function setUp() {
-        parent::setUp();
-        $this->setupDatabase();
+    public static function setUpBeforeClass() {
+        self::setupDatabaseIfNotExists();        
     }
 
     public function testCancelActionInNormalState() {
-        $this->setActiveState();
-        
         $url = 'http://example.com/';
         $type = 'HTML validation';        
         
@@ -33,9 +28,7 @@ class TaskControllerCancelTest extends TaskControllerTest {
     }
     
     
-    public function testCancelActionInMaintenanceReadOnlyStateReturnsHttp503() {                
-        $this->setActiveState();
-        
+    public function testCancelActionInMaintenanceReadOnlyStateReturnsHttp503() {
         $url = 'http://example.com/';
         $type = 'HTML validation';        
         
@@ -53,8 +46,6 @@ class TaskControllerCancelTest extends TaskControllerTest {
     
     
     public function testCancelCollectionActionInNormalState() {
-        $this->setActiveState();
-
         $taskData = array(
                 array(
                     'url' => 'http://example.com/one/',
@@ -87,8 +78,6 @@ class TaskControllerCancelTest extends TaskControllerTest {
     
     
     public function testCancelCollectionActionInMaintenanceReadOnlyStateReturnsHttp503() {
-        $this->setActiveState();
-
         $taskData = array(
                 array(
                     'url' => 'http://example.com/one/',
