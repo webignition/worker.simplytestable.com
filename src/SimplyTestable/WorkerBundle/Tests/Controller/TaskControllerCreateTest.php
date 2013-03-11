@@ -25,10 +25,11 @@ class TaskControllerCreateTest extends TaskControllerTest {
         $controller = $this->getTaskController('createAction', $postData);        
         $response = $controller->createAction();
     
-        $responseObject = json_decode($response->getContent());
+        $responseObject = json_decode($response->getContent());     
         
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(1, $responseObject->id);
+        $this->assertInternalType('integer', $responseObject->id);
+        $this->assertGreaterThan(0, $responseObject->id);    
         $this->assertEquals($url, $responseObject->url);
         $this->assertEquals('queued', $responseObject->state);
         $this->assertEquals($type, $responseObject->type);          
@@ -65,8 +66,9 @@ class TaskControllerCreateTest extends TaskControllerTest {
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals(3, count($responseObject));
         
-        foreach ($responseObject as $responseTaskIndex => $responseTask) {
-            $this->assertEquals($responseTaskIndex + 1, $responseTask->id);
+        foreach ($responseObject as $responseTaskIndex => $responseTask) {        
+            $this->assertInternalType('integer', $responseTask->id);
+            $this->assertGreaterThan(0, $responseTask->id);
             $this->assertEquals($taskData[$responseTaskIndex]['url'], $responseTask->url);
             $this->assertEquals('queued', $responseTask->state);
             $this->assertEquals($taskData[$responseTaskIndex]['type'], $responseTask->type);               

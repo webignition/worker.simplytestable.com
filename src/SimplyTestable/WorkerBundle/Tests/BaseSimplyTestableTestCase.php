@@ -12,6 +12,11 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     const TASK_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TaskController';    
     const VERIFY_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\VerifyController';    
     
+    
+    protected function setActiveState() {
+        $this->getWorkerService()->activate();
+    }    
+    
     /**
      *
      * @param string $methodName

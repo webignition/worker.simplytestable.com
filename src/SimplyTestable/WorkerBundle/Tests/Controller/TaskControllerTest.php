@@ -7,11 +7,11 @@ abstract class TaskControllerTest extends BaseControllerJsonTestCase {
     
     const TASK_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TaskController';
     
-    public function setUp() {
-        parent::setUp();
-        $this->setupDatabase();
-        $this->getWorkerService()->activate();
-    }
+//    public function setUp() {
+//        parent::setUp();
+//        $this->setupDatabase();
+//        $this->getWorkerService()->activate();
+//    }
     
     
     /**
@@ -21,18 +21,12 @@ abstract class TaskControllerTest extends BaseControllerJsonTestCase {
      */
     protected function createTaskControllerForAction($action, $postData = array()) {
         return $this->createController(self::TASK_CONTROLLER_NAME, $action, $postData);        
-    }
-    
-    protected function setActiveState() {
-        $this->getWorkerService()->activate();
-    }
+    }   
+
     
     protected function setMaintenanceReadOnlyState() {
         $this->getWorkerService()->setReadOnly();
     }
-    
-    
-
     
     
     /**
