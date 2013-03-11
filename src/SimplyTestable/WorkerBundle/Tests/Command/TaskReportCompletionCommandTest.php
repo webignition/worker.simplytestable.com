@@ -88,5 +88,26 @@ class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         
         $this->assertEquals(-1, $response);
     }
+    
+    public function testReportCompletionWhenCoreApplicationInMaintenanceReadOnlyModeReturnsStatusCode503() {        
+        $this->setupDatabase();
+        $createdTask = $this->createTask('http://example.com/', 'HTML validation');
+        
+        $task = $this->getTaskService()->getById(1);
+        $taskTimePeriod = new TimePeriod();
+        $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
+        $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-02'));
+        
+        $task->setTimePeriod($taskTimePeriod);
+
+        $this->createCompletedTaskOutputForTask($task);
+        
+        $response = $this->runConsole('simplytestable:task:reportcompletion', array(
+            $task->getId() => true,
+            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
+        ));
+        
+        $this->assertEquals(503, $response);
+    }    
 
 }
