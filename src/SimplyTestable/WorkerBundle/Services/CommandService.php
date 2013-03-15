@@ -25,9 +25,10 @@ class CommandService {
      * @return mixed
      */
     public function execute($commandClass, $inputArray = array(), \CoreSphere\ConsoleBundle\Output\StringOutput $output = null) {
-        $command = $this->get($commandClass);       
+        /* @var $command \Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand */
+        $command = $this->get($commandClass);
         
-        $input = new \Symfony\Component\Console\Input\ArrayInput($inputArray);
+        $input = new \Symfony\Component\Console\Input\ArrayInput($inputArray, $command->getDefinition());
         
         if (is_null($output)) {
             $output = new \CoreSphere\ConsoleBundle\Output\StringOutput();
@@ -44,7 +45,7 @@ class CommandService {
      */
     public function get($commandClass) {
         $command = new $commandClass;
-        $command->setContainer($this->container);
+        $command->setContainer($this->container);       
         
         return $command;
     }
