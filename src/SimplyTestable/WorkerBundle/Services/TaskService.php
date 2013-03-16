@@ -452,7 +452,7 @@ class TaskService extends EntityService {
             return true;            
             
         } catch (CurlException $curlException) {
-            $this->logger->info("TaskService::reportCompletion: " . $requestUrl . ": " . $curlException->getMessage());            
+            $this->logger->err("TaskService::reportCompletion: " . $requestUrl . ": " . $curlException->getMessage());            
             return $curlException->getCode();
         }
         
