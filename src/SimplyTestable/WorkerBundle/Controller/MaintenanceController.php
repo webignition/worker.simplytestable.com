@@ -9,11 +9,11 @@ class MaintenanceController extends BaseController
     
     public function enableReadOnlyAction()
     {
-        return $this->executeCommand('SimplyTestable\WorkerBundle\Command\MaintenanceEnableReadOnlyCommand');
+        return $this->executeCommand('SimplyTestable\WorkerBundle\Command\Maintenance\EnableReadOnlyCommand');
     }    
     
     public function disableReadOnlyAction() {
-        return $this->executeCommand('SimplyTestable\WorkerBundle\Command\MaintenanceDisableReadOnlyCommand');      
+        return $this->executeCommand('SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand');      
     }    
     
     public function taskPerformEnqueueAction() {
@@ -22,7 +22,7 @@ class MaintenanceController extends BaseController
     
     public function leaveReadOnlyAction() {
         $commands = array(
-            'SimplyTestable\WorkerBundle\Command\MaintenanceDisableReadOnlyCommand',
+            'SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand',
             'SimplyTestable\WorkerBundle\Command\TaskReportCompletionEnqueueCommand',
             'SimplyTestable\WorkerBundle\Command\TaskPerformEnqueueCommand'
         );

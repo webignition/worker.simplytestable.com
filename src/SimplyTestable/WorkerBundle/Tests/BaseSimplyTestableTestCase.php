@@ -11,7 +11,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
     const TASK_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TaskController';    
     const VERIFY_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\VerifyController';    
-    
+    const MAINTENANCE_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\MaintenanceController';        
     
     protected function setActiveState() {
         $this->getWorkerService()->activate();
@@ -37,6 +37,16 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     protected function getVerifyController($methodName, $postData = array()) {
         return $this->getController(self::VERIFY_CONTROLLER_NAME, $methodName, $postData);
     }    
+    
+    /**
+     *
+     * @param string $methodName
+     * @param array $postData
+     * @return \SimplyTestable\WorkerBundle\Controller\MaintenanceController
+     */
+    protected function getMaintenanceController($methodName, $postData = array()) {
+        return $this->getController(self::MAINTENANCE_CONTROLLER_NAME, $methodName, $postData);
+    }       
     
     
     /**
