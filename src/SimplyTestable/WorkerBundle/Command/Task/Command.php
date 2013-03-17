@@ -1,5 +1,7 @@
 <?php
-namespace SimplyTestable\WorkerBundle\Command;
+namespace SimplyTestable\WorkerBundle\Command\Task;
+
+use SimplyTestable\WorkerBundle\Command\BaseCommand;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -7,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-abstract class TaskCommand extends BaseCommand
+abstract class Command extends BaseCommand
 {    
     /**
      *

@@ -23,8 +23,8 @@ class MaintenanceController extends BaseController
     public function leaveReadOnlyAction() {
         $commands = array(
             'SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand',
-            'SimplyTestable\WorkerBundle\Command\TaskReportCompletionEnqueueCommand',
-            'SimplyTestable\WorkerBundle\Command\TaskPerformEnqueueCommand'
+            'SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand',
+            'SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand'
         );
         
         $responseLines = array();

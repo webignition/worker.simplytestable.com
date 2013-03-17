@@ -1,5 +1,5 @@
 <?php
-namespace SimplyTestable\WorkerBundle\Command;
+namespace SimplyTestable\WorkerBundle\Command\Task;
 
 use SimplyTestable\WorkerBundle\Services\CommandService;
 
@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class TaskPerformAllCommand extends TaskCommand
+class PerformAllCommand extends Command
 { 
     protected function configure()
     {

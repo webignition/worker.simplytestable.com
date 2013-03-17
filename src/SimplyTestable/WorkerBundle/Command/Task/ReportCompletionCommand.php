@@ -1,12 +1,12 @@
 <?php
-namespace SimplyTestable\WorkerBundle\Command;
+namespace SimplyTestable\WorkerBundle\Command\Task;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TaskReportCompletionCommand extends TaskCommand
+class ReportCompletionCommand extends Command
 {    
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;     

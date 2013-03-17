@@ -1,5 +1,5 @@
 <?php
-namespace SimplyTestable\WorkerBundle\Command;
+namespace SimplyTestable\WorkerBundle\Command\Task;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class TaskReportCompletionEnqueueCommand extends TaskCommand
+class ReportCompletionEnqueueCommand extends Command
 { 
     protected function configure()
     {

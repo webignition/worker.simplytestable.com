@@ -1,10 +1,10 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Command;
+namespace SimplyTestable\WorkerBundle\Tests\Command\Task;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
-class TaskPerformEnqueueCommandTest extends ConsoleCommandBaseTestCase {
+class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase {
     
     public static function setUpBeforeClass() {
         self::setupDatabaseIfNotExists();        

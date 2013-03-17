@@ -1,10 +1,10 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Command;
+namespace SimplyTestable\WorkerBundle\Tests\Command\Task;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
-class TaskReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
+class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
     
     public function testEnqueueTaskReportCompletionJobs() {
         $this->setupDatabase();        

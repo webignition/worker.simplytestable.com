@@ -1,11 +1,11 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Command;
+namespace SimplyTestable\WorkerBundle\Tests\Command\Task;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 
-class TaskReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
+class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
     
     public static function setUpBeforeClass() {
         self::setupDatabaseIfNotExists();        
