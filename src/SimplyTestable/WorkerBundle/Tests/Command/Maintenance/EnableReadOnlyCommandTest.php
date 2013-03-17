@@ -1,10 +1,10 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Command;
+namespace SimplyTestable\WorkerBundle\Tests\Command\Maintenance;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
-class MaintenanceEnableReadOnlyCommandTest extends ConsoleCommandBaseTestCase {
+class EnableReadOnlyCommandTest extends ConsoleCommandBaseTestCase {
     
     public static function setUpBeforeClass() {
         self::setupDatabaseIfNotExists();        
