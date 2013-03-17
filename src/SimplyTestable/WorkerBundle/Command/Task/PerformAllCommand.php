@@ -37,7 +37,7 @@ EOF
                 $commandResponse = 'dry run';
             } else {
                 $commandResponse =  $this->getCommandService()->execute(
-                        'SimplyTestable\WorkerBundle\Command\TaskPerformCommand',
+                        'SimplyTestable\WorkerBundle\Command\Task\PerformCommand',
                         array('id' => $taskId),
                         $outputBuffer
                 );                
