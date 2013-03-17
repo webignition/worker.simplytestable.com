@@ -11,8 +11,21 @@ class StatusController extends BaseController
     
     public function indexAction()
     {
+        $status = array();        
         $thisWorker = $this->getWorkerService()->get();
-        return $this->sendResponse($thisWorker); 
+        
+        $status['hostname'] = $thisWorker->getHostname();
+        $status['state'] = $thisWorker->getState()->getName();
+        $status['version'] = $this->getLatestGitHash();
+        
+       // var_dump($)
+        
+        return $this->sendResponse($status); 
+    }
+    
+    
+    private function getLatestGitHash() {
+        return trim(shell_exec("git log | head -1 | awk {'print $2;'}"));
     }
     
     
