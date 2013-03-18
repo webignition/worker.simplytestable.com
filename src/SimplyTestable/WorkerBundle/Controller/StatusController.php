@@ -15,7 +15,7 @@ class StatusController extends BaseController
         $thisWorker = $this->getWorkerService()->get();
         
         $status['hostname'] = $thisWorker->getHostname();
-        $status['state'] = $thisWorker->getState()->getName();
+        $status['state'] = $thisWorker->getPublicSerializedState();
         $status['version'] = $this->getLatestGitHash();
         
        // var_dump($)
