@@ -263,7 +263,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $webPage->find('script')->each(function ($index, \DOMElement $domElement) use (&$scriptUrls, $thisUrl) {            
             $src = trim($domElement->getAttribute('src'));
             if ($src != '') {
-                $absoluteUrlDeriver = new AbsoluteUrlDeriver(new Url($src), $thisUrl);
+                $absoluteUrlDeriver = new AbsoluteUrlDeriver($src, $thisUrl);
                 
                 $scriptUrls[] = $absoluteUrlDeriver->getAbsoluteUrl();
             }

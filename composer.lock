@@ -1739,18 +1739,18 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webignition/absolute-url-deriver",
-                "reference": "d84d6f74fe55429d4e19f7ede4d81fd3090738cc"
+                "url": "https://github.com/webignition/absolute-url-deriver.git",
+                "reference": "1.3.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/absolute-url-deriver/archive/d84d6f74fe55429d4e19f7ede4d81fd3090738cc.zip",
-                "reference": "d84d6f74fe55429d4e19f7ede4d81fd3090738cc",
+                "url": "https://api.github.com/repos/webignition/absolute-url-deriver/zipball/1.3.2",
+                "reference": "1.3.2",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0",
-                "webignition/url": ">=1.1"
+                "webignition/url": ">=1.7.1"
             },
             "type": "library",
             "autoload": {
@@ -1774,7 +1774,7 @@
                 "absolute",
                 "url"
             ],
-            "time": "2012-07-26 23:07:45"
+            "time": "2013-03-18 13:17:18"
         },
         {
             "name": "webignition/container-aware-migration",
@@ -2219,16 +2219,16 @@
         },
         {
             "name": "webignition/url",
-            "version": "1.7",
+            "version": "1.7.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webignition/url",
-                "reference": "1.7"
+                "url": "https://github.com/webignition/url.git",
+                "reference": "1.7.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/url/archive/1.7.zip",
-                "reference": "1.7",
+                "url": "https://api.github.com/repos/webignition/url/zipball/1.7.1",
+                "reference": "1.7.1",
                 "shasum": ""
             },
             "require": {
@@ -2256,7 +2256,7 @@
             "keywords": [
                 "url"
             ],
-            "time": "2013-01-18 12:56:59"
+            "time": "2013-03-18 12:47:00"
         },
         {
             "name": "webignition/web-json-model",
@@ -2438,12 +2438,20 @@
             "time": "2013-02-21 19:48:51"
         }
     ],
-    "packages-dev": null,
+    "packages-dev": [
+
+    ],
     "aliases": [
 
     ],
     "minimum-stability": "dev",
     "stability-flags": {
         "jms/serializer-bundle": 20
-    }
+    },
+    "platform": {
+        "php": ">=5.3.3"
+    },
+    "platform-dev": [
+
+    ]
 }
