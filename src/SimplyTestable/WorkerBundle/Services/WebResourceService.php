@@ -58,17 +58,18 @@ class WebResourceService {
                 // Interesting to see what makes this happen
                 break;
             
-            case self::RESPONSE_CLASS_SUCCESS:
+            case self::RESPONSE_CLASS_SUCCESS:                
                 $mediaTypeParser = new InternetMediaTypeParser();
-                $contentType = $mediaTypeParser->parse($response->getHeader('content-type'));
+                $mediaTypeParser->setIgnoreInvalidAttributes(true);
+                $contentType = $mediaTypeParser->parse($response->getHeader('content-type'));               
 
                 $webResourceClassName = $this->getWebResourceClassName($contentType->getTypeSubtypeString());
 
-                $resource = new $webResourceClassName;
-                $resource->setContent($response->getBody());
-                $resource->setContentType($response->getHeader('content-type'));
+                $resource = new $webResourceClassName;                
+                $resource->setContent($response->getBody());                              
+                $resource->setContentType((string)$contentType);                  
                 $resource->setUrl($request->getUrl());       
-
+                
                 return $resource;
             
             case self::RESPONSE_CLASS_REDIRECTION:
