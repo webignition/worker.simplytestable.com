@@ -51,5 +51,29 @@ class TaskRepository extends EntityRepository
         return $ids;         
     }
     
+    
+    public function getUnfinishedIdsByMaxStartDate(\DateTime $startDateTime) {
+        $queryBuilder = $this->createQueryBuilder('Task');
+        $queryBuilder->join('Task.timePeriod', 'TimePeriod');
+        $queryBuilder->select('Task.id as TaskId'); 
+        $queryBuilder->where('TimePeriod.startDateTime <= :StartDateTime AND TimePeriod.endDateTime IS NULL');
+        
+        $queryBuilder->setParameter('StartDateTime', $startDateTime);
+       
+        $result = $queryBuilder->getQuery()->getResult(); 
+        
+        if (count($result) === 0) {
+            return array();
+        }
+        
+        $ids = array();
+        
+        foreach ($result as $taskOutputIdResult) {
+            $ids[] = $taskOutputIdResult['TaskId'];
+        }
+        
+        return $ids;         
+    }    
+    
   
 }
