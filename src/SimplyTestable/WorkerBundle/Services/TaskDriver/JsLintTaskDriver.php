@@ -152,8 +152,22 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
 //
 //                $this->httpClientException = $httpClientException;
         } catch (\webignition\Http\Client\CurlException $curlException) {
-            var_dump("CurlException");
-            exit();                
+            $this->errorCount++;
+
+            return array(
+                'errorCount' => 1,
+                'output' => array(
+                    'statusLine' => 'failed',
+                    'errorReport' => array(
+                        'reason' => 'curlException',
+                        'statusCode' => $curlException->getCode()
+                    )
+                )
+            );
+
+            
+            //var_dump("CurlException");
+            //exit();                
 //                $this->response->setHasFailed();
 //
 //                if ($curlException->isTimeoutException()) {
