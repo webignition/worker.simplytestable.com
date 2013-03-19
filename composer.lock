@@ -1,5 +1,5 @@
 {
-    "hash": "cae89504e7588009a27760c18b16f409",
+    "hash": "062e0366e9cd7b7b948bb8e721b3f3f1",
     "packages": [
         {
             "name": "doctrine/common",
@@ -2048,16 +2048,16 @@
         },
         {
             "name": "webignition/node-jslint-output-parser",
-            "version": "dev-master",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/node-jslint-output-parser.git",
-                "reference": "4bdd281a46d0e07c6a5fbceaf4712aa62c98a99f"
+                "reference": "1.0.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/node-jslint-output-parser/archive/4bdd281a46d0e07c6a5fbceaf4712aa62c98a99f.zip",
-                "reference": "4bdd281a46d0e07c6a5fbceaf4712aa62c98a99f",
+                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/1.0.1",
+                "reference": "1.0.1",
                 "shasum": ""
             },
             "require": {
@@ -2085,7 +2085,7 @@
             "keywords": [
                 "rss"
             ],
-            "time": "2012-12-03 19:21:48"
+            "time": "2013-03-19 18:11:28"
         },
         {
             "name": "webignition/quoted-string",
