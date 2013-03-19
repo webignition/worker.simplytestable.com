@@ -82,9 +82,9 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         $scriptValues = $this->getScriptValues();
         foreach ($scriptValues as $scriptValue) {            
-            $nodeJsLintOutput = $this->validateJsContent($scriptValue);             
-            $errorCount += $nodeJsLintOutput->getEntryCount();            
-            $jsLintOutput[md5($scriptValue)] = $nodeJsLintOutput->__toArray();  
+            $nodeJsLintOutput = $this->validateJsContent($scriptValue);                         
+            $jsLintOutput[md5($scriptValue)] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);
+            $errorCount += $nodeJsLintOutput->getEntryCount();
         }
         
         $this->response->setErrorCount($errorCount);
@@ -113,23 +113,54 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
             'errorCount' => $timeCachedOutput->getErrorCount(),
             'output' => unserialize($timeCachedOutput->getOutput())
         );
-    }   
+    } 
+    
+    
+    private function entryToArray(\webignition\NodeJslintOutput\Entry\Entry $entry) {
+        $output = array(
+            'headerLine' => array(
+                'errorNumber' => 1,
+                'errorMessage' => $entry->getReason()
+            ),
+            'fragmentLine' => array(
+                'fragment' => $entry->getEvidence(),
+                'lineNumber' => $entry->getLineNumber(),
+                'columnNumber' => $entry->getColumnNumber()
+            )
+        );
+
+        return $output;
+    }
+    
+    private function nodeJsLintOutputToArray(\webignition\NodeJslintOutput\NodeJslintOutput $nodeJsLintOutput) {
+        $output = array();
+        $output['statusLine'] = $nodeJsLintOutput->getStatusLine();
+        $output['entries'] = array();
+        
+        foreach ($nodeJsLintOutput->getEntries() as $entry) {
+            /* @var $entry \webignition\NodeJslintOutput\Entry\Entry */
+            $output['entries'][] = $this->entryToArray($entry);
+        }
+        
+        return $output;        
+    }
+    
     
     
     private function getSourceJsLintOutputForUrl($scriptUrl) {        
-        try {
+        try {            
             $nodeJsLintOutput = $this->validateScriptFromUrl($scriptUrl);
             
             foreach ($nodeJsLintOutput->getEntries() as $entry) {
                 /* @var $entry \webignition\NodeJslintOutput\Entry\Entry */
-                if (strlen($entry->getFragmentLine()->getFragment()) > 256) {
-                    $entry->getFragmentLine()->setFragment(substr($entry->getFragmentLine()->getFragment(), 0, 256));
-                }             
+                if (strlen($entry->getEvidence()) > 256) {
+                    $entry->setEvidence(substr($entry->getEvidence(), 0, 256));
+                }            
             }
             
             return array(
                 'errorCount' => $nodeJsLintOutput->getEntryCount(),
-                'output' => $nodeJsLintOutput->__toArray()
+                'output' => $this->nodeJsLintOutputToArray($nodeJsLintOutput)
             );                            
         } catch (WebResourceException $webResourceException) {
             $this->errorCount++;
@@ -170,25 +201,6 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                     )
                 )
             );
-
-            
-            //var_dump("CurlException");
-            //exit();                
-//                $this->response->setHasFailed();
-//
-//                if ($curlException->isTimeoutException()) {
-//                    $this->response->setIsRetryable(false);
-//                }
-//
-//                if ($curlException->isDnsLookupFailureException()) {
-//                    $this->response->setIsRetryable(false);
-//                }            
-//
-//                if ($curlException->isInvalidUrlException()) {
-//                    $this->response->setIsRetryable(false);
-//                }              
-//
-//                $this->curlException = $curlException;
         }         
     }
     
@@ -214,23 +226,23 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     
     private function validateScriptFromUrl(Url $url) {        
         $webResource = $this->getJavaScriptWebResourceFromUrl($url);        
-        return $this->validateJsContent($webResource->getContent());              
+        return $this->validateJsContent($webResource->getContent());                   
     }
     
     
-    private function validateJsContent($js) {        
+    private function validateJsContent($js) {                
         $localPath = $this->getLocalJavaScriptResourcePathFromContent($js);
         
         file_put_contents($localPath, $js);
         
         $outputLines = array();
         
-        $command = $this->getProperty('node-path') . " ".$this->getProperty('node-jslint-path')."/jslint.js ".$localPath;
+        $command = $this->getProperty('node-path') . " ".$this->getProperty('node-jslint-path')."/jslint.js --json ".$localPath;        
         exec($command, $outputLines); 
         
-        $output = implode("\n", $outputLines);
+        $output = implode("\n", $outputLines);       
         
-        $outputParser = new \webignition\NodeJslintOutput\Parser();
+        $outputParser = new \webignition\NodeJslintOutput\Parser();        
         $outputParser->parse($output);
         
         $nodeJsLintOutput = $outputParser->getNodeJsLintOutput();
