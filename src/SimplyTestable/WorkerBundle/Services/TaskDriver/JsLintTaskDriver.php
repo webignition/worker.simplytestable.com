@@ -145,12 +145,18 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                 )
             );        
         } catch (\webignition\Http\Client\Exception $httpClientException) {
-            var_dump("HttpClientException");
-            exit();                
-//                $this->response->setHasFailed();
-//                $this->response->setIsRetryable(false);
-//
-//                $this->httpClientException = $httpClientException;
+            $this->errorCount++;
+
+            return array(
+                'errorCount' => 1,
+                'output' => array(
+                    'statusLine' => 'failed',
+                    'errorReport' => array(
+                        'reason' => 'httpClientException',
+                        'statusCode' => $httpClientException->getCode()
+                    )
+                )
+            );
         } catch (\webignition\Http\Client\CurlException $curlException) {
             $this->errorCount++;
 
@@ -254,6 +260,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      */
     private function getJavaScriptWebResourceFromUrl($url) {
         $this->getWebResourceService()->getHttpClient()->setUserAgent('SimplyTestable JS static analyser/0.1 (http://simplytestable.com/)');        
+        $this->getWebResourceService()->getHttpClient()->redirectHandler()->clearRedirectCount();
         $request = new \HttpRequest((string)$url, HTTP_METH_GET);
         $webResource = $this->getWebResourceService()->get($request);
         $this->getWebResourceService()->getHttpClient()->clearUserAgent();        
