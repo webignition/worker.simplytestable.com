@@ -2300,16 +2300,16 @@
         },
         {
             "name": "webignition/web-page-model",
-            "version": "0.4.2",
+            "version": "0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-page-model.git",
-                "reference": "0.4.2"
+                "reference": "0.5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/web-page-model/archive/0.4.2.zip",
-                "reference": "0.4.2",
+                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/0.5",
+                "reference": "0.5",
                 "shasum": ""
             },
             "require": {
@@ -2339,7 +2339,7 @@
                 "model",
                 "webpage"
             ],
-            "time": "2012-12-03 12:46:24"
+            "time": "2013-03-20 10:28:34"
         },
         {
             "name": "webignition/web-resource-model",
