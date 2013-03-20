@@ -13,6 +13,7 @@ class TaskControllerCancelTest extends TaskControllerTest {
         $type = 'HTML validation';        
         
         $createdTask = $this->createTask($url, $type);
+        $this->assertInstanceOf('\SimplyTestable\WorkerBundle\Entity\Task\Task', $this->getTaskService()->getById($createdTask->id));
         
         $postData = array(
             'id' => $createdTask->id
@@ -21,10 +22,9 @@ class TaskControllerCancelTest extends TaskControllerTest {
         $controller = $this->getTaskController('cancelAction', $postData);
        
         $cancellationResponse = $controller->cancelAction();        
-        $cancelledTask = json_decode($cancellationResponse->getContent());
-        
         $this->assertEquals(200, $cancellationResponse->getStatusCode());
-        $this->assertEquals('cancelled', $cancelledTask->state);      
+        
+        $this->assertNull($this->getTaskService()->getById($createdTask->id));     
     }
     
     
@@ -73,6 +73,11 @@ class TaskControllerCancelTest extends TaskControllerTest {
         ));
        
         $cancellationResponse = $controller->cancelCollectionAction();      
+        
+        foreach ($taskIds as $taskId) {
+            $this->assertNull($this->getTaskService()->getById($taskId));
+        }
+        
         $this->assertEquals(200, $cancellationResponse->getStatusCode());          
     }
     

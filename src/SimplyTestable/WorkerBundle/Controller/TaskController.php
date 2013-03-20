@@ -123,7 +123,11 @@ class TaskController extends BaseController
         }
 
         $this->getTaskService()->cancel($task);        
-        return $this->sendResponse($task);
+        
+        $this->getTaskService()->getEntityManager()->remove($task);
+        $this->getTaskService()->getEntityManager()->flush();        
+        
+        return $this->sendSuccessResponse();
     }
     
     public function cancelCollectionAction()
@@ -133,11 +137,19 @@ class TaskController extends BaseController
         }           
         
         $taskIds = explode(',', $this->getArguments('cancelCollectionAction')->get('ids'));
+        
+        $cancelledTaskCount = 0;
         foreach ($taskIds as $taskId) {
             $task = $this->getTaskService()->getById($taskId);
             if (!is_null($task)) {
                 $this->getTaskService()->cancel($task);
+                $this->getTaskService()->getEntityManager()->remove($task);
+                $cancelledTaskCount++;
             }                          
+        }
+        
+        if ($cancelledTaskCount > 0) {
+            $this->getTaskService()->getEntityManager()->flush(); 
         }
         
         return $this->sendSuccessResponse();
