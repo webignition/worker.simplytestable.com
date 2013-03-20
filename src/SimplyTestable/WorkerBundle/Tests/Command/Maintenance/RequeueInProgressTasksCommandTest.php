@@ -11,7 +11,7 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase {
         self::setupDatabase();        
     }     
 
-    public function testEnableReadOnlyModeCorrectlyChangesState() {
+    public function testRequeueInProgressTasksCommand() {
         $urls = array(
             'http://example.com/zero/',
             'http://example.com/one/',

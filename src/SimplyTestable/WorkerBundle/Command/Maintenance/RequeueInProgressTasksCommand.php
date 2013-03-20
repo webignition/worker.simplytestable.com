@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class RequeueInProgressTasksCommand extends BaseCommand
 {        
-    const DEFAULT_AGE_IN_DAYS = 24;
+    const DEFAULT_AGE_IN_DAYS = 1;
     
     /**
      *
@@ -45,7 +45,7 @@ EOF
         $startDateTime = new \DateTime('-'.$this->getAgeInHours($input).' hour');        
         $taskIds = $this->getTaskService()->getEntityRepository()->getUnfinishedIdsByMaxStartDate($startDateTime);
         
-        $output->writeln('Tasks started more than '.$this->getAgeInHours().' days ago: <info>'.count($taskIds).'</info>');
+        $output->writeln('Tasks started more than '.$this->getAgeInHours().' hours ago: <info>'.count($taskIds).'</info>');
         $output->writeln(''); 
         
         $processedTaskCount = 0;
@@ -54,20 +54,19 @@ EOF
             $processedTaskCount++;
             $output->writeln('Processing task '.$taskId.' ('.$processedTaskCount.' of '.count($taskIds).')');
             
-            $inProgressTask = $this->getTaskService()->getById($taskId);            
-            $newTask = $this->getTaskService()->create($inProgressTask->getUrl(), $inProgressTask->getType(), $inProgressTask->getParameters());
+            $inProgressTask = $this->getTaskService()->getById($taskId);           
+            $inProgressTask->setState($this->getTaskService()->getQueuedState());            
             
             if ($this->isDryRun()) {
                 $this->getTaskService()->getEntityManager()->detach($inProgressTask);
             } else {
-                $this->getTaskService()->getEntityManager()->persist($newTask);
-                $this->getTaskService()->getEntityManager()->remove($inProgressTask);
+                $this->getTaskService()->getEntityManager()->persist($inProgressTask);                
                 $this->getTaskService()->getEntityManager()->flush();
 
                 $this->getResqueQueueService()->add(
                     'task-perform',
                     array(
-                        'id' => $newTask->getId()
+                        'id' => $inProgressTask->getId()
                     )                
                 );                
             }
