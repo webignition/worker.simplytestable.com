@@ -285,9 +285,9 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * 
      * @return array
      */
-    private function getScriptUrls() {        
+    private function getScriptUrls() {
         $webPage = new WebPage();
-        $webPage->setContent($this->webResource->getContent()); 
+        $webPage->setContent($this->webResource->getContent());
         
         $scriptUrls = array();
         
@@ -297,8 +297,11 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
             $src = trim($domElement->getAttribute('src'));
             if ($src != '') {
                 $absoluteUrlDeriver = new AbsoluteUrlDeriver($src, $thisUrl);
+                $absoluteScriptUrl = $absoluteUrlDeriver->getAbsoluteUrl();
                 
-                $scriptUrls[] = $absoluteUrlDeriver->getAbsoluteUrl();
+                if (!in_array($absoluteScriptUrl, $scriptUrls)) {
+                    $scriptUrls[] = $absoluteScriptUrl;
+                }
             }
         });
         
