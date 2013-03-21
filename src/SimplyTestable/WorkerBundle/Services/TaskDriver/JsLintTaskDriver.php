@@ -286,8 +286,12 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return array
      */
     private function getScriptUrls() {
-        $webPage = new WebPage();
-        $webPage->setContent($this->webResource->getContent());
+        if ($this->webResource instanceof WebPage) {
+            $webPage = clone $this->webResource;
+        } else {
+            $webPage = new WebPage();
+            $webPage->setContent($this->webResource->getContent());            
+        }
         
         $scriptUrls = array();
         
