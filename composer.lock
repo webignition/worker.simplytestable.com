@@ -1,5 +1,5 @@
 {
-    "hash": "062e0366e9cd7b7b948bb8e721b3f3f1",
+    "hash": "06c5c6be2b00d9158618af61f5913cff",
     "packages": [
         {
             "name": "doctrine/common",
@@ -2300,16 +2300,16 @@
         },
         {
             "name": "webignition/web-page-model",
-            "version": "0.5",
+            "version": "0.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-page-model.git",
-                "reference": "0.5"
+                "reference": "0.5.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/0.5",
-                "reference": "0.5",
+                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/0.5.1",
+                "reference": "0.5.1",
                 "shasum": ""
             },
             "require": {
@@ -2339,7 +2339,7 @@
                 "model",
                 "webpage"
             ],
-            "time": "2013-03-20 10:28:34"
+            "time": "2013-03-21 13:45:19"
         },
         {
             "name": "webignition/web-resource-model",
