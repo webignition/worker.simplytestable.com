@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class RequeueInProgressTasksCommand extends BaseCommand
 {        
-    const DEFAULT_AGE_IN_DAYS = 1;
+    const DEFAULT_AGE_IN_HOURS = 1;
     
     /**
      *
@@ -23,9 +23,9 @@ class RequeueInProgressTasksCommand extends BaseCommand
     {
         $this
             ->setName('simplytestable:maintenance:requeue-in-progress-tasks')
-            ->setDescription('Requeue tasks in progress that are started more than X days ago')
+            ->setDescription('Requeue tasks in progress that are started more than X hours ago')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'desc')
-            ->addOption('age-in-hours', null, InputOption::VALUE_OPTIONAL, 'desc', self::DEFAULT_AGE_IN_DAYS)
+            ->addOption('age-in-hours', null, InputOption::VALUE_OPTIONAL, 'desc', self::DEFAULT_AGE_IN_HOURS)
             ->setHelp(<<<EOF
 Requeue tasks in progress that are started prior to a given date
 EOF
@@ -100,8 +100,8 @@ EOF
      */
     private function getAgeInHours() {
         $age = $this->input->getOption('age-in-hours');
-        if (!is_int($age) || $age < self::DEFAULT_AGE_IN_DAYS) {
-            $age = self::DEFAULT_AGE_IN_DAYS;
+        if (!is_int($age) || $age < self::DEFAULT_AGE_IN_HOURS) {
+            $age = self::DEFAULT_AGE_IN_HOURS;
         }
         
         return $age;
