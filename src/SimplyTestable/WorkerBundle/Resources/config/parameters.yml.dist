@@ -36,3 +36,4 @@ parameters:
     "task-report-completion": "SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob"  
   resque_pid: "simplytestable_workerbundle"
   hostname: hydrogen.worker.simplytestable.com  
+  admin_password: password
