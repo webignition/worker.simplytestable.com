@@ -40,6 +40,7 @@ class CssValidationTaskDriver extends TaskDriver {
         exec($command, $validationOutputLines);
         
         $cssValidatorOutputParser = new CssValidatorOutputParser();
+        $cssValidatorOutputParser->setIgnoreFalseBackgroundImageDataUrlMessages(true);
         $cssValidatorOutputParser->setRawOutput(implode("\n", $validationOutputLines));
         
         if ($task->hasParameter('domains-to-ignore')) {
