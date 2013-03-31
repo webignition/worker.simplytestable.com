@@ -51,6 +51,10 @@ class WebResourceService {
      * @return \webignition\WebResource\WebResource 
      */
     public function get($request) {
+        $request->addHeaders(array(
+            'Accept-Encoding' => 'gzip,deflate'
+        ));        
+        
         $response = $this->httpClient->getResponse($request);
         
         switch ($this->getResponseClass($response)) {
