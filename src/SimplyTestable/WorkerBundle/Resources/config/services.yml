@@ -1,7 +1,4 @@
-services:
-  simplytestable.services.httpClient:
-    class:  webignition\Http\Client\Client
-    
+services:    
   simplytestable.services.coreApplicationService:
     class:  SimplyTestable\WorkerBundle\Services\CoreApplicationService
     arguments: 
