@@ -3,6 +3,7 @@
 namespace SimplyTestable\WorkerBundle\Tests\Command\Task;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 
 class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
     
@@ -33,10 +34,18 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
         
         $tasks = array();        
         foreach ($taskPropertyCollection as $taskIndex => $taskProperties) {
-            $tasks[] = $this->createTask($taskProperties['url'], $taskProperties['type']);
-            $this->runConsole('simplytestable:task:perform', array(
-                ($taskIndex + 1) => true                
-            ));
+            $taskObject = $this->createTask($taskProperties['url'], $taskProperties['type']);               
+
+            $task = $this->getTaskService()->getById($taskObject->id);
+            $taskTimePeriod = new TimePeriod();
+            $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
+            $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-02'));
+
+            $task->setTimePeriod($taskTimePeriod);
+
+            $this->createCompletedTaskOutputForTask($task);
+            
+            $tasks[] = $task;
         }
         
         $this->assertTrue($this->clearRedis());
@@ -44,20 +53,10 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
         $response = $this->runConsole('simplytestable:task:reportcompletion:enqueue');        
         $this->assertEquals(0, $response);
         
-        $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
-            'id' => $tasks[0]->id
-        ))); 
-
-        $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
-            'id' => $tasks[1]->id
-        ))); 
-
-        $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
-            'id' => $tasks[2]->id
-        ))); 
-
-        $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
-            'id' => $tasks[3]->id
-        )));
+        foreach ($tasks as $task) {
+            $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
+                'id' => $task->getId()
+            )));             
+        }
     }
 }
