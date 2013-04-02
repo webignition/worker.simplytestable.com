@@ -39,15 +39,25 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
             ));
         }
         
-        $this->clearRedis();
+        $this->assertTrue($this->clearRedis());
        
         $response = $this->runConsole('simplytestable:task:reportcompletion:enqueue');        
         $this->assertEquals(0, $response);
         
-        foreach ($tasks as $task) {
-            $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
-                'id' => $task->id
-            )));             
-        }
+        $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
+            'id' => $tasks[0]->id
+        ))); 
+
+        $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
+            'id' => $tasks[1]->id
+        ))); 
+
+        $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
+            'id' => $tasks[2]->id
+        ))); 
+
+        $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
+            'id' => $tasks[3]->id
+        )));
     }
 }

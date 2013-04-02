@@ -96,7 +96,16 @@ abstract class BaseTestCase extends WebTestCase {
     }    
     
     protected function clearRedis() {
-        exec('redis-cli -r 1 flushall');
+        $output = array();
+        $returnValue = null;
+        
+        exec('redis-cli -r 1 flushall', $output, $returnValue);
+        
+        if ($output !== array('OK')) {
+            return false;
+        }
+        
+        return $returnValue === 0;
     }    
     
     /**
