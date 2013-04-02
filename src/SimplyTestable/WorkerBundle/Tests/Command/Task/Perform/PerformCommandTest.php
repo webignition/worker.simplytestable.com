@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Command\Task;
+namespace SimplyTestable\WorkerBundle\Tests\Command\Task\Perform;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
