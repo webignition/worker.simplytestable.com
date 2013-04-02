@@ -172,7 +172,7 @@ class WorkerService extends EntityService {
      * Issue activation request to core application
      * Activation is completed when core application verifies
      * 
-     * @return itn 
+     * @return int 
      */
     public function activate() {
         $this->logger->info("WorkerService::activate: Initialising");

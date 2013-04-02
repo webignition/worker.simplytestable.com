@@ -25,14 +25,14 @@ class VerifyController extends BaseController
     {         
         if ($this->isInMaintenanceReadOnlyMode()) {
             return $this->sendServiceUnavailableResponse();
-        }
+        } 
         
         $thisWorker = $this->getWorkerService()->get();
-        if ($thisWorker->getHostname() != $this->getArguments('activateAction')->get('hostname')) {
+        if ($thisWorker->getHostname() != $this->getArguments('indexAction')->get('hostname')) {
             return $this->sendFailureResponse();
-        }
+        }        
         
-        if ($thisWorker->getActivationToken() != $this->getArguments('activateAction')->get('token')) {
+        if ($thisWorker->getActivationToken() != $this->getArguments('indexAction')->get('token')) {
             return $this->sendFailureResponse();
         }
         
