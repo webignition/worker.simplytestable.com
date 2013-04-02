@@ -222,15 +222,15 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         if ($this->curlException instanceof \Guzzle\Http\Exception\CurlException) {
             // TBC, following still refers to old curlException will not work
             
-            if ($this->curlException->isTimeoutException()) {
+            if ($this->isTimeoutException($this->curlException)) {
                 return 'Timeout reached retrieving resource';
             }
             
-            if ($this->curlException->isDnsLookupFailureException()) {
+            if ($this->isDnsLookupFailureException($this->curlException)) {
                 return 'DNS lookup failure resolving resource domain name';
             }            
             
-            if ($this->curlException->isInvalidUrlException()) {
+            if ($this->isInvalidUrlException($this->curlException)) {
                 return 'Invalid resource URL';
             }                        
         }
@@ -259,8 +259,8 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             }
         }
         
-        if ($this->curlException instanceof \webignition\Http\Client\CurlException) {
-            return 'curl-code-' . $this->curlException->getCode();                     
+        if ($this->curlException instanceof \Guzzle\Http\Exception\CurlException) {
+            return 'curl-code-' . $this->curlException->getErrorNo();                     
         }        
         
         if ($this->webResourceException instanceof WebResourceException) {

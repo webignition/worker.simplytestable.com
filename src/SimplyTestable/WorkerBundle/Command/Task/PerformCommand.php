@@ -52,11 +52,6 @@ EOF
         
         $performResult = $this->getTaskService()->perform($task);
         
-        return 404;         
-        
-        var_dump($performResult);
-        exit();
-        
         if ($performResult === 0) {
             $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(
                 'task-report-completion',
