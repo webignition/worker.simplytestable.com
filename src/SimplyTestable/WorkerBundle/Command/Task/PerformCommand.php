@@ -26,8 +26,7 @@ class PerformCommand extends Command
         $this
             ->setName('simplytestable:task:perform')
             ->setDescription('Start a task')
-            ->addArgument('id', InputArgument::REQUIRED, 'id of task to start')                
-            ->addArgument('http-fixture-path', InputArgument::OPTIONAL, 'path to HTTP fixture data when testing')
+            ->addArgument('id', InputArgument::REQUIRED, 'id of task to start')
             ->setHelp(<<<EOF
 Start a task
 EOF
@@ -35,30 +34,28 @@ EOF
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
-    {        
-        $task = $this->getTaskService()->getById($input->getArgument('id'));
+    {
+        $task = $this->getTaskService()->getById($input->getArgument('id'));      
+        
         if (is_null($task)) {
             $this->getContainer()->get('logger')->err("TaskPerformCommand::execute: [".$input->getArgument('id')."] does not exist");            
             $output->writeln('Unable to execute, task '.$input->getArgument('id').' does not exist');
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
-        }
+        }       
         
         $this->getContainer()->get('logger')->info("TaskPerformCommand::execute: [".$task->getId()."] [".$task->getState()->getName()."]");        
 
         if ($this->getWorkerService()->isMaintenanceReadOnly()) {            
             $output->writeln('Unable to perform task, worker application is in maintenance read-only mode');
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
-        }        
-        
-        if ($input->hasArgument('http-fixture-path')) {
-            $httpClient = $this->getContainer()->get('simplytestable.services.httpClient');
-            
-            if ($httpClient instanceof \webignition\Http\Mock\Client\Client) {
-                $httpClient->getStoredResponseList()->setFixturesPath($input->getArgument('http-fixture-path'));
-            }            
-        }  
+        }
         
         $performResult = $this->getTaskService()->perform($task);
+        
+        return 404;         
+        
+        var_dump($performResult);
+        exit();
         
         if ($performResult === 0) {
             $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(
@@ -86,5 +83,6 @@ EOF
         
         $output->writeln('Task perform failed, unknown error');
         return self::RETURN_CODE_UNKNOWN_ERROR;       
-    }
+    }    
+
 }

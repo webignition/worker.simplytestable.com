@@ -28,19 +28,21 @@ EOF
         $queuedTaskIds = $this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState());
         $output->writeln(count($queuedTaskIds).' queued tasks ready to be performed');
         
-        foreach ($queuedTaskIds as $taskId) {
+        foreach ($queuedTaskIds as $taskId) {            
             $output->writeln('Issuing perform command for task '.$taskId);
             
             $outputBuffer = new \CoreSphere\ConsoleBundle\Output\StringOutput();
             
             if ($this->isDryRun($input)) {
                 $commandResponse = 'dry run';
-            } else {
+            } else {                      
                 $commandResponse =  $this->getCommandService()->execute(
-                        'SimplyTestable\WorkerBundle\Command\Task\PerformCommand',
-                        array('id' => $taskId),
-                        $outputBuffer
-                );                
+                    'SimplyTestable\WorkerBundle\Command\Task\PerformCommand',
+                    array(
+                        'id' => $taskId
+                    ),
+                    $outputBuffer
+                );
             }
             
             $output->writeln(trim($outputBuffer->getBuffer()));
@@ -62,5 +64,5 @@ EOF
      */
     private function getCommandService() {
         return $this->getContainer()->get('simplytestable.services.commandService');
-    }     
+    }    
 }

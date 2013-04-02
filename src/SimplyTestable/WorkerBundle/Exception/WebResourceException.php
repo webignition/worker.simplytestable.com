@@ -7,44 +7,44 @@ class WebResourceException extends BaseException {
     
     /**
      *
-     * @var \HttpMessage
+     * @var \Guzzle\Http\Message\Request
      */
     private $response;
     
     
     /**
      *
-     * @var \HttpResponse
+     * @var \Guzzle\Http\Message\Response
      */
     private $request;
     
     
     /**
      * 
-     * @param \HttpMessage $response
-     * @param \HttpRequest $request
+     * @param \Guzzle\Http\Message\Response $response
+     * @param \Guzzle\Http\Message\Request $request
      */
-    public function __construct(\HttpMessage $response, \HttpRequest $request = null) {
+    public function __construct(\Guzzle\Http\Message\Response $response, \Guzzle\Http\Message\Request $request = null) {
         $this->response = $response;
         $this->request = $request;
         
-        parent::__construct($response->getResponseStatus(), $response->getResponseCode());
+        parent::__construct($response->getReasonPhrase(), $response->getStatusCode());
     }
     
     
     /**
      * 
-     * @return \HttpMessage
+     * @return \Guzzle\Http\Message\Response
      */
-    public function getHttpResponse() {
+    public function getResponse() {
         return $this->response;
     }
     
     /**
      * 
-     * @return \HttpRequest
+     * @return \Guzzle\Http\Message\Request
      */
-    public function getHttpRequest() {
+    public function getRequest() {
         return $this->request;
     }
     

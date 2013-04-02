@@ -12,7 +12,7 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
     }     
     
     public function testReportCompletionSuccessfullyReturnsStatusCode0() {
-        $this->setupDatabase();        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         $taskObject = $createdTask = $this->createTask('http://example.com/', 'HTML validation');                
         
         $task = $this->getTaskService()->getById($taskObject->id);
@@ -25,8 +25,7 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->createCompletedTaskOutputForTask($task);
         
         $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            $task->getId() => true,
-            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
+            $task->getId() => true
         ));
         
         $this->assertEquals(0, $response);        
@@ -44,6 +43,8 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
     
     
     public function testReportCompletionWhenNoCoreApplicationReturnsStatusCode404() {        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
         $createdTask = $this->createTask('http://example.com/', 'HTML validation');
         
         $task = $this->getTaskService()->getById($createdTask->id);
@@ -56,40 +57,52 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->createCompletedTaskOutputForTask($task);
         
         $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            $task->getId() => true,
-            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
+            $task->getId() => true            
         ));
         
         $this->assertEquals(404, $response);      
     }
     
     
-    public function testReportCompletionInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {
-        //$this->setupDatabase();
-        //$this->getWorkerService()->activate();
+    public function testReportCompletionWhenInvalidCoreApplicationHostReturnsCurlCode6() {        
+        $coreApplication = $this->getCoreApplicationService()->get();
+        
+        $coreApplication->setUrl('http://invalid');
+        $this->getCoreApplicationService()->getEntityManager()->persist($coreApplication);
+        $this->getCoreApplicationService()->getEntityManager()->flush();        
         
         $createdTask = $this->createTask('http://example.com/', 'HTML validation');
         
         $task = $this->getTaskService()->getById($createdTask->id);
         $taskTimePeriod = new TimePeriod();
         $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
-        $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-02'));
+        $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-03'));
         
         $task->setTimePeriod($taskTimePeriod);
 
         $this->createCompletedTaskOutputForTask($task);
         
+        $response = $this->runConsole('simplytestable:task:reportcompletion', array(
+            $task->getId() => true            
+        ));
+        
+        $this->assertEquals(6, $response);      
+    }    
+    
+    
+    public function testReportCompletionInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {        
         $this->getWorkerService()->setReadOnly();
         
         $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            $task->getId() => true,
-            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
+            1 => true
         ));
         
         $this->assertEquals(-1, $response);
     }
     
     public function testReportCompletionWhenCoreApplicationInMaintenanceReadOnlyModeReturnsStatusCode503() {        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
         $this->setupDatabase();
         $createdTask = $this->createTask('http://example.com/', 'HTML validation');
         
@@ -103,8 +116,7 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->createCompletedTaskOutputForTask($task);
         
         $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            $task->getId() => true,
-            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
+            $task->getId() => true
         ));
         
         $this->assertEquals(503, $response);

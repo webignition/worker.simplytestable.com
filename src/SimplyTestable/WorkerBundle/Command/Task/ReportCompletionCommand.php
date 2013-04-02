@@ -18,7 +18,6 @@ class ReportCompletionCommand extends Command
             ->setName('simplytestable:task:reportcompletion')
             ->setDescription('Report back to the core application the completed status of a task')
             ->addArgument('id', InputArgument::REQUIRED, 'id of task to report')                
-            ->addArgument('http-fixture-path', InputArgument::OPTIONAL, 'path to HTTP fixture data when testing')
             ->setHelp(<<<EOF
 Report back to the core application the completed status of a task
 EOF
@@ -27,25 +26,17 @@ EOF
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->hasArgument('http-fixture-path')) {
-            $httpClient = $this->getContainer()->get('simplytestable.services.httpClient');
-            
-            if ($httpClient instanceof \webignition\Http\Mock\Client\Client) {
-                $httpClient->getStoredResponseList()->setFixturesPath($input->getArgument('http-fixture-path'));
-            }            
-        }
-        
-        $task = $this->getTaskService()->getById($input->getArgument('id'));
-        if (is_null($task)) {
-            $this->getContainer()->get('logger')->err("TaskReportCompletionCommand::execute: [".$input->getArgument('id')."] does not exist");            
-            $output->writeln($input->getArgument('id')."] does not exist");
-            return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
-        }
-        
         if ($this->getWorkerService()->isMaintenanceReadOnly()) {            
             $output->writeln('Unable to report completion, worker application is in maintenance read-only mode');
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }         
+        
+        $task = $this->getTaskService()->getById($input->getArgument('id'));
+        if (is_null($task)) {
+            $this->getContainer()->get('logger')->err("TaskReportCompletionCommand::execute: [".$input->getArgument('id')."] does not exist");            
+            $output->writeln("[" . $input->getArgument('id')."] does not exist");
+            return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
+        }              
         
         $reportCompletionResult = $this->getTaskService()->reportCompletion($task);
         

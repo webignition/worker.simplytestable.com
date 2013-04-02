@@ -58,7 +58,7 @@ class WorkerService extends EntityService {
     
     /**
      *
-     * @var \webignition\Http\Client\Client
+     * @var \Guzzle\Http\Client
      */
     private $httpClient; 
     
@@ -78,7 +78,7 @@ class WorkerService extends EntityService {
      * @param string $hostname
      * @param \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService 
      * @param \SimplyTestable\WorkerBundle\Services\StateService $stateService
-     * @param \webignition\Http\Client\Client $httpClient
+     * @param \SimplyTestable\WorkerBundle\Services $httpClientService
      * @param \SimplyTestable\WorkerBundle\Services\UrlService $urlService
      */
     public function __construct(
@@ -88,7 +88,7 @@ class WorkerService extends EntityService {
             $hostname,
             \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService,
             \SimplyTestable\WorkerBundle\Services\StateService $stateService,
-            \webignition\Http\Client\Client $httpClient,
+            \SimplyTestable\WorkerBundle\Services\HttpClientService $httpClientService,
             \SimplyTestable\WorkerBundle\Services\UrlService $urlService)
     {    
         parent::__construct($entityManager);
@@ -98,8 +98,8 @@ class WorkerService extends EntityService {
         $this->hostname = $hostname;
         $this->coreApplicationService = $coreApplicationService;
         $this->stateService = $stateService;
-        $this->httpClient = $httpClient;
-        $this->httpClient->redirectHandler()->enable();  
+        $this->httpClient = $httpClientService->get();
+        //$this->httpClient->redirectHandler()->enable();  
         $this->urlService = $urlService;
     }  
     

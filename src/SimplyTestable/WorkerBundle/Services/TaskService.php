@@ -69,9 +69,9 @@ class TaskService extends EntityService {
     
     /**
      *
-     * @var \webignition\Http\Client\Client
+     * @var \SimplyTestable\WorkerBundle\Services\HttpClientService
      */
-    private $httpClient; 
+    private $httpClientService; 
     
     
     /**
@@ -92,7 +92,7 @@ class TaskService extends EntityService {
      * @param \SimplyTestable\WorkerBundle\Services\UrlService $urlService
      * @param \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService
      * @param \SimplyTestable\WorkerBundle\Services\WorkerService $workerService
-     * @param \webignition\Http\Client\Client $httpClient
+     * @param \SimplyTestable\WorkerBundle\Services\HttpClientService $httpClientService
      */
     public function __construct(
             EntityManager $entityManager,
@@ -102,7 +102,7 @@ class TaskService extends EntityService {
             \SimplyTestable\WorkerBundle\Services\UrlService $urlService,
             \SimplyTestable\WorkerBundle\Services\CoreApplicationService$coreApplicationService,
             \SimplyTestable\WorkerBundle\Services\WorkerService $workerService,
-            \webignition\Http\Client\Client $httpClient)
+            \SimplyTestable\WorkerBundle\Services\HttpClientService $httpClientService)
     {    
         parent::__construct($entityManager);
         
@@ -112,7 +112,7 @@ class TaskService extends EntityService {
         $this->urlService = $urlService;
         $this->coreApplicationService = $coreApplicationService;
         $this->workerService = $workerService;
-        $this->httpClient = $httpClient;
+        $this->httpClientService = $httpClientService;
     }     
   
 
@@ -269,7 +269,7 @@ class TaskService extends EntityService {
      * @return int 
      */
     public function perform(Task $task) {        
-        $this->logger->info("TaskService::perform: [".$task->getId()."] [".$task->getState()->getName()."] Initialising");        
+        $this->logger->info("TaskService::perform: [".$task->getId()."] [".$task->getState()->getName()."] Initialising");
         
         if (!$this->isQueued($task)) {
             $this->logger->info("TaskService::perform: [".$task->getId()."] Task state is [".$task->getState()->getName()."] and cannot be performed");
@@ -414,8 +414,7 @@ class TaskService extends EntityService {
         
         $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/task/'.$this->workerService->get()->getHostname().'/'.$task->getId().'/complete/');
         
-        $httpRequest = new \HttpRequest($requestUrl, HTTP_METH_POST);
-        $httpRequest->setPostFields(array(
+        $httpRequest = $this->httpClientService->postRequest($requestUrl, null, array(
             'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
             'output' => $task->getOutput()->getOutput(),
             'contentType' => (string)$task->getOutput()->getContentType(),
@@ -427,36 +426,29 @@ class TaskService extends EntityService {
         $this->logger->info("TaskService::reportCompletion: Reporting completion state to " . $requestUrl);
         
         try {
-            $response = $this->httpClient->getResponse($httpRequest);
-            
-            if ($this->httpClient instanceof \webignition\Http\Mock\Client\Client) {
-                $this->logger->info("TaskService::reportCompletion: response fixture path: " . $this->httpClient->getStoredResponseList()->getRequestFixturePath($httpRequest));
-                if (file_exists($this->httpClient->getStoredResponseList()->getRequestFixturePath($httpRequest))) {
-                    $this->logger->info("TaskService::reportCompletion: response fixture path: found");
-                } else {
-                    $this->logger->info("TaskService::reportCompletion: response fixture path: not found");
-                }
-            }            
-            
-            $this->logger->info("TaskService::reportCompletion: " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
-            
-            if ($response->getResponseCode() !== 200) {
-                $this->logger->err("TaskService::reportCompletion: Completion reporting failed for [".$task->getId()."] [".$task->getUrl()."]");
-                $this->logger->err("TaskService::reportCompletion: [".$task->getId()."] " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
-                return $response->getResponseCode();
-            }
-            
-            $task->setNextState();        
-            $this->persistAndFlush($task);
-
-            return true;            
-            
-        } catch (CurlException $curlException) {
-            $this->logger->err("TaskService::reportCompletion: " . $requestUrl . ": " . $curlException->getMessage());            
-            return $curlException->getCode();
+            $response = $this->httpClientService->get()->send($httpRequest);            
+        } catch (\Guzzle\Http\Exception\CurlException $curlException) {
+            $this->logger->err("TaskService::reportCompletion: " . $requestUrl . ": " . $curlException->getErrorNo());            
+            return $curlException->getErrorNo();
+        } catch (\Guzzle\Http\Exception\ClientErrorResponseException $clientErrorResponseException) {
+            /* @var $response \Guzzle\Http\Message\Response */
+            $response = $clientErrorResponseException->getResponse();
+        } catch (\Guzzle\Http\Exception\ServerErrorResponseException $serverErrorResponseException) {            
+            $response = $serverErrorResponseException->getResponse();
         }
         
-        return false;
+        $this->logger->info("TaskService::reportCompletion: " . $requestUrl . ": " . $response->getStatusCode()." ".$response->getReasonPhrase());
+        
+        if (!$response->isSuccessful()) {
+            $this->logger->err("TaskService::reportCompletion: Completion reporting failed for [".$task->getId()."] [".$task->getUrl()."]");
+            $this->logger->err("TaskService::reportCompletion: [".$task->getId()."] " . $requestUrl . ": " . $response->getStatusCode()." ".$response->getReasonPhrase());
+            return $response->getStatusCode();            
+        }
+         
+        $task->setNextState();        
+        $this->persistAndFlush($task);
+
+        return true;
     }
     
     /**

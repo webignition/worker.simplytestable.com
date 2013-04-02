@@ -58,13 +58,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    protected function performValidation() {        
-        $characterEncoding = ($this->webResource->getIsDocumentCharacterEncodingValid()) ? $this->webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;
-       
-        $validationRequest = new \HttpRequest($this->getProperty('validator-url'), HTTP_METH_POST, array(
-            'timeout' => 300
-        ));
-        
+    protected function performValidation() {          
         $fragment = $this->webResource->getContent();
         
         $htmlDocumentTypeIdentifier = new HtmlDocumentTypeIdentifier();
@@ -82,7 +76,9 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
             return json_encode($this->getInvalidDocumentTypeOutput($htmlDocumentTypeIdentifier->getDocumentTypeString()));             
-        }
+        }        
+        
+        $characterEncoding = ($this->webResource->getIsDocumentCharacterEncodingValid()) ? $this->webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;
         
         $requestPostFields = array(
             'fragment' => $fragment,
@@ -91,9 +87,14 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         
         if (!is_null($characterEncoding)) {
             $requestPostFields['charset'] = $characterEncoding;
-        }
+        }        
         
-        $validationRequest->setPostFields($requestPostFields);
+        $validationRequest = $this->getWebResourceService()->getHttpClientService()->postRequest(
+                $this->getProperty('validator-url'),
+                null,
+                $requestPostFields
+        );        
+        $validationRequest->getCurlOptions()->add(CURLOPT_TIMEOUT, 300);
         
         /* @var $validationResponse JsonDocument */
         $validationResponse = $this->getWebResourceService()->get($validationRequest);

@@ -88,11 +88,39 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
     /**
      *
+     * @return \SimplyTestable\WorkerBundle\Services\HttpClientService
+     */
+    protected function getHttpClientService() {
+        return $this->container->get('simplytestable.services.httpclientservice');
+    }     
+    
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Services\WebResourceService
+     */
+    protected function getWebResourceService() {
+        return $this->container->get('simplytestable.services.webresourceservice');
+    }     
+        
+    
+    
+    /**
+     *
      * @return \SimplyTestable\WorkerBundle\Services\TaskService
      */
     protected function getTaskService() {
         return $this->container->get('simplytestable.services.taskservice');
     }       
+    
+    
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Services\CoreApplicationService
+     */
+    protected function getCoreApplicationService() {
+        return $this->container->get('simplytestable.services.coreapplicationservice');
+    }      
     
     
     /**
@@ -108,7 +136,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         ))->createAction();
         
         return json_decode($response->getContent());
-    } 
+    }
     
     
     /**

@@ -5,19 +5,13 @@ namespace SimplyTestable\WorkerBundle\Services;
 use webignition\InternetMediaType\Parser\Parser as InternetMediaTypeParser;
 use SimplyTestable\WorkerBundle\Exception\WebResourceException;
 
-class WebResourceService {
-    
-    const RESPONSE_CLASS_INFORMATIONAL = 1;
-    const RESPONSE_CLASS_SUCCESS = 2;
-    const RESPONSE_CLASS_REDIRECTION = 3;
-    const RESPONSE_CLASS_CLIENT_ERROR = 4;
-    const RESPONSE_CLASS_SERVER_ERROR = 5;    
+class WebResourceService {    
     
     /**
      *
-     * @var \webignition\Http\Client\Client
+     * @var \SimplyTestable\WorkerBundle\Services\HttpClientService
      */
-    private $httpClient; 
+    private $httpClientService;
     
     
     /**
@@ -30,82 +24,80 @@ class WebResourceService {
     
     /**
      *
-     * @param \webignition\Http\Client\Client $httpClient
+     * @param \SimplyTestable\WorkerBundle\Services\HttpClientService $httpClientService
      * @param array $contentTypeWebResourceMap
      */
     public function __construct(
-            \webignition\Http\Client\Client $httpClient,
+            \SimplyTestable\WorkerBundle\Services\HttpClientService $httpClientService,
             $contentTypeWebResourceMap)
     {
-        $this->httpClient = $httpClient;
-        $this->httpClient->redirectHandler()->enable();        
-        $this->httpClient->redirectHandler()->setLimit(10);      
-        
+        $this->httpClientService = $httpClientService;        
         $this->contentTypeWebResourceMap = $contentTypeWebResourceMap;        
     }
     
     
     /**
+     * 
+     * @return \SimplyTestable\WorkerBundle\Services\HttpClientService
+     */
+    public function getHttpClientService() {        
+        return $this->httpClientService;
+    }    
+    
+    /**
      *
-     * @param \HttpRequest $request
+     * @param \Guzzle\Http\Message\Request $request
      * @return \webignition\WebResource\WebResource 
      */
-    public function get($request) {
-        $request->addHeaders(array(
-            'Accept-Encoding' => 'gzip,deflate'
-        ));        
+    public function get(\Guzzle\Http\Message\Request $request) {
+//        var_dump($request->getUrl());
+//        
+//        //if ($request->getUrl() == 'http://hydrogen.worker.simplytestable.com/w3c-validator/check') {
+//        if ($request->getUrl() == 'http://html-validator.worker.simplytestable.com:8090/w3c-validator/check') {
+//            $response = $request->send();
+//            
+//            file_put_contents('/home/jon/www/dev.worker.simplytestable.com/src/SimplyTestable/WorkerBundle/Tests/Fixtures/Data/SimplyTestable/WorkerBundle/Tests/Command/Task/PerformAllCommandTest/testPerformAll/HttpResponses/2', $response.'');
+//
+//            
+//            var_dump("don");
+//            exit();
+//        }
         
-        $response = $this->httpClient->getResponse($request);
+        try {
+            $response = $request->send();
+        } catch (\Guzzle\Http\Exception\ServerErrorResponseException $serverErrorResponseException) {
+            $response = $serverErrorResponseException->getResponse();
+        } catch (\Guzzle\Http\Exception\ClientErrorResponseException $clientErrorResponseException) {
+            $response = $clientErrorResponseException->getResponse();
+        }        
         
-        switch ($this->getResponseClass($response)) {
-            case self::RESPONSE_CLASS_INFORMATIONAL:
-                // Interesting to see what makes this happen
-                break;
-            
-            case self::RESPONSE_CLASS_SUCCESS:                
-                $mediaTypeParser = new InternetMediaTypeParser();
-                $mediaTypeParser->setIgnoreInvalidAttributes(true);
-                $contentType = $mediaTypeParser->parse($response->getHeader('content-type'));               
-
-                $webResourceClassName = $this->getWebResourceClassName($contentType->getTypeSubtypeString());
-
-                $resource = new $webResourceClassName;                
-                $resource->setContent($response->getBody());                              
-                $resource->setContentType((string)$contentType);                  
-                $resource->setUrl($request->getUrl());       
-                
-                return $resource;
-            
-            case self::RESPONSE_CLASS_REDIRECTION:
-                // Shouldn't happen, HTTP client should have the redirect handler
-                // enabled, redirects should be followed
-                break;
-            
-            case self::RESPONSE_CLASS_CLIENT_ERROR:          
-            case self::RESPONSE_CLASS_SERVER_ERROR:
-                // Both client and server errors intentionally handled together
-                throw new WebResourceException($response, $request);                
-                break;
+        if ($response->isInformational()) {
+            // Interesting to see what makes this happen
+            return;
         }
-    }
-    
-    
-    /**
-     * 
-     * @param \HttpMessage $response
-     * @return int
-     */
-    private function getResponseClass(\HttpMessage $response) {
-        return (int)substr($response->getResponseCode(), 0, 1);
-    }
-    
-    
-    /**
-     *
-     * @return \webignition\Http\Client\Client
-     */
-    public function getHttpClient() {
-        return $this->httpClient;
+        
+        if ($response->isRedirect()) {
+            // Shouldn't happen, HTTP client should have the redirect handler
+            // enabled, redirects should be followed            
+            return;
+        }
+        
+        if ($response->isClientError() || $response->isServerError()) {
+            throw new WebResourceException($response, $request); 
+        }
+        
+        $mediaTypeParser = new InternetMediaTypeParser();
+        $mediaTypeParser->setIgnoreInvalidAttributes(true);
+        $contentType = $mediaTypeParser->parse($response->getContentType());               
+
+        $webResourceClassName = $this->getWebResourceClassName($contentType->getTypeSubtypeString());
+
+        $resource = new $webResourceClassName;                
+        $resource->setContent($response->getBody(true));                              
+        $resource->setContentType((string)$contentType);                  
+        $resource->setUrl($request->getUrl());          
+
+        return $resource;
     }
     
 

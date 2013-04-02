@@ -63,9 +63,9 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         $this->task = $task;
                 
         /* @var $webResource WebPage */
-        $this->getWebResourceService()->getHttpClient()->setUserAgent('SimplyTestable HTML Validator/0.1 (http://simplytestable.com/)');
-        $this->webResource = $this->getWebResource($task);
-        $this->getWebResourceService()->getHttpClient()->clearUserAgent();
+        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable HTML Validator/0.1 (http://simplytestable.com/)');
+        $this->webResource = $this->getWebResource($task);        
+        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);        
 
         if (!$this->response->hasSucceeded()) {
             return $this->hasNotSucceedHandler();
@@ -79,21 +79,21 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             return $this->isBlankWebResourceHandler();
         }
         
-        if ($this->canCacheValidationOutput()) {            
-            $hash = $this->getWebResourceTaskHash();                
-            if ($this->getWebResourceTaskOutputService()->has($hash)) {
-                $webResourceTaskOutput = $this->getWebResourceTaskOutputService()->find($hash);
-                $this->response->setErrorCount($webResourceTaskOutput->getErrorCount());
-                return $webResourceTaskOutput->getOutput();
-            }            
-        }
+//        if ($this->canCacheValidationOutput()) {            
+//            $hash = $this->getWebResourceTaskHash();                
+//            if ($this->getWebResourceTaskOutputService()->has($hash)) {
+//                $webResourceTaskOutput = $this->getWebResourceTaskOutputService()->find($hash);
+//                $this->response->setErrorCount($webResourceTaskOutput->getErrorCount());
+//                return $webResourceTaskOutput->getOutput();
+//            }            
+//        }
         
         $validationOutput = $this->performValidation();
         
-        if ($this->canCacheValidationOutput()) {
-            $hash = $this->getWebResourceTaskHash();
-            $this->getWebResourceTaskOutputService()->create($hash, $validationOutput, $this->response->getErrorCount());
-        }
+//        if ($this->canCacheValidationOutput()) {
+//            $hash = $this->getWebResourceTaskHash();
+//            $this->getWebResourceTaskOutputService()->create($hash, $validationOutput, $this->response->getErrorCount());
+//        }
         
         return $validationOutput;
     }
@@ -152,30 +152,25 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      */
     protected function getWebResource(Task $task) {
         try {
-            $resourceRequest = new \HttpRequest($task->getUrl(), HTTP_METH_GET);
-            return $this->getWebResourceService()->get($resourceRequest);            
+            $request = $this->getWebResourceService()->getHttpClientService()->getRequest($task->getUrl());
+            return $this->getWebResourceService()->get($request);            
         } catch (WebResourceException $webResourceException) {
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
             
             $this->webResourceException = $webResourceException;           
-        } catch (\webignition\Http\Client\Exception $httpClientException) {
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
-            
-            $this->httpClientException = $httpClientException;
-        } catch (\webignition\Http\Client\CurlException $curlException) {
+        } catch (\Guzzle\Http\Exception\CurlException $curlException) {
             $this->response->setHasFailed();
             
-            if ($curlException->isTimeoutException()) {
+            if ($this->isTimeoutException($curlException)) {
                 $this->response->setIsRetryable(false);
             }
             
-            if ($curlException->isDnsLookupFailureException()) {
+            if ($this->isDnsLookupFailureException($curlException)) {
                 $this->response->setIsRetryable(false);
             }            
             
-            if ($curlException->isInvalidUrlException()) {
+            if ($this->isInvalidUrlException($curlException)) {
                 $this->response->setIsRetryable(false);
             }              
             
@@ -188,7 +183,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      *
      * @return \stdClass 
      */
-    protected function getWebResourceExceptionOutput() {        
+    protected function getWebResourceExceptionOutput() {
         $outputObjectMessage = new \stdClass();
         $outputObjectMessage->message = $this->getOutputMessage();
         $outputObjectMessage->messageId = 'http-retrieval-' . $this->getOutputMessageId();
@@ -206,18 +201,27 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      * @return string 
      */
     private function getOutputMessage() {
-        if ($this->httpClientException instanceof \webignition\Http\Client\Exception) {
-            switch ($this->httpClientException->getCode()) {
-                case 310:
-                    return 'Redirect limit of ' . $this->getWebResourceService()->getHttpClient()->redirectHandler()->limit().' redirects reached';                
-
-                case 311:
-                    return 'Redirect loop deteted';
-                    break;
-            }
-        }
+//        var_dump("cp01");
+//        exit();
         
-        if ($this->curlException instanceof \webignition\Http\Client\CurlException) {
+        // Still need to catch redirect limits and redirect loops
+        
+        
+        
+//        if ($this->httpClientException instanceof \webignition\Http\Client\Exception) {
+//            switch ($this->httpClientException->getCode()) {
+//                case 310:
+//                    return 'Redirect limit of ' . $this->getWebResourceService()->getHttpClient()->redirectHandler()->limit().' redirects reached';                
+//
+//                case 311:
+//                    return 'Redirect loop deteted';
+//                    break;
+//            }
+//        }
+        
+        if ($this->curlException instanceof \Guzzle\Http\Exception\CurlException) {
+            // TBC, following still refers to old curlException will not work
+            
             if ($this->curlException->isTimeoutException()) {
                 return 'Timeout reached retrieving resource';
             }
@@ -232,7 +236,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         }
         
         if ($this->webResourceException instanceof WebResourceException) {
-            return $this->webResourceException->getHttpResponse()->getResponseStatus();
+            return $this->webResourceException->getResponse()->getStatusCode();
         }
         
         return '';
@@ -260,10 +264,38 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         }        
         
         if ($this->webResourceException instanceof WebResourceException) {
-            return $this->webResourceException->getHttpResponse()->getResponseCode();
+            return $this->webResourceException->getResponse()->getStatusCode();
         }        
         
         return '';        
     }
+    
+    
+    /**
+     *
+     * @param \Guzzle\Http\Exception\CurlException $curlException
+     * @return boolean 
+     */
+    public function isInvalidUrlException(\Guzzle\Http\Exception\CurlException $curlException) {        
+        return $curlException->getErrorNo() === 3;
+    }
+    
+    
+    /**
+     *
+     * @param \Guzzle\Http\Exception\CurlException $curlException
+     */
+    public function isTimeoutException(\Guzzle\Http\Exception\CurlException $curlException) {
+        return $curlException->getErrorNo() === 28;
+    }
+    
+    
+    /**
+     *
+     * @param \Guzzle\Http\Exception\CurlException $curlException
+     */
+    public function isDnsLookupFailureException(\Guzzle\Http\Exception\CurlException $curlException) {
+        return $curlException->getErrorNo() === 6;
+    }      
     
 }

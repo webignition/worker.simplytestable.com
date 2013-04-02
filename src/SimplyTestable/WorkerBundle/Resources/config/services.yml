@@ -1,4 +1,7 @@
-services:    
+services:
+  simplytestable.services.httpClientService:
+    class:  SimplyTestable\WorkerBundle\Services\HttpClientService
+  
   simplytestable.services.coreApplicationService:
     class:  SimplyTestable\WorkerBundle\Services\CoreApplicationService
     arguments: 
@@ -18,22 +21,22 @@ services:
         hostname: %hostname%
         coreApplicationService: "@simplytestable.services.coreApplicationService"
         stateService: "@simplytestable.services.stateservice"
-        httpClient: "@simplytestable.services.httpClient"
+        httpClientService: "@simplytestable.services.httpClientService"
         urlService: "@simplytestable.services.urlService"
         
-  simplytestable.services.urlService:
-    class:  SimplyTestable\WorkerBundle\Services\UrlService     
-    
-  simplytestable.services.requestservice:
-    class:   SimplyTestable\WorkerBundle\Services\RequestService    
-    
-  simplytestable.controller.action_listener:
-    class: SimplyTestable\WorkerBundle\EventListener\BeforeListener    
-    arguments:
-        logger: "@logger"
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }  
-      
+#  simplytestable.services.urlService:
+#    class:  SimplyTestable\WorkerBundle\Services\UrlService     
+#    
+#  simplytestable.services.requestservice:
+#    class:   SimplyTestable\WorkerBundle\Services\RequestService    
+#    
+#  simplytestable.controller.action_listener:
+#    class: SimplyTestable\WorkerBundle\EventListener\BeforeListener    
+#    arguments:
+#        logger: "@logger"
+#    tags:
+#      - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }  
+#      
   simplytestable.services.taskservice:
     class:   SimplyTestable\WorkerBundle\Services\TaskService
     arguments:
@@ -44,7 +47,7 @@ services:
         urlService: "@simplytestable.services.urlservice"
         coreApplicationService: "@simplytestable.services.coreapplicationservice"
         workerService: "@simplytestable.services.workerservice"
-        httpClient: "@simplytestable.services.httpClient"
+        httpClientService: "@simplytestable.services.httpClientService"
 
   simplytestable.services.tasktypeservice:
     class:   SimplyTestable\WorkerBundle\Services\TaskTypeService
@@ -74,7 +77,7 @@ services:
   simplytestable.services.webresourceservice:
     class:   SimplyTestable\WorkerBundle\Services\WebResourceService
     arguments:
-        httpClient: "@simplytestable.services.httpClient"
+        httpClientService: "@simplytestable.services.httpClientService"
         contentTypeWebResourceMap: %content_type_web_resource_map%
         
   simplytestable.services.ResqueJobFactoryService:

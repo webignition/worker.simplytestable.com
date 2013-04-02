@@ -3,20 +3,30 @@
 namespace SimplyTestable\WorkerBundle\Tests\Command\Task;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
-use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 
 class PerformAllCommandTest extends ConsoleCommandBaseTestCase {
     
     public static function setUpBeforeClass() {
-        self::setupDatabaseIfNotExists();        
+        self::setupDatabase();        
     }    
 
-    public function testPerformAll() {                 
-        $task = $this->createTask('http://example.com/', 'HTML validation');        
-        $response = $this->runConsole('simplytestable:task:perform:all');
+    public function testPerformAll() {        
+        $taskProperties = $this->createTask('http://example.com/', 'HTML validation');        
+        
+        $task = $this->getTaskService()->getById($taskProperties->id);
+        $task->setState($this->getTaskService()->getQueuedState());
+        $this->getTaskService()->getEntityManager()->persist($task);
+        $this->getTaskService()->getEntityManager()->flush();
+        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));        
+        
+        $response = $this->runConsole('simplytestable:task:perform:all');          
         
         $this->assertEquals(0, $response);
-    }  
+    } 
+    
+    
+   
 
 
 }
