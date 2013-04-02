@@ -64,6 +64,7 @@ class CssValidationTaskDriver extends TaskDriver {
         if ($cssValidatorOutput->getIsUnknownMimeTypeError()) {
             $this->response->setHasBeenSkipped();
             $this->response->setErrorCount(0);
+            $this->response->setIsRetryable(false);
             return true;            
         }
         
@@ -74,11 +75,57 @@ class CssValidationTaskDriver extends TaskDriver {
             return json_encode($this->getUnknownExceptionErrorOutput($task));
         }
         
+        if ($cssValidatorOutput->getIsFileNotFoundErrorOutput()) {
+            $this->response->setHasFailed();
+            $this->response->setErrorCount(1); 
+            $this->response->setIsRetryable(false);
+            return json_encode($this->getFileNotFoundExceptionOutput($task));
+        }
+        
+        if ($cssValidatorOutput->getIsUnknownHostErrorOutput()) {
+            $this->response->setHasFailed();
+            $this->response->setErrorCount(1); 
+            $this->response->setIsRetryable(false);
+            return json_encode($this->getUnknownHostExceptionOutput($task));
+        }        
+        
         $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
         $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
         
         return $this->getSerializer()->serialize($cssValidatorOutput->getMessages(), 'json');
     } 
+
+    /**
+     *
+     * @return \stdClass 
+     */
+    protected function getUnknownHostExceptionOutput(Task $task) {        
+        $outputObjectMessage = new \stdClass();
+        $outputObjectMessage->message = 'Unknown-host';
+        $outputObjectMessage->class = 'css-validation-6';
+        $outputObjectMessage->type = 'error';
+        $outputObjectMessage->context = '';
+        $outputObjectMessage->ref = $task->getUrl();
+        $outputObjectMessage->line_number = 0;
+        
+        return array($outputObjectMessage);        
+    }      
+    
+    /**
+     *
+     * @return \stdClass 
+     */
+    protected function getFileNotFoundExceptionOutput(Task $task) {        
+        $outputObjectMessage = new \stdClass();
+        $outputObjectMessage->message = 'File not found';
+        $outputObjectMessage->class = 'css-validation-404';
+        $outputObjectMessage->type = 'error';
+        $outputObjectMessage->context = '';
+        $outputObjectMessage->ref = $task->getUrl();
+        $outputObjectMessage->line_number = 0;
+        
+        return array($outputObjectMessage);        
+    }        
     
     
     /**
