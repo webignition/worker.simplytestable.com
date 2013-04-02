@@ -10,14 +10,7 @@ class HttpClientService {
      *
      * @var \Guzzle\Http\Client
      */
-    private $httpClient = null;
-    
-    
-//    /**
-//     *
-//     * @var string
-//     */
-//    private $userAgent = null;    
+    private $httpClient = null;   
     
     
     public function get($baseUrl = '', $config = null) {
@@ -54,40 +47,6 @@ class HttpClientService {
     public function postRequest($uri = null, $headers = null, $postBody = null) {
         $request = $this->get()->post($uri, $headers, $postBody);        
         return $request;        
-    }
-    
-    
-//    /**
-//     * 
-//     * @return boolean
-//     */
-//    private function hasUserAgent() {
-//        return !is_null($this->userAgent);
-//    }
-//    
-//    
-//    /**
-//     * 
-//     * @param \Guzzle\Http\Message\Request $request
-//     * @return boolean
-//     */
-//    private function requestHasUserAgent(\Guzzle\Http\Message\Request $request) {
-//        return preg_match('/^Guzzle\//', $request->getHeader('User-Agent')) === 0;
-//    }   
-//
-//    
-//    
-//    /**
-//     * 
-//     * @param string $userAgent
-//     */
-//    public function setUserAgent($userAgent = null) {
-//        $this->userAgent = $userAgent;
-//    }
-//    
-//    
-//    public function clearUserAgent() {
-//        $this->userAgent = null;
-//    }    
+    } 
     
 }
