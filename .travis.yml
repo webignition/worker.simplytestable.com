@@ -12,10 +12,10 @@ before_script:
   #- git clone https://github.com/phingofficial/phing.git build/phing
   
   # Installing pecl_http module
-  - wget http://pecl.php.net/get/pecl_http-1.7.5.tgz
-  - tar -zxf pecl_http-1.7.5.tgz
-  - sh -c "cd pecl_http-1.7.5 && phpize && ./configure && make --quiet && sudo make --quiet install"
-  - echo "extension=http.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s/.*:\s*//"`    
+  #- wget http://pecl.php.net/get/pecl_http-1.7.5.tgz
+  #- tar -zxf pecl_http-1.7.5.tgz
+  #- sh -c "cd pecl_http-1.7.5 && phpize && ./configure && make --quiet && sudo make --quiet install"
+  #- echo "extension=http.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s/.*:\s*//"`    
   
   # Install composer for dependency management
   - wget http://getcomposer.org/composer.phar 
@@ -35,11 +35,11 @@ before_script:
   - php app/console doctrine:migrations:migrate --no-interaction
   
 script:
-  - phpunit -c app
+  - phpunit -c app --group standard
   
 after_failure:
-  - cat /home/travis/build/webignition/worker.simplytestable.com/app/logs/test.log | grep "response fixture path"
-  - cat /home/travis/build/webignition/worker.simplytestable.com/app/logs/test.log | grep "TaskService::reportCompletion"
+  #- cat /home/travis/build/webignition/worker.simplytestable.com/app/logs/test.log | grep "response fixture path"
+  #- cat /home/travis/build/webignition/worker.simplytestable.com/app/logs/test.log | grep "TaskService::reportCompletion"
   
 notifications:
   irc:
