@@ -161,7 +161,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
             return array(
                 'errorCount' => $nodeJsLintOutput->getEntryCount(),
                 'output' => $this->nodeJsLintOutputToArray($nodeJsLintOutput)
-            );                            
+            );           
         } catch (WebResourceException $webResourceException) {
             $this->errorCount++;
             
@@ -174,21 +174,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                         'statusCode' => $webResourceException->getCode()
                     )
                 )
-            );        
-        } catch (\webignition\Http\Client\Exception $httpClientException) {
-            $this->errorCount++;
-
-            return array(
-                'errorCount' => 1,
-                'output' => array(
-                    'statusLine' => 'failed',
-                    'errorReport' => array(
-                        'reason' => 'httpClientException',
-                        'statusCode' => $httpClientException->getCode()
-                    )
-                )
-            );
-        } catch (\webignition\Http\Client\CurlException $curlException) {
+            );          
+        } catch (\Guzzle\Http\Exception\CurlException $curlException) {
             $this->errorCount++;
 
             return array(
@@ -197,11 +184,35 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                     'statusLine' => 'failed',
                     'errorReport' => array(
                         'reason' => 'curlException',
-                        'statusCode' => $curlException->getCode()
+                        'statusCode' => $curlException->getErrorNo()
                     )
                 )
             );
-        }         
+        } catch (\Guzzle\Http\Exception\ClientErrorResponseException $clientErrorResponseException) {
+            $this->errorCount++;
+            
+            return array(
+                'errorCount' => 1,
+                'output' => array(
+                    'statusLine' => 'failed',
+                    'errorReport' => array(
+                        'reason' => 'webResourceException',
+                        'statusCode' => $clientErrorResponseException->getResponse()->getStatusCode()
+                    )
+                )
+            );            
+        } catch (\Guzzle\Http\Exception\ServerErrorResponseException $serverErrorResponseException) {
+            return array(
+                'errorCount' => 1,
+                'output' => array(
+                    'statusLine' => 'failed',
+                    'errorReport' => array(
+                        'reason' => 'webResourceException',
+                        'statusCode' => $serverErrorResponseException->getResponse()->getStatusCode()
+                    )
+                )
+            );              
+        }        
     }
     
     
@@ -264,20 +275,18 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         return sys_get_temp_dir() . '/' . md5($content) . ':' . $this->task->getId() . ':' . microtime(true);
     }
     
-    
     /**
      * 
-     * @param type $scriptUrl
+     * @param string $url
      * @return WebResource
-     */
-    private function getJavaScriptWebResourceFromUrl($url) {
-        $this->getWebResourceService()->getHttpClient()->setUserAgent('SimplyTestable JS static analyser/0.1 (http://simplytestable.com/)');        
-        $this->getWebResourceService()->getHttpClient()->redirectHandler()->clearRedirectCount();
-        $request = new \HttpRequest((string)$url, HTTP_METH_GET);
-        $webResource = $this->getWebResourceService()->get($request);
-        $this->getWebResourceService()->getHttpClient()->clearUserAgent();        
-        
-        return $webResource;      
+     */    
+    private function getJavaScriptWebResourceFromUrl($url) {            
+        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable JS static analyser/0.1 (http://simplytestable.com/)');        
+        $request = $this->getWebResourceService()->getHttpClientService()->getRequest((string)$url, array());
+        $webResource = $this->getWebResourceService()->get($request);        
+        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);             
+
+        return $webResource;       
     }
     
     
