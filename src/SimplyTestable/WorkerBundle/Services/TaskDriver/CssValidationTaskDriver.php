@@ -6,27 +6,66 @@ use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\CssValidatorOutput\Parser as CssValidatorOutputParser;
 
-class CssValidationTaskDriver extends TaskDriver {
+class CssValidationTaskDriver extends WebResourceTaskDriver {
     
+    /**
+     *
+     * @return \webignition\InternetMediaType\InternetMediaType 
+     */
+    protected function getOutputContentType()
+    {
+        $mediaTypeParser = new \webignition\InternetMediaType\Parser\Parser();
+        return $mediaTypeParser->parse('application/json');
+    }
+
+    /**
+     * 
+     * @return string
+     */
+    protected function hasNotSucceedHandler() {
+        $this->response->setErrorCount(1);
+        return json_encode($this->getWebResourceExceptionOutput());        
+    }
+
+    protected function isBlankWebResourceHandler() {
+        $this->response->setHasBeenSkipped();
+        $this->response->setErrorCount(0);
+        return true;        
+    }
+
     /**
      * 
      * @param \SimplyTestable\WorkerBundle\Entity\Task\Task $task
-     * @return string
+     * @return boolean
      */
-    public function execute(Task $task) {                
-        if (!$this->isCorrectTaskType($task)) {
-            return false;
-        }
-        
+    protected function isCorrectTaskType(Task $task) {        
+        return $task->getType()->equals($this->getTaskTypeService()->getCssValidationTaskType());
+    } 
+
+    /**
+     * 
+     * @return boolean
+     */
+    protected function isCorrectWebResourceType() {
+        return $this->webResource instanceof WebPage;
+    }
+
+    protected function isNotCorrectWebResourceTypeHandler() {
+        $this->response->setHasBeenSkipped();
+        $this->response->setErrorCount(0);
+        return true;
+    }
+
+    protected function performValidation() { 
         $commandOptions = array(
             'output' => 'ucn'
         );
         
-        if ($task->getParameter('vendor-extensions') == 'warn') {
+        if ($this->task->getParameter('vendor-extensions') == 'warn') {
             $commandOptions['vextwarning'] = 'true';
         }
         
-        if ($task->getParameter('vendor-extensions') == 'error') {
+        if ($this->task->getParameter('vendor-extensions') == 'error') {
             $commandOptions['vextwarning'] = 'false';
         }        
         
@@ -36,26 +75,26 @@ class CssValidationTaskDriver extends TaskDriver {
         }
         
         $validationOutputLines = array();
-        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." \"" .$task->getUrl()."\" 2>&1";        
+        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." \"" .$this->task->getUrl()."\" 2>&1";        
         exec($command, $validationOutputLines);
         
         $cssValidatorOutputParser = new CssValidatorOutputParser();
         $cssValidatorOutputParser->setIgnoreFalseBackgroundImageDataUrlMessages(true);
         $cssValidatorOutputParser->setRawOutput(implode("\n", $validationOutputLines));
         
-        if ($task->hasParameter('domains-to-ignore')) {
+        if ($this->task->hasParameter('domains-to-ignore')) {
             $cssValidatorOutputParser->setRefDomainsToIgnore($task->getParameter('domains-to-ignore'));
         }
         
-        if ($task->isTrue('ignore-warnings')) {
+        if ($this->task->isTrue('ignore-warnings')) {
             $cssValidatorOutputParser->setIgnoreWarnings(true);
         }
         
-        if ($task->getParameter('vendor-extensions') == 'ignore') {    
+        if ($this->task->getParameter('vendor-extensions') == 'ignore') {    
             $cssValidatorOutputParser->setIgnoreVendorExtensionIssues(true);
         }
         
-        if ($task->getParameter('vendor-extensions') == 'warn' && $task->isTrue('ignore-warnings')) {
+        if ($this->task->getParameter('vendor-extensions') == 'warn' && $task->isTrue('ignore-warnings')) {
             $cssValidatorOutputParser->setIgnoreVendorExtensionIssues(true);
         }        
         
@@ -73,105 +112,11 @@ class CssValidationTaskDriver extends TaskDriver {
             $this->response->setErrorCount(1); 
             $this->response->setIsRetryable(false);
             return json_encode($this->getUnknownExceptionErrorOutput($task));
-        }
-        
-        if ($cssValidatorOutput->getIsFileNotFoundErrorOutput()) {
-            $this->response->setHasFailed();
-            $this->response->setErrorCount(1); 
-            $this->response->setIsRetryable(false);
-            return json_encode($this->getFileNotFoundExceptionOutput($task));
-        }
-        
-        if ($cssValidatorOutput->getIsUnknownHostErrorOutput()) {
-            $this->response->setHasFailed();
-            $this->response->setErrorCount(1); 
-            $this->response->setIsRetryable(false);
-            return json_encode($this->getUnknownHostExceptionOutput($task));
-        }        
+        }       
         
         $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
         $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
         
-        return $this->getSerializer()->serialize($cssValidatorOutput->getMessages(), 'json');
-    } 
-
-    /**
-     *
-     * @return \stdClass 
-     */
-    protected function getUnknownHostExceptionOutput(Task $task) {        
-        $outputObjectMessage = new \stdClass();
-        $outputObjectMessage->message = 'Unknown-host';
-        $outputObjectMessage->class = 'css-validation-6';
-        $outputObjectMessage->type = 'error';
-        $outputObjectMessage->context = '';
-        $outputObjectMessage->ref = $task->getUrl();
-        $outputObjectMessage->line_number = 0;
-        
-        return array($outputObjectMessage);        
-    }      
-    
-    /**
-     *
-     * @return \stdClass 
-     */
-    protected function getFileNotFoundExceptionOutput(Task $task) {        
-        $outputObjectMessage = new \stdClass();
-        $outputObjectMessage->message = 'File not found';
-        $outputObjectMessage->class = 'css-validation-404';
-        $outputObjectMessage->type = 'error';
-        $outputObjectMessage->context = '';
-        $outputObjectMessage->ref = $task->getUrl();
-        $outputObjectMessage->line_number = 0;
-        
-        return array($outputObjectMessage);        
-    }        
-    
-    
-    /**
-     *
-     * @return \stdClass 
-     */
-    protected function getUnknownExceptionErrorOutput(Task $task) {        
-        $outputObjectMessage = new \stdClass();
-        $outputObjectMessage->message = 'Unknown error';
-        $outputObjectMessage->class = 'css-validation-exception-unknown';
-        $outputObjectMessage->type = 'error';
-        $outputObjectMessage->context = '';
-        $outputObjectMessage->ref = $task->getUrl();
-        $outputObjectMessage->line_number = 0;
-        
-        return array($outputObjectMessage);        
+        return $this->getSerializer()->serialize($cssValidatorOutput->getMessages(), 'json');        
     }    
-    
-    
-    /**
-     * 
-     * @param \SimplyTestable\WorkerBundle\Entity\Task\Task $task
-     * @return boolean
-     */
-    protected function isCorrectTaskType(Task $task) {        
-        return $task->getType()->equals($this->getTaskTypeService()->getCssValidationTaskType());
-    }    
-   
-    
-    /**
-     * 
-     * @return boolean
-     */
-    protected function isCorrectWebResourceType() {
-        return $this->webResource instanceof WebPage;
-    }
-    
-    
-    /**
-     *
-     * @return \webignition\InternetMediaType\InternetMediaType 
-     */
-    protected function getOutputContentType()
-    {
-        $mediaTypeParser = new \webignition\InternetMediaType\Parser\Parser();
-        return $mediaTypeParser->parse('application/json');
-    }   
-    
 }

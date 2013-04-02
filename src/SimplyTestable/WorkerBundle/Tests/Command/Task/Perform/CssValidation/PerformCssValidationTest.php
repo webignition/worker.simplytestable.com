@@ -23,7 +23,7 @@ class PerformCommandCssValidationTest extends ConsoleCommandBaseTestCase {
 
         $this->assertEquals(0, $response);
         $this->assertEquals(1, $task->getOutput()->getErrorCount());
-        $this->assertEquals('[{"message":"File not found","class":"css-validation-404","type":"error","context":"","ref":"http:\/\/blog.simplytestable.com\/invalid","line_number":0}]', $task->getOutput()->getOutput());
+        $this->assertEquals('{"messages":[{"message":404,"messageId":"http-retrieval-404","type":"error"}]}', $task->getOutput()->getOutput());
     }
     
     
@@ -39,7 +39,7 @@ class PerformCommandCssValidationTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(0, $response);        
         $this->assertEquals(1, $task->getOutput()->getErrorCount());
         
-        $this->assertEquals('[{"message":"Unknown-host","class":"css-validation-6","type":"error","context":"","ref":"http:\/\/invalid\/","line_number":0}]', $task->getOutput()->getOutput());        
+        $this->assertEquals('{"messages":[{"message":"DNS lookup failure resolving resource domain name","messageId":"http-retrieval-curl-code-6","type":"error"}]}', $task->getOutput()->getOutput());        
     }    
 
 
