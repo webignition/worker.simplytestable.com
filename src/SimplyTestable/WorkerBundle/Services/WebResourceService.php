@@ -49,20 +49,7 @@ class WebResourceService {
      * @param \Guzzle\Http\Message\Request $request
      * @return \webignition\WebResource\WebResource 
      */
-    public function get(\Guzzle\Http\Message\Request $request) {
-//        var_dump($request->getUrl());
-//        
-//        //if ($request->getUrl() == 'http://hydrogen.worker.simplytestable.com/w3c-validator/check') {
-//        if ($request->getUrl() == 'http://html-validator.worker.simplytestable.com:8090/w3c-validator/check') {
-//            $response = $request->send();
-//            
-//            file_put_contents('/home/jon/www/dev.worker.simplytestable.com/src/SimplyTestable/WorkerBundle/Tests/Fixtures/Data/SimplyTestable/WorkerBundle/Tests/Command/Task/PerformAllCommandTest/testPerformAll/HttpResponses/2', $response.'');
-//
-//            
-//            var_dump("don");
-//            exit();
-//        }
-        
+    public function get(\Guzzle\Http\Message\Request $request) {        
         try {
             $response = $request->send();
         } catch (\Guzzle\Http\Exception\ServerErrorResponseException $serverErrorResponseException) {

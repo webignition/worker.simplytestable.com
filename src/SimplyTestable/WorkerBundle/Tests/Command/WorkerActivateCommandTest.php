@@ -11,28 +11,28 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
     }       
 
     public function testSuccessfulActivateWorker() {        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
+        
         $thisWorker = $this->getWorkerService()->get();
         $thisWorker->setState($this->getWorkerService()->getStartingState());
         $this->getWorkerService()->getEntityManager()->persist($thisWorker);
         $this->getWorkerService()->getEntityManager()->flush();
         
-        $response = $this->runConsole('simplytestable:worker:activate', array(
-            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
-        ));
+        $response = $this->runConsole('simplytestable:worker:activate');
         
         $this->assertEquals(self::CONSOLE_COMMAND_SUCCESS, $response);
     }
     
 
     public function test404FailureActivateWorker() {        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
+        
         $thisWorker = $this->getWorkerService()->get();
         $thisWorker->setState($this->getWorkerService()->getStartingState());
         $this->getWorkerService()->getEntityManager()->persist($thisWorker);
         $this->getWorkerService()->getEntityManager()->flush();        
         
-        $response = $this->runConsole('simplytestable:worker:activate', array(
-            '/invalid-fixtures-path-forces-mock-http-client-to-respond-with-404' => true
-        ));
+        $response = $this->runConsole('simplytestable:worker:activate');
         
         $this->assertEquals(404, $response);
     }
@@ -40,20 +40,18 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
     public function testActivationInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {
         $this->getWorkerService()->setReadOnly();
         
-        $this->assertEquals(-1, $this->runConsole('simplytestable:worker:activate', array(
-            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
-        )));
+        $this->assertEquals(-1, $this->runConsole('simplytestable:worker:activate'));
     }
     
     public function testActivationWithCoreApplicationInMaintenanceReadOnlyModeReturnsStatusCode503() {
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
         $thisWorker = $this->getWorkerService()->get();
         $thisWorker->setState($this->getWorkerService()->getStartingState());
         $this->getWorkerService()->getEntityManager()->persist($thisWorker);
         $this->getWorkerService()->getEntityManager()->flush(); 
         
-        $this->assertEquals(503, $this->runConsole('simplytestable:worker:activate', array(
-            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
-        )));
+        $this->assertEquals(503, $this->runConsole('simplytestable:worker:activate'));
     }    
 
 }

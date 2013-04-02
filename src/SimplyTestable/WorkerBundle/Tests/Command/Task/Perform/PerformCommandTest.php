@@ -30,8 +30,7 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
         $this->getWorkerService()->setReadOnly();
         
         $this->runConsole('simplytestable:task:perform', array(
-            $task->id => true,
-            $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
+            $task->id => true
         ));        
         
         $this->assertTrue($this->getRequeQueueService()->contains('task-perform', array(

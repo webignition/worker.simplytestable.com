@@ -17,20 +17,11 @@ class WorkerActivateCommand extends BaseCommand
         $this
             ->setName('simplytestable:worker:activate')
             ->setDescription('Activate this worker, making it known to all core application instance of which it is aware')
-            ->addArgument('http-fixture-path', InputArgument::OPTIONAL, 'path to HTTP fixture data when testing')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {        
-        if ($input->hasArgument('http-fixture-path')) {
-            $httpClient = $this->getContainer()->get('simplytestable.services.httpClient');
-            
-            if ($httpClient instanceof \webignition\Http\Mock\Client\Client) {
-                $httpClient->getStoredResponseList()->setFixturesPath($input->getArgument('http-fixture-path'));
-            }            
-        }
-        
         if ($this->getWorkerService()->isMaintenanceReadOnly()) {
             $output->writeln('Unable to activate, worker application is in maintenance read-only mode');
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;

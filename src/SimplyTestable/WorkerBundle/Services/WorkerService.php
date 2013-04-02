@@ -58,9 +58,9 @@ class WorkerService extends EntityService {
     
     /**
      *
-     * @var \Guzzle\Http\Client
+     * @var \SimplyTestable\WorkerBundle\Services\HttpClientService
      */
-    private $httpClient; 
+    private $httpClientService; 
     
     
     /**
@@ -98,7 +98,7 @@ class WorkerService extends EntityService {
         $this->hostname = $hostname;
         $this->coreApplicationService = $coreApplicationService;
         $this->stateService = $stateService;
-        $this->httpClient = $httpClientService->get();
+        $this->httpClientService = $httpClientService;
         //$this->httpClient->redirectHandler()->enable();  
         $this->urlService = $urlService;
     }  
@@ -190,53 +190,42 @@ class WorkerService extends EntityService {
  
         $remoteEndpoint = $this->getWorkerActivateRemoteEndpoint($coreApplication);
         
-        $httpRequest = $remoteEndpoint->getHttpRequest();
         $requestUrl = $this->urlService->prepare($remoteEndpoint->getHttpRequest()->getUrl());
-        $httpRequest->setUrl($requestUrl);
         
-        $httpRequest->setPostFields(array(
+        $httpRequest = $this->httpClientService->postRequest($requestUrl, null, array(
             'hostname' => $thisWorker->getHostname(),
             'token' => $thisWorker->getActivationToken()
-        ));
+        ));        
 
         $this->logger->info("WorkerService::activate: Requesting activation with " . $requestUrl);
         
         try {
-            $response = $this->httpClient->getResponse($httpRequest);
-            
-            if ($this->httpClient instanceof \webignition\Http\Mock\Client\Client) {
-                $this->logger->info("WorkerService:activate: response fixture path: " . $this->httpClient->getStoredResponseList()->getRequestFixturePath($httpRequest));
-                
-                if (file_exists($this->httpClient->getStoredResponseList()->getRequestFixturePath($httpRequest))) {
-                    $this->logger->info("WorkerService:activate: response fixture path: found");
-                } else {
-                    $this->logger->info("WorkerService:activate: response fixture path: not found");
-                }                
-            }            
-            
-            $this->logger->info("WorkerService::activate: " . $requestUrl . ": " . $response->getResponseCode()." ".$response->getResponseStatus());
-            
-            if ($response->getResponseCode() === 503) {
-                $this->logger->err("WorkerService::activate: Activation request failed (core application is in read-only mode)");
-                return $response->getResponseCode();
-            }
-            
-            if ($response->getResponseCode() !== 200) {
-                $this->logger->err("WorkerService::activate: Activation request failed");
-                return $response->getResponseCode();
-            }
-            
-            $thisWorker->setNextState();
-            $this->persistAndFlush($thisWorker);
-
-            return 0;            
-            
-        } catch (CurlException $curlException) {
-            $this->logger->err("WorkerService::activate: " . $requestUrl . ": " . $curlException->getMessage());            
-            return $curlException->getCode();
+            $response = $httpRequest->send();            
+        } catch (\Guzzle\Http\Exception\ServerErrorResponseException $serverErrorResponseException) {
+            $response = $serverErrorResponseException->getResponse();
+        } catch (\Guzzle\Http\Exception\ClientErrorResponseException $clientErrorResponseException) {
+            $response = $clientErrorResponseException->getResponse();
+        } catch (\Guzzle\Http\Exception\CurlException $curlException) {
+            $this->logger->err("WorkerService::activate: " . $requestUrl . ": " . $curlException->getErrorNo());            
+            return $curlException->getErrorNo();
         }
-        
-        return 1;
+            
+        $this->logger->info("WorkerService::activate: " . $requestUrl . ": " . $response->getStatusCode()." ".$response->getReasonPhrase());
+
+        if ($response->getStatusCode() === 503) {
+            $this->logger->err("WorkerService::activate: Activation request failed (core application is in read-only mode)");
+            return $response->getStatusCode();
+        }
+
+        if ($response->getStatusCode() !== 200) {
+            $this->logger->err("WorkerService::activate: Activation request failed");
+            return $response->getStatusCode();
+        }
+            
+        $thisWorker->setNextState();
+        $this->persistAndFlush($thisWorker);
+
+        return 0;;
     }
     
     

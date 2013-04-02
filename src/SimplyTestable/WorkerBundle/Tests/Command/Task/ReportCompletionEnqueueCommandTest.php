@@ -32,8 +32,7 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
         foreach ($taskPropertyCollection as $taskIndex => $taskProperties) {
             $tasks[] = $this->createTask($taskProperties['url'], $taskProperties['type']);
             $this->runConsole('simplytestable:task:perform', array(
-                ($taskIndex + 1) => true,
-                $this->getFixturesDataPath(__FUNCTION__) . '/HttpResponses' => true
+                ($taskIndex + 1) => true                
             ));
         }
         
