@@ -9,6 +9,10 @@ class VerifyControllerTest extends BaseControllerJsonTestCase {
         self::setupDatabaseIfNotExists();        
     }
 
+    
+    /**
+     * @group standard
+     */    
     public function testVerifyingActivationOfRegularService() {
         $thisWorker = $this->getWorkerService()->get();
     
@@ -24,6 +28,9 @@ class VerifyControllerTest extends BaseControllerJsonTestCase {
     }
     
     
+    /**
+     * @group standard
+     */    
     public function testVerifyingActivationInMaintenanceReadOnlyStateReturnsHttp503 () {
         $this->getWorkerService()->setReadOnly();
         $thisWorker = $this->getWorkerService()->get();

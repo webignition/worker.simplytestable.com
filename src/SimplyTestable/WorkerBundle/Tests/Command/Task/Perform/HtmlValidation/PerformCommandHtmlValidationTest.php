@@ -10,6 +10,10 @@ class PerformCommandHtmlValidationTest extends ConsoleCommandBaseTestCase {
         self::setupDatabase();        
     }    
     
+    
+    /**
+     * @group standard
+     */    
     public function testPerformOnNonExistentUrl() {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
@@ -27,6 +31,9 @@ class PerformCommandHtmlValidationTest extends ConsoleCommandBaseTestCase {
     }
     
     
+    /**
+     * @group standard
+     */    
     public function testPerformOnNonExistentHost() {        
         $taskObject = $this->createTask('http://invalid/', 'HTML validation');
         

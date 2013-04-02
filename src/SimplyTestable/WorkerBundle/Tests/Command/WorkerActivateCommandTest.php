@@ -10,6 +10,9 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
         self::setupDatabaseIfNotExists();        
     }       
 
+    /**
+     * @group standard
+     */    
     public function testSuccessfulActivateWorker() {        
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
         
@@ -23,7 +26,9 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(self::CONSOLE_COMMAND_SUCCESS, $response);
     }
     
-
+    /**
+     * @group standard
+     */
     public function test404FailureActivateWorker() {        
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
         
@@ -37,12 +42,18 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(404, $response);
     }
     
+    /**
+     * @group standard
+     */    
     public function testActivationInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {
         $this->getWorkerService()->setReadOnly();
         
         $this->assertEquals(-1, $this->runConsole('simplytestable:worker:activate'));
     }
     
+    /**
+     * @group standard
+     */    
     public function testActivationWithCoreApplicationInMaintenanceReadOnlyModeReturnsStatusCode503() {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         

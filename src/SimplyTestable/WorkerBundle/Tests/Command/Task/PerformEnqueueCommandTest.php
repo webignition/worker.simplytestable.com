@@ -10,6 +10,10 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase {
         self::setupDatabaseIfNotExists();        
     }     
     
+    
+    /**
+     * @group standard
+     */    
     public function testEnqueueTaskPerformJobs() {        
         $taskPropertyCollection = array(
             array(

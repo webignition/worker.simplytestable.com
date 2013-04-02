@@ -6,6 +6,9 @@ use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
 class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
     
+    /**
+     * @group standard
+     */    
     public function testEnqueueTaskReportCompletionJobs() {
         $this->setupDatabase();        
         

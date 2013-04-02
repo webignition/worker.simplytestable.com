@@ -8,6 +8,9 @@ class TaskControllerCancelTest extends TaskControllerTest {
         self::setupDatabaseIfNotExists();        
     }
 
+    /**
+     * @group standard
+     */    
     public function testCancelActionInNormalState() {
         $url = 'http://example.com/';
         $type = 'HTML validation';        
@@ -27,7 +30,9 @@ class TaskControllerCancelTest extends TaskControllerTest {
         $this->assertNull($this->getTaskService()->getById($createdTask->id));     
     }
     
-    
+    /**
+     * @group standard
+     */    
     public function testCancelActionInMaintenanceReadOnlyStateReturnsHttp503() {
         $url = 'http://example.com/';
         $type = 'HTML validation';        
@@ -45,6 +50,9 @@ class TaskControllerCancelTest extends TaskControllerTest {
     }
     
     
+    /**
+     * @group standard
+     */    
     public function testCancelCollectionActionInNormalState() {
         $taskData = array(
                 array(
@@ -82,6 +90,9 @@ class TaskControllerCancelTest extends TaskControllerTest {
     }
     
     
+    /**
+     * @group standard
+     */    
     public function testCancelCollectionActionInMaintenanceReadOnlyStateReturnsHttp503() {
         $taskData = array(
                 array(

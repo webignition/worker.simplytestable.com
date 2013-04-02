@@ -15,7 +15,7 @@ abstract class TaskControllerTest extends BaseControllerJsonTestCase {
      * 
      * @param array $tasks
      * @return \stdClass
-     */
+     */    
     protected function createTaskCollection($tasks) {
         $controller = $this->getTaskController('createCollectionAction', array(
             'tasks' => $tasks

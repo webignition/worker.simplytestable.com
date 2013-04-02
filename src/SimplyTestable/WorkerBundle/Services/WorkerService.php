@@ -190,7 +190,7 @@ class WorkerService extends EntityService {
  
         $remoteEndpoint = $this->getWorkerActivateRemoteEndpoint($coreApplication);
         
-        $requestUrl = $this->urlService->prepare($remoteEndpoint->getHttpRequest()->getUrl());
+        $requestUrl = $this->urlService->prepare($remoteEndpoint->getUrl());
         
         $httpRequest = $this->httpClientService->postRequest($requestUrl, null, array(
             'hostname' => $thisWorker->getHostname(),

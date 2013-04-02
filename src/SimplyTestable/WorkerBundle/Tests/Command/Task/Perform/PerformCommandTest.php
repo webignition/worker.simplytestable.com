@@ -11,6 +11,10 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
         self::setupDatabase();        
     }    
 
+    
+    /**
+     * @group standard
+     */    
     public function testPerformInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {                 
         $task = $this->createTask('http://example.com/', 'HTML validation');        
         $this->getWorkerService()->setReadOnly();
@@ -22,6 +26,10 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(-1, $response);
     }    
     
+    
+    /**
+     * @group standard
+     */    
     public function testPerformInMaintenanceReadOnlyModeReturnsResqueJobToQueue() {
         $this->clearRedis();
         
@@ -38,6 +46,10 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
         )));       
     }    
     
+    
+    /**
+     * @group standard
+     */    
     public function testPerformInvalidTestReturnsStatusCodeMinus2() {        
         $response = $this->runConsole('simplytestable:task:perform', array(
             -1 => true
@@ -47,6 +59,10 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
     }   
     
     
+    
+    /**
+     * @group standard
+     */    
     public function testPerformForTestInInvalidStateReturnsStatusCodeMinus3() {        
         $taskObject = $this->createTask('http://example.com/', 'HTML validation');
         
@@ -62,6 +78,10 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(-3, $response);
     }
     
+    
+    /**
+     * @group standard
+     */    
     public function testPerformTestWhereNoTaskDriverFoundReturnsStatusCodeMinus4() {        
         $taskObject = $this->createTask('http://example.com/', 'HTML validation');
         $task = $this->getTaskService()->getById($taskObject->id);
@@ -85,6 +105,10 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
     } 
     
     
+    
+    /**
+     * @group standard
+     */    
     public function testPerformOnNonExistentUrl() {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
@@ -102,6 +126,10 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
     }
     
     
+    
+    /**
+     * @group standard
+     */    
     public function testPerformOnNonExistentHost() {        
         $taskObject = $this->createTask('http://invalid/', 'HTML validation');
         

@@ -11,6 +11,10 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase {
         self::setupDatabase();        
     }     
 
+    
+    /**
+     * @group standard
+     */    
     public function testRequeueInProgressTasksCommand() {
         $urls = array(
             'http://example.com/zero/',

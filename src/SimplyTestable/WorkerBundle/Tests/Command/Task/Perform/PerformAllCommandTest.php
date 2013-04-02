@@ -10,6 +10,10 @@ class PerformAllCommandTest extends ConsoleCommandBaseTestCase {
         self::setupDatabase();        
     }    
 
+    
+    /**
+     * @group standard
+     */    
     public function testPerformAll() {        
         $taskProperties = $this->createTask('http://example.com/', 'HTML validation');        
         

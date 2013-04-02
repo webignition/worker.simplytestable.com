@@ -9,6 +9,9 @@ class MaintenanceControllerTest extends BaseControllerJsonTestCase {
         self::setupDatabaseIfNotExists();        
     }
 
+    /**
+     * @group standard
+     */    
     public function testEnableReadOnlyAction() {        
         $response = $this->getMaintenanceController('enableReadOnlyAction')->enableReadOnlyAction();
         $this->assertEquals('["Set state to maintenance-read-only"]', $response->getContent());
@@ -16,6 +19,9 @@ class MaintenanceControllerTest extends BaseControllerJsonTestCase {
         $this->assertFalse($this->getWorkerService()->isActive());
     }
     
+    /**
+     * @group standard
+     */    
     public function testDisableReadOnlyAction() {        
         $response = $this->getMaintenanceController('disableReadOnlyAction')->disableReadOnlyAction();
         $this->assertEquals('["Set state to active"]', $response->getContent());
@@ -23,6 +29,9 @@ class MaintenanceControllerTest extends BaseControllerJsonTestCase {
         $this->assertTrue($this->getWorkerService()->isActive());
     }    
     
+    /**
+     * @group standard
+     */    
     public function testLeaveReadOnlyAction() {        
         $this->setupDatabase();
         $response = $this->getMaintenanceController('leaveReadOnlyAction')->leaveReadOnlyAction();

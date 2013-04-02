@@ -11,6 +11,10 @@ class ReportCompletionAllCommandTest extends ConsoleCommandBaseTestCase {
         self::setupDatabaseIfNotExists();        
     }    
 
+    
+    /**
+     * @group standard
+     */    
     public function testReportCompletionAll() {        
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));        
         

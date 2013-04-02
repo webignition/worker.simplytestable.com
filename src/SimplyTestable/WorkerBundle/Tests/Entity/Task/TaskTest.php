@@ -7,6 +7,10 @@ use SimplyTestable\WorkerBundle\Tests\BaseTestCase;
 
 class TaskTest extends BaseTestCase {
 
+    
+    /**
+     * @group standard
+     */    
     public function testCheckIfParameterIsTrue() {
         $parameters = array(
             'one' => true,

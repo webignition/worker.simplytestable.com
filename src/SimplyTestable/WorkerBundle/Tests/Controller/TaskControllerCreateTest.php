@@ -9,6 +9,10 @@ class TaskControllerCreateTest extends TaskControllerTest {
         self::setupDatabaseIfNotExists();        
     }
 
+    
+    /**
+     * @group standard
+     */    
     public function testCreateActionInNormalState() {
         $this->setActiveState();
         
@@ -34,6 +38,9 @@ class TaskControllerCreateTest extends TaskControllerTest {
     }
     
     
+    /**
+     * @group standard
+     */    
     public function testCreateCollectionActionInNormalState() {
         $this->setActiveState();
         
@@ -73,6 +80,10 @@ class TaskControllerCreateTest extends TaskControllerTest {
         }       
     }
     
+    
+    /**
+     * @group standard
+     */    
     public function testCreateActionInMaintenanceReadOnlyStateReturnsHttp503() {
         $this->setMaintenanceReadOnlyState();      
         
@@ -85,6 +96,9 @@ class TaskControllerCreateTest extends TaskControllerTest {
     }      
     
     
+    /**
+     * @group standard
+     */    
     public function testCreateCollectionActionInMaintenanceReadOnlyStateReturnsHttp503() {
         $this->setMaintenanceReadOnlyState();  
         

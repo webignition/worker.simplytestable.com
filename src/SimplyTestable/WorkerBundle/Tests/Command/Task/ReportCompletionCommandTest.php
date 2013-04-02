@@ -11,6 +11,10 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         self::setupDatabaseIfNotExists();        
     }     
     
+    
+    /**
+     * @group standard
+     */    
     public function testReportCompletionSuccessfullyReturnsStatusCode0() {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         $taskObject = $createdTask = $this->createTask('http://example.com/', 'HTML validation');                
@@ -33,15 +37,21 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
     }
     
 
+    
+    /**
+     * @group standard
+     */    
     public function testReportCompletionForInvalidTaskReturnsStatusCodeMinus2() {        
         $response = $this->runConsole('simplytestable:task:reportcompletion', array(
             -1 => true
         ));
         
         $this->assertEquals(-2, $response);        
-    }
+    }    
     
-    
+    /**
+     * @group standard
+     */    
     public function testReportCompletionWhenNoCoreApplicationReturnsStatusCode404() {        
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
@@ -64,6 +74,9 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
     }
     
     
+    /**
+     * @group standard
+     */    
     public function testReportCompletionWhenInvalidCoreApplicationHostReturnsCurlCode6() {        
         $coreApplication = $this->getCoreApplicationService()->get();
         
@@ -87,9 +100,12 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         ));
         
         $this->assertEquals(6, $response);      
-    }    
+    }
     
     
+    /**
+     * @group standard
+     */    
     public function testReportCompletionInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {        
         $this->getWorkerService()->setReadOnly();
         
@@ -100,6 +116,10 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(-1, $response);
     }
     
+    
+    /**
+     * @group standard
+     */    
     public function testReportCompletionWhenCoreApplicationInMaintenanceReadOnlyModeReturnsStatusCode503() {        
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
