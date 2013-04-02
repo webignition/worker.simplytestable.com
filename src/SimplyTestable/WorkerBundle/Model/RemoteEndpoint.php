@@ -29,13 +29,6 @@ class RemoteEndpoint
      */
     private $method = HTTP_METH_GET;
     
-    
-    /**
-     *
-     * @var \HttpRequest
-     */
-    private $httpRequest = null;
-    
 
     /**
      * Set url
@@ -101,18 +94,5 @@ class RemoteEndpoint
     public function getMethod()
     {
         return $this->method;
-    }
-    
-    
-    /**
-     *
-     * @return \HttpRequest
-     */
-    public function getHttpRequest() {
-        if (is_null($this->httpRequest)) {
-            $this->httpRequest = new \HttpRequest($this->getUrl(), $this->getMethod());
-        }
-        
-        return $this->httpRequest;
     }
 }
