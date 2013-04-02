@@ -114,7 +114,7 @@ abstract class BaseController extends Controller
      */    
     public function getArguments($methodName) {        
         if (is_null($this->arguments)) {                                    
-            if ($this->getRequestType($methodName) === HTTP_METH_POST) {                
+            if ($this->getRequestType($methodName) === \Guzzle\Http\Message\RequestInterface::POST) {                
                 $this->arguments = $this->get('request')->request;
             } else {
                 $this->arguments = $this->get('request')->query;
@@ -141,15 +141,15 @@ abstract class BaseController extends Controller
     /**
      * 
      * @param string $methodName
-     * @return int
+     * @return string
      */
     private function getRequestType($methodName) {
         if (!is_array($this->requestTypes)) {
-            return HTTP_METH_GET;
+            return \Guzzle\Http\Message\RequestInterface::GET;
         }
         
         if (!isset($this->requestTypes[$methodName])) {
-            return HTTP_METH_GET;
+            return \Guzzle\Http\Message\RequestInterface::GET;
         }
         
         return $this->requestTypes[$methodName];

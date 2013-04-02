@@ -12,7 +12,7 @@ class CoreApplicationService extends EntityService {
     private $remoteEndpoints = array(
         'worker-activate' => array(
             'url' => '/worker/activate/',
-            'method' => HTTP_METH_POST
+            'method' => \Guzzle\Http\Message\RequestInterface::POST
         )
     );
     

@@ -17,7 +17,7 @@ class VerifyController extends BaseController
         ));
         
         $this->setRequestTypes(array(
-            'indexAction' => HTTP_METH_POST
+            'indexAction' => \Guzzle\Http\Message\RequestInterface::POST
         ));
     }    
     

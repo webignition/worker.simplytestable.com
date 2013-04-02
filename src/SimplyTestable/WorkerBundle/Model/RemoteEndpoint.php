@@ -27,7 +27,7 @@ class RemoteEndpoint
      *
      * @var int
      */
-    private $method = HTTP_METH_GET;
+    private $method = \Guzzle\Http\Message\RequestInterface::GET;
     
 
     /**

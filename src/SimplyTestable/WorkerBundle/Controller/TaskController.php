@@ -28,10 +28,10 @@ class TaskController extends BaseController
         ));
         
         $this->setRequestTypes(array(
-            'createAction' => HTTP_METH_POST,
-            'createCollectionAction' => HTTP_METH_POST,
-            'cancelAction' => HTTP_METH_POST,
-            'cancelCollectionAction' => HTTP_METH_POST   
+            'createAction' => \Guzzle\Http\Message\RequestInterface::POST,
+            'createCollectionAction' => \Guzzle\Http\Message\RequestInterface::POST,
+            'cancelAction' => \Guzzle\Http\Message\RequestInterface::POST,
+            'cancelCollectionAction' => \Guzzle\Http\Message\RequestInterface::POST   
         ));
     }    
     
