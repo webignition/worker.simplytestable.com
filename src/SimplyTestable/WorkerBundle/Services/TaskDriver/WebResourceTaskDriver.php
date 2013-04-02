@@ -200,14 +200,8 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      *
      * @return string 
      */
-    private function getOutputMessage() {
-//        var_dump("cp01");
-//        exit();
-        
-        // Still need to catch redirect limits and redirect loops
-        
-        
-        
+    private function getOutputMessage() {       
+        // Still need to catch redirect limits and redirect loops        
 //        if ($this->httpClientException instanceof \webignition\Http\Client\Exception) {
 //            switch ($this->httpClientException->getCode()) {
 //                case 310:
@@ -219,9 +213,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
 //            }
 //        }
         
-        if ($this->curlException instanceof \Guzzle\Http\Exception\CurlException) {
-            // TBC, following still refers to old curlException will not work
-            
+        if ($this->curlException instanceof \Guzzle\Http\Exception\CurlException) {            
             if ($this->isTimeoutException($this->curlException)) {
                 return 'Timeout reached retrieving resource';
             }
