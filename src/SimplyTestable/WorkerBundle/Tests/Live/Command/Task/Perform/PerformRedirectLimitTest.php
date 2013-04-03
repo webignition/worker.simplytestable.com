@@ -4,7 +4,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Live\Command\Task\Perform;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
-class PerformCommandTest extends ConsoleCommandBaseTestCase {
+class PerformRedirectLimitTest extends ConsoleCommandBaseTestCase {
     
     public static function setUpBeforeClass() {
         self::setupDatabase();        
