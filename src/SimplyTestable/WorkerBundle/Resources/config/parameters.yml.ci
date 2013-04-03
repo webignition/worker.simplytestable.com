@@ -31,3 +31,4 @@ parameters:
   resque-job-class-map:
     "task-perform": "SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob"
     "task-report-completion": "SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob"
+  admin_password: password

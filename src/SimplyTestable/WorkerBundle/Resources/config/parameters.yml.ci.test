@@ -1,0 +1,5 @@
+  hostname: test.worker.simplytestable.com
+  resque_pid: "simplytestable_workerbundle_test"
+
+glit_resque:
+  prefix: "SimplyTestable\WorkerBundle\Test"
