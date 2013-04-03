@@ -97,7 +97,13 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         $validationRequest->getCurlOptions()->add(CURLOPT_TIMEOUT, 300);
         
         /* @var $validationResponse JsonDocument */
-        $validationResponse = $this->getWebResourceService()->get($validationRequest);
+        try {
+            $validationResponse = $this->getWebResourceService()->get($validationRequest);
+        } catch (\Exception $exception) {
+            $exceptionCode = ($exception instanceof \Guzzle\Http\Exception\CurlException) ? $exception->getErrorNo() : $exception->getCode();            
+            $this->getLogger()->err('HtmlValidationTaskDriver::validation request failed with exception ['.get_class($exception).'] ['.$exceptionCode.'] ['.$validationRequest->getUrl().']');
+            throw $exception;
+        }
         
         if ($validationResponse->getContentType()->getTypeSubtypeString() == 'text/html') {
             // HTML response, the validator failed to validate
