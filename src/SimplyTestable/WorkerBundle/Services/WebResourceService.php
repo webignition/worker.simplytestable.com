@@ -50,13 +50,16 @@ class WebResourceService {
      * @return \webignition\WebResource\WebResource 
      */
     public function get(\Guzzle\Http\Message\Request $request) {        
+        // Guzzle seems to be flailing in errors if redirects total more than 4
+        $request->getParams()->set('redirect.max', 4);
+        
         try {
             $response = $request->send();
         } catch (\Guzzle\Http\Exception\ServerErrorResponseException $serverErrorResponseException) {
             $response = $serverErrorResponseException->getResponse();
         } catch (\Guzzle\Http\Exception\ClientErrorResponseException $clientErrorResponseException) {
             $response = $clientErrorResponseException->getResponse();
-        }        
+        }
         
         if ($response->isInformational()) {
             // Interesting to see what makes this happen

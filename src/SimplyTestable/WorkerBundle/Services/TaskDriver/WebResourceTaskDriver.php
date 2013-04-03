@@ -16,12 +16,6 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     
     /**
      *
-     * @var \webignition\Http\Client\Exception
-     */
-    protected $httpClientException;
-    
-    /**
-     *
      * @var \webignition\Http\Client\CurlException  
      */
     protected $curlException;
@@ -55,6 +49,13 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     private $webResourceTaskHash = null;
     
     
+    /**
+     *
+     * @var \Guzzle\Http\Exception\TooManyRedirectsException
+     */
+    private $tooManyRedirectsException = null;
+    
+    
     public function execute(Task $task) {                
         if (!$this->isCorrectTaskType($task)) {
             return false;
@@ -67,7 +68,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         $this->webResource = $this->getWebResource($task);        
         $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);        
 
-        if (!$this->response->hasSucceeded()) {
+        if (!$this->response->hasSucceeded()) {            
             return $this->hasNotSucceedHandler();
         }
         
@@ -175,6 +176,11 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             }              
             
             $this->curlException = $curlException;
+        } catch (\Guzzle\Http\Exception\TooManyRedirectsException $tooManyRedirectsException) {
+            $this->response->setHasFailed();
+            $this->response->setIsRetryable(false);            
+            
+            $this->tooManyRedirectsException = $tooManyRedirectsException;
         }
     } 
     
@@ -202,6 +208,9 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      */
     private function getOutputMessage() {       
         // Still need to catch redirect limits and redirect loops        
+        if ($this->tooManyRedirectsException instanceof \Guzzle\Http\Exception\TooManyRedirectsException) {            
+            return 'Redirect limit of 4 redirects reached';
+        }
 //        if ($this->httpClientException instanceof \webignition\Http\Client\Exception) {
 //            switch ($this->httpClientException->getCode()) {
 //                case 310:
@@ -240,16 +249,23 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      * @return string 
      */
     private function getOutputMessageId() {        
-        if ($this->httpClientException instanceof \webignition\Http\Client\Exception) {
-            switch ($this->httpClientException->getCode()) {
-                case 310:
-                    return 'redirect-limit-reached';                
-
-                case 311:
-                    return 'redirect-loop';
-                    break;
-            }
+        if ($this->tooManyRedirectsException instanceof \Guzzle\Http\Exception\TooManyRedirectsException) {
+            return 'redirect-limit-reached';
+            
+            var_dump($this->tooManyRedirectsException->getMessage());
         }
+        //exit();
+        
+//        if ($this->httpClientException instanceof \webignition\Http\Client\Exception) {
+//            switch ($this->httpClientException->getCode()) {
+//                case 310:
+//                    return 'redirect-limit-reached';                
+//
+//                case 311:
+//                    return 'redirect-loop';
+//                    break;
+//            }
+//        }
         
         if ($this->curlException instanceof \Guzzle\Http\Exception\CurlException) {
             return 'curl-code-' . $this->curlException->getErrorNo();                     
