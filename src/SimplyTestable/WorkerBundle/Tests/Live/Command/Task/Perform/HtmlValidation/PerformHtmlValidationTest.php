@@ -12,6 +12,7 @@ class PerformHtmlValidationTest extends ConsoleCommandBaseTestCase {
 
     /**
      * @group live
+     * @group live-travis
      */    
     public function testErrorFreeHtmlValidation() {        
         $taskObject = $this->createTask('http://html-validation.simplytestable.com', 'HTML validation');

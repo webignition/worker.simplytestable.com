@@ -12,6 +12,7 @@ class PerformRedirectLoopTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group live
+     * @group live-travis
      */    
     public function testRedirectLoopHandling() {        
         $taskObject = $this->createTask('http://simplytestable.com/redirect-loop-test/', 'HTML validation');

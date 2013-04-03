@@ -30,7 +30,7 @@ before_script:
   
 script:
   - phpunit -c app --group standard
-  - phpunit -c app --group live
+  - phpunit -c app --group live-travis
   
 after_failure:
   #- cat /home/travis/build/webignition/worker.simplytestable.com/app/logs/test.log | grep "response fixture path"

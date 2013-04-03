@@ -208,7 +208,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      */
     private function getOutputMessage() {       
         // Still need to catch redirect limits and redirect loops        
-        if ($this->tooManyRedirectsException instanceof \Guzzle\Http\Exception\TooManyRedirectsException) {
+        if ($this->tooManyRedirectsException instanceof \Guzzle\Http\Exception\TooManyRedirectsException) {            
             if ($this->isRedirectLoopException()) {
                 return 'Redirect loop detected';
             }
@@ -240,23 +240,26 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     
     /**
      * 
-     * @return string
+     * @return boolean
      */
     private function isRedirectLoopException() {
         $lines = explode("\n", $this->tooManyRedirectsException->getMessage());
+        
         $locationLines = array();
         
-        foreach ($lines as $line) {
+        foreach ($lines as $line) {            
             $line = trim($line);
             
             if (preg_match('/^location:/i', $line)) {
                 if (in_array($line, $locationLines)) {
-                    return 'redirect-loop';
+                    return true;
                 }
+                
+                $locationLines[] = $line;
             }
         }
         
-        return 'redirect-limit';
+        return false;
     }
 
     

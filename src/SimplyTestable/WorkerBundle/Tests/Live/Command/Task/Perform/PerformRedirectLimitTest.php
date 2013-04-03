@@ -12,6 +12,7 @@ class PerformRedirectLimitTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group live
+     * @group live-travis
      */    
     public function testRedirectLimitHandling() {        
         $taskObject = $this->createTask('http://simplytestable.com/redirect-limit-test/', 'HTML validation');
