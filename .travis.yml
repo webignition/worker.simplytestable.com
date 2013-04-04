@@ -14,7 +14,8 @@ before_script:
   - cd /usr/share/css-validator
   - sudo CVSROOT=:pserver:anonymous:anonymous@dev.w3.org:/sources/public cvs checkout 2002/css-validator
   - cd 2002/css-validator/
-  - sudo ant jar  
+  - sudo ant jar
+  - cd /home/travis/webignition/worker.simplytestable.com
   
   # Install composer for dependency management
   - wget http://getcomposer.org/composer.phar 
