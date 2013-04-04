@@ -122,7 +122,7 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
         
         $this->assertEquals(0, $response);
         $this->assertEquals(1, $task->getOutput()->getErrorCount());
-        $this->assertEquals('{"messages":[{"message":404,"messageId":"http-retrieval-404","type":"error"}]}', $task->getOutput()->getOutput());
+        $this->assertEquals('{"messages":[{"message":"Not Found","messageId":"http-retrieval-404","type":"error"}]}', $task->getOutput()->getOutput());
     }
     
     

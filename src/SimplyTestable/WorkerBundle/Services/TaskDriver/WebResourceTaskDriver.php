@@ -231,7 +231,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         }
         
         if ($this->webResourceException instanceof WebResourceException) {
-            return $this->webResourceException->getResponse()->getStatusCode();
+            return $this->webResourceException->getResponse()->getReasonPhrase();
         }
         
         return '';
