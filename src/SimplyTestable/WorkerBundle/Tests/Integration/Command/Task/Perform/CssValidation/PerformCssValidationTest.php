@@ -18,6 +18,7 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
 
     /**
      * @group integration
+     * @group integration-travis
      */    
     public function testErrorFreeCssValidation() {        
         $taskObject = $this->createTask('http://css-validation.simplytestable.com', 'CSS validation');
@@ -36,7 +37,8 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
 
     /**
      * @group integration
-     */    
+     * @group integration-travis
+     */       
     public function testCssValidationRedirectLoop() {        
         $taskObject = $this->createTask('http://simplytestable.com/redirect-loop-test/', 'CSS validation');
         
@@ -55,7 +57,8 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
-     */    
+     * @group integration-travis
+     */      
     public function testCssValidationRedirectLimit() {        
         $taskObject = $this->createTask('http://simplytestable.com/redirect-limit-test/', 'CSS validation');
         
@@ -74,7 +77,8 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
-     */    
+     * @group integration-travis
+     */       
     public function testTwitterBootstrap231() {        
         $taskObject = $this->createTask('http://css-validation.simplytestable.com/twitter-bootstrap/2.3.1.html', 'CSS validation');
         
@@ -91,7 +95,8 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
 
     /**
      * @group integration
-     */    
+     * @group integration-travis
+     */      
     public function testTwitterBootstrapWithNetdnaBootstrapcdncomInDomainsToIgnore() {                
         $taskObject = $this->createTask(
                 'http://css-validation.simplytestable.com/twitter-bootstrap/2.3.1.html',
@@ -112,4 +117,31 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(0, $response);
         $this->assertEquals(0, $task->getOutput()->getErrorCount());
     }     
+    
+    
+    /**
+     * @group integration
+     * @group integration-travis
+     */        
+    public function testOneErrorOneWarning() {                
+        $taskObject = $this->createTask(
+                'http://css-validation.simplytestable.com/one-error-one-warning.html',
+                'CSS validation'                   
+        );
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+
+        $this->assertEquals(0, $response);
+        $this->assertEquals(1, $task->getOutput()->getErrorCount());
+        
+        // Should ideally be getting 1 warning but when calling the CSS validator
+        // from the command line no warnings are returned. This might be a CSS
+        // validator bug.
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());
+    }     
 }
+
