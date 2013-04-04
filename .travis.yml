@@ -7,7 +7,15 @@ php:
   - 5.4
   - 5.5
   
-before_script:  
+before_script:
+  # Install the W3C CSS validator
+  - sudo apt-get install ant cvs openjdk-7-jdk
+  - sudo mkdir /usr/share/css-validator
+  - cd /usr/share/css-validator
+  - sudo CVSROOT=:pserver:anonymous:anonymous@dev.w3.org:/sources/public cvs checkout 2002/css-validator
+  - cd 2002/css-validator/
+  - sudo ant jar  
+  
   # Install composer for dependency management
   - wget http://getcomposer.org/composer.phar 
   
