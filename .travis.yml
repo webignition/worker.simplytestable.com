@@ -28,9 +28,10 @@ before_script:
   - ls -la /usr/bin/node
   - ls -la /usr/bin/nodejs
   - sudo mkdir /usr/share/node-jslint && cd /usr/share/node-jslint && sudo npm install jslint && sudo npm install jslint
+  - cd $CI_HOME
   
   # Test node-jslint
-  - /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js  
+  - /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js travis-ci/sample.js
   
   # Install composer for dependency management
   - wget http://getcomposer.org/composer.phar 
