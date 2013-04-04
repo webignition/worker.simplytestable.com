@@ -2,6 +2,7 @@
 namespace SimplyTestable\WorkerBundle\Services;
 
 use Guzzle\Http\Client as HttpClient;
+use Guzzle\Plugin\Backoff\BackoffPlugin;
 
 class HttpClientService { 
     
@@ -15,7 +16,8 @@ class HttpClientService {
     
     public function get($baseUrl = '', $config = null) {
         if (is_null($this->httpClient)) {
-            $this->httpClient = new HttpClient($baseUrl = '', $config);
+            $this->httpClient = new HttpClient($baseUrl, $config);
+            $this->httpClient->addSubscriber(BackoffPlugin::getExponentialBackoff());            
         }
         
         return $this->httpClient;
