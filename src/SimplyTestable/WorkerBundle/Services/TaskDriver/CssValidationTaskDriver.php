@@ -111,7 +111,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
             $this->response->setHasFailed();
             $this->response->setErrorCount(1); 
             $this->response->setIsRetryable(false);
-            return json_encode($this->getUnknownExceptionErrorOutput($task));
+            return json_encode($this->getUnknownExceptionErrorOutput($this->task));
         }       
         
         $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
