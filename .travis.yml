@@ -27,7 +27,7 @@ before_script:
   - sudo ln -s /usr/bin/node /usr/bin/nodejs
   - ls -la /usr/bin/node
   - ls -la /usr/bin/nodejs
-  - mkdir /usr/share/node-jslint && cd /usr/share/node-jslint && sudo npm install jslint && sudo npm install jslint
+  - sudo mkdir /usr/share/node-jslint && cd /usr/share/node-jslint && sudo npm install jslint && sudo npm install jslint
   
   # Test node-jslint
   - /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js  
