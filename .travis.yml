@@ -7,6 +7,11 @@ php:
   - 5.4
   - 5.5
   
+env:
+  global:
+    - REPO="webignition/worker.simplytestable.com"
+    - CI_HOME=`pwd`/$REPO  
+  
 before_script:
   # Install the W3C CSS validator
   - sudo apt-get install ant cvs openjdk-7-jdk
@@ -15,7 +20,7 @@ before_script:
   - sudo CVSROOT=:pserver:anonymous:anonymous@dev.w3.org:/sources/public cvs checkout -q 2002/css-validator
   - cd 2002/css-validator/
   - sudo ant -q jar
-  - cd /home/travis/webignition/worker.simplytestable.com
+  - cd $CI_HOME
   
   # Install composer for dependency management
   - wget http://getcomposer.org/composer.phar 
