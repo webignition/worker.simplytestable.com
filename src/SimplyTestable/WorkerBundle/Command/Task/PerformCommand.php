@@ -50,7 +50,12 @@ EOF
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }
         
-        $performResult = $this->getTaskService()->perform($task);
+        try {
+            $performResult = $this->getTaskService()->perform($task);            
+        } catch (\Exception $e) {
+            var_dump('Exception calling $this->getTaskService()->perform');
+            var_dump('Exception class: '.get_class($e));
+        }
         
         if ($performResult === 0) {
             $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(
