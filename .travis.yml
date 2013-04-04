@@ -54,6 +54,21 @@ before_script:
   - echo "5.9.84.201 html-validator.worker.simplytestable.com" | sudo tee --append /etc/hosts
   
 script:
+  - echo 'Running standard unit tests'
+  - phpunit -c app --group standard
+
+  - echo 'Running standard integration tests'
+  - phpunit -c app --group integration-standard-travis
+
+  - echo 'Running HTML validation integration tests'
+  - phpunit -c app --group integration-html-validation-travis
+
+  - echo 'Running CSS validation integration tests'
+  - phpunit -c app --group integration-css-validation-travis
+
+  - echo 'Running JS static analysis integration tests'
+  - phpunit -c app --group integration-js-static-analysis-travis
+  
   - phpunit -c app --group standard
   - phpunit -c app --group integration-travis
   

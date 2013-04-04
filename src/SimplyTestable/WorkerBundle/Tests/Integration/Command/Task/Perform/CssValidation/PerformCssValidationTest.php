@@ -29,7 +29,9 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
 
     /**
      * @group integration
+     * @group integration-css-validation
      * @group integration-travis
+     * @group integration-css-validation-travis
      */    
     public function testErrorFreeCssValidation() {        
         $taskObject = $this->createTask('http://css-validation.simplytestable.com', 'CSS validation');
@@ -48,8 +50,10 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
 
     /**
      * @group integration
+     * @group integration-css-validation
      * @group integration-travis
-     */       
+     * @group integration-css-validation-travis
+     */         
     public function testCssValidationRedirectLoop() {        
         $taskObject = $this->createTask('http://simplytestable.com/redirect-loop-test/', 'CSS validation');
         
@@ -68,8 +72,10 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
+     * @group integration-css-validation
      * @group integration-travis
-     */      
+     * @group integration-css-validation-travis
+     */        
     public function testCssValidationRedirectLimit() {        
         $taskObject = $this->createTask('http://simplytestable.com/redirect-limit-test/', 'CSS validation');
         
@@ -88,8 +94,10 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
+     * @group integration-css-validation
      * @group integration-travis
-     */       
+     * @group integration-css-validation-travis
+     */          
     public function testTwitterBootstrap231() {        
         $taskObject = $this->createTask('http://css-validation.simplytestable.com/twitter-bootstrap/2.3.1.html', 'CSS validation');
         
@@ -106,8 +114,10 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
 
     /**
      * @group integration
+     * @group integration-css-validation
      * @group integration-travis
-     */      
+     * @group integration-css-validation-travis
+     */        
     public function testTwitterBootstrapWithNetdnaBootstrapcdncomInDomainsToIgnore() {                
         $taskObject = $this->createTask(
                 'http://css-validation.simplytestable.com/twitter-bootstrap/2.3.1.html',
@@ -132,8 +142,10 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
+     * @group integration-css-validation
      * @group integration-travis
-     */        
+     * @group integration-css-validation-travis
+     */          
     public function testOneErrorOneWarning() {                
         $taskObject = $this->createTask(
                 'http://css-validation.simplytestable.com/one-error-one-warning.html',
@@ -158,8 +170,10 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
+     * @group integration-css-validation
      * @group integration-travis
-     */      
+     * @group integration-css-validation-travis
+     */        
     public function testFiveErrorsOneVextWarning() {                
         $taskObject = $this->createTask(
                 'http://css-validation.simplytestable.com/five-errors-one-warning.html',
@@ -184,8 +198,10 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
+     * @group integration-css-validation
      * @group integration-travis
-     */      
+     * @group integration-css-validation-travis
+     */        
     public function testFiveErrorsOneVextWarningIgnoreWarnings() {                
         $taskObject = $this->createTask(
                 'http://css-validation.simplytestable.com/five-errors-one-warning.html',
@@ -210,8 +226,10 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
+     * @group integration-css-validation
      * @group integration-travis
-     */      
+     * @group integration-css-validation-travis
+     */        
     public function testFiveErrorsOneVextWarningAsError() {                
         $taskObject = $this->createTask(
                 'http://css-validation.simplytestable.com/five-errors-one-warning.html',

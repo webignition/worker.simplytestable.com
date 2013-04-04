@@ -27,7 +27,9 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
 
     /**
      * @group integration
+     * @group integration-js-static-analysis
      * @group integration-travis
+     * @group integration-js-static-analysis-travis
      */      
     public function testErrorFreeJsStaticAnalysis() {        
         $taskObject = $this->createTask('http://js-static-analysis.simplytestable.com', 'JS static analysis');
@@ -46,7 +48,9 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
 
     /**
      * @group integration
+     * @group integration-js-static-analysis
      * @group integration-travis
+     * @group integration-js-static-analysis-travis
      */       
     public function testJsStaticAnalysisRedirectLoop() {        
         $taskObject = $this->createTask('http://simplytestable.com/redirect-loop-test/', 'JS static analysis');
@@ -66,7 +70,9 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
+     * @group integration-js-static-analysis
      * @group integration-travis
+     * @group integration-js-static-analysis-travis
      */      
     public function testJsStaticAnalysisRedirectLimit() {        
         $taskObject = $this->createTask('http://simplytestable.com/redirect-limit-test/', 'JS static analysis');
@@ -86,8 +92,10 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
+     * @group integration-js-static-analysis
      * @group integration-travis
-     */         
+     * @group integration-js-static-analysis-travis
+     */          
     public function testOneInlineError() {        
         $taskObject = $this->createTask('http://js-static-analysis.simplytestable.com/one-inline-error.html', 'JS static analysis');
         
@@ -104,7 +112,9 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
+     * @group integration-js-static-analysis
      * @group integration-travis
+     * @group integration-js-static-analysis-travis
      */         
     public function testOneReferencedError() {        
         $taskObject = $this->createTask('http://js-static-analysis.simplytestable.com/one-referenced-error.html', 'JS static analysis');
@@ -123,8 +133,10 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
+     * @group integration-js-static-analysis
      * @group integration-travis
-     */         
+     * @group integration-js-static-analysis-travis
+     */           
     public function testTwitterBootstrap231Default() {        
         $taskObject = $this->createTask(
                 'http://js-static-analysis.simplytestable.com/twitter-bootstrap/2.3.1.html',
@@ -144,7 +156,9 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
+     * @group integration-js-static-analysis
      * @group integration-travis
+     * @group integration-js-static-analysis-travis
      */         
     public function testTwitterBootstrap231NetdnaBootstrapcdnComInDomainsToIgnore() {        
         $taskObject = $this->createTask(
