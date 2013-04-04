@@ -83,7 +83,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
         $cssValidatorOutputParser->setRawOutput(implode("\n", $validationOutputLines));
         
         if ($this->task->hasParameter('domains-to-ignore')) {
-            $cssValidatorOutputParser->setRefDomainsToIgnore($task->getParameter('domains-to-ignore'));
+            $cssValidatorOutputParser->setRefDomainsToIgnore($this->task->getParameter('domains-to-ignore'));
         }
         
         if ($this->task->isTrue('ignore-warnings')) {

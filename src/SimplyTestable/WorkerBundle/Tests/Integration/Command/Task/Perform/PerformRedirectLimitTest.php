@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Live\Command\Task\Perform;
+namespace SimplyTestable\WorkerBundle\Tests\Integration\Command\Task\Perform;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
@@ -11,8 +11,8 @@ class PerformRedirectLimitTest extends ConsoleCommandBaseTestCase {
     }     
     
     /**
-     * @group live
-     * @group live-travis
+     * @group integration
+     * @group integration-travis
      */    
     public function testRedirectLimitHandling() {        
         $taskObject = $this->createTask('http://simplytestable.com/redirect-limit-test/', 'HTML validation');

@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Live\Command\Task\Perform\HtmlValidation\XHTML10;
+namespace SimplyTestable\WorkerBundle\Tests\Integration\Command\Task\Perform\HtmlValidation\XHTML10;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
@@ -12,8 +12,8 @@ class PerformHtmlValidationTest extends ConsoleCommandBaseTestCase {
     
     
     /**
-     * @group live
-     * @group live-travis
+     * @group integration
+     * @group integration-travis
      */    
     public function testMinimalBasicNoErrors() {        
         $taskObject = $this->createTask('http://html-validation.simplytestable.com/xhtml10/minimal-basic-no-errors', 'HTML validation');
@@ -31,8 +31,8 @@ class PerformHtmlValidationTest extends ConsoleCommandBaseTestCase {
     
     
     /**
-     * @group live
-     * @group live-travis
+     * @group integration
+     * @group integration-travis
      */    
     public function testMinimalFramesetNoErrors() {        
         $taskObject = $this->createTask('http://html-validation.simplytestable.com/xhtml10/minimal-frameset-no-errors', 'HTML validation');
@@ -50,8 +50,8 @@ class PerformHtmlValidationTest extends ConsoleCommandBaseTestCase {
     
     
     /**
-     * @group live
-     * @group live-travis
+     * @group integration
+     * @group integration-travis
      */    
     public function testMinimalStrictNoErrors() {        
         $taskObject = $this->createTask('http://html-validation.simplytestable.com/xhtml10/minimal-strict-no-errors', 'HTML validation');
@@ -69,8 +69,8 @@ class PerformHtmlValidationTest extends ConsoleCommandBaseTestCase {
     
     
     /**
-     * @group live
-     * @group live-travis
+     * @group integration
+     * @group integration-travis
      */    
     public function testMinimalTransitionalNoErrors() {        
         $taskObject = $this->createTask('http://html-validation.simplytestable.com/xhtml10/minimal-transitional-no-errors', 'HTML validation');

@@ -1,8 +1,14 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Live\Command\Task\Perform\HtmlValidation;
+namespace SimplyTestable\WorkerBundle\Tests\Integration\Command\Task\Perform\HtmlValidation;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
+
+/**
+ * Example parameter set:
+ * 
+ * {"ignore-warnings":"1","ignore-common-cdns":"1","vendor-extensions":"warn","domains-to-ignore":["cdnjs.cloudflare.com","ajax.googleapis.com","netdna.bootstrapcdn.com","ajax.aspnetcdn.com","static.nrelate.com"]}
+ */
 
 class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
@@ -11,7 +17,7 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     }    
 
     /**
-     * @group live
+     * @group integration
      */    
     public function testErrorFreeCssValidation() {        
         $taskObject = $this->createTask('http://css-validation.simplytestable.com', 'CSS validation');
@@ -29,7 +35,7 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
 
     /**
-     * @group live
+     * @group integration
      */    
     public function testCssValidationRedirectLoop() {        
         $taskObject = $this->createTask('http://simplytestable.com/redirect-loop-test/', 'CSS validation');
@@ -48,7 +54,7 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
     
     /**
-     * @group live
+     * @group integration
      */    
     public function testCssValidationRedirectLimit() {        
         $taskObject = $this->createTask('http://simplytestable.com/redirect-limit-test/', 'CSS validation');
@@ -64,6 +70,46 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
         
         $this->assertEquals('{"messages":[{"message":"Redirect limit of 4 redirects reached","messageId":"http-retrieval-redirect-limit-reached","type":"error"}]}', $task->getOutput()->getOutput());
     }     
+    
+    
+    /**
+     * @group integration
+     */    
+    public function testTwitterBootstrap231() {        
+        $taskObject = $this->createTask('http://css-validation.simplytestable.com/twitter-bootstrap/2.3.1.html', 'CSS validation');
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+
+        $this->assertEquals(0, $response);
+        $this->assertEquals(1099, $task->getOutput()->getErrorCount());        
+    }     
 
 
+    /**
+     * @group integration
+     */    
+    public function testTwitterBootstrapWithNetdnaBootstrapcdncomInDomainsToIgnore() {                
+        $taskObject = $this->createTask(
+                'http://css-validation.simplytestable.com/twitter-bootstrap/2.3.1.html',
+                'CSS validation',
+                json_encode(array(
+                    'domains-to-ignore' => array(
+                        'netdna.bootstrapcdn.com'
+                    )
+                ))                
+        );
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+
+        $this->assertEquals(0, $response);
+        $this->assertEquals(0, $task->getOutput()->getErrorCount());
+    }     
 }

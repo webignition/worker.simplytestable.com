@@ -129,10 +129,11 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      * @param string $type
      * @return \stdClass
      */
-    protected function createTask($url, $type) {
+    protected function createTask($url, $type, $parameters = null) {
         $response = $this->getTaskController('createAction', array(
             'url' => $url,
-            'type' => $type
+            'type' => $type,
+            'parameters' => $parameters
         ))->createAction();
         
         return json_decode($response->getContent());

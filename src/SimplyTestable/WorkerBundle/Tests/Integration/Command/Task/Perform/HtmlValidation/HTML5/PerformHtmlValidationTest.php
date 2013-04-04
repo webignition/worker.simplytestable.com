@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Live\Command\Task\Perform\HtmlValidation\HTML5;
+namespace SimplyTestable\WorkerBundle\Tests\Integration\Command\Task\Perform\HtmlValidation\HTML5;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
@@ -11,8 +11,8 @@ class PerformHtmlValidationTest extends ConsoleCommandBaseTestCase {
     }    
 
     /**
-     * @group live
-     * @group live-travis
+     * @group integration
+     * @group integration-travis
      */    
     public function testErrorFreeHtmlValidation() {        
         $taskObject = $this->createTask('http://html-validation.simplytestable.com', 'HTML validation');
@@ -30,8 +30,8 @@ class PerformHtmlValidationTest extends ConsoleCommandBaseTestCase {
     
     
     /**
-     * @group live
-     * @group live-travis
+     * @group integration
+     * @group integration-travis
      */    
     public function testMinimalNoErrors() {        
         $taskObject = $this->createTask('http://html-validation.simplytestable.com/html5/minimal-no-errors.html', 'HTML validation');
@@ -49,8 +49,8 @@ class PerformHtmlValidationTest extends ConsoleCommandBaseTestCase {
     
     
     /**
-     * @group live
-     * @group live-travis
+     * @group integration
+     * @group integration-travis
      */    
     public function testMinimalNoErrorsWithUtf8Bom() {        
         $taskObject = $this->createTask('http://html-validation.simplytestable.com/html5/minimal-with-utf8-bom.html', 'HTML validation');
