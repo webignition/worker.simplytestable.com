@@ -22,6 +22,16 @@ before_script:
   - sudo ant -q jar
   - cd $CI_HOME
   
+  # Install nodejs and node-jslint
+  - sudo apt-get install nodejs npm
+  - ls -la /usr/bin/nodejs
+  - ls -la /usr/bin/node
+  - mkdir /usr/share/node-jslint && cd /usr/share/node-jslint && sudo npm install jslint && sudo npm install jslint
+  
+  # Test node-jslint
+  - /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js
+  
+  
   # Install composer for dependency management
   - wget http://getcomposer.org/composer.phar 
   
