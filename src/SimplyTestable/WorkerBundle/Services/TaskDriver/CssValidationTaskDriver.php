@@ -94,7 +94,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
             $cssValidatorOutputParser->setIgnoreVendorExtensionIssues(true);
         }
         
-        if ($this->task->getParameter('vendor-extensions') == 'warn' && $task->isTrue('ignore-warnings')) {
+        if ($this->task->getParameter('vendor-extensions') == 'warn' && $this->task->isTrue('ignore-warnings')) {
             $cssValidatorOutputParser->setIgnoreVendorExtensionIssues(true);
         }        
         
