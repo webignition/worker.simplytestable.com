@@ -4,7 +4,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Integration\Command\Task\Perform;
 
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
-class PerformReliablyTest extends ConsoleCommandBaseTestCase {
+class PerformReliabilityTest extends ConsoleCommandBaseTestCase {
     
     public static function setUpBeforeClass() {
         self::setupDatabase();        
