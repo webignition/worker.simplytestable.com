@@ -7,7 +7,18 @@ use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 /**
  * Example parameter set:
  * 
- * {"ignore-warnings":"1","ignore-common-cdns":"1","vendor-extensions":"warn","domains-to-ignore":["cdnjs.cloudflare.com","ajax.googleapis.com","netdna.bootstrapcdn.com","ajax.aspnetcdn.com","static.nrelate.com"]}
+ * {
+ *    "ignore-warnings":"1",
+ *    "ignore-common-cdns":"1",
+ *    "vendor-extensions":"warn",
+ *    "domains-to-ignore":[
+ *       "cdnjs.cloudflare.com",
+ *       "ajax.googleapis.com",
+ *       "netdna.bootstrapcdn.com",
+ *       "ajax.aspnetcdn.com",
+ *       "static.nrelate.com"
+ *    ]
+ * }
  */
 
 class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
@@ -168,6 +179,58 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(0, $response);
         $this->assertEquals(5, $task->getOutput()->getErrorCount());
         $this->assertEquals(1, $task->getOutput()->getWarningCount());
-    }      
+    }   
+    
+    
+    /**
+     * @group integration
+     * @group integration-travis
+     */      
+    public function testFiveErrorsOneVextWarningIgnoreWarnings() {                
+        $taskObject = $this->createTask(
+                'http://css-validation.simplytestable.com/five-errors-one-warning.html',
+                'CSS validation',
+                json_encode(array(
+                    'vendor-extensions' => 'warn',
+                    'ignore-warnings' => 1
+                ))                
+        );
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);
+        $this->assertEquals(5, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());
+    }   
+    
+    
+    /**
+     * @group integration
+     * @group integration-travis
+     */      
+    public function testFiveErrorsOneVextWarningAsError() {                
+        $taskObject = $this->createTask(
+                'http://css-validation.simplytestable.com/five-errors-one-warning.html',
+                'CSS validation',
+                json_encode(array(
+                    'vendor-extensions' => 'error',
+                    'ignore-warnings' => 0
+                ))                
+        );
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);
+        $this->assertEquals(6, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());
+    }     
 }
 
