@@ -75,7 +75,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
         }
         
         $validationOutputLines = array();
-        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." \"" .$this->task->getUrl()."\" 2>&1";        
+        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." \"" .$this->webResource->getUrl()."\" 2>&1";        
         exec($command, $validationOutputLines);
         
         $cssValidatorOutputParser = new CssValidatorOutputParser();
@@ -99,7 +99,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
         }        
         
         $cssValidatorOutput = $cssValidatorOutputParser->getOutput();
-        
+
         if ($cssValidatorOutput->getIsUnknownMimeTypeError()) {
             $this->response->setHasBeenSkipped();
             $this->response->setErrorCount(0);
@@ -118,5 +118,22 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
         $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
         
         return $this->getSerializer()->serialize($cssValidatorOutput->getMessages(), 'json');        
-    }    
+    }  
+    
+    
+    /**
+     *
+     * @return \stdClass 
+     */
+    protected function getUnknownExceptionErrorOutput(Task $task) {        
+        $outputObjectMessage = new \stdClass();
+        $outputObjectMessage->message = 'Unknown error';
+        $outputObjectMessage->class = 'css-validation-exception-unknown';
+        $outputObjectMessage->type = 'error';
+        $outputObjectMessage->context = '';
+        $outputObjectMessage->ref = $task->getUrl();
+        $outputObjectMessage->line_number = 0;
+        
+        return array($outputObjectMessage);        
+    }     
 }
