@@ -17,7 +17,11 @@ class HttpClientService {
     public function get($baseUrl = '', $config = null) {
         if (is_null($this->httpClient)) {
             $this->httpClient = new HttpClient($baseUrl, $config);
-            $this->httpClient->addSubscriber(BackoffPlugin::getExponentialBackoff());            
+            
+            $this->httpClient->addSubscriber(BackoffPlugin::getExponentialBackoff(
+                    3,
+                    array(500, 503, 504)
+            ));            
         }
         
         return $this->httpClient;
