@@ -1,5 +1,5 @@
 {
-    "hash": "07c25ca2ce5df93201ccdf75362690d7",
+    "hash": "86e6790b77a775da5cc4c172627a8728",
     "packages": [
         {
             "name": "doctrine/common",
@@ -1960,16 +1960,16 @@
         },
         {
             "name": "webignition/css-validator-output-parser",
-            "version": "1.6.1.4",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-output-parser.git",
-                "reference": "1.6.1.4"
+                "reference": "1.6.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/1.6.1.4",
-                "reference": "1.6.1.4",
+                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/1.6.2",
+                "reference": "1.6.2",
                 "shasum": ""
             },
             "require": {
@@ -1999,7 +1999,7 @@
                 "parser",
                 "validator"
             ],
-            "time": "2013-04-02 16:27:05"
+            "time": "2013-04-05 14:26:50"
         },
         {
             "name": "webignition/doctrine-migrations-bundle",
