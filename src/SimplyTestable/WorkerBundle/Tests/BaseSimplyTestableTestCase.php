@@ -124,6 +124,15 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
     
     /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Services\MemcacheService
+     */
+    protected function getMemcacheService() {
+        return $this->container->get('simplytestable.services.memcacheservice');
+    }      
+    
+    
+    /**
      * 
      * @param string $url
      * @param string $type

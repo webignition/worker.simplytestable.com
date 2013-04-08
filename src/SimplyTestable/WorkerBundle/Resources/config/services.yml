@@ -99,3 +99,6 @@ services:
     class:   SimplyTestable\WorkerBundle\Services\CommandService
     arguments:
       container: "@service_container"    
+      
+  simplytestable.services.memcacheService:
+    class:   SimplyTestable\WorkerBundle\Services\MemcacheService     
