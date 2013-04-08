@@ -10,21 +10,21 @@ class MemcacheServiceTest extends BaseSimplyTestableTestCase {
      * @group standard
      */    
     public function testHasMemcache() {
-        $this->assertTrue(class_exists('\Memcache'));        
+        $this->assertTrue(class_exists('\Memcache'));
     }     
     
     /**
      * @group standard
      */    
     public function testGetMemcacheService() {
-        $this->assertInstanceOf('\Simplytestable\WorkerBundle\Services\MemcacheService', $this->getMemcacheService());
+        $this->assertTrue($this->getMemcacheService() instanceof \Simplytestable\WorkerBundle\Services\MemcacheService);
     }
     
     /**
      * @group standard
      */    
     public function testGetMemcache() {
-        $this->assertInstanceOf('\Memcache', $this->getMemcacheService()->get());
+        $this->assertTrue($this->getMemcacheService()->get() instanceof \Memcache);
     }    
 
 }

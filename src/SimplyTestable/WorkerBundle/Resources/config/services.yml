@@ -1,6 +1,8 @@
 services:
   simplytestable.services.httpClientService:
     class:  SimplyTestable\WorkerBundle\Services\HttpClientService
+    arguments:
+        memcacheService: "@simplytestable.services.memcacheService"    
   
   simplytestable.services.coreApplicationService:
     class:  SimplyTestable\WorkerBundle\Services\CoreApplicationService

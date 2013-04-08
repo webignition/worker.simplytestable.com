@@ -3,6 +3,9 @@ namespace SimplyTestable\WorkerBundle\Services;
 
 use Guzzle\Http\Client as HttpClient;
 use Guzzle\Plugin\Backoff\BackoffPlugin;
+use Doctrine\Common\Cache\MemcacheCache;
+use Guzzle\Cache\DoctrineCacheAdapter;
+use Guzzle\Plugin\Cache\CachePlugin;
 
 class HttpClientService { 
     
@@ -14,6 +17,22 @@ class HttpClientService {
     private $httpClient = null;   
     
     
+    /**
+     *
+     * @var (\SimplyTestable\WorkerBundle\Services\MemcacheService 
+     */
+    private $memcacheService = null;
+    
+    
+    /**
+     *
+     * @param \SimplyTestable\WorkerBundle\Services\MemcacheService $memcacheService 
+     */
+    public function __construct(\SimplyTestable\WorkerBundle\Services\MemcacheService $memcacheService) {
+        $this->memcacheService = $memcacheService;   
+    }      
+    
+    
     public function get($baseUrl = '', $config = null) {
         if (is_null($this->httpClient)) {
             $this->httpClient = new HttpClient($baseUrl, $config);
@@ -21,7 +40,18 @@ class HttpClientService {
             $this->httpClient->addSubscriber(BackoffPlugin::getExponentialBackoff(
                     3,
                     array(500, 503, 504)
-            ));            
+            ));
+            
+            $memcache = $this->memcacheService->get();
+            if (!is_null($memcache)) {
+                $memcacheCache = new MemcacheCache();
+                $memcacheCache->setMemcache($memcache);
+
+                $adapter = new DoctrineCacheAdapter($memcacheCache);
+                $cache = new CachePlugin($adapter, true);
+
+                $this->httpClient->addSubscriber($cache);                                     
+            }            
         }
         
         return $this->httpClient;
