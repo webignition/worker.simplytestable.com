@@ -15,6 +15,7 @@ class PerformCommandCssValidationTest extends ConsoleCommandBaseTestCase {
      * @group standard
      */    
     public function testPerformOnNonExistentUrl() {
+        $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
         $taskObject = $this->createTask('http://blog.simplytestable.com/invalid', 'CSS validation');

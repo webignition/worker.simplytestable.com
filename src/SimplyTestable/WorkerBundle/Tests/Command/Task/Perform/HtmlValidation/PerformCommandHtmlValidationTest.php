@@ -15,6 +15,7 @@ class PerformCommandHtmlValidationTest extends ConsoleCommandBaseTestCase {
      * @group standard
      */    
     public function testPerformOnNonExistentUrl() {
+        $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
         $taskObject = $this->createTask('http://example.com/', 'HTML validation');
