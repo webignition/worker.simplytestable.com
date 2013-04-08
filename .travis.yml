@@ -15,7 +15,7 @@ env:
   
 before_script:
   # Install memcache extension
-  #- printf "yes\n" | pecl install memcache
+  - printf "yes\n" | pecl install memcache
   - echo "extension=\"memcache.so\"" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`  
   - php -r 'new \Memcache;'
   
