@@ -6,6 +6,7 @@ use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\Task\Output as TaskOutput;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use webignition\InternetMediaType\Parser\Parser as InternetMediaTypeParser;
+use Doctrine\Common\Cache\MemcacheCache;
 
 abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
@@ -207,6 +208,13 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         }
         
         $this->getTaskService()->complete($task, $taskDriverResponse);
+    }
+    
+    
+    protected function clearMemcacheHttpCache() {
+        $memcacheCache = new MemcacheCache();
+        $memcacheCache->setMemcache($this->getMemcacheService()->get());
+        $memcacheCache->deleteAll();        
     }
 
 
