@@ -15,9 +15,11 @@ env:
   
 before_script:
   # Install memcache extension
-  - sudo apt-get install php5-memcache
-  - cat /etc/php5/conf.d/memcache.ini
-  - cat /etc/php5/cli/conf.d/memcache.ini
+  - printf "no\n" | pecl install memcache > /dev/null
+  - echo "extension=\"memcache.so\"" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`  
+  #- sudo apt-get install php5-memcache
+  #- cat /etc/php5/conf.d/memcache.ini
+  #- cat /etc/php5/cli/conf.d/memcache.ini
   #- "php -i | grep memcache"  
   #- "php -r 'new \Memcache;'"  
   
