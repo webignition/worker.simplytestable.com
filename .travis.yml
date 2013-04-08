@@ -17,6 +17,7 @@ before_script:
   # Install memcache extension
   #- printf "yes\n" | pecl install memcache
   - echo "extension=\"memcache.so\"" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`  
+  - php -r 'new \Memcache;'
   
   # Install the W3C CSS validator
   - sudo apt-get install ant cvs openjdk-7-jdk
