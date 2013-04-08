@@ -140,6 +140,38 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         ));
         
         $this->assertEquals(503, $response);
+    }  
+    
+    /**
+     * @group standard
+     */    
+    public function testReportCompletionSuccessfullyDeletesTask() {
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        $taskObject = $createdTask = $this->createTask('http://example.com/', 'HTML validation');                
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+        $taskTimePeriod = new TimePeriod();
+        $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
+        $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-02'));
+        
+        $task->setTimePeriod($taskTimePeriod);
+
+        $this->createCompletedTaskOutputForTask($task);
+        
+        $this->assertNotNull($task->getId());
+        $this->assertNotNull($task->getOutput()->getId());
+        $this->assertNotNull($task->getTimePeriod()->getId());        
+        
+        $response = $this->runConsole('simplytestable:task:reportcompletion', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);        
+        $this->assertNull($this->getTaskService()->getById($createdTask->id));
+        
+        $this->assertNull($task->getId());
+        $this->assertNull($task->getOutput()->getId());
+        $this->assertNull($task->getTimePeriod()->getId());
     }    
 
 }

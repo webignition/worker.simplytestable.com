@@ -47,6 +47,7 @@ EOF
             $entityManager = $this->getContainer()->get('doctrine')->getEntityManager();
             $entityManager->remove($task);
             $entityManager->remove($task->getOutput());
+            $entityManager->remove($task->getTimePeriod());
             $entityManager->flush();
             
             return 0;
