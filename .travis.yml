@@ -36,6 +36,7 @@ before_script:
   
   # Install memcache extension
   - sudo apt-get install php5-memcache
+  - ls -la /etc/php5/conf.d/
   
   # Install composer for dependency management
   - wget http://getcomposer.org/composer.phar 
