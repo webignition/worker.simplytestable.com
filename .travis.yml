@@ -14,6 +14,12 @@ env:
     - CI_HOME=`pwd`/$REPO  
   
 before_script:
+  # Install memcache extension
+  - sudo apt-get install php5-memcache
+  - cat /etc/php5/conf.d/memcache.ini
+  - "php -i | grep memcache"  
+  #- "php -r 'new \Memcache;'"  
+  
   # Install the W3C CSS validator
   - sudo apt-get install ant cvs openjdk-7-jdk
   - sudo mkdir /usr/share/css-validator
@@ -33,12 +39,6 @@ before_script:
   
   # Test node-jslint
   - /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js travis-ci/sample.js
-  
-  # Install memcache extension
-  - sudo apt-get install php5-memcache
-  - cat /etc/php5/conf.d/memcache.ini
-  #- "php -i | grep memcache"  
-  #- "php -r 'new \Memcache;'"
   
   # Install composer for dependency management
   - wget http://getcomposer.org/composer.phar 
