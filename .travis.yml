@@ -17,7 +17,7 @@ before_script:
   # Install memcache extension
   #- yes | pecl install memcache
   #- printf "no\n" | pecl install memcache > /dev/null
-  - locate memcache.so
+  #- locate memcache.so
   - echo "extension=\"memcache.so\"" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`  
   #- sudo apt-get install php5-memcache
   #- cat /etc/php5/conf.d/memcache.ini
