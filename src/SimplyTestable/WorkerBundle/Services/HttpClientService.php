@@ -26,6 +26,13 @@ class HttpClientService {
     
     /**
      *
+     * @var \Doctrine\Common\Cache\MemcacheCache 
+     */
+    private $memcacheCache = null;
+    
+    
+    /**
+     *
      * @param \SimplyTestable\WorkerBundle\Services\MemcacheService $memcacheService 
      */
     public function __construct(\SimplyTestable\WorkerBundle\Services\MemcacheService $memcacheService) {
@@ -42,11 +49,8 @@ class HttpClientService {
                     array(500, 503, 504)
             ));
             
-            $memcache = $this->memcacheService->get();
-            if (!is_null($memcache)) {
-                $memcacheCache = new MemcacheCache();
-                $memcacheCache->setMemcache($memcache);
-
+            $memcacheCache = $this->getMemcacheCache();
+            if (!is_null($memcacheCache)) {
                 $adapter = new DoctrineCacheAdapter($memcacheCache);
                 $cache = new CachePlugin($adapter, true);
 
@@ -83,6 +87,32 @@ class HttpClientService {
     public function postRequest($uri = null, $headers = null, $postBody = null) {
         $request = $this->get()->post($uri, $headers, $postBody);        
         return $request;        
-    } 
+    }
+    
+    
+    /**
+     * 
+     * @return \Doctrine\Common\Cache\MemcacheCache 
+     */
+    public function getMemcacheCache() {
+        if (is_null($this->memcacheCache)) {
+            $memcache = $this->memcacheService->get();
+            if (!is_null($memcache)) {                
+                $this->memcacheCache = new MemcacheCache();                
+                $this->memcacheCache->setMemcache($memcache);                                    
+            }            
+        }
+        
+        return $this->memcacheCache;
+    }
+    
+    
+    /**
+     * 
+     * @return boolean
+     */
+    public function hasMemcacheCache() {
+        return !is_null($this->getMemcacheCache());
+    }
     
 }
