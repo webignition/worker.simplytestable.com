@@ -20,7 +20,7 @@ doctrine:
     connections:
       default:
         driver: pdo_sqlite
-        path: /run/shm/app.simplytestable.com.db
+        path: /run/shm/worker.simplytestable.com.db
         
 monolog:
     handlers:
