@@ -19,15 +19,29 @@ class StatusController extends BaseController
         $status['state'] = $thisWorker->getPublicSerializedState();
         $status['version'] = $this->getLatestGitHash();
         
-        if ($this->getHttpClientService()->hasMemcacheCache()) {
-            $status['http_cache_stats'] = $this->getHttpClientService()->getMemcacheCache()->getStats();
+        if ($this->getHttpClientService()->hasMemcacheCache()) {            
+            $status['http_cache_stats'] = $this->getHttpCacheStats();
         }
         
-        
-        
-       // var_dump($)
-        
         return $this->sendResponse($status); 
+    }
+    
+    private function getHttpCacheStats() {
+        $httpCacheStats = $this->getHttpClientService()->getMemcacheCache()->getStats();
+        
+        $hitsToMissesRatio = 0;
+        
+        if ($httpCacheStats['hits'] > 0 && $httpCacheStats['misses'] == 0) {
+            $hitsToMissesRatio = 'infinity';
+        }
+        
+        if ($httpCacheStats['hits'] > 0 && $httpCacheStats['misses'] > 0) {
+            $hitsToMissesRatio = round($httpCacheStats['hits'] / $httpCacheStats['misses'], 2);
+        }
+        
+        $httpCacheStats['hits-to-misses-ratio'] = $hitsToMissesRatio;
+        
+        return $httpCacheStats;
     }
     
     
