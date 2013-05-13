@@ -32,11 +32,12 @@ class StatusController extends BaseController
         $hitsToMissesRatio = 0;
         
         if ($httpCacheStats['hits'] > 0 && $httpCacheStats['misses'] == 0) {
-            $hitsToMissesRatio = 'infinity';
+            $hitsToMissesRatio = 1;
         }
         
         if ($httpCacheStats['hits'] > 0 && $httpCacheStats['misses'] > 0) {
-            $hitsToMissesRatio = round($httpCacheStats['hits'] / $httpCacheStats['misses'], 2);
+            $hitsPlusMisses = $httpCacheStats['hits'] + $httpCacheStats['misses'];            
+            $hitsToMissesRatio = round($httpCacheStats['hits'] / $hitsPlusMisses, 2);
         }
         
         $httpCacheStats['hits-to-misses-ratio'] = $hitsToMissesRatio;
