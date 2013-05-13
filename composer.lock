@@ -1,5 +1,9 @@
 {
-    "hash": "4940fedf0204279d54a95132528ff0c4",
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
+    "hash": "c2f0c60e23531865a670997f49df4b82",
     "packages": [
         {
             "name": "doctrine/common",
@@ -2393,16 +2397,16 @@
         },
         {
             "name": "webignition/web-page-model",
-            "version": "0.5.3",
+            "version": "0.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-page-model.git",
-                "reference": "0.5.3"
+                "reference": "0.5.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/0.5.3",
-                "reference": "0.5.3",
+                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/0.5.4",
+                "reference": "0.5.4",
                 "shasum": ""
             },
             "require": {
@@ -2432,7 +2436,7 @@
                 "model",
                 "webpage"
             ],
-            "time": "2013-03-21 15:34:22"
+            "time": "2013-05-13 10:26:50"
         },
         {
             "name": "webignition/web-resource-model",
