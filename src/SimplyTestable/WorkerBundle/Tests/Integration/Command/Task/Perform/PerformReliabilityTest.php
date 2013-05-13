@@ -17,6 +17,8 @@ class PerformReliabilityTest extends ConsoleCommandBaseTestCase {
      * @group integration-standard-travis
      */    
     public function testRetryingWhenEncounteringHttpErrors() {        
+        $this->markTestSkipped('Skipping, test is not reliable.');        
+        
         $taskObject = $this->createTask('http://unreliable.simplytestable.com/?error=503&probability=0.5', 'HTML validation');        
         $task = $this->getTaskService()->getById($taskObject->id);
         
@@ -36,6 +38,8 @@ class PerformReliabilityTest extends ConsoleCommandBaseTestCase {
      * @group integration-standard-travis
      */    
     public function testRetryingWhenEncounteringHttpTimeouts() {
+        $this->markTestSkipped('Skipping, test is not reliable.'); 
+        
         $httpClientCurlOptions = $this->getHttpClientService()->get()->getConfig('curl.options');
         $httpClientCurlOptions[CURLOPT_TIMEOUT] = 1;
         
