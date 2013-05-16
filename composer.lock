@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "c2f0c60e23531865a670997f49df4b82",
+    "hash": "2713a6ced05ccaabf727056da25d240b",
     "packages": [
         {
             "name": "doctrine/common",
@@ -1964,16 +1964,16 @@
         },
         {
             "name": "webignition/css-validator-output-parser",
-            "version": "1.6.2",
+            "version": "1.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-output-parser.git",
-                "reference": "1.6.2"
+                "reference": "1.6.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/1.6.2",
-                "reference": "1.6.2",
+                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/1.6.3",
+                "reference": "1.6.3",
                 "shasum": ""
             },
             "require": {
@@ -2003,7 +2003,7 @@
                 "parser",
                 "validator"
             ],
-            "time": "2013-04-05 14:26:50"
+            "time": "2013-05-16 09:43:25"
         },
         {
             "name": "webignition/doctrine-migrations-bundle",
