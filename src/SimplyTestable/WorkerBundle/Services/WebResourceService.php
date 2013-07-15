@@ -77,6 +77,7 @@ class WebResourceService {
         }
         
         $mediaTypeParser = new InternetMediaTypeParser();
+        $mediaTypeParser->setAttemptToRecoverFromInvalidInternalCharacter(true);
         $mediaTypeParser->setIgnoreInvalidAttributes(true);
         $contentType = $mediaTypeParser->parse($response->getContentType());               
 
