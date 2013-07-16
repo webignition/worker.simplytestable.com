@@ -74,10 +74,12 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
             $commandOptionsStrings[] = '-'.$key.' '.$value;
         }
         
-        $validationOutputLines = array();
-        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." \"" .$this->webResource->getUrl()."\" 2>&1";        
-        exec($command, $validationOutputLines);
+        $preparedUrl = str_replace('"', '\"', $this->webResource->getUrl());        
         
+        $validationOutputLines = array();
+        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." \"" . $preparedUrl ."\" 2>&1";        
+        exec($command, $validationOutputLines);
+               
         $cssValidatorOutputParser = new CssValidatorOutputParser();
         $cssValidatorOutputParser->setIgnoreFalseBackgroundImageDataUrlMessages(true);
         $cssValidatorOutputParser->setRawOutput(implode("\n", $validationOutputLines));

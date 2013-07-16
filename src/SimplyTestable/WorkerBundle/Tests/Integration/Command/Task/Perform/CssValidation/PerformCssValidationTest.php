@@ -249,6 +249,32 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(0, $response);
         $this->assertEquals(6, $task->getOutput()->getErrorCount());
         $this->assertEquals(0, $task->getOutput()->getWarningCount());
-    }     
+    } 
+    
+    
+    /**
+     * @group integration
+     * @group integration-css-validation
+     * @group integration-travis
+     * @group integration-css-validation-travis
+     */        
+    public function testSourceUrlContainingDoubleQuote() {                
+        $taskObject = $this->createTask(
+                'http://css-validation.simplytestable.com/with-double-"-quotes-in-URL.html',                
+                'CSS validation',
+                json_encode(array(
+                    'vendor-extensions' => 'error',
+                    'ignore-warnings' => 0
+                ))                
+        );
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);
+    }  
 }
 
