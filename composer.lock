@@ -2099,16 +2099,16 @@
         },
         {
             "name": "webignition/internet-media-type",
-            "version": "0.4.2",
+            "version": "0.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/internet-media-type.git",
-                "reference": "0.4.2"
+                "reference": "0.4.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/internet-media-type/zipball/0.4.2",
-                "reference": "0.4.2",
+                "url": "https://api.github.com/repos/webignition/internet-media-type/zipball/0.4.3",
+                "reference": "0.4.3",
                 "shasum": ""
             },
             "require": {
@@ -2141,7 +2141,7 @@
                 "media type",
                 "media-type"
             ],
-            "time": "2013-07-15 15:39:24"
+            "time": "2013-07-29 09:56:33"
         },
         {
             "name": "webignition/node-jslint-output-parser",
