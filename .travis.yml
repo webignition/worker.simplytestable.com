@@ -32,7 +32,7 @@ before_script:
   - sudo CVSROOT=:pserver:anonymous:anonymous@dev.w3.org:/sources/public cvs -q checkout 2002/css-validator
   - cd 2002/css-validator/
   #- sudo ant -q jar
-  - wget http://www.w3.org/QA/Tools/css-validator/css-validator.jar
+  - sudo wget http://www.w3.org/QA/Tools/css-validator/css-validator.jar
   - cd $CI_HOME
   
   # Install nodejs and node-jslint
