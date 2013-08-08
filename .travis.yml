@@ -71,7 +71,7 @@ script:
   - phpunit -c app --group standard
   - phpunit -c app --group integration-standard-travis
   - phpunit -c app --group integration-html-validation-travis
-  - phpunit -c app --group integration-css-validation-travis
+  #- phpunit -c app --group integration-css-validation-travis
   - phpunit -c app --group integration-js-static-analysis-travis
   
 after_failure:
