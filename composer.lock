@@ -1964,16 +1964,16 @@
         },
         {
             "name": "webignition/css-validator-output-parser",
-            "version": "1.6.4",
+            "version": "1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-output-parser.git",
-                "reference": "1.6.4"
+                "reference": "1.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/1.6.4",
-                "reference": "1.6.4",
+                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/1.7",
+                "reference": "1.7",
                 "shasum": ""
             },
             "require": {
@@ -2003,7 +2003,7 @@
                 "parser",
                 "validator"
             ],
-            "time": "2013-05-28 09:45:11"
+            "time": "2013-08-08 11:38:45"
         },
         {
             "name": "webignition/doctrine-migrations-bundle",

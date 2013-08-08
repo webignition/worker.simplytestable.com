@@ -77,7 +77,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
         $preparedUrl = str_replace('"', '\"', $this->webResource->getUrl());        
         
         $validationOutputLines = array();
-        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." \"" . $preparedUrl ."\" 2>&1";        
+        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." \"" . $preparedUrl ."\" 2>&1";               
         exec($command, $validationOutputLines);
                
         $cssValidatorOutputParser = new CssValidatorOutputParser();
@@ -101,26 +101,34 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
         }        
         
         $cssValidatorOutput = $cssValidatorOutputParser->getOutput();
-
+        
         if ($cssValidatorOutput->getIsUnknownMimeTypeError()) {
             $this->response->setHasBeenSkipped();
             $this->response->setErrorCount(0);
             $this->response->setIsRetryable(false);
             return true;            
+        } 
+        
+        if ($cssValidatorOutput->getIsSSlExceptionErrorOutput()) {
+            $this->response->setHasFailed();
+            $this->response->setErrorCount(1); 
+            $this->response->setIsRetryable(false);
+            return json_encode($this->getSslExceptionErrorOutput($this->task));
         }
         
-        if ($cssValidatorOutput->getIsUnknownExceptionError()) {
+        
+        if ($cssValidatorOutput->getIsUnknownExceptionError()) {            
             $this->response->setHasFailed();
             $this->response->setErrorCount(1); 
             $this->response->setIsRetryable(false);
             return json_encode($this->getUnknownExceptionErrorOutput($this->task));
-        }       
+        }        
         
         $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
         $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
         
         return $this->getSerializer()->serialize($cssValidatorOutput->getMessages(), 'json');        
-    }  
+    }
     
     
     /**
@@ -137,5 +145,22 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
         $outputObjectMessage->line_number = 0;
         
         return array($outputObjectMessage);        
-    }     
+    } 
+    
+    
+    /**
+     *
+     * @return \stdClass 
+     */
+    protected function getSslExceptionErrorOutput(Task $task) {        
+        $outputObjectMessage = new \stdClass();
+        $outputObjectMessage->message = 'SSL Error';
+        $outputObjectMessage->class = 'css-validation-ss-error';
+        $outputObjectMessage->type = 'error';
+        $outputObjectMessage->context = '';
+        $outputObjectMessage->ref = $task->getUrl();
+        $outputObjectMessage->line_number = 0;
+        
+        return array($outputObjectMessage);        
+    }   
 }
