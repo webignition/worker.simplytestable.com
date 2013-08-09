@@ -412,8 +412,7 @@ class TaskService extends EntityService {
             return true;
         }
         
-        $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/task/'.$this->workerService->get()->getHostname().'/'.$task->getId().'/complete/');
-        
+        $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/task/' . urlencode($task->getUrl()) . '/' . urlencode($task->getType()->getName()) . '/' . $task->getParametersHash() . '/complete/');       
         $httpRequest = $this->httpClientService->postRequest($requestUrl, null, array(
             'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
             'output' => $task->getOutput()->getOutput(),

@@ -279,7 +279,16 @@ class Task
     public function getParameters()
     {
         return $this->parameters;
-    }  
+    } 
+    
+    
+    /**
+     * 
+     * @return string
+     */
+    public function getParametersHash() {
+        return md5($this->getParameters());
+    }
     
     /**
      * 
