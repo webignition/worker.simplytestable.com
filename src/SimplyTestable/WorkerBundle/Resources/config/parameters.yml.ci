@@ -23,6 +23,10 @@ parameters:
       properties:
         node-path: /usr/bin/nodejs
         node-jslint-path: /usr/share/node-jslint/node_modules/jslint/bin 
+    url-discovery:
+      class: SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver
+      task-types:
+        - "URL discovery" 
   content_type_web_resource_map:
     default: webignition\WebResource\WebResource
     text/html: webignition\WebResource\WebPage\WebPage
