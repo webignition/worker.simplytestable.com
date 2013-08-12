@@ -13,7 +13,7 @@ use SimplyTestable\BaseMigrationsBundle\Migration\EntityModificationMigration,
 class Version20130108162655_add_Url_Discovery_TaskType extends EntityModificationMigration
 {
     private $taskTypes = array(
-        'URL Discovery' => array(
+        'URL discovery' => array(
             'description' => 'Discover URLs relevant for testing in the content of a given URL',
             'class' => 'discovery'
         )
