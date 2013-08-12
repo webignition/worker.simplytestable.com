@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "4db73aa59546902129eef41620210e9f",
+    "hash": "faa2e222165a2bea155de553521a0c20",
     "packages": [
         {
             "name": "doctrine/common",
@@ -2057,6 +2057,51 @@
                 "schema"
             ],
             "time": "2012-07-14 13:29:54"
+        },
+        {
+            "name": "webignition/html-document-link-finder",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/html-document-link-url-finder.git",
+                "reference": "0.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/0.1",
+                "reference": "0.1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "webignition/absolute-url-deriver": "*",
+                "webignition/url": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Find anchor URLs in a given HTML document",
+            "homepage": "https://github.com/webignition/html-document-link-finder",
+            "keywords": [
+                "error",
+                "html",
+                "linkifier",
+                "validation"
+            ],
+            "time": "2013-08-12 15:02:37"
         },
         {
             "name": "webignition/html-document-type-identifier",
