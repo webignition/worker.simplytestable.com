@@ -56,14 +56,14 @@ class PerformCommandUrlDiscoveryTest extends ConsoleCommandBaseTestCase {
     public function testPerformOnValidUrl() {
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-        
-        $taskObject = $this->createTask('http://example.com/', 'URL discovery');
+
+        $taskObject = $this->createTask('http://example.com/', 'URL discovery', '{"scope":"http:\/\/example.com\/"}');
         
         $task = $this->getTaskService()->getById($taskObject->id);
 
         $this->assertEquals(0, $this->runConsole('simplytestable:task:perform', array(
             $task->getId() => true
-        )));    
+        )));
         
         $this->assertEquals(array(
             "http://example.com/",
