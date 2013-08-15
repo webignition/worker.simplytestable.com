@@ -2060,16 +2060,16 @@
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "0.1",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "0.1"
+                "reference": "0.1.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/0.1",
-                "reference": "0.1",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/0.1.1",
+                "reference": "0.1.1",
                 "shasum": ""
             },
             "require": {
@@ -2101,7 +2101,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2013-08-12 15:02:37"
+            "time": "2013-08-15 12:03:52"
         },
         {
             "name": "webignition/html-document-type-identifier",
