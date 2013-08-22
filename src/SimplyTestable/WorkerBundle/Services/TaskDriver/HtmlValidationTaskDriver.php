@@ -67,8 +67,13 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         if (!$htmlDocumentTypeIdentifier->hasDocumentType()) {
             $this->response->setErrorCount(1);
             $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
-            return json_encode($this->getMissingDocumentTypeOutput($htmlDocumentTypeIdentifier->getDocumentTypeString()));             
+            $this->response->setIsRetryable(false);            
+            
+            if ($this->isMarkup($fragment)) {
+                return json_encode($this->getMissingDocumentTypeOutput());
+            } else {
+                return json_encode($this->getIsNotMarkupOutput($fragment));
+            }
         }
         
         if (!$htmlDocumentTypeIdentifier->hasValidDocumentType()) {            
@@ -130,12 +135,35 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         
         return json_encode($outputObject);         
     }
-
+    
+    
+    /**
+     * 
+     * @param string $fragment
+     * @return boolean
+     */
+    private function isMarkup($fragment) {
+        return strip_tags($fragment) !== $fragment;
+    }
+    
     protected function getMissingDocumentTypeOutput() {        
         $outputObjectMessage = new \stdClass();
         $outputObjectMessage->message = 'No doctype';
         $outputObjectMessage->messageId = 'document-type-missing';
         $outputObjectMessage->type = 'error';
+        
+        $outputObject = new \stdClass();
+        $outputObject->messages = array($outputObjectMessage);        
+        
+        return $outputObject;
+    }      
+
+    protected function getIsNotMarkupOutput($fragment) {        
+        $outputObjectMessage = new \stdClass();
+        $outputObjectMessage->message = 'Not markup';
+        $outputObjectMessage->messageId = 'document-is-not-markup';
+        $outputObjectMessage->type = 'error';
+        $outputObjectMessage->fragment = $fragment;
         
         $outputObject = new \stdClass();
         $outputObject->messages = array($outputObjectMessage);        

@@ -67,6 +67,26 @@ class PerformCommandHtmlValidationTest extends ConsoleCommandBaseTestCase {
         
         $this->assertEquals(0, $response);
     }
+    
+    
+    public function testFailGracefullyWhenContentIsServedAsTextHtmlButIsNot() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
+        $taskObject = $this->createTask('http://example.com/', 'HTML validation');       
+     
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);        
+        
+        $outputObject = json_decode($task->getOutput()->getOutput());
+        
+        $this->assertEquals('document-is-not-markup', $outputObject->messages[0]->messageId);
+    }
 
 
 }
