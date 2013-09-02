@@ -12,6 +12,70 @@ use SimplyTestable\WorkerBundle\Exception\WebResourceException;
 
 class JsLintTaskDriver extends WebResourceTaskDriver {  
     
+     const JSLINT_PARAMETER_NAME_PREFIX = 'jslint-option-';
+    
+    
+    /**
+     *
+     * @var string
+     */
+    private $jsLintCommandOptions = null;
+    
+    /**
+     * jslint-option-passfail
+     * jslint-option-bitwise
+     * jslint-option-continue
+     * jslint-option-debug
+     * jslint-option-evil
+     * jslint-option-eqeq
+     * jslint-option-es5
+     * jslint-option-forin
+     * jslint-option-newcap
+     * jslint-option-nomen
+     * jslint-option-plusplus
+     * jslint-option-regexp
+     * jslint-option-undef
+     * jslint-option-unparam
+     * jslint-option-sloppy
+     * jslint-option-stupid
+     * jslint-option-sub
+     * jslint-option-vars
+     * jslint-option-white
+     * jslint-option-anon
+     * jslint-option-browser
+     * jslint-option-devel
+     * jslint-option-windows
+     * 
+     * jslint-option-maxerr":"50","jslint-option-indent":"4","jslint-option-maxlen":"256","jslint-option-predef":[""]}
+     * 
+     * @var array
+     */
+    private $jsLintBooleanOptions = array(
+        'passfail',
+        'bitwise',
+        'continue',
+        'debug',
+        'evil',
+        'eqeq',
+        'es5',
+        'forin',
+        'newcap',
+        'nomen',
+        'plusplus',
+        'regexp',
+        'undef',
+        'unparam',
+        'sloppy',
+        'stupid',
+        'sub',
+        'vars',
+        'white',
+        'anon',
+        'browser',
+        'devel',
+        'windows',       
+    );
+    
     
     /**
      * 
@@ -83,8 +147,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $scriptValues = $this->getScriptValues();
         foreach ($scriptValues as $scriptValue) {            
             $nodeJsLintOutput = $this->validateJsContent($scriptValue);                         
-            $jsLintOutput[md5($scriptValue)] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);
-            $errorCount += $nodeJsLintOutput->getEntryCount();
+            $jsLintOutput[md5($scriptValue)] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);            
+            $errorCount += $this->getNodeJsErrorCount($nodeJsLintOutput);
         }
         
         $this->response->setErrorCount($errorCount);
@@ -99,6 +163,29 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     }
     
     
+    /**
+     * 
+     * @param \webignition\NodeJslintOutput\NodeJslintOutput $nodeJsLintOutput
+     * @return int
+     */
+    private function getNodeJsErrorCount(\webignition\NodeJslintOutput\NodeJslintOutput $nodeJsLintOutput) {
+        $errorCount = $nodeJsLintOutput->getEntryCount();
+        if ($nodeJsLintOutput->wasStopped()) {
+            $errorCount--;
+        }
+        
+        if ($nodeJsLintOutput->hasTooManyErrors()) {
+            $errorCount--;
+        }
+        
+        if ($errorCount < 0) {
+            $errorCount = 0;
+        }
+        
+        return $errorCount;
+    }
+    
+    
     private function getJsLintOutputForUrl($scriptUrl) {        
         $hash = md5($scriptUrl);
         
@@ -110,7 +197,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $timeCachedOutput = $this->getTimeCachedTaskOutputService()->find($hash);
         
         return array(
-            'errorCount' => $timeCachedOutput->getErrorCount(),
+            'errorCount' => $this->getNodeJsErrorCount($timeCachedOutput),
             'output' => unserialize($timeCachedOutput->getOutput())
         );
     } 
@@ -241,14 +328,21 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    private function validateJsContent($js) {                
+    private function validateJsContent($js) { 
+        $this->getJsLintCommandOptions();
+        
+//        var_dump($this->task->getParameters()."!");
+//        exit();
+        
         $localPath = $this->getLocalJavaScriptResourcePathFromContent($js);
         
         file_put_contents($localPath, $js);
         
         $outputLines = array();
         
-        $command = $this->getProperty('node-path') . " ".$this->getProperty('node-jslint-path')."/jslint.js --json ".$localPath;        
+        $command = $this->getProperty('node-path') . " ".$this->getProperty('node-jslint-path')."/jslint.js --json ". $this->getJsLintCommandOptions() . " " .  $localPath;        
+//        var_dump($command);
+//        exit();
         exec($command, $outputLines); 
         
         $output = implode("\n", $outputLines);       
@@ -257,13 +351,51 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $outputParser->parse($output);
         
         $nodeJsLintOutput = $outputParser->getNodeJsLintOutput();
-        unlink($localPath);
+        
+        //unlink($localPath);
         
         return $nodeJsLintOutput;         
     }
     
+    private function getJsLintCommandOptions() {
+        if (is_null($this->jsLintCommandOptions)) {
+            $jsLintCommandOptions = '';
+            
+            $parametersObject = $this->task->getParametersObject();
+            foreach ($parametersObject as $key => $value) {
+                if ($this->isJslintParameter($key)) {
+                    if ($this->isJslintBooleanParameter($key)) {
+                        $jsLintCommandOptions .= ' --' . str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) . '=';
+                        $jsLintCommandOptions .= filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+                    }
+                }                
+            }     
+            
+            $this->jsLintCommandOptions = $jsLintCommandOptions;
+        }
+        
+        return $this->jsLintCommandOptions;
+    }
     
     
+    /**
+     * 
+     * @param string $key
+     * @return boolean
+     */
+    private function isJslintParameter($key) {
+        return substr($key, 0, strlen(self::JSLINT_PARAMETER_NAME_PREFIX)) == self::JSLINT_PARAMETER_NAME_PREFIX;
+    }
+    
+    
+    /**
+     * 
+     * @param string $key
+     * @return boolean
+     */
+    private function isJslintBooleanParameter($key) {
+        return in_array(str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key), $this->jsLintBooleanOptions);
+    }
     
     
     /**
@@ -332,7 +464,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         $scriptValues = array();
         
-        $webPage->find('script')->each(function ($index, \DOMElement $domElement) use (&$scriptValues) {
+        $webPage->find('script')->each(function ($index, \DOMElement $domElement) use (&$scriptValues) {            
             $nodeValue = trim($domElement->nodeValue);
             if ($nodeValue != '') {
                 $scriptValues[] = $nodeValue;
