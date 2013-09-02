@@ -17,6 +17,7 @@ class JsLintOptionsTest extends ConsoleCommandBaseTestCase {
  * {"jslint-option-continue":"1","jslint-option-debug":"1","jslint-option-evil":"1","jslint-option-eqeq":"1","jslint-option-es5":"0","jslint-option-forin":"1","jslint-option-newcap":"1","jslint-option-nomen":"1","jslint-option-plusplus":"1","jslint-option-regexp":"1","jslint-option-undef":"1","jslint-option-unparam":"1","jslint-option-sloppy":"1","jslint-option-stupid":"1","jslint-option-sub":"1","jslint-option-vars":"1","jslint-option-white":"1","jslint-option-anon":"1","jslint-option-browser":"1","jslint-option-devel":"0","jslint-option-windows":"0","jslint-option-maxerr":"50","jslint-option-indent":"4","jslint-option-maxlen":"256","jslint-option-predef":[""]}
  * {"jslint-option-passfail":"0"}
  * {"jslint-option-bitwise":"0"}
+ * {"jslint-option-continue":"0"}
  */    
     
     
