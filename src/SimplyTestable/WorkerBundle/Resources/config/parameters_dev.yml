@@ -1,5 +1,5 @@
 parameters:
-  hostname: dev.worker.simplytestable.com
+  hostname: worker.simplytestable.com
   core_url: http://dev.app.simplytestable.com
   
 glit_resque:
