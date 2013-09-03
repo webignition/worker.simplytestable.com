@@ -69,7 +69,7 @@ class MaxLenTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(1, $task->getOutput()->getErrorCount());
     }    
     
-    protected function getFixturesDataPath() {
+    protected function getFixturesDataPath($testName = null) {
         $fixturesDataPathParts = explode('/', parent::getFixturesDataPath(__FUNCTION__));        
         return implode('/', array_slice($fixturesDataPathParts, 0, count($fixturesDataPathParts) - 1)) . '/HttpResponses'; 
     }
