@@ -194,10 +194,9 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
             $this->getTimeCachedTaskOutputService()->set($hash, serialize($output['output']), $output['errorCount'], 0);
         }
         
-        $timeCachedOutput = $this->getTimeCachedTaskOutputService()->find($hash);
-        
+        $timeCachedOutput = $this->getTimeCachedTaskOutputService()->find($hash);        
         return array(
-            'errorCount' => $this->getNodeJsErrorCount($timeCachedOutput),
+            'errorCount' => $timeCachedOutput->getErrorCount(),
             'output' => unserialize($timeCachedOutput->getOutput())
         );
     } 
