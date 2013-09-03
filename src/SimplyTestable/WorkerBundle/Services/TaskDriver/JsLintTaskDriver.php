@@ -331,9 +331,6 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     private function validateJsContent($js) { 
         $this->getJsLintCommandOptions();
         
-//        var_dump($this->task->getParameters()."!");
-//        exit();
-        
         $localPath = $this->getLocalJavaScriptResourcePathFromContent($js);
         
         file_put_contents($localPath, $js);
@@ -341,8 +338,6 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $outputLines = array();
         
         $command = $this->getProperty('node-path') . " ".$this->getProperty('node-jslint-path')."/jslint.js --json ". $this->getJsLintCommandOptions() . " " .  $localPath;        
-//        var_dump($command);
-//        exit();
         exec($command, $outputLines); 
         
         $output = implode("\n", $outputLines);       
@@ -352,23 +347,32 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         $nodeJsLintOutput = $outputParser->getNodeJsLintOutput();
         
-        //unlink($localPath);
+        unlink($localPath);
         
         return $nodeJsLintOutput;         
     }
     
     private function getJsLintCommandOptions() {
-        if (is_null($this->jsLintCommandOptions)) {
+        if (is_null($this->jsLintCommandOptions) && $this->task->hasParameters()) {
             $jsLintCommandOptions = '';
             
-            $parametersObject = $this->task->getParametersObject();
+            $parametersObject = $this->task->getParametersObject();            
             foreach ($parametersObject as $key => $value) {
                 if ($this->isJslintParameter($key)) {
                     if ($this->isJslintBooleanParameter($key)) {
                         $jsLintCommandOptions .= ' --' . str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) . '=';
                         $jsLintCommandOptions .= filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
-                    }
-                }                
+                    } else {
+                        if (str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) === 'predef') {
+                            $values = explode(' ', $value);                            
+                            foreach ($values as $predefValue) {
+                                $jsLintCommandOptions .= ' --' . str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) . '=' . $predefValue;
+                            }                        
+                        } else {
+                            $jsLintCommandOptions .= ' --' . str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) . '=' . $value;
+                        }                        
+                    }  
+                }                                              
             }     
             
             $this->jsLintCommandOptions = $jsLintCommandOptions;

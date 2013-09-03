@@ -1,0 +1,52 @@
+HTTP/1.1 200 Ok
+Date: Mon, 01 Apr 2013 20:57:09 GMT
+Content-Type: text/html
+
+<!doctype html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<title>blah</title>
+<script type="text/javascript">
+var foo, bar, foobar, collectionIndex, collection, fooobject, key;
+foo = 'bar';
+bar = 8
+foobar = 'foobar'
+bar << 1;
+
+collection = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+
+debugger;
+
+for (collectionIndex = 0; collectionIndex < collection.length; collectionIndex++) {
+    if (collectionIndex < 5) {
+        continue;
+    }
+}
+
+eval('foo == bar;');
+
+if (foo == bar) {foo = bar; }
+foo = bar;
+
+var x = {
+    real: 10,
+    get x () {
+        "use strict";
+        return this.real / 2;
+    },
+    set x (value) {
+        "use strict";
+        this.real = value;
+    }
+};
+
+fooobject = {'a': 'x', 'b': 'y'} ;
+
+for (key in fooobject) { foobar=1; } ;
+</script>
+</head>
+<body>
+<p>I'm the content</p>
+</body>
+</html>
