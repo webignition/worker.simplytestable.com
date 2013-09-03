@@ -133,6 +133,15 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
      * @group standard
      */    
     public function testPerformOnNonExistentHost() {        
+        $this->getWebResourceService()->setRequestSkeletonToCurlErrorMap(array(
+            'http://invalid/' => array(
+                'GET' => array(
+                    'errorMessage' => "Couldn't resolve host. The given remote host was not resolved.",
+                    'errorNumber' => 6                    
+                )
+            )
+        ));         
+        
         $taskObject = $this->createTask('http://invalid/', 'HTML validation');
         
         $task = $this->getTaskService()->getById($taskObject->id);

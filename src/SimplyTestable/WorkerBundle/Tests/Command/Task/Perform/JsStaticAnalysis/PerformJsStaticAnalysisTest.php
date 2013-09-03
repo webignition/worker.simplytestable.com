@@ -36,7 +36,16 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
     /**
      * @group standard
      */    
-    public function testPerformOnNonExistentHost() {        
+    public function testPerformOnNonExistentHost() {
+        $this->getWebResourceService()->setRequestSkeletonToCurlErrorMap(array(
+            'http://invalid/' => array(
+                'GET' => array(
+                    'errorMessage' => "Couldn't resolve host. The given remote host was not resolved.",
+                    'errorNumber' => 6                    
+                )
+            )
+        ));        
+        
         $taskObject = $this->createTask('http://invalid/', 'JS static analysis');
         
         $task = $this->getTaskService()->getById($taskObject->id);
@@ -49,7 +58,6 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(1, $task->getOutput()->getErrorCount());
         
         $this->assertEquals('{"messages":[{"message":"DNS lookup failure resolving resource domain name","messageId":"http-retrieval-curl-code-6","type":"error"}]}', $task->getOutput()->getOutput());        
-    }    
-
+    }
 
 }

@@ -98,7 +98,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
     /**
      *
-     * @return \SimplyTestable\WorkerBundle\Services\WebResourceService
+     * @return \SimplyTestable\WorkerBundle\Services\TestWebResourceService
      */
     protected function getWebResourceService() {
         return $this->container->get('simplytestable.services.webresourceservice');
