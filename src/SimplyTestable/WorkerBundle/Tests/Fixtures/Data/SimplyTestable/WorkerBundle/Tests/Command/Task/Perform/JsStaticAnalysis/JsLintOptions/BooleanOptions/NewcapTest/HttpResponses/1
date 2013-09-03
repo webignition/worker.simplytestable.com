@@ -1,0 +1,21 @@
+HTTP/1.1 200 Ok
+Date: Mon, 01 Apr 2013 20:57:09 GMT
+Content-Type: text/html
+
+<!doctype html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<title>blah</title>
+<script type="text/javascript">
+function myClass() {
+    "use strict";
+}
+
+var myInstance = new myClass();
+</script>
+</head>
+<body>
+<p>I'm the content</p>
+</body>
+</html>

@@ -1,0 +1,23 @@
+HTTP/1.1 200 Ok
+Date: Mon, 01 Apr 2013 20:57:09 GMT
+Content-Type: text/html
+
+<!doctype html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<title>blah</title>
+<script type="text/javascript">
+var collection, current, item;
+
+collection = {'a': 1, 'b': 2, 'c': 3};
+current = 1;
+for (item in collection) {
+    current = collection.item;
+}
+</script>
+</head>
+<body>
+<p>I'm the content</p>
+</body>
+</html>

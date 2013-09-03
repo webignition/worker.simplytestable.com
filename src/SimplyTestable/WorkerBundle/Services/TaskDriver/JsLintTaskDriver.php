@@ -129,6 +129,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     }
 
     protected function performValidation() {
+        $this->jsLintCommandOptions = null;
         $jsLintOutput = array();
         $scriptUrls = $this->getScriptUrls();              
         
@@ -145,7 +146,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         }
         
         $scriptValues = $this->getScriptValues();
-        foreach ($scriptValues as $scriptValue) {            
+        foreach ($scriptValues as $scriptValue) {              
             $nodeJsLintOutput = $this->validateJsContent($scriptValue);                         
             $jsLintOutput[md5($scriptValue)] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);            
             $errorCount += $this->getNodeJsErrorCount($nodeJsLintOutput);
@@ -187,18 +188,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     
     
     private function getJsLintOutputForUrl($scriptUrl) {        
-        $hash = md5($scriptUrl);
-        
-        if ($this->getTimeCachedTaskOutputService()->isStale($hash)) {
-            $output = $this->getSourceJsLintOutputForUrl($scriptUrl);                        
-            $this->getTimeCachedTaskOutputService()->set($hash, serialize($output['output']), $output['errorCount'], 0);
-        }
-        
-        $timeCachedOutput = $this->getTimeCachedTaskOutputService()->find($hash);        
-        return array(
-            'errorCount' => $timeCachedOutput->getErrorCount(),
-            'output' => unserialize($timeCachedOutput->getOutput())
-        );
+        return $this->getSourceJsLintOutputForUrl($scriptUrl);
     } 
     
     
@@ -337,7 +327,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $outputLines = array();
         
         $command = $this->getProperty('node-path') . " ".$this->getProperty('node-jslint-path')."/jslint.js --json ". $this->getJsLintCommandOptions() . " " .  $localPath;        
-        exec($command, $outputLines); 
+        exec($command, $outputLines);
         
         $output = implode("\n", $outputLines);       
         
