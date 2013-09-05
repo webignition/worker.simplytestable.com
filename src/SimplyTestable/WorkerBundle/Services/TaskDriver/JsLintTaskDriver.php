@@ -235,7 +235,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
             }
             
             return array(
-                'errorCount' => $nodeJsLintOutput->getEntryCount(),
+                'errorCount' => $this->getNodeJsErrorCount($nodeJsLintOutput),
                 'output' => $this->nodeJsLintOutputToArray($nodeJsLintOutput)
             );           
         } catch (WebResourceException $webResourceException) {
