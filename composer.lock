@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "faa2e222165a2bea155de553521a0c20",
+    "hash": "f3d8ea527de93caedc2dc25bb7321ee9",
     "packages": [
         {
             "name": "doctrine/common",
@@ -2144,16 +2144,16 @@
         },
         {
             "name": "webignition/internet-media-type",
-            "version": "0.4.3",
+            "version": "0.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/internet-media-type.git",
-                "reference": "0.4.3"
+                "reference": "de30f77c5e9d3584b8bdfba29dce5517f10c9ab1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/internet-media-type/zipball/0.4.3",
-                "reference": "0.4.3",
+                "url": "https://api.github.com/repos/webignition/internet-media-type/zipball/de30f77c5e9d3584b8bdfba29dce5517f10c9ab1",
+                "reference": "de30f77c5e9d3584b8bdfba29dce5517f10c9ab1",
                 "shasum": ""
             },
             "require": {
@@ -2186,7 +2186,7 @@
                 "media type",
                 "media-type"
             ],
-            "time": "2013-07-29 09:56:33"
+            "time": "2013-09-05 16:34:19"
         },
         {
             "name": "webignition/node-jslint-output-parser",
@@ -2442,21 +2442,22 @@
         },
         {
             "name": "webignition/web-page-model",
-            "version": "0.5.4",
+            "version": "0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-page-model.git",
-                "reference": "0.5.4"
+                "reference": "5ef875a2a4e2863aae7a26820d31ad5f2072afb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/0.5.4",
-                "reference": "0.5.4",
+                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/5ef875a2a4e2863aae7a26820d31ad5f2072afb1",
+                "reference": "5ef875a2a4e2863aae7a26820d31ad5f2072afb1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0",
                 "querypath/querypath": ">=3.0.0",
+                "webignition/internet-media-type": ">=0.1,<1.0",
                 "webignition/web-resource-model": ">=0.1,<2.0"
             },
             "type": "library",
@@ -2481,7 +2482,7 @@
                 "model",
                 "webpage"
             ],
-            "time": "2013-05-13 10:26:50"
+            "time": "2013-09-05 16:13:43"
         },
         {
             "name": "webignition/web-resource-model",
