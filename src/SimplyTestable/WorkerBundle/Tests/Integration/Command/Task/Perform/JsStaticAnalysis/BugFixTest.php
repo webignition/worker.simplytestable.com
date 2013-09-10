@@ -14,7 +14,7 @@ class BugFixTest extends ConsoleCommandBaseTestCase {
         $this->assertTrue(true);
         return;
         
-        $taskObject = $this->createTask('http://moralogy.jp/', 'JS static analysis');
+//        $taskObject = $this->createTask('http://ekloges.pkm.gov.gr/', 'JS static analysis');
         
         $task = $this->getTaskService()->getById($taskObject->id);
         

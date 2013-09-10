@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "f3d8ea527de93caedc2dc25bb7321ee9",
+    "hash": "82f8828142d4bcd1a9a006c7fe622e53",
     "packages": [
         {
             "name": "doctrine/common",
@@ -2190,16 +2190,16 @@
         },
         {
             "name": "webignition/node-jslint-output-parser",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/node-jslint-output-parser.git",
-                "reference": "1.0.2"
+                "reference": "a51f8a348eb3513893570733e528b762c3829f50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/1.0.2",
-                "reference": "1.0.2",
+                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/a51f8a348eb3513893570733e528b762c3829f50",
+                "reference": "a51f8a348eb3513893570733e528b762c3829f50",
                 "shasum": ""
             },
             "require": {
@@ -2226,7 +2226,7 @@
             "keywords": [
                 "rss"
             ],
-            "time": "2013-03-19 19:02:49"
+            "time": "2013-09-10 15:14:45"
         },
         {
             "name": "webignition/quoted-string",
