@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "82f8828142d4bcd1a9a006c7fe622e53",
+    "hash": "324574cd183ebedcb2874180b6a7a75e",
     "packages": [
         {
             "name": "doctrine/common",
@@ -1276,17 +1276,17 @@
             "time": "2012-12-21 11:40:51"
         },
         {
-            "name": "querypath/QueryPath",
-            "version": "dev-master",
+            "name": "querypath/querypath",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/technosophos/querypath.git",
-                "reference": "3.0.0"
+                "reference": "e0895d54d083144548ec3d599f1e968bba2b3efc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/technosophos/querypath/archive/3.0.0.zip",
-                "reference": "3.0.0",
+                "url": "https://api.github.com/repos/technosophos/querypath/zipball/e0895d54d083144548ec3d599f1e968bba2b3efc",
+                "reference": "e0895d54d083144548ec3d599f1e968bba2b3efc",
                 "shasum": ""
             },
             "require": {
@@ -1296,7 +1296,10 @@
             "autoload": {
                 "psr-0": {
                     "QueryPath": "src/"
-                }
+                },
+                "files": [
+                    "src/qp_functions.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -1311,7 +1314,7 @@
                 "xml",
                 "xslt"
             ],
-            "time": "2012-12-11 14:38:11"
+            "time": "2013-05-24 02:50:10"
         },
         {
             "name": "sensio/distribution-bundle",
