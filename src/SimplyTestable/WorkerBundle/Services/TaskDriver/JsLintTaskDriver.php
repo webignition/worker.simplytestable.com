@@ -7,13 +7,11 @@ use webignition\WebResource\WebPage\WebPage;
 use webignition\Url\Url;
 use webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver;
 use webignition\WebResource\WebResource;
-use webignition\NodeJslintOutput\Parser;
 use SimplyTestable\WorkerBundle\Exception\WebResourceException;
 
 class JsLintTaskDriver extends WebResourceTaskDriver {  
     
-     const JSLINT_PARAMETER_NAME_PREFIX = 'jslint-option-';
-    
+     const JSLINT_PARAMETER_NAME_PREFIX = 'jslint-option-';    
     
     /**
      *
@@ -140,16 +138,26 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                 continue;
             }
             
-            $output = $this->getJsLintOutputForUrl($scriptUrl);
-            $jsLintOutput[(string)$scriptUrl] = $output['output'];
-            $errorCount += $output['errorCount'];
-        }
+            try {
+                $output = $this->getJsLintOutputForUrl($scriptUrl);             
+                $jsLintOutput[(string)$scriptUrl] = $output['output'];
+                $errorCount += $output['errorCount'];
+            } catch (\SimplyTestable\WorkerBundle\Exception\JsLintTaskDriverException $jsLintTaskDriverException) {
+                // JSLint returned unparseable output, likely from unparseable JS                
+                $this->getLogger()->err('JSLintTaskDriver::jslint error: [at '.$scriptUrl.']['.$jsLintTaskDriverException->getMessage().']');
+            }
+        }        
         
-        $scriptValues = $this->getScriptValues();
-        foreach ($scriptValues as $scriptValue) {              
-            $nodeJsLintOutput = $this->validateJsContent($scriptValue);                         
-            $jsLintOutput[md5($scriptValue)] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);            
-            $errorCount += $this->getNodeJsErrorCount($nodeJsLintOutput);
+        $scriptValues = $this->getScriptValues();        
+        foreach ($scriptValues as $scriptValue) {
+            try {
+                $nodeJsLintOutput = $this->validateJsContent($scriptValue); 
+                $jsLintOutput[md5($scriptValue)] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);            
+                $errorCount += $this->getNodeJsErrorCount($nodeJsLintOutput);                
+            } catch (\SimplyTestable\WorkerBundle\Exception\JsLintTaskDriverException $jsLintTaskDriverException) {
+                // JSLint returned unparseable output, likely from unparseable JS                
+                $this->getLogger()->err('JSLintTaskDriver::jslint error: [inline at '.$this->task->getUrl().'][starting "'.substr($scriptValue, 0, 16).'"]['.$jsLintTaskDriverException->getMessage().']');
+            }
         }
         
         $this->response->setErrorCount($errorCount);
@@ -187,7 +195,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    private function getJsLintOutputForUrl($scriptUrl) {        
+    private function getJsLintOutputForUrl($scriptUrl) {                
         return $this->getSourceJsLintOutputForUrl($scriptUrl);
     } 
     
@@ -288,7 +296,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                     )
                 )
             );              
-        }        
+        }
     }
     
     
@@ -313,11 +321,11 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     
     private function validateScriptFromUrl(Url $url) {        
         $webResource = $this->getJavaScriptWebResourceFromUrl($url);        
-        return $this->validateJsContent($webResource->getContent());                   
+        return $this->validateJsContent($webResource->getContent());     
     }
     
     
-    private function validateJsContent($js) { 
+    private function validateJsContent($js) {        
         $this->getJsLintCommandOptions();
         
         $localPath = $this->getLocalJavaScriptResourcePathFromContent($js);
@@ -326,19 +334,19 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         $outputLines = array();
         
-        $command = $this->getProperty('node-path') . " ".$this->getProperty('node-jslint-path')."/jslint.js --json ". $this->getJsLintCommandOptions() . " " .  $localPath;        
+        $command = $this->getProperty('node-path') . " ".$this->getProperty('node-jslint-path')."/jslint.js --json ". $this->getJsLintCommandOptions() . " " .  $localPath . " 2>&1";        
         exec($command, $outputLines);
         
-        $output = implode("\n", $outputLines);       
-        
+        $output = implode("\n", $outputLines);    
+
         $outputParser = new \webignition\NodeJslintOutput\Parser();        
-        $outputParser->parse($output);
+        if (!$outputParser->parse($output)) {
+            throw new \SimplyTestable\WorkerBundle\Exception\JsLintTaskDriverException($output, 1);
+        }
         
         $nodeJsLintOutput = $outputParser->getNodeJsLintOutput();
-        
         unlink($localPath);
-        
-        return $nodeJsLintOutput;         
+        return $nodeJsLintOutput;        
     }
     
     private function getJsLintCommandOptions() {
@@ -451,7 +459,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * 
      * @return array
      */
-    private function getScriptValues() {
+    private function getScriptValues() {        
         $webPage = new WebPage();
         $webPage->setContent($this->webResource->getContent());
         
