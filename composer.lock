@@ -2362,16 +2362,16 @@
         },
         {
             "name": "webignition/url",
-            "version": "1.8.2",
+            "version": "1.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/url.git",
-                "reference": "1.8.2"
+                "reference": "3c280a9204fad130a8e5b10786793869f8dd46a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/url/zipball/1.8.2",
-                "reference": "1.8.2",
+                "url": "https://api.github.com/repos/webignition/url/zipball/3c280a9204fad130a8e5b10786793869f8dd46a1",
+                "reference": "3c280a9204fad130a8e5b10786793869f8dd46a1",
                 "shasum": ""
             },
             "require": {
@@ -2399,7 +2399,7 @@
             "keywords": [
                 "url"
             ],
-            "time": "2013-08-15 10:51:12"
+            "time": "2013-09-12 14:26:55"
         },
         {
             "name": "webignition/web-json-model",
