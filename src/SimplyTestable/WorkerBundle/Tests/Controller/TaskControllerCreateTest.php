@@ -120,7 +120,39 @@ class TaskControllerCreateTest extends TaskControllerTest {
         ))->createCollectionAction();        
     
         $this->assertEquals(503, $response->getStatusCode());      
-    }    
+    } 
+    
+    
+    /**
+     * @group standard
+     */    
+    public function testTaskIsCreatedWithEncodedUrl() {
+        $this->assertEquals('http://example.com/foo%20bar/', $this->createTask('http://example.com/foo bar/', 'HTML validation')->url);
+    }
+    
+    
+    public function testTaskCollectionIsCreatedWithEncodedUrls() {
+        $responseObject = json_decode($this->getTaskController('createCollectionAction', array(
+            'tasks' => array(
+                    array(
+                        'url' => 'http://example.com/foo bar/',
+                        'type' => 'HTML validation'
+                    ),
+                    array(
+                        'url' => 'http://example.com/foo%bar/',
+                        'type' => 'CSS validation'
+                    ),
+                    array(
+                        'url' => 'http://example.com/foo&bar/',
+                        'type' => 'JS static analysis'
+                    ),              
+            )
+        ))->createCollectionAction()->getContent());
+        
+        $this->assertEquals('http://example.com/foo%20bar/', $responseObject[0]->url);
+        $this->assertEquals('http://example.com/foo%25bar/', $responseObject[1]->url);
+        $this->assertEquals('http://example.com/foo%26bar/', $responseObject[2]->url);
+    }
     
 }
 

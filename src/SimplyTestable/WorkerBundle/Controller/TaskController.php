@@ -53,7 +53,7 @@ class TaskController extends BaseController
         $this->get('logger')->info('TaskController::createAction: parameters: ['.$parameters.']');
         
         $task = $this->getTaskService()->create(
-            $this->getArguments('activateAction')->get('url'),
+            $this->getArguments('createAction')->get('url'),
             $taskType,
             $parameters
         );
