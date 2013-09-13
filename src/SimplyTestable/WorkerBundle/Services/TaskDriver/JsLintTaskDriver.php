@@ -152,7 +152,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         foreach ($scriptValues as $scriptValue) {
             try {
                 $nodeJsLintOutput = $this->validateJsContent($scriptValue); 
-                $jsLintOutput[md5($scriptValue)] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);            
+                $jsLintOutput[md5($scriptValue)] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);                
                 $errorCount += $this->getNodeJsErrorCount($nodeJsLintOutput);                
             } catch (\SimplyTestable\WorkerBundle\Exception\JsLintTaskDriverException $jsLintTaskDriverException) {
                 // JSLint returned unparseable output, likely from unparseable JS                
@@ -178,7 +178,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return int
      */
     private function getNodeJsErrorCount(\webignition\NodeJslintOutput\NodeJslintOutput $nodeJsLintOutput) {
-        $errorCount = $nodeJsLintOutput->getEntryCount();
+        $errorCount = $nodeJsLintOutput->getEntryCount();        
         if ($nodeJsLintOutput->wasStopped()) {
             $errorCount--;
         }
@@ -359,8 +359,12 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                     if ($this->isJslintBooleanParameter($key)) {
                         $jsLintCommandOptions .= ' --' . str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) . '=';
                         $jsLintCommandOptions .= filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
-                    } else {
+                    } else {                        
                         if (str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) === 'predef') {
+                            if (is_array($value)) {
+                                $value = $value[0];
+                            }
+                            
                             $values = explode(' ', $value);                            
                             foreach ($values as $predefValue) {
                                 $jsLintCommandOptions .= ' --' . str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) . '=' . $predefValue;
@@ -384,7 +388,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @param string $key
      * @return boolean
      */
-    private function isJslintParameter($key) {
+    private function isJslintParameter($key) {        
         return substr($key, 0, strlen(self::JSLINT_PARAMETER_NAME_PREFIX)) == self::JSLINT_PARAMETER_NAME_PREFIX;
     }
     
@@ -394,7 +398,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @param string $key
      * @return boolean
      */
-    private function isJslintBooleanParameter($key) {
+    private function isJslintBooleanParameter($key) {        
         return in_array(str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key), $this->jsLintBooleanOptions);
     }
     

@@ -2193,16 +2193,16 @@
         },
         {
             "name": "webignition/node-jslint-output-parser",
-            "version": "1.0.3",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/node-jslint-output-parser.git",
-                "reference": "a51f8a348eb3513893570733e528b762c3829f50"
+                "reference": "3560c606249c64fcf327a970c6cfd0accdf86fbe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/a51f8a348eb3513893570733e528b762c3829f50",
-                "reference": "a51f8a348eb3513893570733e528b762c3829f50",
+                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/3560c606249c64fcf327a970c6cfd0accdf86fbe",
+                "reference": "3560c606249c64fcf327a970c6cfd0accdf86fbe",
                 "shasum": ""
             },
             "require": {
@@ -2229,7 +2229,7 @@
             "keywords": [
                 "rss"
             ],
-            "time": "2013-09-10 15:14:45"
+            "time": "2013-09-13 15:26:15"
         },
         {
             "name": "webignition/quoted-string",
