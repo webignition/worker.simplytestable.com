@@ -2108,16 +2108,16 @@
         },
         {
             "name": "webignition/html-document-type-identifier",
-            "version": "0.7",
+            "version": "0.8",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webignition/html-document-type-identifier",
-                "reference": "0.7"
+                "url": "https://github.com/webignition/html-document-type-identifier.git",
+                "reference": "16208b1773e477a529a7fd89cceb98dcadd9733e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/html-document-type-identifier/archive/0.7.zip",
-                "reference": "0.7",
+                "url": "https://api.github.com/repos/webignition/html-document-type-identifier/zipball/16208b1773e477a529a7fd89cceb98dcadd9733e",
+                "reference": "16208b1773e477a529a7fd89cceb98dcadd9733e",
                 "shasum": ""
             },
             "type": "library",
@@ -2143,7 +2143,7 @@
                 "document",
                 "html"
             ],
-            "time": "2013-01-19 16:27:06"
+            "time": "2013-09-13 14:14:56"
         },
         {
             "name": "webignition/internet-media-type",
