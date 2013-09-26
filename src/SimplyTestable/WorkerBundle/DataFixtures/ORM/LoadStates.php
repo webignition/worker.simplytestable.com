@@ -28,7 +28,20 @@ class LoadStates extends AbstractFixture implements OrderedFixtureInterface, Con
         'worker-active' => null,
         'worker-awaiting-activation-verification' => 'worker-active',
         'worker-new' => 'worker-awaiting-activation-verification',
-    );  
+        'task-cancelled' => null,
+        'task-completed' => null,
+        'task-in-progress' => 'task-completed',
+        'task-queued' => 'task-in-progress',
+        'taskoutput-sent' => null,
+        'taskoutput-sending' => 'taskoutput-sent',
+        'taskoutput-queued' => 'taskoutput-sending',
+        'task-failed-no-retry-available' => null,
+        'task-failed-retry-available' => null,
+        'task-failed-retry-limit-reached' => null,
+        'task-skipped' => null,
+        'worker-maintenance-read-only' => null
+    );
+    
     
     /**
      * {@inheritDoc}
