@@ -66,7 +66,7 @@ abstract class BaseTestCase extends WebTestCase {
     }
     
     protected static function setupDatabase() {
-        exec('php app/console doctrine:database:drop -e test --force && php app/console doctrine:database:create -e test && php app/console doctrine:migrations:migrate -e test --no-interaction');
+        exec('php app/console doctrine:database:drop -e test --force && php app/console doctrine:database:create -e test && php app/console doctrine:migrations:migrate -e test --no-interaction && php app/console doctrine:fixtures:load -e test --append');
     }
     
     protected static function setDefaultSystemState() {
