@@ -3,8 +3,6 @@
 namespace Application\Migrations;
 
 use SimplyTestable\BaseMigrationsBundle\Migration\EntityModificationMigration,
-    SimplyTestable\WorkerBundle\Entity\State,
-    SimplyTestable\WorkerBundle\Entity\ThisWorker,
     Doctrine\DBAL\Schema\Schema;
 
 /**
@@ -44,27 +42,6 @@ class Version20120802174754_create_State_insert_worker_states extends EntityModi
         );      
         
         parent::down($schema);
-    }
-    
-    
-    public function postUp(Schema $schema)
-    {
-        $state_active = new State();
-        $state_active->setName('worker-active');        
-        $this->getEntityManager()->persist($state_active);
-        $this->getEntityManager()->flush();
-        
-        $state_awaiting_activation_verification = new State();
-        $state_awaiting_activation_verification->setName('worker-awaiting-activation-verification');
-        $state_awaiting_activation_verification->setNextState($state_active);        
-        $this->getEntityManager()->persist($state_awaiting_activation_verification);
-        $this->getEntityManager()->flush();        
-        
-        $state_new = new State();
-        $state_new->setName('worker-new');
-        $state_new->setNextState($state_awaiting_activation_verification);        
-        $this->getEntityManager()->persist($state_new);
-        $this->getEntityManager()->flush();
-    }  
+    } 
 
 }
