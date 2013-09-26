@@ -64,6 +64,7 @@ before_script:
   - php composer.phar install
   - php app/console doctrine:database:create
   - php app/console doctrine:migrations:migrate --no-interaction
+  - php app/console doctrine:fixtures:load --append  
   
   # Update /etc/hosts for html validator
   - echo "5.9.84.201 html-validator.worker.simplytestable.com" | sudo tee --append /etc/hosts
