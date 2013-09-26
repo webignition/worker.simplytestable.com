@@ -35,7 +35,8 @@
         "webignition/css-validator-output-parser":">=1.6.4,<2.0",
         "winzou/console-bundle":"1.0.0",
         "guzzle/guzzle":"3.3.1",
-        "webignition/html-document-link-finder":">=0.1,<1.0"
+        "webignition/html-document-link-finder":">=0.1,<1.0",
+        "doctrine/doctrine-fixtures-bundle": "dev-master"
     },
     "scripts": {
         "post-install-cmd": [
