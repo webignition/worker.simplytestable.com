@@ -28,11 +28,18 @@ class LoadCoreApplication extends AbstractFixture implements OrderedFixtureInter
      * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
-    {
-        $coreApplication = new CoreApplication();
-        $coreApplication->setUrl($this->container->getParameter('core_url'));
-        $manager->persist($coreApplication);
-        $manager->flush();
+    {        
+        $coreApplicationUrl = $this->container->getParameter('core_url');
+        $repository = $manager->getRepository('SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication');
+        
+        $coreApplicationList = $repository->findAll();
+        $coreApplication = (count($coreApplicationList)) ? $coreApplicationList[0] : new CoreApplication(); 
+        
+        if ($coreApplication->getUrl() != $coreApplicationUrl) {
+            $coreApplication->setUrl($coreApplicationUrl);
+            $manager->persist($coreApplication);
+            $manager->flush();            
+        }
     }
 
     /**
