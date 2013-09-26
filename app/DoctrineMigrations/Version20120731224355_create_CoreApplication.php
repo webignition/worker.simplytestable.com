@@ -3,7 +3,6 @@
 namespace Application\Migrations;
 
 use SimplyTestable\BaseMigrationsBundle\Migration\EntityModificationMigration,
-    SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication,
     Doctrine\DBAL\Schema\Schema;
 
 /**
@@ -29,12 +28,5 @@ class Version20120731224355_create_CoreApplication extends EntityModificationMig
     {
         $this->addCommonStatement("DROP TABLE CoreApplication");        
         parent::down($schema);       
-    }
-    
-    public function postUp(Schema $schema) {
-        $coreApplication = new CoreApplication();
-        $coreApplication->setUrl($this->container->getParameter('core_url'));
-        $this->getEntityManager()->persist($coreApplication);
-        $this->getEntityManager()->flush();        
-    }    
+    }   
 }
