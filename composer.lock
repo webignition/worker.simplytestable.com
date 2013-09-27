@@ -2176,16 +2176,16 @@
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "0.2",
+            "version": "0.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "0.2"
+                "reference": "84ef29c0912465e5d2db363ef2162cb021448762"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/0.2",
-                "reference": "0.2",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/84ef29c0912465e5d2db363ef2162cb021448762",
+                "reference": "84ef29c0912465e5d2db363ef2162cb021448762",
                 "shasum": ""
             },
             "require": {
@@ -2217,7 +2217,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2013-08-16 20:26:30"
+            "time": "2013-09-27 12:29:37"
         },
         {
             "name": "webignition/html-document-type-identifier",
