@@ -2,61 +2,15 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Command\Task\Perform\HtmlValidation;
 
-use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Tests\Command\Task\Perform\PerformCommandTaskTypeTest;
 
-class PerformCommandHtmlValidationTest extends ConsoleCommandBaseTestCase {
+class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
     
-    public static function setUpBeforeClass() {
-        self::setupDatabase();        
-    }    
+    const TASK_TYPE_NAME = 'HTML validation';
     
-    
-    /**
-     * @group standard
-     */    
-    public function testPerformOnNonExistentUrl() {
-        $this->clearMemcacheHttpCache();  
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-        
-        $taskObject = $this->createTask('http://example.com/', 'HTML validation');
-        
-        $task = $this->getTaskService()->getById($taskObject->id);
-        
-        $response = $this->runConsole('simplytestable:task:perform', array(
-            $task->getId() => true
-        ));
-        
-        $this->assertEquals(0, $response);
-        $this->assertEquals(1, $task->getOutput()->getErrorCount());
-        $this->assertEquals('{"messages":[{"message":"Not Found","messageId":"http-retrieval-404","type":"error"}]}', $task->getOutput()->getOutput());
+    protected function getTaskTypeName() {
+        return self::TASK_TYPE_NAME;
     }
-    
-    
-    /**
-     * @group standard
-     */    
-    public function testPerformOnNonExistentHost() {
-        $this->getWebResourceService()->setRequestSkeletonToCurlErrorMap(array(
-            'http://invalid/' => array(
-                'GET' => array(
-                    'errorMessage' => "Couldn't resolve host. The given remote host was not resolved.",
-                    'errorNumber' => 6                    
-                )
-            )
-        ));         
-        
-        $taskObject = $this->createTask('http://invalid/', 'HTML validation');
-        
-        $task = $this->getTaskService()->getById($taskObject->id);
-        
-        $response = $this->runConsole('simplytestable:task:perform', array(
-            $task->getId() => true
-        ));
-        
-        $this->assertEquals(0, $response);        
-        $this->assertEquals(1, $task->getOutput()->getErrorCount());
-        $this->assertEquals('{"messages":[{"message":"DNS lookup failure resolving resource domain name","messageId":"http-retrieval-curl-code-6","type":"error"}]}', $task->getOutput()->getOutput());        
-    }   
     
     
     /**
@@ -66,7 +20,7 @@ class PerformCommandHtmlValidationTest extends ConsoleCommandBaseTestCase {
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
-        $taskObject = $this->createTask('http://example.com/', 'HTML validation');       
+        $taskObject = $this->createTask('http://example.com/', $this->getTaskTypeName());       
      
         $task = $this->getTaskService()->getById($taskObject->id);
         
@@ -82,7 +36,7 @@ class PerformCommandHtmlValidationTest extends ConsoleCommandBaseTestCase {
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
-        $taskObject = $this->createTask('http://example.com/', 'HTML validation');       
+        $taskObject = $this->createTask('http://example.com/', $this->getTaskTypeName());   
      
         $task = $this->getTaskService()->getById($taskObject->id);
         

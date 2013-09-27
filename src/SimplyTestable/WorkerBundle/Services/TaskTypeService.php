@@ -12,6 +12,7 @@ class TaskTypeService extends EntityService {
     const CSS_VALIDATION_NAME = 'CSS Validation';
     const JS_STATIC_ANALYSIS_NAME = 'JS static analysis';
     const URL_DISCOVERY_NAME = 'URL discovery';
+    const LINK_VERIFICATRION_NAME = 'Link verification';
     
     /**
      *
@@ -39,6 +40,15 @@ class TaskTypeService extends EntityService {
     public function has($name) {
         return !is_null($this->fetch($name));
     }
+    
+    
+    /**
+     * 
+     * @return \SimplyTestable\WorkerBundle\Entity\Task\Type\Type
+     */
+    public function getLinkVerificationTaskType() {
+        return $this->fetch(self::LINK_VERIFICATRION_NAME);
+    }    
     
 
     /**

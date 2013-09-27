@@ -56,7 +56,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     private $tooManyRedirectsException = null;
     
     
-    public function execute(Task $task) {                
+    public function execute(Task $task) {                        
         if (!$this->isCorrectTaskType($task)) {
             return false;
         }

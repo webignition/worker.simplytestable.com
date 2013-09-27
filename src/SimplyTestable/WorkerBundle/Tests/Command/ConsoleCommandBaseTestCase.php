@@ -22,16 +22,32 @@ abstract class ConsoleCommandBaseTestCase extends BaseSimplyTestableTestCase {
     
     
     protected function getHttpFixtures($path) {
-        $fixtures = array();
-        
+        $httpMessages = array();
+
         $fixturesDirectory = new \DirectoryIterator($path);
         foreach ($fixturesDirectory as $directoryItem) {
             if ($directoryItem->isFile()) {                
-                $fixtures[] = \Guzzle\Http\Message\Response::fromMessage(file_get_contents($directoryItem->getPathname()));
+                $httpMessages[] = file_get_contents($directoryItem->getPathname());
             }
         }
         
+        return $this->buildHttpFixtureSet($httpMessages);
+    }
+    
+    
+    /**
+     * 
+     * @param array $httpMessages
+     * @return array
+     */
+    protected function buildHttpFixtureSet($httpMessages) {
+        $fixtures = array();
+        
+        foreach ($httpMessages as $httpMessage) {
+            $fixtures[] = \Guzzle\Http\Message\Response::fromMessage($httpMessage);
+        }
+        
         return $fixtures;
-    }     
+    }
 
 }

@@ -34,7 +34,7 @@ EOF
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
-    {
+    {        
         $task = $this->getTaskService()->getById($input->getArgument('id'));      
         
         if (is_null($task)) {
