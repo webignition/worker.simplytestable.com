@@ -54,9 +54,10 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
         $finder = new HtmlDocumentLinkUrlFinder();
         $finder->setSourceContent($fragment);
         $finder->setSourceUrl($this->task->getUrl());
+        $finder->setElementScope('a');
         
         if ($this->task->hasParameter('scope')) {
-            $finder->setScope($this->task->getParameter('scope'));
+            $finder->setUrlScope($this->task->getParameter('scope'));
         }
         
         return json_encode($finder->getUrls());       
