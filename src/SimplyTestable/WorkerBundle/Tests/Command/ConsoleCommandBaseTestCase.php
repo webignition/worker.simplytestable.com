@@ -10,11 +10,15 @@ abstract class ConsoleCommandBaseTestCase extends BaseSimplyTestableTestCase {
     const CONSOLE_COMMAND_FAILURE = 1;
     
     
-    protected function setHttpFixtures($fixtures) {
+    protected function setHttpFixtures($fixtures) {        
         $plugin = new \Guzzle\Plugin\Mock\MockPlugin();
         
         foreach ($fixtures as $fixture) {
-            $plugin->addResponse($fixture);
+            if ($fixture instanceof \Exception) {
+                $plugin->addException($fixture);
+            } else {
+                $plugin->addResponse($fixture);
+            }
         }
          
         $this->getHttpClientService()->get()->addSubscriber($plugin);              
@@ -47,14 +51,48 @@ abstract class ConsoleCommandBaseTestCase extends BaseSimplyTestableTestCase {
      * @param array $httpMessages
      * @return array
      */
-    protected function buildHttpFixtureSet($httpMessages) {
+    protected function buildHttpFixtureSet($items) {
         $fixtures = array();
         
-        foreach ($httpMessages as $httpMessage) {
-            $fixtures[] = \Guzzle\Http\Message\Response::fromMessage($httpMessage);
+        foreach ($items as $item) {
+            switch ($this->getHttpFixtureItemType($item)) {
+                case 'httpMessage':
+                    $fixtures[] = \Guzzle\Http\Message\Response::fromMessage($item);
+                    break;
+                
+                case 'curlException':
+                    $fixtures[] = $this->getCurlExceptionFromCurlMessage($item);                    
+                    break;
+                
+                default:
+                    throw new \LogicException();
+            }
         }
         
         return $fixtures;
+    }
+    
+    private function getHttpFixtureItemType($item) {
+        if (substr($item, 0, strlen('HTTP')) == 'HTTP') {
+            return 'httpMessage';
+        }
+        
+        return 'curlException';
+    }
+    
+    
+    /**
+     * 
+     * @param string $curlMessage
+     * @return \Guzzle\Http\Exception\CurlException
+     */
+    private function getCurlExceptionFromCurlMessage($curlMessage) {
+        $curlMessageParts = explode(' ', $curlMessage, 2);
+        
+        $curlException = new \Guzzle\Http\Exception\CurlException();
+        $curlException->setError($curlMessageParts[1], (int)  str_replace('CURL/', '', $curlMessageParts[0]));
+        
+        return $curlException;
     }
 
 }

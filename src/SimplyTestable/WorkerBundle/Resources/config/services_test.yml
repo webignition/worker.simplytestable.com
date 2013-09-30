@@ -2,6 +2,11 @@ services:
   simplytestable.services.httpClient:
     class:  webignition\Http\Mock\Client\Client
     
+  simplytestable.services.httpClientService:
+    class:  SimplyTestable\WorkerBundle\Services\TestHttpClientService     
+    arguments:
+        memcacheService: "@simplytestable.services.memcacheService"        
+    
   simplytestable.services.requestservice:
     class:   SimplyTestable\WorkerBundle\Services\TestRequestService    
     

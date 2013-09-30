@@ -14,7 +14,7 @@ class HttpClientService {
      *
      * @var \Guzzle\Http\Client
      */
-    private $httpClient = null;   
+    protected $httpClient = null;   
     
     
     /**

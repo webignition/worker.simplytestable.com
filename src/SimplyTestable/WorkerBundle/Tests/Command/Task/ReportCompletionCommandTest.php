@@ -77,7 +77,8 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
     /**
      * @group standard
      */    
-    public function testReportCompletionWhenInvalidCoreApplicationHostReturnsCurlCode6() {        
+    public function testReportCompletionWhenInvalidCoreApplicationHostReturnsCurlCode6() {                
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         $coreApplication = $this->getCoreApplicationService()->get();
         
         $coreApplication->setUrl('http://invalid');
@@ -122,8 +123,7 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
      */    
     public function testReportCompletionWhenCoreApplicationInMaintenanceReadOnlyModeReturnsStatusCode503() {        
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-        
-        $this->setupDatabase();
+
         $createdTask = $this->createTask('http://example.com/', 'HTML validation');
         
         $task = $this->getTaskService()->getById($createdTask->id);
