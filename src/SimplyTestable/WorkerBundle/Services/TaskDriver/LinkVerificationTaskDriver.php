@@ -12,16 +12,8 @@ use webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier;
 
 class LinkVerificationTaskDriver extends WebResourceTaskDriver {    
     
-    const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
-    
-    /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser 
-     */
-    private $validatorErrorCollectionParser = null;
-    
     public function __construct() {
-        $this->canCacheValidationOutput = true;
+        $this->canCacheValidationOutput = false;
     }
     
     
@@ -58,96 +50,17 @@ class LinkVerificationTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    protected function performValidation() {          
-        var_dump("cp01");
-        exit();
+    protected function performValidation() {                  
+        $linkChecker = new \webignition\HtmlDocumentLinkChecker\HtmlDocumentLinkChecker();
+        $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());
+        $linkChecker->setWebPage($this->webResource);
         
-        $fragment = $this->webResource->getContent();
+        $erroredLinks = $linkChecker->getErrored();
         
-        $htmlDocumentTypeIdentifier = new HtmlDocumentTypeIdentifier();
-        $htmlDocumentTypeIdentifier->setHtml($fragment);
-        
-        if (!$htmlDocumentTypeIdentifier->hasDocumentType()) {
-            $this->response->setErrorCount(1);
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);            
-            
-            if ($this->isMarkup($fragment)) {
-                return json_encode($this->getMissingDocumentTypeOutput());
-            } else {
-                return json_encode($this->getIsNotMarkupOutput($fragment));
-            }
-        }
-        
-        if (!$htmlDocumentTypeIdentifier->hasValidDocumentType()) {            
-            $this->response->setErrorCount(1);
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
-            return json_encode($this->getInvalidDocumentTypeOutput($htmlDocumentTypeIdentifier->getDocumentTypeString()));             
-        }        
-        
-        $characterEncoding = ($this->webResource->getIsDocumentCharacterEncodingValid()) ? $this->webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING;
-        
-        $requestPostFields = array(
-            'fragment' => $fragment,
-            'output' => 'json'
-        );
-        
-        if (!is_null($characterEncoding)) {
-            $requestPostFields['charset'] = $characterEncoding;
-        }        
-        
-        $validationRequest = $this->getWebResourceService()->getHttpClientService()->postRequest(
-                $this->getProperty('validator-url'),
-                null,
-                $requestPostFields
-        );        
-        $validationRequest->getCurlOptions()->add(CURLOPT_TIMEOUT, 300);
-        
-        /* @var $validationResponse JsonDocument */
-        try {
-            $validationResponse = $this->getWebResourceService()->get($validationRequest);
-        } catch (\Exception $exception) {
-            $exceptionCode = ($exception instanceof \Guzzle\Http\Exception\CurlException) ? $exception->getErrorNo() : $exception->getCode();            
-            $this->getLogger()->err('HtmlValidationTaskDriver::validation request failed with exception ['.get_class($exception).'] ['.$exceptionCode.'] ['.$validationRequest->getUrl().']');
-            throw $exception;
-        }
-        
-        if ($validationResponse->getContentType()->getTypeSubtypeString() == 'text/html') {
-            // HTML response, the validator failed to validate
-            $outputObject = $this->getW3cValidatorErrorCollectionParser()->getOutputObject($validationResponse);
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
-            $this->response->setErrorCount(1);            
-            $this->canCacheValidationOutput = false;
-        } else {
-            // Regular JSON output
-            $outputObject = $this->getOutputOject($validationResponse->getContentObject());
-            $this->response->setHasSucceeded();
-            
-            $errorCount = 0;
-            foreach ($validationResponse->getContentObject()->messages as $message) {
-                if ($message->type == 'error') {
-                    $errorCount++;
-                }
-            }
-            
-            $this->response->setErrorCount($errorCount);
-            $this->canCacheValidationOutput = true;
-        }
-        
-        return json_encode($outputObject);         
+        $this->response->setErrorCount(count($erroredLinks));        
+        return json_encode($this->getOutputOject($erroredLinks));
     }
     
-    
-    /**
-     * 
-     * @param string $fragment
-     * @return boolean
-     */
-    private function isMarkup($fragment) {
-        return strip_tags($fragment) !== $fragment;
-    }
     
     protected function getMissingDocumentTypeOutput() {        
         $outputObjectMessage = new \stdClass();
@@ -210,59 +123,22 @@ class LinkVerificationTaskDriver extends WebResourceTaskDriver {
     
     /**
      *
-     * @param \stdClass $validationResponseObject
+     * @param array $erroredLinks
      * @return \stdClass 
      */
-    private function getOutputOject(\stdClass $validationResponseObject) {
-        $outputObject = new \stdClass();
-        $outputObject->messages = array();
+    private function getOutputOject($erroredLinks) {
+        $outputObject = array();
         
-        foreach ($validationResponseObject->messages as $validationMessageObject) {
-            $outputObject->messages[] = $this->getOutputObjectMessage($validationMessageObject);
+        foreach ($erroredLinks as $linkState) {          
+            $outputObject[] = array(
+                'context' => $linkState->getContext(),
+                'state' => $linkState->getState(),
+                'type' => $linkState->getType(),
+                'url' => $linkState->getUrl()
+            );
         }
         
         return $outputObject;
-    }
-    
-    
-    /**
-     *
-     * @param \stdClass $validationMessageObject
-     * @return \stdClass 
-     */
-    private function getOutputObjectMessage(\stdClass $validationMessageObject) {
-        $requiredProperties = array(
-            'lastLine',
-            'lastColumn',
-            'message',
-            'messageid',            
-            'type'
-        );
-        
-        $outputObjectMessage = new \stdClass;
-        
-        foreach ($requiredProperties as $requiredPropertyName) {
-            if (isset($validationMessageObject->$requiredPropertyName)) {
-                $outputObjectMessage->$requiredPropertyName = $validationMessageObject->$requiredPropertyName;
-            }
-        }
-        
-        return $outputObjectMessage;
-    }
-    
-    
-    /**
-     *
-     * @return SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorCollectionParser
-     */
-    private function getW3cValidatorErrorCollectionParser() {
-        if (is_null($this->validatorErrorCollectionParser)) {            
-            $className = $this->getProperty('validator-error-collection-parser-class');
-            $this->validatorErrorCollectionParser = new $className;
-            $this->validatorErrorCollectionParser->setErrorParserClass($this->getProperty('validator-error-parser-class'));
-        }
-        
-        return $this->validatorErrorCollectionParser;
     }
     
 }

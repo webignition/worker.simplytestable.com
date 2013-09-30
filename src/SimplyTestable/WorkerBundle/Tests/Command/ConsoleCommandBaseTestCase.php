@@ -25,10 +25,17 @@ abstract class ConsoleCommandBaseTestCase extends BaseSimplyTestableTestCase {
         $httpMessages = array();
 
         $fixturesDirectory = new \DirectoryIterator($path);
+        $fixturePaths = array();
         foreach ($fixturesDirectory as $directoryItem) {
             if ($directoryItem->isFile()) {                
-                $httpMessages[] = file_get_contents($directoryItem->getPathname());
+                $fixturePaths[] = $directoryItem->getPathname();
             }
+        }        
+        
+        sort($fixturePaths);
+        
+        foreach ($fixturePaths as $fixturePath) {
+            $httpMessages[] = file_get_contents($fixturePath);
         }
         
         return $this->buildHttpFixtureSet($httpMessages);
