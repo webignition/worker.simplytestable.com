@@ -60,7 +60,7 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
             $finder->setUrlScope($this->task->getParameter('scope'));
         }
         
-        return json_encode($finder->getUrls());       
+        return json_encode($finder->getUniqueUrls());       
     }
     
     /**
