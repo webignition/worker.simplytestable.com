@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "d4e92bb4d85f9af7e83f227b789edc50",
+    "hash": "1be37c14d6e50dad54eb5fe45a5bd989",
     "packages": [
         {
             "name": "doctrine/common",
@@ -527,16 +527,16 @@
         },
         {
             "name": "guzzle/guzzle",
-            "version": "v3.3.1",
+            "version": "v3.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "v3.3.1"
+                "reference": "eaef90d27bb1d682e1f6ab2d77606dc0159049e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/v3.3.1",
-                "reference": "v3.3.1",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/eaef90d27bb1d682e1f6ab2d77606dc0159049e6",
+                "reference": "eaef90d27bb1d682e1f6ab2d77606dc0159049e6",
                 "shasum": ""
             },
             "require": {
@@ -572,16 +572,15 @@
                 "doctrine/cache": "*",
                 "monolog/monolog": "1.*",
                 "phpunit/phpunit": "3.7.*",
+                "psr/log": "1.0.*",
                 "symfony/class-loader": "*",
-                "zend/zend-cache1": "1.12",
-                "zend/zend-log1": "1.12",
                 "zendframework/zend-cache": "2.0.*",
                 "zendframework/zend-log": "2.0.*"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.3-dev"
+                    "dev-master": "3.7-dev"
                 }
             },
             "autoload": {
@@ -616,7 +615,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2013-03-10 23:05:38"
+            "time": "2013-08-02 18:31:05"
         },
         {
             "name": "jdorn/sql-formatter",
@@ -1195,22 +1194,23 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "3f8c37b23c893ab72d85b6deb02cea9e215d2d3c"
+                "reference": "df90f919b73e2e848d767a372caf9ca036877bf6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/3f8c37b23c893ab72d85b6deb02cea9e215d2d3c",
-                "reference": "3f8c37b23c893ab72d85b6deb02cea9e215d2d3c",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/df90f919b73e2e848d767a372caf9ca036877bf6",
+                "reference": "df90f919b73e2e848d767a372caf9ca036877bf6",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0",
-                "psr/log": ">=1.0,<2.0"
+                "psr/log": "~1.0"
             },
             "require-dev": {
                 "doctrine/couchdb": "dev-master",
                 "mlehner/gelf-php": "1.0.*",
-                "raven/raven": "0.3.*"
+                "phpunit/phpunit": "~3.7.0",
+                "raven/raven": "0.5.*"
             },
             "suggest": {
                 "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
@@ -1222,7 +1222,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.4.x-dev"
+                    "dev-master": "1.6.x-dev"
                 }
             },
             "autoload": {
@@ -1249,7 +1249,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2013-03-28 10:41:04"
+            "time": "2013-09-27 14:18:10"
         },
         {
             "name": "phpcollection/phpcollection",
@@ -2175,17 +2175,63 @@
             "time": "2012-07-14 13:29:54"
         },
         {
-            "name": "webignition/html-document-link-finder",
-            "version": "0.3.2",
+            "name": "webignition/html-document-link-checker",
+            "version": "0.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "84ef29c0912465e5d2db363ef2162cb021448762"
+                "url": "https://github.com/webignition/html-document-link-checker.git",
+                "reference": "44a8eeeb4654d9c35d3b52309c5abe2c62f63310"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/84ef29c0912465e5d2db363ef2162cb021448762",
-                "reference": "84ef29c0912465e5d2db363ef2162cb021448762",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/44a8eeeb4654d9c35d3b52309c5abe2c62f63310",
+                "reference": "44a8eeeb4654d9c35d3b52309c5abe2c62f63310",
+                "shasum": ""
+            },
+            "require": {
+                "guzzle/guzzle": "3.7.2",
+                "php": ">=5.3.0",
+                "webignition/html-document-link-finder": "0.3.4",
+                "webignition/web-page-model": "0.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Check the links in a HTML document, find the working ones, find the broken ones, make happy people",
+            "homepage": "https://github.com/webignition/html-document-link-checker",
+            "keywords": [
+                "broken",
+                "document",
+                "html",
+                "link"
+            ],
+            "time": "2013-09-27 15:54:35"
+        },
+        {
+            "name": "webignition/html-document-link-finder",
+            "version": "0.3.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/html-document-link-url-finder.git",
+                "reference": "617bf7e1125d3b6effa3e857abce2ac1f31b21d8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/617bf7e1125d3b6effa3e857abce2ac1f31b21d8",
+                "reference": "617bf7e1125d3b6effa3e857abce2ac1f31b21d8",
                 "shasum": ""
             },
             "require": {
@@ -2217,7 +2263,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2013-09-27 12:29:37"
+            "time": "2013-09-27 13:33:43"
         },
         {
             "name": "webignition/html-document-type-identifier",
