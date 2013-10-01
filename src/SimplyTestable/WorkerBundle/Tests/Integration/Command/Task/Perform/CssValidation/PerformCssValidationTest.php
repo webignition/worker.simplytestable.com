@@ -54,7 +54,7 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
      * @group integration-travis
      * @group integration-css-validation-travis
      */         
-    public function testCssValidationRedirectLoop() {        
+    public function testCssValidationRedirectLoop() {                
         $taskObject = $this->createTask('http://simplytestable.com/redirect-loop-test/', 'CSS validation');
         
         $task = $this->getTaskService()->getById($taskObject->id);
@@ -88,7 +88,7 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(0, $response);
         $this->assertEquals(1, $task->getOutput()->getErrorCount());        
         
-        $this->assertEquals('{"messages":[{"message":"Redirect limit of 4 redirects reached","messageId":"http-retrieval-redirect-limit-reached","type":"error"}]}', $task->getOutput()->getOutput());
+        $this->assertEquals('{"messages":[{"message":"Redirect limit of ' . $this->getWebResourceService()->getMaxRedirects() . ' redirects reached","messageId":"http-retrieval-redirect-limit-reached","type":"error"}]}', $task->getOutput()->getOutput());
     }     
     
     

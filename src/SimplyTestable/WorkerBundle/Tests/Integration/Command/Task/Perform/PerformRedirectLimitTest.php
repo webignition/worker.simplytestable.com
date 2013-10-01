@@ -28,7 +28,7 @@ class PerformRedirectLimitTest extends ConsoleCommandBaseTestCase {
         $this->assertEquals(0, $response);
         $this->assertEquals(1, $task->getOutput()->getErrorCount());
         
-        $this->assertEquals('{"messages":[{"message":"Redirect limit of 4 redirects reached","messageId":"http-retrieval-redirect-limit-reached","type":"error"}]}', $task->getOutput()->getOutput());
+        $this->assertEquals('{"messages":[{"message":"Redirect limit of ' . $this->getWebResourceService()->getMaxRedirects() . ' redirects reached","messageId":"http-retrieval-redirect-limit-reached","type":"error"}]}', $task->getOutput()->getOutput());
     }    
 
 

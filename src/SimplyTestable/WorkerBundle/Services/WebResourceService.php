@@ -7,6 +7,8 @@ use SimplyTestable\WorkerBundle\Exception\WebResourceException;
 
 class WebResourceService {    
     
+    const MAX_REDIRECTS = 5;
+    
     /**
      *
      * @var \SimplyTestable\WorkerBundle\Services\HttpClientService
@@ -20,7 +22,7 @@ class WebResourceService {
      * @var array
      */
     private $contentTypeWebResourceMap = array();
-    
+
     
     /**
      *
@@ -33,6 +35,15 @@ class WebResourceService {
     {
         $this->httpClientService = $httpClientService;        
         $this->contentTypeWebResourceMap = $contentTypeWebResourceMap;        
+    }
+    
+    
+    /**
+     * 
+     * @return int
+     */
+    public function getMaxRedirects() {
+        return self::MAX_REDIRECTS;
     }
     
     
@@ -51,7 +62,7 @@ class WebResourceService {
      */
     public function get(\Guzzle\Http\Message\Request $request) {        
         // Guzzle seems to be flailing in errors if redirects total more than 4
-        $request->getParams()->set('redirect.max', 4);
+        $request->getParams()->set('redirect.max', self::MAX_REDIRECTS);
         
         try {
             $response = $request->send();
@@ -85,7 +96,7 @@ class WebResourceService {
 
         $resource = new $webResourceClassName;                
         $resource->setContent($response->getBody(true));                              
-        $resource->setContentType((string)$contentType);                  
+        $resource->setContentType((string)$contentType);        
         $resource->setUrl($response->getEffectiveUrl());          
 
         return $resource;

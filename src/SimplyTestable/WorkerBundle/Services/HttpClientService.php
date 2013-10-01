@@ -44,21 +44,34 @@ class HttpClientService {
         if (is_null($this->httpClient)) {
             $this->httpClient = new HttpClient($baseUrl, $config);
             
-            $this->httpClient->addSubscriber(BackoffPlugin::getExponentialBackoff(
-                    3,
-                    array(500, 503, 504)
-            ));
-            
-            $memcacheCache = $this->getMemcacheCache();
-            if (!is_null($memcacheCache)) {
-                $adapter = new DoctrineCacheAdapter($memcacheCache);
-                $cache = new CachePlugin($adapter, true);
-
-                $this->httpClient->addSubscriber($cache);                                     
+            foreach ($this->getPlugins() as $plugin) {
+                $this->httpClient->addSubscriber($plugin);
             }            
         }
         
         return $this->httpClient;
+    }
+    
+    
+    protected function getPlugins() {        
+        return array(
+            BackoffPlugin::getExponentialBackoff(
+                3,
+                array(500, 503, 504)
+            ),
+            $this->getCachePlugin(),
+            new \Guzzle\Plugin\History\HistoryPlugin()
+        );
+    }
+    
+    protected function getCachePlugin() {
+        $memcacheCache = $this->getMemcacheCache();
+        if (is_null($memcacheCache)) {
+            return null;
+        }
+
+        $adapter = new DoctrineCacheAdapter($memcacheCache);            
+        return new CachePlugin($adapter, true);
     }
     
     
@@ -113,6 +126,24 @@ class HttpClientService {
      */
     public function hasMemcacheCache() {
         return !is_null($this->getMemcacheCache());
+    }
+    
+    
+    
+    /**
+     * 
+     * @return \Guzzle\Plugin\History\HistoryPlugin|null
+     */
+    public function getHistory() {
+        $listenerCollections = $this->get()->getEventDispatcher()->getListeners('request.sent');
+        
+        foreach ($listenerCollections as $listener) {
+            if ($listener[0] instanceof \Guzzle\Plugin\History\HistoryPlugin) {
+                return $listener[0];
+            }
+        }
+        
+        return null;     
     }
     
 }

@@ -61,8 +61,8 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             return false;
         }
         
-        $this->task = $task;
-                
+        $this->task = $task;        
+        
         /* @var $webResource WebPage */
         $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable Web Resource Task Driver/0.1 (http://simplytestable.com/)');
         $this->webResource = $this->getWebResource($task);        
@@ -151,8 +151,8 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      * @param Task $task
      * @return WebResource 
      */
-    protected function getWebResource(Task $task) {
-        try {
+    protected function getWebResource(Task $task) {        
+        try {            
             $request = $this->getWebResourceService()->getHttpClientService()->getRequest($task->getUrl());
             return $this->getWebResourceService()->get($request);            
         } catch (WebResourceException $webResourceException) {
@@ -176,7 +176,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             }              
             
             $this->curlException = $curlException;
-        } catch (\Guzzle\Http\Exception\TooManyRedirectsException $tooManyRedirectsException) {
+        } catch (\Guzzle\Http\Exception\TooManyRedirectsException $tooManyRedirectsException) {            
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);            
             
@@ -206,14 +206,13 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      *
      * @return string 
      */
-    private function getOutputMessage() {       
-        // Still need to catch redirect limits and redirect loops        
+    private function getOutputMessage() {         
         if ($this->tooManyRedirectsException instanceof \Guzzle\Http\Exception\TooManyRedirectsException) {            
             if ($this->isRedirectLoopException()) {
                 return 'Redirect loop detected';
             }
             
-            return 'Redirect limit of 4 redirects reached';
+            return 'Redirect limit of ' . $this->getWebResourceService()->getMaxRedirects() . ' redirects reached';
         }
         
         if ($this->curlException instanceof \Guzzle\Http\Exception\CurlException) {            
@@ -243,19 +242,20 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      * @return boolean
      */
     private function isRedirectLoopException() {
-        $lines = explode("\n", $this->tooManyRedirectsException->getMessage());
+        $history = $this->getWebResourceService()->getHttpClientService()->getHistory();
+        if (is_null($history)) {
+            return false;
+        }
         
-        $locationLines = array();
+        $urlHistory = array();
+    
+        foreach ($history->getAll() as $transaction) {
+            $urlHistory[] = $transaction['request']->getUrl();
+        }
         
-        foreach ($lines as $line) {            
-            $line = trim($line);
-            
-            if (preg_match('/^location:/i', $line)) {
-                if (in_array($line, $locationLines)) {
-                    return true;
-                }
-                
-                $locationLines[] = $line;
+        foreach ($urlHistory as $urlIndex => $url) {            
+            if (in_array($url, array_slice($urlHistory, $urlIndex + 1))) {
+                return true;
             }
         }
         
