@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "1be37c14d6e50dad54eb5fe45a5bd989",
+    "hash": "511bc022e6e7f09ef17037402888f7f9",
     "packages": [
         {
             "name": "doctrine/common",
@@ -2176,22 +2176,22 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "0.3",
+            "version": "0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "44a8eeeb4654d9c35d3b52309c5abe2c62f63310"
+                "reference": "739ad885c54bdab0bff8107862e3ce0ea8d543ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/44a8eeeb4654d9c35d3b52309c5abe2c62f63310",
-                "reference": "44a8eeeb4654d9c35d3b52309c5abe2c62f63310",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/739ad885c54bdab0bff8107862e3ce0ea8d543ef",
+                "reference": "739ad885c54bdab0bff8107862e3ce0ea8d543ef",
                 "shasum": ""
             },
             "require": {
                 "guzzle/guzzle": "3.7.2",
                 "php": ">=5.3.0",
-                "webignition/html-document-link-finder": "0.3.4",
+                "webignition/html-document-link-finder": ">=0.3.5,<1.0",
                 "webignition/web-page-model": "0.6"
             },
             "type": "library",
@@ -2218,20 +2218,20 @@
                 "html",
                 "link"
             ],
-            "time": "2013-09-27 15:54:35"
+            "time": "2013-10-01 14:57:54"
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "0.3.4",
+            "version": "0.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "617bf7e1125d3b6effa3e857abce2ac1f31b21d8"
+                "reference": "69acba075e61c06c228e62f336c809f60627ffed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/617bf7e1125d3b6effa3e857abce2ac1f31b21d8",
-                "reference": "617bf7e1125d3b6effa3e857abce2ac1f31b21d8",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/69acba075e61c06c228e62f336c809f60627ffed",
+                "reference": "69acba075e61c06c228e62f336c809f60627ffed",
                 "shasum": ""
             },
             "require": {
@@ -2263,7 +2263,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2013-09-27 13:33:43"
+            "time": "2013-10-01 14:42:00"
         },
         {
             "name": "webignition/html-document-type-identifier",
