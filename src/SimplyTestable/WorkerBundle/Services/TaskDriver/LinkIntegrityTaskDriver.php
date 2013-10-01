@@ -10,7 +10,7 @@ use webignition\WebResource\JsonDocument\JsonDocument;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser;
 use webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier;
 
-class LinkVerificationTaskDriver extends WebResourceTaskDriver {    
+class LinkIntegrityTaskDriver extends WebResourceTaskDriver {    
     
     public function __construct() {
         $this->canCacheValidationOutput = false;
@@ -23,7 +23,7 @@ class LinkVerificationTaskDriver extends WebResourceTaskDriver {
      * @return boolean
      */
     protected function isCorrectTaskType(Task $task) {        
-        return $task->getType()->equals($this->getTaskTypeService()->getLinkVerificationTaskType());
+        return $task->getType()->equals($this->getTaskTypeService()->getLinkIntegrityTaskType());
     }
     
     

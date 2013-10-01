@@ -1,12 +1,12 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Command\Task\Perform\LinkVerification;
+namespace SimplyTestable\WorkerBundle\Tests\Command\Task\Perform\LinkIntegrity;
 
 use SimplyTestable\WorkerBundle\Tests\Command\Task\Perform\PerformCommandTaskTypeTest;
 
-class PerformCommandLinkVerificationTest extends PerformCommandTaskTypeTest {
+class PerformCommandLinkIntegrityTest extends PerformCommandTaskTypeTest {
     
-    const TASK_TYPE_NAME = 'Link verification';
+    const TASK_TYPE_NAME = 'Link integrity';
     
     protected function getTaskTypeName() {
         return self::TASK_TYPE_NAME;

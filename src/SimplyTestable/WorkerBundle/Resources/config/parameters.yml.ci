@@ -27,10 +27,10 @@ parameters:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver
       task-types:
         - "URL discovery" 
-    link-verification:
-      class: SimplyTestable\WorkerBundle\Services\TaskDriver\LinkVerificationTaskDriver
+    link-integrity:
+      class: SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver
       task-types:
-        - "Link verification"    
+        - "Link integrity"    
   content_type_web_resource_map:
     default: webignition\WebResource\WebResource
     text/html: webignition\WebResource\WebPage\WebPage
