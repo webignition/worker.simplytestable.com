@@ -54,7 +54,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
         $linkChecker = new \webignition\HtmlDocumentLinkChecker\HtmlDocumentLinkChecker();
         $linkChecker->setWebPage($this->webResource);
         
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable Link Integrity Task Driver/0.1 (http://simplytestable.com/)');     
+        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable-Link-Integrity-Task-Driver/0.1 (http://simplytestable.com/)');             
         $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());        
         $erroredLinks = $linkChecker->getErrored();
         $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);

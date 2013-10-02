@@ -64,7 +64,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         $this->task = $task;        
         
         /* @var $webResource WebPage */
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable Web Resource Task Driver/0.1 (http://simplytestable.com/)');
+        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable-Web-Resource-Task-Driver/0.1 (http://simplytestable.com/)');
         $this->webResource = $this->getWebResource($task);        
         $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);        
 

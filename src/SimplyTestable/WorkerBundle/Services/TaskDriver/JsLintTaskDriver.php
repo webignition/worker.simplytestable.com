@@ -418,7 +418,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return WebResource
      */    
     private function getJavaScriptWebResourceFromUrl($url) {            
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable JS static analyser/0.1 (http://simplytestable.com/)');        
+        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable-JS-static-analyser/0.1 (http://simplytestable.com/)');        
         $request = $this->getWebResourceService()->getHttpClientService()->getRequest((string)$url, array());
         $webResource = $this->getWebResourceService()->get($request);        
         $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);             
