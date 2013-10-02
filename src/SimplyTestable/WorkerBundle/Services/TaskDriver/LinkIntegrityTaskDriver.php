@@ -52,10 +52,12 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
     
     protected function performValidation() {                  
         $linkChecker = new \webignition\HtmlDocumentLinkChecker\HtmlDocumentLinkChecker();
-        $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());
         $linkChecker->setWebPage($this->webResource);
         
+        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable Link Integrity Task Driver/0.1 (http://simplytestable.com/)');     
+        $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());        
         $erroredLinks = $linkChecker->getErrored();
+        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);
         
         $this->response->setErrorCount(count($erroredLinks));        
         return json_encode($this->getOutputOject($erroredLinks));
