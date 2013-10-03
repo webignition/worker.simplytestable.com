@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "14167bb139b364e7f6b28e78e6b16cbd",
+    "hash": "009cc827802ac0b2a91a6f5b456effd1",
     "packages": [
         {
             "name": "doctrine/common",
@@ -1997,12 +1997,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/absolute-url-deriver.git",
-                "reference": "3212e24d98a2ced54d245f71e11c59b5e47ea9b6"
+                "reference": "1f0c4eb56d6547096771e8dd90009e16841d6757"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/absolute-url-deriver/zipball/3212e24d98a2ced54d245f71e11c59b5e47ea9b6",
-                "reference": "3212e24d98a2ced54d245f71e11c59b5e47ea9b6",
+                "url": "https://api.github.com/repos/webignition/absolute-url-deriver/zipball/1f0c4eb56d6547096771e8dd90009e16841d6757",
+                "reference": "1f0c4eb56d6547096771e8dd90009e16841d6757",
                 "shasum": ""
             },
             "require": {
@@ -2031,7 +2031,7 @@
                 "absolute",
                 "url"
             ],
-            "time": "2013-10-03 11:28:29"
+            "time": "2013-10-03 13:32:31"
         },
         {
             "name": "webignition/container-aware-migration",
@@ -2176,22 +2176,22 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "0.5.5",
+            "version": "0.5.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "d1646d5fc6970ff717ebd8ef4c785ead7a050f29"
+                "reference": "c3758842a5896d117167a86b2d9189f0415401ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/d1646d5fc6970ff717ebd8ef4c785ead7a050f29",
-                "reference": "d1646d5fc6970ff717ebd8ef4c785ead7a050f29",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/c3758842a5896d117167a86b2d9189f0415401ed",
+                "reference": "c3758842a5896d117167a86b2d9189f0415401ed",
                 "shasum": ""
             },
             "require": {
                 "guzzle/guzzle": "3.7.2",
                 "php": ">=5.3.0",
-                "webignition/html-document-link-finder": ">=0.4,<1.0",
+                "webignition/html-document-link-finder": ">=0.4.2,<1.0",
                 "webignition/url": "*",
                 "webignition/web-page-model": "0.6"
             },
@@ -2219,25 +2219,25 @@
                 "html",
                 "link"
             ],
-            "time": "2013-10-03 11:47:07"
+            "time": "2013-10-03 13:54:38"
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "0.4.1",
+            "version": "0.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "ad753650c825941346e2e28d9dcc99a26ce9df4f"
+                "reference": "ad1b21891222d3a6356f338370345d4028eaf228"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/ad753650c825941346e2e28d9dcc99a26ce9df4f",
-                "reference": "ad753650c825941346e2e28d9dcc99a26ce9df4f",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/ad1b21891222d3a6356f338370345d4028eaf228",
+                "reference": "ad1b21891222d3a6356f338370345d4028eaf228",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0",
-                "webignition/absolute-url-deriver": ">=1.3.7",
+                "webignition/absolute-url-deriver": ">=1.4",
                 "webignition/url": "*"
             },
             "type": "library",
@@ -2264,7 +2264,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2013-10-03 11:31:02"
+            "time": "2013-10-03 13:41:52"
         },
         {
             "name": "webignition/html-document-type-identifier",
