@@ -131,11 +131,13 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
     private function getOutputOject($erroredLinks) {
         $outputObject = array();
         
+        
+        /* @var $linkState \webignition\HtmlDocumentLinkChecker\LinkCheckResult */
         foreach ($erroredLinks as $linkState) {          
             $outputObject[] = array(
                 'context' => $linkState->getContext(),
-                'state' => $linkState->getState(),
-                'type' => $linkState->getType(),
+                'state' => $linkState->getLinkState()->getState(),
+                'type' => $linkState->getLinkState()->getType(),
                 'url' => $linkState->getUrl()
             );
         }

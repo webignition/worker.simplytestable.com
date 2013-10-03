@@ -37,7 +37,7 @@
         "guzzle/guzzle":"3.7.2",        
         "doctrine/doctrine-fixtures-bundle": "dev-master",
         "webignition/html-document-link-finder":">=0.4.2,<1.0",
-        "webignition/html-document-link-checker":">=0.5.6,<1.0"
+        "webignition/html-document-link-checker":">=0.5.7,<1.0"
     },
     "scripts": {
         "post-install-cmd": [
