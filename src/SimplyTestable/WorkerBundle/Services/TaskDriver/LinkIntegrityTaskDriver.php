@@ -56,11 +56,11 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
         
         $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable-Link-Integrity-Task-Driver/0.1 (http://simplytestable.com/)');             
         $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());        
-        $erroredLinks = $linkChecker->getErrored();
+        $linkCheckResults = $linkChecker->getAll();
         $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);
         
-        $this->response->setErrorCount(count($erroredLinks));        
-        return json_encode($this->getOutputOject($erroredLinks));
+        $this->response->setErrorCount(count($linkChecker->getErrored()));        
+        return json_encode($this->getOutputOject($linkCheckResults));
     }
     
     
@@ -125,20 +125,20 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
     
     /**
      *
-     * @param array $erroredLinks
+     * @param array $linkCheckResults
      * @return \stdClass 
      */
-    private function getOutputOject($erroredLinks) {
+    private function getOutputOject($linkCheckResults) {
         $outputObject = array();
         
         
         /* @var $linkState \webignition\HtmlDocumentLinkChecker\LinkCheckResult */
-        foreach ($erroredLinks as $linkState) {          
+        foreach ($linkCheckResults as $linkCheckResult) {          
             $outputObject[] = array(
-                'context' => $linkState->getContext(),
-                'state' => $linkState->getLinkState()->getState(),
-                'type' => $linkState->getLinkState()->getType(),
-                'url' => $linkState->getUrl()
+                'context' => $linkCheckResult->getContext(),
+                'state' => $linkCheckResult->getLinkState()->getState(),
+                'type' => $linkCheckResult->getLinkState()->getType(),
+                'url' => $linkCheckResult->getUrl()
             );
         }
         
