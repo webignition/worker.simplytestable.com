@@ -154,6 +154,48 @@ class TaskControllerCreateTest extends TaskControllerTest {
         $this->assertEquals('http://example.com/foo%26bar/', $responseObject[2]->url);
     }
     
+    public function testCreateLinkIntegrityTaskAcceptsExludedUrlsParameter() {
+        $parameters = array(
+            'excluded-urls' => array(
+                'http://example.com/'
+            )
+        );
+        
+        $response = $this->getTaskController('createAction', array(
+                'url' => 'http://example.com/one/',
+                'type' => 'Link integrity',
+                'parameters' => json_encode($parameters)
+        ))->createAction();
+        
+        $responseObject = json_decode($response->getContent());        
+        $task = $this->getTaskService()->getById($responseObject->id);        
+        
+        $this->assertEquals($parameters, json_decode($task->getParameters(), true));
+    }
+    
+    public function testCreateLinkIntegrityTaskCollectionAcceptsExludedUrlsParameter() {
+        $parameters = array(
+            'excluded-urls' => array(
+                'http://example.com/'
+            )
+        );
+        
+        $response = $this->getTaskController('createCollectionAction', array(
+            'tasks' => array(
+                array(
+                    'url' => 'http://example.com/foo bar/',
+                    'type' => 'Link integrity',
+                    'parameters' => json_encode($parameters)
+                )              
+            )
+        ))->createCollectionAction();
+        
+        $responseObject = json_decode($response->getContent());                
+        $task = $this->getTaskService()->getById($responseObject[0]->id);        
+        
+        $this->assertEquals($parameters, json_decode($task->getParameters(), true));
+    }    
+    
 }
 
 
