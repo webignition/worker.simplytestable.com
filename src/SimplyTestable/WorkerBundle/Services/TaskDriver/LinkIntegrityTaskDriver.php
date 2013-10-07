@@ -12,6 +12,8 @@ use webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier;
 
 class LinkIntegrityTaskDriver extends WebResourceTaskDriver {    
     
+    const EXCLUDED_URLS_PARAMETER_NAME = 'excluded-urls';
+    
     public function __construct() {
         $this->canCacheValidationOutput = false;
     }
@@ -50,9 +52,13 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    protected function performValidation() {                  
+    protected function performValidation() {
         $linkChecker = new \webignition\HtmlDocumentLinkChecker\HtmlDocumentLinkChecker();
         $linkChecker->setWebPage($this->webResource);
+        
+        if ($this->task->hasParameter(self::EXCLUDED_URLS_PARAMETER_NAME)) {
+            $linkChecker->setUrlsToExclude($this->task->getParameter(self::EXCLUDED_URLS_PARAMETER_NAME));
+        }
         
         $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable-Link-Integrity-Task-Driver/0.1 (http://simplytestable.com/)');             
         $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());        
