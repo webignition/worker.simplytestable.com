@@ -14,13 +14,16 @@ class BugFixTest extends ConsoleCommandBaseTestCase {
         $this->assertTrue(true);
         return;
    
-        $taskObject = $this->createTask('http://www.boxuk.com/blog/dark-patterns-in-ux/', 'Link integrity');
+//        $taskObject = $this->createTask('http://www.boxuk.com/blog/dark-patterns-in-ux/', 'Link integrity');
+        $taskObject = $this->createTask('http://www.joelonsoftware.com/', 'Link integrity');
 
         $task = $this->getTaskService()->getById($taskObject->id);
         
         $this->assertEquals(0, $this->runConsole('simplytestable:task:perform', array(
             $task->getId() => true
         )));
+        
+        var_dump(json_decode($task->getOutput()->getOutput()));
     } 
 }
 

@@ -417,8 +417,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @param string $url
      * @return WebResource
      */    
-    private function getJavaScriptWebResourceFromUrl($url) {            
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('SimplyTestable-JS-static-analyser/0.1 (http://simplytestable.com/)');        
+    private function getJavaScriptWebResourceFromUrl($url) {                    
+        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('ST Link JS Static Analysis Task Driver (http://bit.ly/RlhKCL)');
         $request = $this->getWebResourceService()->getHttpClientService()->getRequest((string)$url, array());
         $webResource = $this->getWebResourceService()->get($request);        
         $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);             
