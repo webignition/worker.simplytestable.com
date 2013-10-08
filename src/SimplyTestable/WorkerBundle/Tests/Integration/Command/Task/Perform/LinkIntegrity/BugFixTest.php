@@ -13,9 +13,12 @@ class BugFixTest extends ConsoleCommandBaseTestCase {
     public function testBugFix() {        
         $this->assertTrue(true);
         return;
+	
+        
+        $taskObject = $this->createTask('http://www.joelonsoftware.com/articles/fog0000000017.html', 'Link integrity');
    
 //        $taskObject = $this->createTask('http://www.boxuk.com/blog/dark-patterns-in-ux/', 'Link integrity');
-        $taskObject = $this->createTask('http://www.joelonsoftware.com/', 'Link integrity');
+//        $taskObject = $this->createTask('http://www.joelonsoftware.com/', 'Link integrity');
 
         $task = $this->getTaskService()->getById($taskObject->id);
         
@@ -23,7 +26,7 @@ class BugFixTest extends ConsoleCommandBaseTestCase {
             $task->getId() => true
         )));
         
-        var_dump(json_decode($task->getOutput()->getOutput()));
+        //var_dump(json_decode($task->getOutput()->getOutput()));
     } 
 }
 

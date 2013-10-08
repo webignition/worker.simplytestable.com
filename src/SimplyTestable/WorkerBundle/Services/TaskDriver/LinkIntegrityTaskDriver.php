@@ -60,10 +60,14 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
             $linkChecker->setUrlsToExclude($this->task->getParameter(self::EXCLUDED_URLS_PARAMETER_NAME));
         }
         
+        $this->getWebResourceService()->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
+        
         $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('ST Link Integrity Task Driver (http://bit.ly/RlhKCL)');             
         $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());        
         $linkCheckResults = $linkChecker->getAll();
         $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);
+        
+        $this->getWebResourceService()->getHttpClientService()->enablePlugins();
 
         $this->response->setErrorCount(count($linkChecker->getErrored()));                
         return json_encode($this->getOutputOject($linkCheckResults));

@@ -42,14 +42,57 @@ class HttpClientService {
     
     public function get($baseUrl = '', $config = null) {
         if (is_null($this->httpClient)) {
-            $this->httpClient = new HttpClient($baseUrl, $config);
-            
-            foreach ($this->getPlugins() as $plugin) {
-                $this->httpClient->addSubscriber($plugin);
-            }            
+            $this->httpClient = new HttpClient($baseUrl, $config);            
+            $this->enablePlugins();         
         }
         
         return $this->httpClient;
+    }
+    
+    public function enablePlugins() {        
+        foreach ($this->getPlugins() as $plugin) {
+            if (!$this->hasPlugin(get_class($plugin))) {
+                $this->httpClient->addSubscriber($plugin);
+            }            
+        }        
+    }    
+    
+    
+    public function disablePlugin($pluginClassName) {
+        if (!$this->hasPlugin($pluginClassName)) {
+            return true;
+        }
+        
+        $this->get()->getEventDispatcher()->removeSubscriber($this->getPluginListener($pluginClassName));
+    }  
+    
+    
+    private function getPluginListener($pluginClassName) {
+        foreach ($this->httpClient->getEventDispatcher()->getListeners() as $eventName => $eventListeners) {
+            foreach ($eventListeners as $eventListener) {
+                if (get_class($eventListener[0]) == $pluginClassName) {
+                    return $eventListener[0];
+                }
+            }
+        }       
+    }
+    
+    
+    /**
+     * 
+     * @param string $pluginClassName
+     * @return boolean
+     */
+    public function hasPlugin($pluginClassName) {        
+        foreach ($this->httpClient->getEventDispatcher()->getListeners() as $eventName => $eventListeners) {
+            foreach ($eventListeners as $eventListener) {
+                if (get_class($eventListener[0]) == $pluginClassName) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
     
     
