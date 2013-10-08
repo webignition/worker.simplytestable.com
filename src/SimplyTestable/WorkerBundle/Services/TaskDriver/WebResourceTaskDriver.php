@@ -151,11 +151,31 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      * @param Task $task
      * @return WebResource 
      */
-    protected function getWebResource(Task $task) {        
+    protected function getWebResource(Task $task, $additionalHeaders = array()) {        
         try {            
             $request = $this->getWebResourceService()->getHttpClientService()->getRequest($task->getUrl());
+            
+            if (is_array($additionalHeaders) && count($additionalHeaders)) {
+                $request->addHeaders($additionalHeaders);
+            }
+            
             return $this->getWebResourceService()->get($request);            
-        } catch (WebResourceException $webResourceException) {
+        } catch (WebResourceException $webResourceException) {            
+            if ($webResourceException->getResponse()->getStatusCode() == 401 && $task->hasParameter('http-auth')) {
+                $httpAuthParameters = $task->getParameter('http-auth');
+                if (!isset($httpAuthParameters->{'has-tried'})) {
+                    $httpAuthParameters->has_tried = true;
+                    $taskParameters = $task->getParametersObject();
+                    $taskParameters->{'http-auth'}->{'has-tried'} = true;
+                    
+                    $task->setParameters(json_encode($taskParameters));
+                    
+                    return $this->getWebResource($task, array(
+                        'Authorization' => 'Basic ' . base64_encode($httpAuthParameters->username.':'.$httpAuthParameters->password)
+                    ));
+                }
+            }
+            
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
             
