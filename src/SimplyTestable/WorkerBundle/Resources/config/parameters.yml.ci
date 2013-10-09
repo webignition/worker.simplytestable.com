@@ -30,7 +30,11 @@ parameters:
     link-integrity:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver
       task-types:
-        - "Link integrity"    
+        - "Link integrity"
+      properties:
+        user-agents:
+          - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
+          - Mozilla/5.0   
   content_type_web_resource_map:
     default: webignition\WebResource\WebResource
     text/html: webignition\WebResource\WebPage\WebPage
