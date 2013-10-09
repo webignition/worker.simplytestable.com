@@ -52,7 +52,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    protected function performValidation() {    
+    protected function performValidation() {            
         $linkChecker = new \webignition\HtmlDocumentLinkChecker\HtmlDocumentLinkChecker();
         $linkChecker->setWebPage($this->webResource);
         $linkChecker->setHttpMethodList(array(
@@ -65,10 +65,9 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
         
         $this->getWebResourceService()->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
         
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('ST Link Integrity Task Driver (http://bit.ly/RlhKCL)');             
+        $linkChecker->setUserAgents($this->getProperty('user-agents'));
         $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());
         $linkCheckResults = $linkChecker->getAll();
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);
         
         $this->getWebResourceService()->getHttpClientService()->enablePlugins();
 

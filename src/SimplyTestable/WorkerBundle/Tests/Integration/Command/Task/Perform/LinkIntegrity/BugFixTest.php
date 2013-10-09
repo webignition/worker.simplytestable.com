@@ -18,7 +18,7 @@ class BugFixTest extends ConsoleCommandBaseTestCase {
 //        $taskObject = $this->createTask('http://www.joelonsoftware.com/articles/fog0000000017.html', 'Link integrity');
 //        $taskObject = $this->createTask('http://www.boxuk.com/blog/dark-patterns-in-ux/', 'Link integrity');
 //        $taskObject = $this->createTask('http://www.joelonsoftware.com/', 'Link integrity');        
-        $taskObject = $this->createTask('http://www.boxuk.com/blog/analyzing-the-design-of-websites/', 'Link integrity');
+        $taskObject = $this->createTask('http://www.boxuk.com/news/box-uk-to-showcase-digital-solutions-at-tfma-exhibition/', 'Link integrity');
    
 
 
