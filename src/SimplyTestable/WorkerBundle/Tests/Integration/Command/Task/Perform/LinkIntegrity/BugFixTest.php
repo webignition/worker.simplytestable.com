@@ -22,7 +22,8 @@ class BugFixTest extends ConsoleCommandBaseTestCase {
 //        $taskObject = $this->createTask('http://www.boxuk.com/news/box-uk-to-showcase-digital-solutions-at-tfma-exhibition/', 'Link integrity');
         
         $urls = array(
-            'http://www.hnp.dk/'
+            'http://sequence.co.uk/tags/design',
+            'http://www.limegreentangerine.co.uk/about/'
         );
         
         foreach ($urls as $url) {
@@ -34,9 +35,9 @@ class BugFixTest extends ConsoleCommandBaseTestCase {
                 $task->getId() => true
             )));
 
-            var_dump($task->getOutput()->getOutput());            
-            
-            echo "\n\n";
+//            //var_dump($task->getOutput()->getOutput());            
+//            
+//            echo "\n\n";
         }
         
         
