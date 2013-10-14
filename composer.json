@@ -30,7 +30,7 @@
         "webignition/web-page-model":">=0.6,<2.0",
         "webignition/web-json-model":">=0.1,<2.0",
         "webignition/absolute-url-deriver":">=1.4",
-        "webignition/node-jslint-output-parser":">=1.0.2,<2.0",
+        "webignition/node-jslint-output-parser":">=1.0.5,<2.0",
         "webignition/html-document-type-identifier":">=0.1,<1.0",
         "webignition/css-validator-output-parser":">=1.6.4,<2.0",
         "winzou/console-bundle":"1.0.0",

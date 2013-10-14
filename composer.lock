@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "31f19896fd844d0ddfe6d783fcd38a58",
+    "hash": "d394f51932af7f13543e1cfcc65a70b9",
     "packages": [
         {
             "name": "doctrine/common",
@@ -2353,16 +2353,16 @@
         },
         {
             "name": "webignition/node-jslint-output-parser",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/node-jslint-output-parser.git",
-                "reference": "3560c606249c64fcf327a970c6cfd0accdf86fbe"
+                "reference": "935401588d097fc7d5cff13521d725e5e94de3d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/3560c606249c64fcf327a970c6cfd0accdf86fbe",
-                "reference": "3560c606249c64fcf327a970c6cfd0accdf86fbe",
+                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/935401588d097fc7d5cff13521d725e5e94de3d8",
+                "reference": "935401588d097fc7d5cff13521d725e5e94de3d8",
                 "shasum": ""
             },
             "require": {
@@ -2389,7 +2389,7 @@
             "keywords": [
                 "rss"
             ],
-            "time": "2013-09-13 15:26:15"
+            "time": "2013-10-14 11:58:49"
         },
         {
             "name": "webignition/quoted-string",

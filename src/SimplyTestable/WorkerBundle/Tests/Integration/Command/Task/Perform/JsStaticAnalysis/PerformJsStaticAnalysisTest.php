@@ -107,7 +107,7 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
 
         $this->assertEquals(0, $response);        
         $this->assertEquals(1, $task->getOutput()->getErrorCount());
-        $this->assertEquals('{"http:\/\/js-static-analysis.simplytestable.com\/assets\/js\/app.js":{"statusLine":"\/tmp\/394c3b5df64d0016a78c6946bbfa7bc9","entries":[]},"9ce0130bd698c62e66f3356818aefff5":{"statusLine":"\/tmp\/9ce0130bd698c62e66f3356818aefff5","entries":[{"headerLine":{"errorNumber":1,"errorMessage":"Missing \'use strict\' statement."},"fragmentLine":{"fragment":"};","lineNumber":5,"columnNumber":1}}]}}', $task->getOutput()->getOutput());     
+        $this->assertEquals('{"http:\/\/js-static-analysis.simplytestable.com\/assets\/js\/app.js":{"statusLine":"\/tmp\/394c3b5df64d0016a78c6946bbfa7bc9","entries":[]},"27b65b1ff31a7d0adc705d8eac9764e4":{"statusLine":"\/tmp\/27b65b1ff31a7d0adc705d8eac9764e4","entries":[{"headerLine":{"errorNumber":1,"errorMessage":"Missing \'use strict\' statement."},"fragmentLine":{"fragment":"    return true;","lineNumber":5,"columnNumber":5}}]}}', $task->getOutput()->getOutput());     
     } 
     
     /**
@@ -127,7 +127,7 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
 
         $this->assertEquals(0, $response);        
         $this->assertEquals(1, $task->getOutput()->getErrorCount());        
-        $this->assertEquals('{"http:\/\/js-static-analysis.simplytestable.com\/assets\/js\/app.js":{"statusLine":"\/tmp\/394c3b5df64d0016a78c6946bbfa7bc9","entries":[]},"http:\/\/js-static-analysis.simplytestable.com\/assets\/js\/one-error.js":{"statusLine":"\/tmp\/9ce0130bd698c62e66f3356818aefff5","entries":[{"headerLine":{"errorNumber":1,"errorMessage":"Missing \'use strict\' statement."},"fragmentLine":{"fragment":"};","lineNumber":5,"columnNumber":1}}]}}', $task->getOutput()->getOutput());     
+        $this->assertEquals('{"http:\/\/js-static-analysis.simplytestable.com\/assets\/js\/app.js":{"statusLine":"\/tmp\/394c3b5df64d0016a78c6946bbfa7bc9","entries":[]},"http:\/\/js-static-analysis.simplytestable.com\/assets\/js\/one-error.js":{"statusLine":"\/tmp\/cf1dee16b6b54c74e9f5085faeb5965c","entries":[{"headerLine":{"errorNumber":1,"errorMessage":"Missing \'use strict\' statement."},"fragmentLine":{"fragment":"    return true;","lineNumber":5,"columnNumber":5}}]}}', $task->getOutput()->getOutput());     
     } 
     
     
@@ -150,7 +150,7 @@ class PerformJsStaticAnalysisTest extends ConsoleCommandBaseTestCase {
         ));
 
         $this->assertEquals(0, $response);        
-        $this->assertEquals(51, $task->getOutput()->getErrorCount());                
+        $this->assertEquals(31, $task->getOutput()->getErrorCount());                
     }  
     
     

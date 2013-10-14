@@ -10,6 +10,7 @@ Content-Type: text/html
 <script type="text/javascript">
 function myClass() {
     "use strict";
+    return true;
 }
 
 var myInstance = new myClass();
