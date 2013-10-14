@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "d394f51932af7f13543e1cfcc65a70b9",
+    "hash": "b62b1b28bee044103ca2c9b23b4d3cc2",
     "packages": [
         {
             "name": "doctrine/common",
@@ -2176,16 +2176,16 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "0.6.3",
+            "version": "0.6.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "31ca717669acee359efa37a66e869a66b8138b1d"
+                "reference": "2eb1f3a4880cff1cb2fd50a0fbc2aafbc5105828"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/31ca717669acee359efa37a66e869a66b8138b1d",
-                "reference": "31ca717669acee359efa37a66e869a66b8138b1d",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/2eb1f3a4880cff1cb2fd50a0fbc2aafbc5105828",
+                "reference": "2eb1f3a4880cff1cb2fd50a0fbc2aafbc5105828",
                 "shasum": ""
             },
             "require": {
@@ -2219,7 +2219,7 @@
                 "html",
                 "link"
             ],
-            "time": "2013-10-11 16:11:02"
+            "time": "2013-10-14 14:30:33"
         },
         {
             "name": "webignition/html-document-link-finder",

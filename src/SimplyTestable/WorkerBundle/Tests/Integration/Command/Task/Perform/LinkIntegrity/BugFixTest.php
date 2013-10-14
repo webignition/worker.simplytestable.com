@@ -22,8 +22,9 @@ class BugFixTest extends ConsoleCommandBaseTestCase {
 //        $taskObject = $this->createTask('http://www.boxuk.com/news/box-uk-to-showcase-digital-solutions-at-tfma-exhibition/', 'Link integrity');
         
         $urls = array(
-            'http://sequence.co.uk/tags/design',
-            'http://www.limegreentangerine.co.uk/about/'
+//            'http://sequence.co.uk/tags/design',
+//            'http://www.limegreentangerine.co.uk/about/',
+            'http://www.imaginet.co.uk/news/awards/hybu-cig-cymru-new-statesman-award/'
         );
         
         foreach ($urls as $url) {
