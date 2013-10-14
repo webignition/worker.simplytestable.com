@@ -42,16 +42,16 @@ before_script:
   - echo "yes" | sudo add-apt-repository ppa:chris-lea/node.js
   - sudo apt-get update
   - sudo apt-get install nodejs  
-  - node -v
+  #- node -v
 
   #- sudo ln -s /usr/bin/node /usr/bin/nodejs
-  - ls -la /usr/bin/node
-  - ls -la /usr/bin/nodejs
-  #- sudo mkdir /usr/share/node-jslint && cd /usr/share/node-jslint && sudo npm install jslint@0.1.9 && sudo npm install jslint
+  #- ls -la /usr/bin/node
+  #- ls -la /usr/bin/nodejs
+  - sudo mkdir /usr/share/node-jslint && cd /usr/share/node-jslint && sudo npm install jslint@0.1.9
   #- cd $CI_HOME
   
   # Test node-jslint
-  #- /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js travis-ci/sample.js
+  - /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js travis-ci/sample.js
   
   # Install composer for dependency management
   #- wget http://getcomposer.org/composer.phar 
@@ -61,22 +61,22 @@ before_script:
   #- cp .travis.composer.config.json ~/.composer/config.json  
   
   # Build!
-  #- mkdir app/cache/test  
-  #- mv app/config/parameters.yml.travis app/config/parameters.yml
-  #- cp app/config/security_credentials.yml.dist app/config/security_credentials.yml
-  #- mv --force app/config/config_travis.yml app/config/config_test.yml
-  #- cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
-  #- php composer.phar install  
-  #- php app/console doctrine:database:create
-  #- php app/console doctrine:migrations:migrate --no-interaction
-  #- php app/console doctrine:fixtures:load --append  
+  - mkdir app/cache/test  
+  - mv app/config/parameters.yml.travis app/config/parameters.yml
+  - cp app/config/security_credentials.yml.dist app/config/security_credentials.yml
+  - mv --force app/config/config_travis.yml app/config/config_test.yml
+  - cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
+  - php composer.phar install  
+  - php app/console doctrine:database:create
+  - php app/console doctrine:migrations:migrate --no-interaction
+  - php app/console doctrine:fixtures:load --append  
   
   # Update /etc/hosts for html validator
   #- echo "5.9.84.201 html-validator.worker.simplytestable.com" | sudo tee --append /etc/hosts
   
 script:
-  - echo "Hello World"
-  #- phpunit -c app --stop-on-failure src/SimplyTestable/WorkerBundle/Tests/Command/Task/Perform/JsStaticAnalysis/JsLintOptions/BooleanOptions/Es5Test.php
+  #- echo "Hello World"
+  - phpunit -c app --stop-on-failure src/SimplyTestable/WorkerBundle/Tests/Command/Task/Perform/JsStaticAnalysis/JsLintOptions/BooleanOptions/Es5Test.php
   #- phpunit -c app --group standard
   #- phpunit -c app --group integration-standard-travis
   #- phpunit -c app --group integration-html-validation-travis
