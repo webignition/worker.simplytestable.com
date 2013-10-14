@@ -24,7 +24,8 @@ class BugFixTest extends ConsoleCommandBaseTestCase {
         $urls = array(
 //            'http://sequence.co.uk/tags/design',
 //            'http://www.limegreentangerine.co.uk/about/',
-            'http://www.imaginet.co.uk/news/awards/hybu-cig-cymru-new-statesman-award/'
+//            'http://www.imaginet.co.uk/news/awards/hybu-cig-cymru-new-statesman-award/',
+            'http://www.limegreentangerine.co.uk/about/'
         );
         
         foreach ($urls as $url) {
@@ -36,7 +37,7 @@ class BugFixTest extends ConsoleCommandBaseTestCase {
                 $task->getId() => true
             )));
 
-//            //var_dump($task->getOutput()->getOutput());            
+//            var_dump($task->getOutput()->getOutput());            
 //            
 //            echo "\n\n";
         }
