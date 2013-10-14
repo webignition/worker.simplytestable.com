@@ -14,18 +14,17 @@ env:
     - CI_HOME=`pwd`/$REPO  
   
 before_script:
-  - lsb_release -a  
-  #- curl http://css-validation.simplytestable.com/twitter-bootstrap/2.3.1.html
+  - curl http://css-validation.simplytestable.com/twitter-bootstrap/2.3.1.html
   
   # Install memcache extension
-  #- wget http://pecl.php.net/get/memcache-2.2.7.tgz
-  #- tar -zxf memcache-2.2.7.tgz
-  #- sh -c "cd memcache-2.2.7 && phpize && ./configure && make --quiet && sudo make --quiet install"
-  #- echo "extension=memcache.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s/.*:\s*//"`  
+  - wget http://pecl.php.net/get/memcache-2.2.7.tgz
+  - tar -zxf memcache-2.2.7.tgz
+  - sh -c "cd memcache-2.2.7 && phpize && ./configure && make --quiet && sudo make --quiet install"
+  - echo "extension=memcache.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s/.*:\s*//"`  
   
   #- printf "yes\n" | pecl install memcache
   #- echo "extension=\"memcache.so\"" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`  
-  #- php -r 'new \Memcache;'
+  - php -r 'new \Memcache;'
   
   # Install the W3C CSS validator
   #- sudo apt-get update
@@ -43,38 +42,34 @@ before_script:
   - sudo ln -s /usr/bin/node /usr/bin/nodejs
   - ls -la /usr/bin/node
   - ls -la /usr/bin/nodejs
-  - /usr/bin/node -v
-  - /usr/bin/nodejs -v
-  #- sudo mkdir /usr/share/node-jslint && cd /usr/share/node-jslint && sudo npm install jslint && sudo npm install jslint
-  #- cd $CI_HOME
+  - sudo mkdir /usr/share/node-jslint && cd /usr/share/node-jslint && sudo npm install jslint && sudo npm install jslint
+  - cd $CI_HOME
   
   # Test node-jslint
-  #- /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js travis-ci/sample.js
+  - /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js travis-ci/sample.js
   
   # Install composer for dependency management
-  #- wget http://getcomposer.org/composer.phar 
+  - wget http://getcomposer.org/composer.phar 
   
   # Set the GitHub OAuth token to make use of the 6000 per hour rate limit
-  #- "mkdir -p ~/.composer"
-  #- cp .travis.composer.config.json ~/.composer/config.json  
+  - "mkdir -p ~/.composer"
+  - cp .travis.composer.config.json ~/.composer/config.json  
   
   # Build!
   #- mkdir app/cache/test  
-  #- mv app/config/parameters.yml.travis app/config/parameters.yml
-  #- cp app/config/security_credentials.yml.dist app/config/security_credentials.yml
-  #- mv --force app/config/config_travis.yml app/config/config_test.yml
-  #- cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
-  #- php composer.phar install
-  #- php app/console doctrine:database:create
-  #- php app/console doctrine:migrations:migrate --no-interaction
-  #- php app/console doctrine:fixtures:load --append  
+  - mv app/config/parameters.yml.travis app/config/parameters.yml
+  - cp app/config/security_credentials.yml.dist app/config/security_credentials.yml
+  - mv --force app/config/config_travis.yml app/config/config_test.yml
+  - cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
+  - php composer.phar install
+  - php app/console doctrine:database:create
+  - php app/console doctrine:migrations:migrate --no-interaction
+  - php app/console doctrine:fixtures:load --append  
   
   # Update /etc/hosts for html validator
   #- echo "5.9.84.201 html-validator.worker.simplytestable.com" | sudo tee --append /etc/hosts
   
 script:
-  - echo "Hello World"
-  #- phpunit -c app src/SimplyTestable/WorkerBundle/Tests/Command/Task/Perform/JsStaticAnalysis/JsLintOptions/BooleanOptions/Es5Test.php
   #- phpunit -c app --group standard
   #- phpunit -c app --group integration-standard-travis
   #- phpunit -c app --group integration-html-validation-travis

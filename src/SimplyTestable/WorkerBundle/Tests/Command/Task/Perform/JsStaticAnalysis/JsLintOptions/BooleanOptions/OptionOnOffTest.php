@@ -36,7 +36,7 @@ abstract class OptionOnOffTest extends ConsoleCommandBaseTestCase {
 
         $this->assertEquals(0, $response);
         
-//        var_dump($task->getOutput()->getOutput());
+        var_dump($task->getOutput()->getOutput());
 //        exit();
         
         $this->assertEquals($expectedErrorCount, $task->getOutput()->getErrorCount());           
