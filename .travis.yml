@@ -27,28 +27,23 @@ before_script:
   - php -r 'new \Memcache;'
   
   # Install the W3C CSS validator
-  #- sudo apt-get update
-  #- sudo apt-get install ant cvs openjdk-7-jdk
-  #- sudo mkdir /usr/share/css-validator
-  #- cd /usr/share/css-validator
-  #- sudo CVSROOT=:pserver:anonymous:anonymous@dev.w3.org:/sources/public cvs -q checkout 2002/css-validator
-  #- cd 2002/css-validator/
-  #- sudo sed -i 's/http:\/\/about.validator.nu\/htmlparser\/htmlparser-1.3.1.zip/ftp:\/\/ftp.linux.org.tr\/gentoo\/distfiles\/htmlparser-1.3.1.zip/g' build.xml
-  #- sudo ant -q jar
-  #- cd $CI_HOME
+  - sudo apt-get update
+  - sudo apt-get install ant cvs openjdk-7-jdk
+  - sudo mkdir /usr/share/css-validator
+  - cd /usr/share/css-validator
+  - sudo CVSROOT=:pserver:anonymous:anonymous@dev.w3.org:/sources/public cvs -q checkout 2002/css-validator
+  - cd 2002/css-validator/
+  - sudo sed -i 's/http:\/\/about.validator.nu\/htmlparser\/htmlparser-1.3.1.zip/ftp:\/\/ftp.linux.org.tr\/gentoo\/distfiles\/htmlparser-1.3.1.zip/g' build.xml
+  - sudo ant -q jar
+  - cd $CI_HOME
   
   # Install nodejs and node-jslint
   - sudo apt-get install python-software-properties python g++ make
   - echo "yes" | sudo add-apt-repository ppa:chris-lea/node.js
   - sudo apt-get update
-  - sudo apt-get install nodejs  
-  #- node -v
-
-  #- sudo ln -s /usr/bin/node /usr/bin/nodejs
-  #- ls -la /usr/bin/node
-  #- ls -la /usr/bin/nodejs
+  - sudo apt-get install nodejs 
   - sudo mkdir /usr/share/node-jslint && cd /usr/share/node-jslint && sudo npm install jslint@0.2.0
-  - cd $CI_HOME
+  - cd $CI_HOME  
   
   # Test node-jslint
   - /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js travis-ci/sample.js
@@ -61,27 +56,25 @@ before_script:
   - cp .travis.composer.config.json ~/.composer/config.json  
   
   # Build!
-  - mkdir app/cache/test  
+  #- mkdir app/cache/test  
   - mv app/config/parameters.yml.travis app/config/parameters.yml
   - cp app/config/security_credentials.yml.dist app/config/security_credentials.yml
   - mv --force app/config/config_travis.yml app/config/config_test.yml
   - cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
-  - php composer.phar install  
+  - php composer.phar install
   - php app/console doctrine:database:create
   - php app/console doctrine:migrations:migrate --no-interaction
   - php app/console doctrine:fixtures:load --append  
   
   # Update /etc/hosts for html validator
-  #- echo "5.9.84.201 html-validator.worker.simplytestable.com" | sudo tee --append /etc/hosts
+  - echo "5.9.84.201 html-validator.worker.simplytestable.com" | sudo tee --append /etc/hosts
   
 script:
-  #- echo "Hello World"
-  - phpunit -c app --stop-on-failure src/SimplyTestable/WorkerBundle/Tests/Command/Task/Perform/JsStaticAnalysis/JsLintOptions/BooleanOptions/Es5Test.php
-  #- phpunit -c app --group standard
-  #- phpunit -c app --group integration-standard-travis
-  #- phpunit -c app --group integration-html-validation-travis
+  - phpunit -c app --group standard
+  - phpunit -c app --group integration-standard-travis
+  - phpunit -c app --group integration-html-validation-travis
   #- phpunit -c app --group integration-css-validation-travis
-  #- phpunit -c app --group integration-js-static-analysis-travis
+  - phpunit -c app --group integration-js-static-analysis-travis
   
 after_failure:
   #- cat /home/travis/build/webignition/worker.simplytestable.com/app/logs/test.log | grep "response fixture path"
