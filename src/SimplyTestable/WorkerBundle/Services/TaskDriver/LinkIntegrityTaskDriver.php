@@ -13,6 +13,7 @@ use webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier;
 class LinkIntegrityTaskDriver extends WebResourceTaskDriver {    
     
     const EXCLUDED_URLS_PARAMETER_NAME = 'excluded-urls';
+    const EXCLUDED_DOMAINS_PARAMETER_NAME = 'excluded-domains';
     
     public function __construct() {
         $this->canCacheValidationOutput = false;
@@ -61,7 +62,11 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
         
         if ($this->task->hasParameter(self::EXCLUDED_URLS_PARAMETER_NAME)) {
             $linkChecker->setUrlsToExclude($this->task->getParameter(self::EXCLUDED_URLS_PARAMETER_NAME));
-        }
+        }        
+        
+        if ($this->task->hasParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME)) {
+            $linkChecker->setDomainsToExclude($this->task->getParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME));
+        }                
         
         $this->getWebResourceService()->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
         
