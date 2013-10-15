@@ -67,6 +67,8 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
         
         $linkChecker->setUserAgents($this->getProperty('user-agents'));
         $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());
+        $linkChecker->setRetryOnBadResponse(false);
+        
         $linkCheckResults = $linkChecker->getAll();
         
         $this->getWebResourceService()->getHttpClientService()->enablePlugins();
