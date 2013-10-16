@@ -36,7 +36,7 @@
         "winzou/console-bundle":"1.0.0",
         "guzzle/guzzle":"3.7.2",        
         "doctrine/doctrine-fixtures-bundle": "dev-master",
-        "webignition/html-document-link-finder":">=0.4.2,<1.0",
+        "webignition/html-document-link-finder":">=0.5,<1.0",
         "webignition/html-document-link-checker":">=0.7,<1.0"
     },
     "scripts": {
