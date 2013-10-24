@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "72f89ef2f0356ab09114a0286594caec",
+    "hash": "de5db03480563b2758934f32a5f95105",
     "packages": [
         {
             "name": "doctrine/common",
@@ -2268,16 +2268,16 @@
         },
         {
             "name": "webignition/html-document-type-identifier",
-            "version": "0.8",
+            "version": "0.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-type-identifier.git",
-                "reference": "16208b1773e477a529a7fd89cceb98dcadd9733e"
+                "reference": "c0b41de6d23f9e1f11d3f4cdfe67213c798331d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-identifier/zipball/16208b1773e477a529a7fd89cceb98dcadd9733e",
-                "reference": "16208b1773e477a529a7fd89cceb98dcadd9733e",
+                "url": "https://api.github.com/repos/webignition/html-document-type-identifier/zipball/c0b41de6d23f9e1f11d3f4cdfe67213c798331d1",
+                "reference": "c0b41de6d23f9e1f11d3f4cdfe67213c798331d1",
                 "shasum": ""
             },
             "type": "library",
@@ -2303,7 +2303,7 @@
                 "document",
                 "html"
             ],
-            "time": "2013-09-13 14:14:56"
+            "time": "2013-10-24 10:08:08"
         },
         {
             "name": "webignition/internet-media-type",
