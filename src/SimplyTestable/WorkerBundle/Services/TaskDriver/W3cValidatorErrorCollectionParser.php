@@ -82,7 +82,7 @@ class W3cValidatorErrorCollectionParser {
     
     /**
      *
-     * @return SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser  
+     * @return \SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser  
      */
     private function getErrorParser() {
         if (is_null($this->errorParser)) {

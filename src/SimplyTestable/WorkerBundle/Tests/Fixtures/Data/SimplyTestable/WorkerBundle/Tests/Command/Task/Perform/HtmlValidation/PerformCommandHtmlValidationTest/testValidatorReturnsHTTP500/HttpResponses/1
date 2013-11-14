@@ -1,0 +1,374 @@
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru-ru" lang="ru-ru">
+
+<head>
+  <base href="http://vash-pereezd.com.ua/dachnye-pereezdy.html" />
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="robots" content="index, follow" />
+  <meta name="keywords" content="Дачные переезды, Мариуполь" />
+  <meta name="title" content="Дачные переезды" />
+  <meta name="author" content="Ваш Переезд" />
+  <meta name="description" content="Дачные переезды относятся к той категории переездам, которая называется сезонной. Переезд дачи осуществляется в основном в тёплое время года." />
+  <meta name="generator" content="" />
+  <title>Дачные переезды</title>
+  <link href="/templates/jb_newstream/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+  <script type="text/javascript" src="/media/system/js/mootools.js"></script>
+  <script type="text/javascript" src="/media/system/js/caption.js"></script>
+  <script type="text/javascript">
+var paneltype = 'height';
+  </script>
+
+<link rel="shortcut icon" href="/templates/jb_newstream/favicon.ico" />
+ 
+<!-- Import Style Sheets-->
+<link rel="stylesheet" href="/templates/zengridframework/css/css.php?s=template_css,joomla,theme&amp;system=1" type="text/css" />
+<link href="/templates/jb_newstream/css/theme.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="/templates/jb_newstream/css/hilites/blueandgreen.css" rel="stylesheet" type="text/css" media="screen" />
+<!--[if IE 6]>
+<link href="/templates/jb_newstream/css/ie6.css" rel="stylesheet" type="text/css" media="screen" />
+<![endif]-->
+
+						<script type="text/JavaScript" src="/templates/zengridframework/js/jquery.zengrid.combined.gzip.php"></script>	
+						<script type="text/javaScript" src="/templates/jb_newstream/js/template.js"></script>	
+
+
+<script type="text/javascript">
+jQuery(document).ready(function(){
+	
+	
+			jQuery(".moduletable-superfish ul,#nav ul")
+			.supersubs({ 
+            minWidth:    17,   // minimum width of sub-menus in em units 
+            maxWidth:    30,   // maximum width of sub-menus in em units 
+            extraWidth:  1     // extra width can ensure lines don't sometimes turn over 
+                               // due to slight rounding differences and font-family 
+        })
+			.superfish({
+				animation : {opacity:"show"},
+				delay : 1000
+			});	
+			
+			
+ 
+ 
+			
+			      
+
+
+						
+});
+</script>
+
+<style type="text/css" media="screen">body {#f9f9f9} h1{} h2{} h3,.moduletable h3{} a{} a{} a:hover{} #tagline span{}#logo h1 {font-size:3em}</style></head>
+
+<body class="helvetica " style="font-size: 78%">
+		<div id="fontHeadings" class="DroidSans">
+ 		
+
+<div class="fullWrap">
+
+
+<!-- Nav Wrapper -->
+<div class="outerWrapper navRow">
+		<div class="container center" style="width:1024px;">
+				<div class="containerBG absolute" style="width: 984px">
+						<div class="innerContainer" style="width:984px;margin-left:20px">
+						
+										 
+										
+									 
+									
+									
+								<div id="navWrapper">
+																				<div id="logo" style="width:231px">
+											<h2>
+												<a href="/index.php">
+																																								<span class="DroidSans">
+															Ваш Переезд														</span>
+																				
+												</a>
+											</h2>												
+																					<div id="tagline">
+													<span style="margin-left:0;margin-top:0;">Грузоперевозки, грузчики</span>
+											</div>
+																				</div> 
+																		
+																				<div id="navWrap" style="width:733px">
+												<div id="nav" class="helvetica">
+																	<div class="moduletable">
+					<ul class="menu"><li class="item1"><a href="http://vash-pereezd.com.ua/" class="mainlevel"><span>Услуги по перевозкам. Грузчики</span></a></li><li class="item102"><a href="/ceny-na-perevozki-v-mariupole.html" class="mainlevel"><span>Цены на перевозки в Мариуполе</span></a></li><li class="item578"><a href="/ceny-na-perevozki-v-kieve.html" class="mainlevel"><span>Цены на перевозки в Киеве</span></a></li></ul>		</div>
+			<div class="moduletable">
+					<p><img width="80" height="60" vspace="0" hspace="2" align="left" alt="" src="/images/stories/our_contacts.png" /><span style="font-size: 18px; ">096-97-90-757 Мариуполь</span></p>
+<p><span style="font-size: 18px; ">063-872-90-03 Киев</span></p>
+<p><span style="font-size: 18px; ">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 067-144-16-85 Киев</span></p>		</div>
+	
+												</div>	
+										</div>
+								</div>	
+						</div>
+				</div>
+		</div>
+</div>
+
+<!-- Nav Wrapper --><!-- Banner Wrapper -->
+<div class="outerWrapper bannerRow">
+		<div class="container center" style="width:1024px;">
+				<div class="containerBG">
+						<div class="innerContainer" style="width:984px;margin-left:20px">
+																
+								
+								<div id="banner" style="width:100%">
+												<div class="moduletable">
+					<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><br />
+<br />
+&nbsp;</p>
+<p><img width="983" height="384" title="Грузоперевозки, услуги грузчиков в Мариуполе" alt="pereezdy-ii-perevozka-gruzov-po-kievu" vspace="299" src="/images/stories/gruzoperevozki-uslugi-gruzchikov.png" /></p>		</div>
+	
+								</div> 								
+							
+																
+						</div>
+				</div>
+		</div>
+</div>
+<!-- Banner Wrapper -->
+<div class="outerWrapper mainRow">
+		<div class="container center" style="width:1024px;">
+				<div class="containerBG absolute ">
+						<div class="innerContainer" style="width:984px;margin-left:20px">
+										
+
+								<div id="mainWrap" class="twoL">
+							
+																
+																
+																<!-- Left Column -->
+									<div id="leftCol">
+											<div id="left" style="width:314.66666666667px;margin-right: 20px" class="twoL">
+											
+																										<div class="moduletable">
+							<h3>Наши плюсы</h3>
+						
+			
+			<div>
+			<p>1. Разборка и сборка мебели производиться без доплат;</p>
+<p>2. Поэтажная оплата отсутствует;</p>
+<p>3. Опыт работы грузчиков не менее 3-х лет;</p>
+<p>4. Отсутствие уловок,&nbsp;хитростей для &quot;выманивания&quot; денег.</p>			</div>
+		</div>
+			<div class="moduletable">
+							<h3>Наши услуги</h3>
+						
+			
+			<div>
+			<ul class="menu_menu"><li class="item567"><a href="/kvartirnye-pereezdy.html" class="mainlevel"><span>Квартирные переезды</span></a></li><li class="item568"><a href="/ofisnye-pereezdy.html" class="mainlevel"><span>Офисные переезды</span></a></li><li id="current" class="active item569"><a href="/dachnye-pereezdy.html" class="mainlevel"><span>Дачные переезды</span></a></li><li class="item570"><a href="/perevozka-mebeli.html" class="mainlevel"><span>Перевозка мебели</span></a></li><li class="item571"><a href="/perevozki-oborudovanija.html" class="mainlevel"><span>Перевозки оборудования</span></a></li><li class="item572"><a href="/perevozka-sejfov.html" class="mainlevel"><span>Перевозка сейфов</span></a></li><li class="item573"><a href="/perevozki-stiralnyh-mashin.html" class="mainlevel"><span>Перевозки стиральных машин</span></a></li><li class="item574"><a href="/perevozki-holodilnikov.html" class="mainlevel"><span>Перевозки холодильников</span></a></li><li class="item575"><a href="/demontazhnye-raboty.html" class="mainlevel"><span>Демонтажные работы</span></a></li><li class="item576"><a href="/vyvoz-stroitelnogo-musora.html" class="mainlevel"><span>Вывоз строительного мусора</span></a></li><li class="item577"><a href="/gruzchiki.html" class="mainlevel"><span>Грузчики</span></a></li><li class="item581"><a href="/poleznaja-informacija.html" class="mainlevel"><span>Полезная информация</span></a></li><li class="item583"><a href="/perevozka-pianino-rojalej.html" class="mainlevel"><span>Перевозка пианино, роялей</span></a></li><li class="item584"><a href="/skidki-v-mariupole.html" class="mainlevel"><span>Скидки в Мариуполе</span></a></li><li class="item585"><a href="/utilizacija-bytovogo-musora.html" class="mainlevel"><span>Утилизация бытового мусора</span></a></li></ul>			</div>
+		</div>
+			<div class="moduletable">
+							<h3>Прием заказов 24 часа в сутки!</h3>
+						
+			
+			<div>
+			<p><span style="font-size: 16px; ">Без перерыва и выходных!</span></p>			</div>
+		</div>
+			<div class="moduletable">
+						
+			
+			<div>
+			<p><img width="250" height="216" alt="" src="/images/stories/banner1.png" /></p>			</div>
+		</div>
+	
+											</div>
+									</div>
+								<!-- End Left Column -->
+																
+								
+								<!-- Main Content -->
+									<div id="midCol" style="width:649.33333333333px;float:right;margin-right: 0px" class="twoL">
+								
+								
+										<div class="clear"></div>
+										
+
+										<div id="mainContent"  class="twoL">
+												
+												﻿
+<div id="jbArticle">
+
+
+
+<h2 class="contentheading">
+				Дачные переезды	</h2>
+<a href="#comments">Перейти к комментариям</a> | <font color="red" size="4">!</font> <b>Информация актуальна по состоянию на:</b>
+<div class="jbMeta">
+
+<div class="jbAuthorDate">
+
+		<div class="jbCreatedate">
+		<span class="datemonth">Сен</span><span class="dateday">09</span><span class="dateyear">2013</span>	</div>
+		
+		<span class="jbAuthor">
+		Автор: Ваш Переезд	</span>
+	
+</div>
+
+
+
+
+
+ <div class="buttons">
+	
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+</div>
+
+<div style="text-align: -webkit-auto;"><span style="font-family: inherit; font-style: inherit; text-align: left; ">Дачные переезды&nbsp;</span><span style="font-family: inherit; font-style: inherit; color: rgb(68, 68, 68); line-height: 22px; text-align: left; ">относятся к той категории переездам, которая называется сезонной. Переезд дачи осуществляется в основном в тёплое время года.</span></div>
+<div style="text-align: -webkit-auto;">
+
+
+</div>
+<div class="itemFullText" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; text-align: left; color: rgb(68, 68, 68); line-height: 22px; ">
+<table width="60%" cellspacing="4" cellpadding="4" border="0" align="center">
+    <tbody>
+        <tr>
+            <td><a href="http://vash-pereezd.com.ua/ceny-na-perevozki-v-mariupole.html"><u><strong><span style="font-size: 16px;">Цены на дачные переезды в Мариуполе</span></strong></u></a></td>
+            <td><a href="http://vash-pereezd.com.ua/ceny-na-perevozki-v-kieve.html"><u><strong><span style="font-size: 16px;">Цены на дачные переезды в Киеве</span></strong></u></a></td>
+        </tr>
+    </tbody>
+</table>
+<h3>&nbsp;</h3>
+<h3>Что в основном перевозят на дачу?</h3>
+<div><br style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; " />
+Для большинства дача &ndash; хранилище старых вещей, которые жалко выкидывать. Сюда свозится старая мебель, аудио/видео техника, которая была заменена на новую. Многие садоводы любители привозят сюда инструменты для работы с растениями и деревьями.<br style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; " />
+Аналогично, как и в случае с передом квартиры и офисным переездом,&nbsp;<strong style="font-weight: bold; font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; ">дачный переезд</strong>&nbsp;имеет свои составляющие этапы.</div>
+<div><br style="font-family: inherit; font-style: inherit; font-size: 14px; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; " />
+ЭТАП 1. ПОДГОТОВКА К ДАЧНОМУ ПЕРЕЕЗДУ.<br style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; " />
+Как и в случае с квартирными и офисными переездами, необходимо:</div>
+<ul style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 10px; margin-right: 0px; margin-bottom: 10px; margin-left: 0px; vertical-align: top; ">
+    <li style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 4px; padding-right: 0px; padding-bottom: 4px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 18px; vertical-align: top; text-align: left; list-style-type: disc; ">заранее спланировать время и дату дачного переезда;</li>
+    <li style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 4px; padding-right: 0px; padding-bottom: 4px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 18px; vertical-align: top; text-align: left; list-style-type: disc; ">связаться с нами для уточнения количества упаковочного материала;</li>
+    <li style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 4px; padding-right: 0px; padding-bottom: 4px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 18px; vertical-align: top; text-align: left; list-style-type: disc; ">определится с количеством перевозимых на дачу вещей;</li>
+    <li style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 4px; padding-right: 0px; padding-bottom: 4px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 18px; vertical-align: top; text-align: left; list-style-type: disc; ">определиться с размерами транспортного средства;</li>
+    <li style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 4px; padding-right: 0px; padding-bottom: 4px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 18px; vertical-align: top; text-align: left; list-style-type: disc; ">произвести разборку/сборку перевозимой на дачу мебели.</li>
+</ul>
+<h3 style="font-weight: normal; font-family: 'Droid Sans', arial, serif; font-style: inherit; font-size: 1.1em; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 16px; padding-right: 0px; padding-bottom: 4px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; line-height: 1.6em; color: rgb(51, 51, 51); border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; border-top-color: rgb(51, 51, 51); border-right-color: rgb(51, 51, 51); border-bottom-color: rgb(51, 51, 51); border-left-color: rgb(51, 51, 51); border-image: initial; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; text-transform: uppercase; background-image: url(file:///E:/1.%20%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B/1.%20%D0%93%D1%80%D1%83%D0%B7%D0%BE%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B7%D0%BA%D0%B8/Re-edit/images/h3.png); background-attachment: initial; background-origin: initial; background-clip: initial; background-color: initial; clear: both; background-position: 100% 50%; background-repeat: no-repeat no-repeat; "><br style="font-family: inherit; font-style: inherit; font-size: 14px; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; " />
+ЭТАП 2. ОСУЩЕСТВЛЕНИЕ ДАЧНОГО ПЕРЕЕЗДА.</h3>
+<div><br style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; " />
+Наши грузчики упаковывают и транспортируют к месту загрузки машины имущество, которое перевозится на дачу.&nbsp;<br style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; " />
+&nbsp;Очень важно. Есть вещи, которые жалко выкидывать. Однако если они Вам совершенно не нужны, советуем пересмотреть отношение к ним, и может быть, отдать в их в хорошие руки.</div>
+<p style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 8px; margin-right: 0px; margin-bottom: 8px; margin-left: 0px; vertical-align: top; "><br style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; " />
+Настоятельно не советуем Вам осуществлять дачный переезд в плохую погоду. В большинстве случаев дачи это не заасфальтированные участки. Проезд транспорта может значительно затруднится, а вещи намокнуть под дождём.</p>
+<p style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 8px; margin-right: 0px; margin-bottom: 8px; margin-left: 0px; vertical-align: top; "><br style="font-family: inherit; font-style: inherit; outline-width: 0px; outline-style: initial; outline-color: initial; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; vertical-align: top; " />
+Заказывая услугу &laquo;Дачный переезд&raquo; у нас, Вы можете быть уверенны в качестве предоставляемых услуг и сроках исполнения заказа.</p>
+</div>
+<p>&nbsp;</p>
+	
+ <div class="share42init"></div>
+<script type="text/javascript" src="http://vash-pereezd.com.ua/share/share42.js"></script> 
+
+<a name="comments"></a>
+<!-- Put this script tag to the <head> of your page -->
+<script type="text/javascript" src="//vk.com/js/api/openapi.js?98"></script>
+
+<script type="text/javascript">
+  VK.init({apiId: 3787245, onlyWidgets: true});
+</script>
+
+<!-- Put this div tag to the place, where the Comments block will be -->
+<div id="vk_comments"></div>
+<script type="text/javascript">
+VK.Widgets.Comments("vk_comments", {limit: 10, width: "650", attach: "*"});
+</script></div>
+
+										</div>
+										
+
+										<div class="clear"></div>
+										
+																		</div>
+								<!-- End Main Content -->
+								
+								
+																
+																</div>
+								
+								<div class="clear"></div>
+								
+														</div>
+				</div>
+		</div>
+</div>
+
+
+<div class="outerWrapper footerRow">
+		<div class="container center" style="width:1024px;">
+			<div class="containerBG">
+				<div class="innerContainer" style="width:984px;margin-left:20px">
+					
+					
+										<div id="bottom">
+											
+					<div id="footer">
+					
+					
+							<div id="footerLeft" style="width:733px;margin-right: 20px">
+											<div class="moduletable">
+					<p><strong><a href="http://vash-pereezd.com.ua">Ваш Переезд</a></strong> - грузовые перевозки, услуги грузчиков в Мариуполе. Доставка товаров, строительных материалов. Вывоз стройтельного мусора. Грузоперевозки от 100 кг до 20 тонн. <strong><a href="http://vash-pereezd.com.ua">Ваш Переезд</a></strong> - наша работа!</p>		</div>
+	
+							</div>
+									
+								
+								
+					</div>
+					<!-- Footer -->	
+					
+										</div>
+										
+						
+	
+					</div> <!-- innerContainer -->
+				</div>	<!-- containerBG -->					
+		</div> <!-- Container -->
+</div>
+			
+
+</div>	<!-- Full Wrap -->	
+</div>
+<div class="clear"></div>
+
+<script type="text/javascript">
+	WebFontConfig = { 
+        google: { families: [ 'Droid+Sans','Droid+Sans' ] }
+      };
+	(function() {
+	        var wf = document.createElement('script');
+	        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+	            '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+	        wf.type = 'text/javascript';
+	        wf.async = 'true';
+	        var s = document.getElementsByTagName('script')[0];
+	        s.parentNode.insertBefore(wf, s);
+	      })();
+	
+</script>
+</body>
+</html>
+<!-- Yandex.Metrika counter --><script type="text/javascript">var yaParams = {/*����� ��������� ������*/};</script><script type="text/javascript">(function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter19106467 = new Ya.Metrika({id:19106467, webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true,params:window.yaParams||{ }}); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks");</script><noscript><div><img src="//mc.yandex.ru/watch/19106467" style="position:absolute; left:-9999px;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->

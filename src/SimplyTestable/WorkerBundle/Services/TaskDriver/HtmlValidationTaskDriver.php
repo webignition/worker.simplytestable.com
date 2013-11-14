@@ -107,7 +107,28 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         } catch (\Exception $exception) {
             $exceptionCode = ($exception instanceof \Guzzle\Http\Exception\CurlException) ? $exception->getErrorNo() : $exception->getCode();            
             $this->getLogger()->err('HtmlValidationTaskDriver::validation request failed with exception ['.get_class($exception).'] ['.$exceptionCode.'] ['.$validationRequest->getUrl().']');
-            throw $exception;
+            
+            if ($exception instanceof \SimplyTestable\WorkerBundle\Exception\WebResourceException) {
+                $outputMessage = new \stdClass;
+                $outputMessage->lastLine = 0;
+                $outputMessage->lastColumn = 0;
+                $outputMessage->message = 'Sorry, this document can\'t be checked';
+                $outputMessage->messageId = 'validator-internal-server-error';
+                $outputMessage->type = 'error';
+                
+                $outputObject = new \stdClass();
+                $outputObject->messages = array($outputMessage);               
+                
+                //$outputObject = $this->getW3cValidatorErrorCollectionParser()->getOutputObject($validationResponse);
+                $this->response->setHasFailed();
+                $this->response->setIsRetryable(false);
+                $this->response->setErrorCount(1);            
+                $this->canCacheValidationOutput = false;
+                
+                return json_encode($outputObject);
+            } else {
+                throw $exception;
+            }
         }
         
         if ($validationResponse->getContentType()->getTypeSubtypeString() == 'text/html') {
@@ -250,7 +271,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
     
     /**
      *
-     * @return SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorCollectionParser
+     * @return \SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorCollectionParser
      */
     private function getW3cValidatorErrorCollectionParser() {
         if (is_null($this->validatorErrorCollectionParser)) {            
