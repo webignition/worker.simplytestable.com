@@ -10,29 +10,9 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
     
     protected function getTaskTypeName() {
         return self::TASK_TYPE_NAME;
-    }
+    }    
     
-    
-    /**
-     * @group standard
-     */      
-    public function testGetContentTypeWhenInMarkupContentTypeIsInvalid() {
-        $this->clearMemcacheHttpCache();  
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-        
-        $taskObject = $this->createTask('http://example.com/', $this->getTaskTypeName());       
-     
-        $task = $this->getTaskService()->getById($taskObject->id);
-        
-        $response = $this->runConsole('simplytestable:task:perform', array(
-            $task->getId() => true
-        ));
-        
-        $this->assertEquals(0, $response);
-    }
-    
-    
-    public function testFailGracefullyWhenContentIsServedAsTextHtmlButIsNot() {
+    public function testFailGracefullyWhenContentIsServedAsTextHtmlButIsNot() {        
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
@@ -52,11 +32,15 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
     }
     
     
-    public function testValidatorReturnsHTTP500() {        
+    public function testValidatorReturnsHTTP500() {
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
-        $taskObject = $this->createTask('http://vash-pereezd.com.ua/dachnye-pereezdy.html', $this->getTaskTypeName());   
+        $this->container->get('simplytestable.services.htmlValidatorWrapperService')->loadFixturesFromPath(
+            $this->getFixturesDataPath(__FUNCTION__ . '/HtmlValidatorResponses')
+        );
+        
+        $taskObject = $this->createTask('http://example.com/', $this->getTaskTypeName());    
      
         $task = $this->getTaskService()->getById($taskObject->id);
         
@@ -65,9 +49,8 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         ));
         
         $this->assertEquals(0, $response);        
-        
+      
         $outputObject = json_decode($task->getOutput()->getOutput());
-
         $this->assertEquals('validator-internal-server-error', $outputObject->messages[0]->messageId);        
     }
 

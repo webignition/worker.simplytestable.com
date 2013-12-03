@@ -55,9 +55,9 @@ EOF
         } catch (\Exception $e) {
             var_dump('Exception calling $this->getTaskService()->perform');
             var_dump('Exception class: '.get_class($e));
-//            var_dump($e);
-//            exit();
-        }
+            var_dump($e);
+            exit();
+        }        
         
         if ($performResult === 0) {
             $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(

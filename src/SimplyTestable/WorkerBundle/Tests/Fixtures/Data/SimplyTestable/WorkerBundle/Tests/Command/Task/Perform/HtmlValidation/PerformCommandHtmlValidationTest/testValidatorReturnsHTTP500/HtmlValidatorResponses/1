@@ -1,0 +1,10 @@
+Content-Type:text/html
+
+<h1>Software error:</h1>
+<pre>Can't use an undefined value as an ARRAY reference at /usr/lib/cgi-bin/w3c-markup-validator/check line 564.
+</pre>
+<p>
+For help, please send mail to the webmaster (<a href="mailto:webmaster@localhost">webmaster@localhost</a>), giving this error message 
+and the time and date of the error.
+
+</p>

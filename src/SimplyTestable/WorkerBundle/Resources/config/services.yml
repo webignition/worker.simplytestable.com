@@ -3,6 +3,9 @@ services:
     class:  SimplyTestable\WorkerBundle\Services\HttpClientService
     arguments:
         memcacheService: "@simplytestable.services.memcacheService"    
+        
+  simplytestable.services.htmlValidatorWrapperService:
+    class:  webignition\HtmlValidator\Wrapper\Wrapper 
   
   simplytestable.services.coreApplicationService:
     class:  SimplyTestable\WorkerBundle\Services\CoreApplicationService
@@ -59,14 +62,15 @@ services:
   simplytestable.services.taskdriverfactoryservice:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService
     arguments:
-        drivers: %drivers%        
-        taskTypeService: "@simplytestable.services.tasktypeservice"
-        stateService: "@simplytestable.services.stateservice"
-        webResourceService: "@simplytestable.services.webresourceservice"        
-        logger: "@logger"
-        webResourceTaskOutputService: "@simplytestable.services.webresourcetaskoutputservice"
-        serializer: "@serializer"
-        timeCachedTaskOutputService: "@simplytestable.services.timecachedtaskoutputservice"
+        drivers: %drivers%  
+        container: "@service_container"
+        #taskTypeService: "@simplytestable.services.tasktypeservice"
+        #stateService: "@simplytestable.services.stateservice"
+        #webResourceService: "@simplytestable.services.webresourceservice"        
+        #logger: "@logger"
+        #webResourceTaskOutputService: "@simplytestable.services.webresourcetaskoutputservice"
+        #serializer: "@serializer"
+        #timeCachedTaskOutputService: "@simplytestable.services.timecachedtaskoutputservice"
         
   simplytestable.services.resqueQueueService:
     class:   SimplyTestable\WorkerBundle\Services\ResqueQueueService

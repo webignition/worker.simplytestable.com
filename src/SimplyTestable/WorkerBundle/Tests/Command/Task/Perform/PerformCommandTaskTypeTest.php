@@ -46,7 +46,7 @@ abstract class PerformCommandTaskTypeTest extends ConsoleCommandBaseTestCase {
                     'errorNumber' => 6                    
                 )
             )
-        ));         
+        ));
         
         $taskObject = $this->createTask('http://invalid/', $this->getTaskTypeName());
         

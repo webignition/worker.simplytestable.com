@@ -73,6 +73,9 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         }
         
         if (!$this->isCorrectWebResourceType()) {
+            var_dump("cp01 is not correct web resource type");
+            exit();
+            
             return $this->isNotCorrectWebResourceTypeHandler();
         }
         
