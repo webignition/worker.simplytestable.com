@@ -9,7 +9,8 @@ parameters:
       task-types:
         - "HTML validation"
       properties:
-        validator-path: /usr/local/validator/cgi-bin/check
+        #validator-path: /usr/local/validator/cgi-bin/check
+        validator-path:  /usr/lib/cgi-bin/w3c-markup-validator/check
         html-validator-wrapper.service: simplytestable.services.htmlValidatorWrapperService
     css-validation:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
