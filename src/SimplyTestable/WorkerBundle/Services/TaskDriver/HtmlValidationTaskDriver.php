@@ -82,6 +82,9 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
 
         $outputObject = new \stdClass();
         $outputObject->messages = $output->getMessages();
+        
+        $this->response->setErrorCount((int)$output->getErrorCount());
+        //$this->response->setWarningCount($output->getWarningCount());
 
         return json_encode($outputObject);      
     }

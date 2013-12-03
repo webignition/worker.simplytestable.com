@@ -110,7 +110,7 @@ class PerformHtmlValidationTest extends BaseHtmlValidationIntegrationTest {
         ));
 
         $this->assertEquals(0, $response);        
-        $this->assertEquals(0, $task->getOutput()->getErrorCount());        
+        $this->assertEquals(1, $task->getOutput()->getErrorCount());        
         
         $outputContentObject = json_decode($task->getOutput()->getOutput());
         

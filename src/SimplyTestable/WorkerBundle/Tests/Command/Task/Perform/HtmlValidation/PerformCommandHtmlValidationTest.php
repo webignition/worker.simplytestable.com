@@ -10,7 +10,28 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
     
     protected function getTaskTypeName() {
         return self::TASK_TYPE_NAME;
-    }    
+    }
+    
+    public function testProcessingValidatorResultsGetsCorrectErrorCount() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
+        $this->container->get('simplytestable.services.htmlValidatorWrapperService')->loadFixturesFromPath(
+            $this->getFixturesDataPath(__FUNCTION__ . '/HtmlValidatorResponses')
+        );        
+        
+        $taskObject = $this->createTask('http://example.com/', $this->getTaskTypeName());   
+     
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);        
+        $this->assertEquals(3, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());     
+    }
     
     public function testFailGracefullyWhenContentIsServedAsTextHtmlButIsNot() {        
         $this->clearMemcacheHttpCache();  
