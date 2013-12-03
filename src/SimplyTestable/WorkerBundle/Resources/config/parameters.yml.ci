@@ -6,9 +6,8 @@ parameters:
       task-types:
         - "HTML validation"
       properties:
-        validator-url: http://w3c-validator.ci.worker.simplytestable.com:8090/w3c-validator/check
-        validator-error-collection-parser-class: SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorCollectionParser
-        validator-error-parser-class: SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser
+        validator-path:  /usr/lib/cgi-bin/w3c-markup-validator/check
+        html-validator-wrapper.service: simplytestable.services.htmlValidatorWrapperService
     css-validation:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
       task-types:
