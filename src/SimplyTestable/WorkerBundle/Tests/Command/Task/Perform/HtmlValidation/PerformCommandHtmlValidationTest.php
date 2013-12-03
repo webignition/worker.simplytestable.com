@@ -76,4 +76,23 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
     }
 
 
+    public function testCharacterEncodingFailureSetsTaskStateAsFailed() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
+        $this->container->get('simplytestable.services.htmlValidatorWrapperService')->loadFixturesFromPath(
+            $this->getFixturesDataPath(__FUNCTION__ . '/HtmlValidatorResponses')
+        );
+        
+        $taskObject = $this->createTask('http://example.com/', $this->getTaskTypeName());    
+     
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);        
+        $this->assertEquals($this->getTaskService()->getFailedNoRetryAvailableState(), $task->getState());
+    }    
 }

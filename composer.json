@@ -38,8 +38,8 @@
         "doctrine/doctrine-fixtures-bundle": "dev-master",
         "webignition/html-document-link-finder":">=0.5,<1.0",
         "webignition/html-document-link-checker":">=0.8,<1.0",
-        "webignition/html-validator-wrapper":">=0.2",
-        "webignition/html-validator-output-parser":">=0.5"
+        "webignition/html-validator-wrapper":">=0.3.1",
+        "webignition/html-validator-output-parser":">=0.6"
     },
     "scripts": {
         "post-install-cmd": [

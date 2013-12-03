@@ -79,6 +79,11 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         ));
 
         $output = $this->getProperty('html-validator-wrapper')->validate();       
+        
+        if ($output->wasAborted()) {
+            $this->response->setHasFailed();
+            $this->response->setIsRetryable(false);            
+        }
 
         $outputObject = new \stdClass();
         $outputObject->messages = $output->getMessages();
