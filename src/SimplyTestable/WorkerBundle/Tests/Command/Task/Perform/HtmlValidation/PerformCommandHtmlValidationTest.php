@@ -94,5 +94,23 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         
         $this->assertEquals(0, $response);        
         $this->assertEquals($this->getTaskService()->getFailedNoRetryAvailableState(), $task->getState());
-    }    
+    } 
+    
+    
+    public function testFailIncorrectWebResourceType() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
+        $taskObject = $this->createTask('http://example.com/', $this->getTaskTypeName());    
+     
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);        
+        $this->assertEquals($this->getTaskService()->getSkippedState(), $task->getState());
+    }     
+    
 }
