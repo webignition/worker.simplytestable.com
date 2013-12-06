@@ -21,7 +21,7 @@ abstract class BaseTestCase extends WebTestCase {
 
     /**
      *
-     * @var appTestDebugProjectContainer
+     * @var \Symfony\Component\DependencyInjection\Container
      */
     protected $container;
     

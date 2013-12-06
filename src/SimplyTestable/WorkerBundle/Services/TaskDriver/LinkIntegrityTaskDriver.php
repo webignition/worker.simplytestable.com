@@ -13,6 +13,7 @@ use webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier;
 class LinkIntegrityTaskDriver extends WebResourceTaskDriver {    
     
     const EXCLUDED_URLS_PARAMETER_NAME = 'excluded-urls';
+    const EXCLUDED_DOMAINS_PARAMETER_NAME = 'excluded-domains';
     
     public function __construct() {
         $this->canCacheValidationOutput = false;
@@ -52,20 +53,33 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    protected function performValidation() {
+    protected function performValidation() {            
         $linkChecker = new \webignition\HtmlDocumentLinkChecker\HtmlDocumentLinkChecker();
         $linkChecker->setWebPage($this->webResource);
+        $linkChecker->setHttpMethodList(array(
+            \webignition\HtmlDocumentLinkChecker\HtmlDocumentLinkChecker::HTTP_METHOD_GET
+        ));
         
         if ($this->task->hasParameter(self::EXCLUDED_URLS_PARAMETER_NAME)) {
             $linkChecker->setUrlsToExclude($this->task->getParameter(self::EXCLUDED_URLS_PARAMETER_NAME));
-        }
+        }        
+        
+        if ($this->task->hasParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME)) {
+            $linkChecker->setDomainsToExclude($this->task->getParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME));
+        }                
         
         $this->getWebResourceService()->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
         
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('ST Link Integrity Task Driver (http://bit.ly/RlhKCL)');             
-        $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());        
+        $linkChecker->setUserAgents($this->getProperty('user-agents'));
+        $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());
+        $linkChecker->setRetryOnBadResponse(false);
+       
+        $requestOptions = $linkChecker->getRequestOptions();
+        $requestOptions['timeout'] = 10;
+        
+        $linkChecker->setRequestOptions($requestOptions);
+
         $linkCheckResults = $linkChecker->getAll();
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);
         
         $this->getWebResourceService()->getHttpClientService()->enablePlugins();
 

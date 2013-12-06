@@ -8,7 +8,7 @@ class PerformAllCommandTest extends ConsoleCommandBaseTestCase {
     
     public static function setUpBeforeClass() {
         self::setupDatabase();        
-    }    
+    }
 
     
     /**
@@ -22,7 +22,11 @@ class PerformAllCommandTest extends ConsoleCommandBaseTestCase {
         $this->getTaskService()->getEntityManager()->persist($task);
         $this->getTaskService()->getEntityManager()->flush();
         
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
+        $this->container->get('simplytestable.services.htmlValidatorWrapperService')->loadFixturesFromPath(
+            $this->getFixturesDataPath(__FUNCTION__ . '/HtmlValidatorResponses')
+        );
         
         $response = $this->runConsole('simplytestable:task:perform:all');          
         

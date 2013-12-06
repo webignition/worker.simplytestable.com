@@ -2,14 +2,9 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Integration\Command\Task\Perform\HtmlValidation\XHTML10;
 
-use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Tests\Integration\Command\Task\Perform\HtmlValidation\BaseHtmlValidationIntegrationTest;
 
-class PerformHtmlValidationTest extends ConsoleCommandBaseTestCase {
-    
-    public static function setUpBeforeClass() {
-        self::setupDatabase();        
-    }
-    
+class PerformHtmlValidationTest extends BaseHtmlValidationIntegrationTest {
     
     /**
      * @group integration

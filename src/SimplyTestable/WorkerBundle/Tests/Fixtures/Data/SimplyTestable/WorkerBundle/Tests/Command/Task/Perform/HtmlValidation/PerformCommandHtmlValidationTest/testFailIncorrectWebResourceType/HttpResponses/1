@@ -1,0 +1,967 @@
+HTTP/1.1 200 OK
+Cache-Control:max-age=600
+Connection:keep-alive
+Content-Encoding:gzip
+Content-Type:text/xml
+Date:Wed, 04 Dec 2013 09:48:44 GMT
+Expires:Wed, 04 Dec 2013 09:58:44 GMT
+Last-Modified:Wed, 27 Nov 2013 14:57:18 GMT
+Server:GitHub.com
+Transfer-Encoding:chunked
+Vary:Accept-Encoding
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Simply Testable Blog</title>
+		<description>Figuring out how to automate away the pain of routine front-end web testing; the story behind simplytestable.com.</description>
+		<link>http://blog.simplytestable.com</link>
+		<atom:link href="http://blog.simplytestable.com/feed.xml" rel="self" type="application/rss+xml" />
+		
+			<item>
+				<title>Simply Testable Updates #67: The Week Where Nothing Happened</title>
+				<description></description>
+				<pubDate>Wed, 27 Nov 2013 00:00:00 -0800</pubDate>
+				<link>http://blog.simplytestable.com/simply-testable-updates-67/</link>
+				<guid isPermaLink="true">http://blog.simplytestable.com/simply-testable-updates-67/</guid>
+			</item>
+		
+			<item>
+				<title>Simply Testable Updates #66: New Dashboard Was Released, HTML Validator Improvements On The Way</title>
+				<description></description>
+				<pubDate>Wed, 20 Nov 2013 00:00:00 -0800</pubDate>
+				<link>http://blog.simplytestable.com/simply-testable-updates-66/</link>
+				<guid isPermaLink="true">http://blog.simplytestable.com/simply-testable-updates-66/</guid>
+			</item>
+		
+			<item>
+				<title>New Test Dashboard and Test History</title>
+				<description>&lt;div class=&quot;section section-first&quot;&gt;
+    &lt;h3&gt;Our New Test Dashboard and Test History Launched!&lt;/h3&gt;
+    
+    &lt;p&gt;
+        From day one the main focus of the service was on letting you run full-site
+        tests that always worked.
+
+        A couple of weeks ago, around a year after
+        the MVP launch, it did. The service works, all the time, for any website &lt;sup&gt;&lt;a href=&quot;#footnote&quot;&gt;*&lt;/a&gt;&lt;/sup&gt;.
+    &lt;/p&gt;    
+
+    &lt;p&gt;
+        The introduction of the new test dashboard and test history page starts
+        a new phase of access to and analysis of test results to add further
+        value to what Simply Testable provides.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        See the &lt;a href=&quot;https://gears.simplytestable.com/&quot;&gt;test dashboard&lt;/a&gt; for yourself. If you&#39;re not signed in
+        you&#39;ll see the demo account dashboard.
+    &lt;/p&gt;
+    &lt;p&gt;
+        Here&#39;s a quick (15 second) video showing the dashboard for my account in action as
+        a test is carried out:
+    &lt;/p&gt;
+    
+    &lt;iframe height=&quot;480&quot; src=&quot;http://www.youtube-nocookie.com/embed/DYzOzzkwEC4&quot; style=&quot;border: none;width:100%;&quot;&gt;&lt;/iframe&gt;  
+    
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;Full Test History&lt;/h3&gt;
+
+    &lt;p&gt;
+        The test dashboard previously contained, for signed in users, a list of 
+        recent tests. You could access the nine most recent tests that you had 
+        run. You could still access any past test if you knew the right URL and 
+        I suspect the number of people who kept track of the right URL was 
+        absolutely zero. It wasn&#39;t very useful.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        The new test history page lists all the tests you&#39;ve ever run. Ten
+        tests are displayed per page with the newest at the top of the list.
+    &lt;/p&gt;    
+    
+    &lt;p&gt;        
+        Take a look at the &lt;a href=&quot;https://gears.simplytestable.com/history/&quot;&gt;test history page&lt;/a&gt; itself or
+        see below how the demo account test history appeared a few minutes ago:
+    &lt;/p&gt;
+    
+    &lt;div class=&quot;illustration-inline illustration-with-zoom&quot;&gt;
+        &lt;a href=&quot;http://i.imgur.com/pj0M3O8.png&quot;&gt;
+            &lt;img src=&quot;http://i.imgur.com/pj0M3O8.png&quot; class=&quot;img-responsive&quot; /&gt;
+        &lt;/a&gt;
+    &lt;/div&gt;
+    
+    &lt;p&gt;
+        Each listed test provides a summary showing you details including:        
+    &lt;/p&gt;
+    
+    &lt;ul&gt;
+        &lt;li&gt;number of URLs tested&lt;/li&gt;
+        &lt;li&gt;number of tests run&lt;/li&gt;
+        &lt;li&gt;total number of errors&lt;/li&gt;
+        &lt;li&gt;total number of warnings&lt;/li&gt;
+        &lt;li&gt;number of errors per test type&lt;/li&gt;
+    &lt;/ul&gt;
+    
+    &lt;p&gt;
+        You no longer have to make a note of the URL for a given test should
+        you want to re-visit the results at a later date!
+    &lt;/p&gt;
+    
+
+&lt;/div&gt;
+
+
+&lt;div class=&quot;section footnote&quot; id=&quot;footnote&quot;&gt;
+    &lt;h4&gt;Footnote&lt;/h4&gt;
+    &lt;p&gt;
+        When I say the service works &lt;em&gt;all the time, for any website&lt;/em&gt;,
+        I&#39;m talking in general terms. There will always be something
+        that doesn&#39;t work or something that can&#39;t be tested but the chances
+        of you running across such a case is very, very low.
+    &lt;/p&gt;
+    &lt;p&gt;
+        Compare this to a year ago where you&#39;d be hard pressed to find a full-site
+        test that wouldn&#39;t get stuck at one point or another.
+    &lt;/p&gt;
+&lt;/div&gt;</description>
+				<pubDate>Thu, 14 Nov 2013 00:00:00 -0800</pubDate>
+				<link>http://blog.simplytestable.com/new-test-dashboard-and-test-history/</link>
+				<guid isPermaLink="true">http://blog.simplytestable.com/new-test-dashboard-and-test-history/</guid>
+			</item>
+		
+			<item>
+				<title>Simply Testable Updates #65: New Dashboard and Test History Being Released Today</title>
+				<description></description>
+				<pubDate>Wed, 13 Nov 2013 00:00:00 -0800</pubDate>
+				<link>http://blog.simplytestable.com/simply-testable-updates-65/</link>
+				<guid isPermaLink="true">http://blog.simplytestable.com/simply-testable-updates-65/</guid>
+			</item>
+		
+			<item>
+				<title>Simply Testable Updates #64: New Test Dashboard Preview</title>
+				<description></description>
+				<pubDate>Wed, 06 Nov 2013 00:00:00 -0800</pubDate>
+				<link>http://blog.simplytestable.com/simply-testable-updates-64/</link>
+				<guid isPermaLink="true">http://blog.simplytestable.com/simply-testable-updates-64/</guid>
+			</item>
+		
+			<item>
+				<title>Simply Testable Updates #63: Link Integrity Improvements, Interview with Web Tester Tom Batey</title>
+				<description></description>
+				<pubDate>Wed, 30 Oct 2013 00:00:00 -0700</pubDate>
+				<link>http://blog.simplytestable.com/simply-testable-updates-63/</link>
+				<guid isPermaLink="true">http://blog.simplytestable.com/simply-testable-updates-63/</guid>
+			</item>
+		
+			<item>
+				<title>Interview With Tom Batey of WebDepend</title>
+				<description>&lt;div class=&quot;section section-first&quot;&gt;
+    &lt;p&gt;   
+        To help figure out how people who make and test websites go through the process
+        of testing websites, I&#39;m interviewing people who make and test websites.
+        It&#39;s a crazy idea.
+    &lt;/p&gt;
+    &lt;p&gt;
+        If you make or test websites and want to help shape tools built
+        to make your life easier, drop me an email (&lt;a href=&quot;mailto:&amp;#106;&amp;#111;&amp;#110;&amp;#64;&amp;#115;&amp;#105;&amp;#109;&amp;#112;&amp;#108;&amp;#121;&amp;#116;&amp;#101;&amp;#115;&amp;#116;&amp;#97;&amp;#98;&amp;#108;&amp;#101;&amp;#46;&amp;#99;&amp;#111;&amp;#109;&quot;&gt;&amp;#106;&amp;#111;&amp;#110;&amp;#64;&amp;#115;&amp;#105;&amp;#109;&amp;#112;&amp;#108;&amp;#121;&amp;#116;&amp;#101;&amp;#115;&amp;#116;&amp;#97;&amp;#98;&amp;#108;&amp;#101;&amp;#46;&amp;#99;&amp;#111;&amp;#109;&lt;/a&gt;)
+        with the subject &amp;ldquo;interview me&amp;rdquo; to get things started.
+    &lt;/p&gt;
+    &lt;p&gt;
+        I recently interviewed professional web tester &lt;a href=&quot;https://twitter.com/TomBatey&quot;&gt;Tom Batey&lt;/a&gt;.
+    &lt;/p&gt;
+    &lt;p&gt;
+        Find out how Tom and the company he owns and built test websites, the
+        tools they use and the approach taken to testing.
+    &lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;
+        Background
+    &lt;/h3&gt;
+    
+    &lt;p&gt;
+        Tom owns and works for &lt;a href=&quot;http://www.webdepend.co.uk/&quot;&gt;WebDepend&lt;/a&gt;,
+        a company dedicated to the testing of websites, built from the need for
+        what he experienced as lacking:
+    &lt;/p&gt;    
+    &lt;blockquote&gt;                
+        &lt;span class=&quot;avatar avatar-tom-batey&quot;&gt;&lt;/span&gt;
+        When I was a project manager delivering projects for clients I could 
+        see that testing often had to be rushed and really needed dedicated 
+        QA staff but there weren&#39;t any available so I decided this was a 
+        route that was worth pursuing.                          
+    &lt;/blockquote&gt;       
+    &lt;p&gt;
+        WebDepend provide professional testing services directly to site owners for
+        organisations including &lt;a href=&quot;http://www.davidlloyd.co.uk/&quot;&gt;David Lloyd Leisure&lt;/a&gt;,
+        &lt;a href=&quot;http://www.janeclayton.co.uk/&quot;&gt;Jane Clayton &amp;amp; Company&lt;/a&gt;,
+        &lt;a href=&quot;http://www.cutlerandgross.com/&quot;&gt;Cutler and Gross&lt;/a&gt; as well
+        as to digital agencies such as &lt;a href=&quot;http://www.opx.co.uk/&quot;&gt;OPX&lt;/a&gt;
+        and &lt;a href=&quot;http://www.graymatter.co.uk/&quot;&gt;Graymatter&lt;/a&gt;.
+    &lt;/p&gt;
+    &lt;p&gt;
+        Tom works on projects ranging from a few days to few months, depending
+        on the scope of the site being tested, covering both new sites and
+        regular re-testing of existing sites as changes are made.
+    &lt;/p&gt;
+    
+    &lt;div class=&quot;question-answer&quot;&gt;
+        &lt;div class=&quot;question&quot;&gt;
+            &lt;h4&gt;
+                &lt;i class=&quot;fa fa-question-circle&quot;&gt;&lt;/i&gt;
+                Are you primarily a developer who carries out testing while developing,
+                or a dedicated tester?
+            &lt;/h4&gt;            
+        &lt;/div&gt;
+        &lt;div class=&quot;answer&quot;&gt;
+            &lt;blockquote&gt;
+                &lt;span class=&quot;avatar avatar-tom-batey&quot;&gt;&lt;/span&gt;
+                &lt;p&gt;
+                    I am a dedicated tester and have some development knowledge but not 
+                    really enough to actually develop anything. I&#39;ve been in the industry 
+                    for over 15 years, mostly working in different roles in digital 
+                    agencies throughout that time from Account Manager, Project Manager 
+                    and even Account Director plus I ran my own small agency for a few years.
+                &lt;/p&gt;               
+            &lt;/blockquote&gt;            
+        &lt;/div&gt;
+    &lt;/div&gt;
+    
+    &lt;div class=&quot;question-answer&quot;&gt;
+        &lt;div class=&quot;question&quot;&gt;
+            &lt;h4&gt;
+                &lt;i class=&quot;fa fa-question-circle&quot;&gt;&lt;/i&gt;
+                What size team do you work in? How many other developers, testers and 
+                so on do you interact with on a daily basis?
+            &lt;/h4&gt;            
+        &lt;/div&gt;
+        &lt;div class=&quot;answer&quot;&gt;
+            &lt;blockquote&gt;
+                &lt;span class=&quot;avatar avatar-tom-batey&quot;&gt;&lt;/span&gt;
+                &lt;p&gt;
+                    At WebDepend there are 2 of us full time and then we bring in 
+                    further freelance testers as we need them. 
+                &lt;/p&gt;
+                &lt;p&gt;
+                    We generally interact with project managers, developers and other QA staff but, 
+                    depending on the client, can sometimes also work with business 
+                    owners, Marketing or IT teams.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For most of the projects we work 
+                    on there are no other testers involved and so we are working 
+                    alongside project managers and reporting issues to developers.
+                &lt;/p&gt;                
+            &lt;/blockquote&gt;            
+        &lt;/div&gt;
+    &lt;/div&gt;  
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;    
+    &lt;h3&gt;Items To Test&lt;/h3&gt;     
+
+    &lt;div class=&quot;question-answer&quot;&gt;
+        &lt;div class=&quot;question&quot;&gt;
+            &lt;h4&gt;
+                &lt;i class=&quot;fa fa-question-circle&quot;&gt;&lt;/i&gt;
+                When carrying out functional testing, and aside from checking whether a specific
+                functional area works as required, what do you check for?&lt;span&gt;In other words, do you
+                have something akin to a checklist of items that you look to test?&lt;/span&gt;
+            &lt;/h4&gt;            
+        &lt;/div&gt;
+        &lt;div class=&quot;answer&quot;&gt;
+            &lt;blockquote&gt;
+                &lt;span class=&quot;avatar avatar-tom-batey&quot;&gt;&lt;/span&gt;
+                &lt;p&gt;
+For each project I will put together a test plan or a checklist of the areas that I need to cover. I also add to that further standard items that pretty much every web project should have, which will be a mixture of web standards, best practice and items that I believe mean a better quality website.
+                &lt;/p&gt;
+                &lt;p&gt;
+I then run through that checklist on each browser and mobile device that we are including as part of the scope of the testing. So aside from testing whether something actually works correctly I am checking that the layout of items on the page, the styling of elements and the ability to use those elements is first of all correct and second is consistent across all the browsers I am testing.
+                &lt;/p&gt;
+                &lt;p&gt;
+With responsive websites I am also checking that the website provides the correct layout depending on the device, screen size and orientation that I am testing on. Plus I check that any responsive elements, such as a swipeable image gallery, can be used correctly.
+                &lt;/p&gt;
+                &lt;p&gt;
+As I test across each browser and each mobile device I&#39;ll also pick up areas that are confusing or difficult to use plus navigation items, headings or button labels that don&#39;t make sense or other areas that might frustrate the user. Some of these issues might not be bugs as such but I&#39;ll report anything that I believe could improve the website and make it better for the user.
+                &lt;/p&gt;
+                &lt;p&gt;
+I will also spend some time carrying out exploratory testing and not referring to the checklist that I&#39;ve prepared. I&#39;ll try and put myself in the mind of the user and carry out journeys that I think they will take, perform actions that they might perform and build in &#39;uncertainty&#39; around the journey I&#39;m performing. This imagines a user is not certain of the action they need to carry out, so they might click the back button or want to go back to the homepage or look for a sitemap or not fill in a form correctly or make a mistake. For example, on a travel website, if you search for hotel room availability between certain dates, can you start to proceed with a booking then backtrack and choose different dates? Some websites &#39;lose&#39; their ability to remember what you searched for if you use the back button or do something unexpected.
+                &lt;/p&gt;
+                &lt;p&gt;
+The amount of testing that we can do for each project will depend on the budget we&#39;ve agreed with our client and I need to estimate this budget correctly and agree with the client how much testing will be carried out and what that testing will be made up of. 
+                &lt;/p&gt;               
+            &lt;/blockquote&gt;            
+        &lt;/div&gt;
+    &lt;/div&gt;
+    
+    &lt;div class=&quot;question-answer&quot;&gt;
+        &lt;div class=&quot;question&quot;&gt;
+            &lt;h4&gt;
+                &lt;i class=&quot;fa fa-question-circle&quot;&gt;&lt;/i&gt;
+                Assuming you have a checklist of items that you look to test (this seems quite common), which would you consider the highest priority such that it would block a site from being related live (or which you&#39;d advise should be fixed as soon as possible if already live)?
+            &lt;/h4&gt;            
+        &lt;/div&gt;
+        &lt;div class=&quot;answer&quot;&gt;
+            &lt;blockquote&gt;
+                &lt;span class=&quot;avatar avatar-tom-batey&quot;&gt;&lt;/span&gt;
+                &lt;p&gt;
+First of all, I need to make sure I can test an entire website and run through the full checklist of items. If I get halfway through the checklist and there is an issue that prevents me from completing the testing then that becomes a blocker and is the highest priority to fix at that point.
+                &lt;/p&gt;
+                &lt;p&gt;
+Next on the list of priorities would be areas that are fundamental to the website. For an ecommerce site those fundamental areas would be to find a product, add it to the shopping basket and go through the checkout process. So can that fundamental user journey be carried out across all the browsers and mobile devices? I&#39;ve found issues before where the layout breaks in a particular browser that means the Add to basket button doesn&#39;t work or the checkout process might be really frustrating to use on an iPhone for example. Those would be high priority issues to fix.
+                &lt;/p&gt;
+                &lt;p&gt;
+Anything that cuts off a large amount of users from being able to carry out a fundamental task would be high priority. If something functionally works but is impossible on a particular device or in a specific browser then that could affect a large percentage of the traffic coming to the site. If there are big accessibility issues then those would also be high priority.
+                &lt;/p&gt;               
+            &lt;/blockquote&gt;            
+        &lt;/div&gt;
+    &lt;/div&gt;     
+
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;    
+    &lt;h3&gt;Tools Used&lt;/h3&gt;     
+
+    &lt;div class=&quot;question-answer&quot;&gt;
+        &lt;div class=&quot;question&quot;&gt;
+            &lt;h4&gt;
+                &lt;i class=&quot;fa fa-question-circle&quot;&gt;&lt;/i&gt;
+                What tools do you use to examine the quality factors against which
+                you&#39;re testing? What tools are used for what tests?
+            &lt;/h4&gt;            
+        &lt;/div&gt;
+        &lt;div class=&quot;answer&quot;&gt;
+            &lt;blockquote&gt;
+                &lt;span class=&quot;avatar avatar-tom-batey&quot;&gt;&lt;/span&gt;
+                &lt;p&gt;
+ In terms of functional testing, I am pretty much entirely manual although I&#39;m planning to use tools for some repeatable test cases where we might have an ongoing testing schedule for a client. For example, we&#39;re planning on using Selenium for a particular project to test a range of enquiry forms to make sure those forms can always be submitted every time the developers deploy a new release. We will still perform some manual tests but Selenium can repeat the same tests across a number of different web browsers so we don&#39;t have to carry out as many tests manually.
+                &lt;/p&gt;
+                &lt;p&gt;
+Similarly, we have used an automated tool called Nimsoft Cloud User Experience Monitor (used to be Watchmouse) to test that specific user journeys are always working and also monitor the performance of those user journeys. So if the user journey was to find a product, add it to a basket and go to the checkout, we would use Nimsoft to run that every 15 minutes and continually monitor the performance of it. Nimsoft will send us alerts if one of the steps goes over a certain threshold and an investigation can then take place as to what is happening that might cause that step to suffer from poor performance or stop working altogether. It is a great early warning system for live websites.
+                &lt;/p&gt;
+                &lt;p&gt;
+Another area I&#39;m interested in is testing a website&#39;s SEO and I use tools from a company called Moz to scan a site and give me results showing me missing or duplicate title tags, meta descriptions and potential duplicate content problems, which are important for SEO but can also affect a user&#39;s experience of the site. For example, if every title tag is the same then that is not really helpful for users or for search engines.
+                &lt;/p&gt;
+                &lt;p&gt;
+Then obviously I use Simply Testable to enable me to gain an appreciation of code quality and adherence to HTML and CSS standards.
+                &lt;/p&gt;               
+            &lt;/blockquote&gt;            
+        &lt;/div&gt;
+    &lt;/div&gt;     
+    
+    &lt;div class=&quot;question-answer&quot;&gt;
+        &lt;div class=&quot;question&quot;&gt;
+            &lt;h4&gt;
+                &lt;i class=&quot;fa fa-question-circle&quot;&gt;&lt;/i&gt;
+                Are there any aspects for which there are no tools to support you?
+                &lt;span&gt;For example, you might check that a site has a custom 404 page instead of the default Apache 404 page, and you find you always have to check this by hand.&lt;/span&gt;
+            &lt;/h4&gt;            
+        &lt;/div&gt;
+        &lt;div class=&quot;answer&quot;&gt;
+            &lt;blockquote&gt;
+                &lt;span class=&quot;avatar avatar-tom-batey&quot;&gt;&lt;/span&gt;
+                &lt;p&gt;
+For me, the majority of what I test is manual and in my view should be manual. I want to use the website as a user would in order to understand the main issues and problems that a user would face, as well as test that functions are working in the way that they are supposed to work.
+                &lt;/p&gt;
+                &lt;p&gt;
+I like to use automated tools that enable me to cover more of the website, especially large websites, and give me insight into areas that I&#39;ve not been able to get to manually. This is not really functionality but a spell check of an entire website would be a good automated tool. There are some existing tools that check the spelling and grammar for a website already but none that I regularly use in my standard checklist yet.
+                &lt;/p&gt;
+                &lt;p&gt;
+In terms of the 404 page example, I&#39;ll always want to manually check that a custom 404 page is in place because I also want to check how good it is. It isn&#39;t enough for there to be a custom 404 page, it should be helpful to the user and enable them to find what they were looking for or go back to the home page or contact someone who can help them.
+                &lt;/p&gt;               
+            &lt;/blockquote&gt;            
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+
+&lt;div class=&quot;section&quot;&gt;    
+    &lt;h3&gt;Pain Points and One-Click Magic&lt;/h3&gt;     
+    
+    &lt;div class=&quot;question-answer&quot;&gt;
+        &lt;div class=&quot;question&quot;&gt;
+            &lt;h4&gt;
+                &lt;i class=&quot;fa fa-question-circle&quot;&gt;&lt;/i&gt;
+                Are there any tests, relative to the project as a whole, that are a pain to carry out?
+                &lt;span&gt;For example, an accessibility related test might concern checking that all images have sensible alt text and whilst a tool can tell you if image alt text is outright missing you find you still spend (far too much) time having to manually verify that alt text is not nonsense.&lt;/span&gt;
+            &lt;/h4&gt;            
+        &lt;/div&gt;
+        &lt;div class=&quot;answer&quot;&gt;
+            &lt;blockquote&gt;
+                &lt;span class=&quot;avatar avatar-tom-batey&quot;&gt;&lt;/span&gt;
+                &lt;p&gt;
+That is a key aspect between using automated tools and manual testing. On the whole, the tool will tell you if alt text is there or not but if the tool tells you that alt text is present it doesn&#39;t mean that the alt text is correct. Automated tools allow you to cover more ground and get further into the testing but you still need to go and look at the alt text, as you say, to make sure it makes sense and correctly describes the image.
+                &lt;/p&gt;
+                &lt;p&gt;
+Another example is title tags, there are tools that tell you a title tag is missing and you can also get tools that tell you if a title tag is very short or is very long. But you still need to review the title tag and see if it makes sense and correctly describes the page.
+                &lt;/p&gt;
+                &lt;p&gt;
+Generally, it is not possible to review all the title tags, meta descriptions, alt tags, etc. that there might be in a website so we have to prioritise our time and only review the most important pages whilst using tools such as Simply Testable to cover the whole site finding all the missing items or the broken links.
+                &lt;/p&gt;               
+            &lt;/blockquote&gt;            
+        &lt;/div&gt;
+    &lt;/div&gt;    
+
+    &lt;div class=&quot;question-answer&quot;&gt;
+        &lt;div class=&quot;question&quot;&gt;
+            &lt;h4&gt;
+                &lt;i class=&quot;fa fa-question-circle&quot;&gt;&lt;/i&gt;
+                &amp;ldquo;I wish I had a button I could click that would do this for me automatically&amp;rdquo; - what first springs to mind, or what is the most significant thing that springs to mind, when reading that?
+            &lt;/h4&gt;            
+        &lt;/div&gt;
+        &lt;div class=&quot;answer&quot;&gt;
+            &lt;blockquote&gt;
+                &lt;span class=&quot;avatar avatar-tom-batey&quot;&gt;&lt;/span&gt;
+                &lt;p&gt;
+Well, you&#39;ve already built some of the features I requested for Simply Testable, which is great.
+                &lt;/p&gt;
+                &lt;p&gt;
+Something we&#39;re doing more is to carry out basic tests to measure the performance of websites and being able to test items at a code level for a whole website would be great. So an automated test to check whether all images have been optimised as much as they can be or whether CSS and JS files have been minified and combined plus any other aspects of the code or images that could indicate potential performance improvements.
+                &lt;/p&gt;               
+            &lt;/blockquote&gt;            
+        &lt;/div&gt;
+    &lt;/div&gt; 
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;And That&#39;s The End of The Interview&lt;/h3&gt;
+    
+    &lt;p&gt;
+        I&#39;d like to thank Tom for both taking his time to answer my questions
+        and for the valuable insights the answers provide.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        The more people I can talk to on these subjects, the better Simply Testable
+        can be for those who need to test websites.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        If you make or test websites and want to help shape tools built
+        to make your life easier, drop me an email (&lt;a href=&quot;mailto:&amp;#106;&amp;#111;&amp;#110;&amp;#64;&amp;#115;&amp;#105;&amp;#109;&amp;#112;&amp;#108;&amp;#121;&amp;#116;&amp;#101;&amp;#115;&amp;#116;&amp;#97;&amp;#98;&amp;#108;&amp;#101;&amp;#46;&amp;#99;&amp;#111;&amp;#109;&quot;&gt;&amp;#106;&amp;#111;&amp;#110;&amp;#64;&amp;#115;&amp;#105;&amp;#109;&amp;#112;&amp;#108;&amp;#121;&amp;#116;&amp;#101;&amp;#115;&amp;#116;&amp;#97;&amp;#98;&amp;#108;&amp;#101;&amp;#46;&amp;#99;&amp;#111;&amp;#109;&lt;/a&gt;)
+        with the subject &lt;i&gt;interview me&lt;/i&gt; to get things started.
+    &lt;/p&gt;        
+&lt;/div&gt;</description>
+				<pubDate>Mon, 28 Oct 2013 00:00:00 -0700</pubDate>
+				<link>http://blog.simplytestable.com/interview-with-tom-batey-of-webdepend/</link>
+				<guid isPermaLink="true">http://blog.simplytestable.com/interview-with-tom-batey-of-webdepend/</guid>
+			</item>
+		
+			<item>
+				<title>You Can Now Test Any Website</title>
+				<description>&lt;div class=&quot;section section-first&quot;&gt;
+    &lt;p&gt;
+        The goal all along of Simply Testable has been to let you easily
+        run a set of frontend tests against any website of your choosing
+        with the minimum possible effort.
+    &lt;/p&gt;
+    &lt;p&gt;
+        Until recently you could only test a large subset of the
+        Internet. It was a large subset of the Internet, but not the entirety.
+    &lt;/p&gt;    
+    &lt;p&gt;
+        For some sites you&#39;d encounter a polite notice informing you
+        that the given site is too large to be tested. For other sites your
+        test would get stuck at &quot;Finding URLs to test: looking for sitemap or news feed&quot;
+        and stay like that forever.
+    &lt;/p&gt;
+    &lt;p&gt;
+        As of a few minutes ago, you can now test absolutely any website.
+        Here is story of how we went from being able to test only a tiny subset
+        of all websites to being able to test absolutely any website.
+    &lt;/p&gt;    
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;The Beginning: Simple Sitemaps Only&lt;/h3&gt;
+    &lt;p&gt;
+        When the service first launched you could only run full-site tests for 
+        sites with simple sitemaps.
+    &lt;/p&gt;
+    &lt;p&gt;
+        Collecting URLs to test from a sitemap is much easier than crawling
+        a site to find URLs. And simple sitemaps are much easier to collect
+        and process than compressed sitemaps, indexed sitemaps and multiple sitemaps.
+    &lt;/p&gt;
+    &lt;p&gt;
+        There was a whole range of sites you couldn&#39;t test but it was better 
+        than nothing and allowed me to focus on building a great testing tool 
+        instead of building a great sitemap reading tool.
+    &lt;/p&gt;
+    &lt;p&gt;
+        The &lt;a href=&quot;/private-alpha-release-available/&quot;&gt;private alpha&lt;/a&gt; was 
+        released on September 12, 2012 and all was good. Limited, covering
+        only a small subset of the Internet and offering just the one feature, but good.
+    &lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;News Feed (RSS, Atom) Support&lt;/h3&gt;
+    &lt;p&gt;
+        Some sites have no sitemap but do publish news feeds, either in RSS
+        or Atom format. And some such sites have been around since the dawn
+        of time and if they haven&#39;t added a sitemap yet they may well never do.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        Whereas a sitemap will ideally list all URLs, a news feed will typically 
+        list a subset of all URLs and commonly these will be the most recent.
+        This turns out to be a good substitute for a sitemap.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        On September 19, 2012, support for &lt;a href=&quot;http://us5.campaign-archive1.com/?u=ac75e33d993d2b502e333ddd0&amp;amp;id=5c86a943e3&quot;&gt;news feeds&lt;/a&gt;
+        was mentioned in the weekly newsletter and so support for this was
+        probably added around then.
+    &lt;/p&gt;        
+    
+    &lt;p&gt;
+        Millions of WordPress blogs and Blogger sites could now be tested.
+    &lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;Compressed Sitemaps&lt;/h3&gt;
+    &lt;p&gt;
+        Instead of serving an XML document listing URLs and metadata about those 
+        URLs, some people take their XML sitemap and gzip it and serve the gzipped
+        archive.
+    &lt;/p&gt;
+    &lt;p&gt;
+        Who&#39;d have thought it?
+
+        Well, anyone who has read the offical spec might have thought of it,
+        that&#39;s who.
+    &lt;/p&gt;
+    &lt;p&gt;
+        In relation to &lt;a href=&quot;http://www.sitemaps.org/protocol.html#index&quot;&gt;sitemap size&lt;/a&gt;,
+        the spec states:
+    &lt;/p&gt;
+    &lt;blockquote&gt;If you would like, you may compress your Sitemap files using gzip to reduce your bandwidth requirement &amp;hellip;&lt;/blockquote&gt;
+    
+    &lt;p&gt;
+        On September 21, 2012, support for &lt;a href=&quot;/compressed-sitemaps-now-supported/&quot;&gt;compressed sitemaps&lt;/a&gt; was added
+        and the small subset of the Internet that could be tested grew a little.
+    &lt;/p&gt;        
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot; id=&quot;feature-requests&quot;&gt;
+    &lt;h3&gt;Multiple Sitemaps and Indexed Sitemaps&lt;/h3&gt;
+    
+    &lt;p&gt;
+        On the subject of &lt;a href=&quot;http://www.sitemaps.org/protocol.html#index&quot;&gt;sitemap size&lt;/a&gt;,
+        the spec states:
+    &lt;/p&gt;
+    
+    &lt;blockquote&gt;You can provide multiple Sitemap files, but each Sitemap file that you
+        provide must have no more than 50,000 URLs and must be no larger than 
+        10MB (10,485,760 bytes). &amp;hellip; If you want 
+        to list more than 50,000 URLs, you must create multiple Sitemap files.&lt;/blockquote&gt;
+    
+    &lt;p&gt;
+        Some sites have more than 50,000 URLs. The staff of some have stalled
+        at the stage of trying to manually count the number of URLs to verify
+        the situation for management so we&#39;ll ignore them for now.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        At this point in time we supported only single, simple sitemaps. If
+        your sitemap was an index that listed other sitemaps you were out of luck.
+        And if you listed many sitemaps in your robots.txt you were out of luck.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        On October 10, 2012, just nipping in prior to the public launch,
+        support for &lt;a href=&quot;/multiple-sitemaps-indexed-sitemaps-supported/&quot;&gt;multiple sitemaps and indexed sitemaps&lt;/a&gt; was added.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        As an aside as an implementor of a tool that discovers and retrieves
+        sitemaps, I&#39;d like to point out the range of sitemap combinations
+        that you as a site owner could opt for:
+    &lt;/p&gt;
+    
+    &lt;ul&gt;
+        &lt;li&gt;
+            &lt;p&gt;
+                a single simple sitemap (listed either in robots.txt or just
+                floating around hoping to get noticed)
+            &lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+            &lt;p&gt;
+                a single simple sitemap index providing URLs to your actual
+                sitemaps (listed either in robots.txt or just floating
+                around hoping to get noticed)
+            &lt;/p&gt;
+        &lt;/li&gt;        
+        &lt;li&gt;
+            &lt;p&gt;
+                multiple simple sitemaps listed in robots.txt
+            &lt;/p&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+            &lt;p&gt;
+                multiple simple sitemaps indexes listed in robots.txt, each
+                listing URLs to your actual sitemaps
+            &lt;/p&gt;
+        &lt;/li&gt;        
+        &lt;li&gt;
+            &lt;p&gt;
+                multiple sitemaps listed in robots.txt, some simple sitemaps
+                and some indexes to other sitemaps, in any combination you
+                fancy
+            &lt;/p&gt;
+        &lt;/li&gt;
+    &lt;/ul&gt;
+    
+    &lt;p&gt;
+        With support for multiple sitemaps and indexed sitemaps added, you could
+        opt for any of the above.
+    &lt;/p&gt;
+    
+&lt;/div&gt;
+
+
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;Crawling To Discover URLs&lt;/h3&gt;
+    &lt;p&gt;
+        All of the above changes allowed the subset of the Internet that could
+        be tested to expand quite a bit but it still failed to cover a
+        notable portion of the Internet: sites with no sitemap and no news
+        feed that will never have a sitemap or news feed.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        I knew from the start that there would always be some sites that had
+        no sitemap and no news feed. It wasn&#39;t possible to discover URLs to test
+        and so such sites couldn&#39;t be tested.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        This might seem like a problem, but when you have to choose between
+        improving support for sites that can be tested and improving the breadth
+        of sites that can be tested, it&#39;s only a problem if the number of sites
+        that can&#39;t be tested is significant.
+    &lt;/p&gt;
+    
+    &lt;p&gt;        
+        Armed with a database of past results and the power of SQL, I set 
+        about the task of finding out. In 0.0002 seconds I had my answer: 
+        about 70% of tests failed due to there being no sitemap and no news
+        feed.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        7 out of every 10 full-site tests that were attempted couldn&#39;t happen
+        due to there being no sitemap and no news feed.
+        Even with my limited understanding of statistical analysis I could tell
+        that 70% is significant.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        On August 22, 2013 I &lt;a href=&quot;/site-crawler-released/&quot;&gt;announced the new site crawler&lt;/a&gt;
+        that would walk all over your site finding URLs to test.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        I boldly stated at the time that:
+    &lt;/p&gt;       
+    
+    &lt;blockquote&gt;There is now no site that we cannot test.&lt;/blockquote&gt;
+    
+    &lt;p&gt;
+        I was wrong about this but didn&#39;t realise it at the time. I thought
+        I was telling the truth.
+    &lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;There is now no site that we cannot test. And I mean it this time.&lt;/h3&gt;
+    
+    &lt;p&gt;
+        Back when I last claimed that there was no site we cannot test I was
+        wrong but not by much.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        Sites that have sitemaps provided in an array of possible ways could be
+        tested. Sites with news feeds could be tested. And sites without sitemaps
+        and without news feeds could be tested.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        What was missing was the ability to test sites that did have sitemaps
+        but where on a scale of 1 to 10 regarding the size of the sitemap
+        they rated somewhere around 27.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        One thing I quickly spotted after the public launch was that sites
+        with insanely large sitemaps caused problems.
+    &lt;/p&gt;    
+    
+    &lt;p&gt;
+        The background process that was kicked off to collect the sitemap for a 
+        site with an insanely large sitemap would take quite a while going
+        about it, consuming more and more server resources as it went. Over time,
+        this would approximate to consuming all server resources and bring
+        things to a grinding halt. All things.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        As a quick and messy fix to the problem of the production server breaking
+        in style every now and again without warning, I scheduled a job
+        to run every few minutes that would kill any sitemap-gathering process
+        that had been running for longer than 2 minutes.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        The fix was quick and messy but allowed me to do anything other than
+        keep a constant eye on the production server. That was good enough for me
+        and let me get on with anything else.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        This did mean that there was still a small subset of the Internet
+        that could not be tested. And if you tried to test one of such sites,
+        you test would get stuck at &quot;Finding URLs to test: looking for sitemap 
+        or news feed&quot; and stay like that forever. This is not a good experience.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        This week I set about sorting out this mess once and for all.
+    &lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;Handling Sites With Insanely Large Sitemaps&lt;/h3&gt;    
+    &lt;p&gt;
+        I was examining a particular site earlier this week. It had a very large sitemap.
+        &quot;How large is large?&quot;, I hear you ask.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        The site I was examining had a single index listing 1396 sitemaps, each
+        listing about 8,000 URLs. That&#39;s about 11 million URLs.
+    &lt;/p&gt;    
+    
+    &lt;p&gt;
+        This particular site also had an interesting property: it was very slow.
+        When a slow site serves a single web page it may take some seconds
+        longer than you expect.
+    &lt;/p&gt;    
+    
+    &lt;p&gt;
+        When a slow site is so slow that it times out serving a single sitemap
+        and when the site has 1396 sitemaps to give you, you end up waiting
+        around a long time.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        Each request to retrieve each sitemap is given 30 seconds to go about it.
+        This is more than enough time for the majority of sites and includes plenty
+        of waiting time for any regularly-slow site.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        But for a site with 1396 sitemaps each timing out after 30 seconds,
+        you have to wait 1396 * 30 seconds to finish the process of retrieving
+        the full sitemap from which to gather URLs to be tested.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        1396 * 30 seconds might sound like a while but it&#39;s hard to fully appreciate
+        as we don&#39;t normally encounter large amounts of seconds. It seems long,
+        but how long? It&#39;s about 11 hours, that&#39;s how long.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        Even if the production server didn&#39;t have a background process that
+        periodically killed off long-running processes that were stuck
+        collecting sitemaps, I can&#39;t imagine you&#39;d sit around waiting
+        11 hours for your test to start. Personally, I&#39;d definitely give up
+        after 5 hours.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        The ability to specify a timeout value for a HTTP request is pretty
+        universal and certainly available to, and most likely used by, any
+        application that uses cURL in the background to handle HTTP communication.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        In this case that wasn&#39;t helping. I could reduce the timeout per HTTP
+        request from 30 seconds to 1 second. I&#39;d then only have to wait about
+        20 minutes to fail to retrieve a very large collection of sitemaps.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        Well, that&#39;s not going to work. 20 minutes is still about 19 minutes
+        longer than I&#39;d like. And then there would be a problem with regularly-slow
+        sites that spent a whole 2 seconds to serve up their sitemaps.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        I then hit upon the so-obvious-why-didn&#39;t-I-think-of-it-before solution
+        of specifying a timeout to be applied to a collection of HTTP requests
+        instead of just one.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        Bingo!
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        Every site now has a full 60 seconds for the full sitemap to be retrieved.
+        It your site has 1396 large sitemaps and isn&#39;t slow and serves them up
+        at a rate of 1 per second, the first 60 would be retrieved and the
+        rest would be ignored.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+         Not all the URLs of such a site would be discovered, but a lot would,
+         certainly enough to give you a good idea of the overall quality
+         of your site once all the tests you selected had finished.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        There is now definitely no site that cannot be tested.
+
+        Updates will follow as soon as I found out that this is not true.
+    &lt;/p&gt;
+&lt;/div&gt;</description>
+				<pubDate>Thu, 24 Oct 2013 00:00:00 -0700</pubDate>
+				<link>http://blog.simplytestable.com/you-can-now-test-any-website/</link>
+				<guid isPermaLink="true">http://blog.simplytestable.com/you-can-now-test-any-website/</guid>
+			</item>
+		
+			<item>
+				<title>Simply Testable Updates #62: Share Private Test Results, Filter Results By Test Type, Towards Testing Absolutely Any Site</title>
+				<description></description>
+				<pubDate>Wed, 23 Oct 2013 00:00:00 -0700</pubDate>
+				<link>http://blog.simplytestable.com/simply-testable-updates-62/</link>
+				<guid isPermaLink="true">http://blog.simplytestable.com/simply-testable-updates-62/</guid>
+			</item>
+		
+			<item>
+				<title>Allowing Public Access To Private Test Results</title>
+				<description>&lt;div class=&quot;section section-first&quot;&gt;
+    &lt;h3&gt;The Need To Share Test Results&lt;/h3&gt;
+    &lt;p&gt;
+        &lt;a href=&quot;https://twitter.com/TomBatey&quot;&gt;Tom Batey&lt;/a&gt; of &lt;a href=&quot;http://www.webdepend.co.uk/&quot;&gt;WebDepend&lt;/a&gt;,
+        recently &lt;a href=&quot;mailto:&amp;#106;&amp;#111;&amp;#110;&amp;#64;&amp;#115;&amp;#105;&amp;#109;&amp;#112;&amp;#108;&amp;#121;&amp;#116;&amp;#101;&amp;#115;&amp;#116;&amp;#97;&amp;#98;&amp;#108;&amp;#101;&amp;#46;&amp;#99;&amp;#111;&amp;#109;&quot;&gt;contacted me by email&lt;/a&gt;
+        with some feature requests that would make his life as a professional
+        web tester easier.
+    &lt;/p&gt;
+    &lt;p&gt;
+        One such request relates to sharing private test results:
+    &lt;/p&gt;
+    &lt;blockquote&gt;
+        [I&#39;d like to have] some way of adding issues into bug trackers or perhaps be able to add a results URL to a bug tracker so that it is accessible by someone who doesn&#39;t have a Simply Testable account.
+    &lt;/blockquote&gt;
+    &lt;p&gt;
+        I thought this was an excellent idea and when I&#39;d cleared &lt;a href=&quot;http://local.blog.simplytestable.com/awesome-link-integrity-testing-now-available/&quot;&gt;link integrity testing&lt;/a&gt;
+        from my workload I set about making this happen.
+    &lt;/p&gt;
+    &lt;p&gt;
+        (Psst. &lt;a href=&quot;#feature-requests&quot;&gt;Need a feature?&lt;/a&gt;)
+    &lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;Unlocking Private Test Results&lt;/h3&gt;
+    &lt;div class=&quot;illustration-inline illustration-inline-test-locked&quot;&gt;
+        &lt;img src=&quot;http://i.imgur.com/xbBDHkf.png&quot; class=&quot;img-responsive&quot; /&gt;
+        &lt;span class=&quot;illustration-highlight&quot;&gt;&lt;/span&gt;        
+    &lt;/div&gt;
+    &lt;p&gt;
+        Tests that you run when signed in are private and can be accessed
+        only by you. The fact that a test is locked to your account
+        can now be seen below the re-test button when viewing the main 
+        test results.
+    &lt;/p&gt;
+    &lt;p&gt;
+        This is generally a good default as you might not want the whole
+        world to know what you&#39;re working on.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        If you want to share private test results with colleagues or clients,
+        just click the unlock button show above.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        You&#39;ll now see that your test is unlocked and the results can be viewed
+        by anyone. You then have the option to lock the test again if you
+        no longer want to be able to share the results:
+    &lt;/p&gt;
+    
+    &lt;div class=&quot;illustration-inline illustration-inline-test-locked&quot;&gt;
+        &lt;img src=&quot;http://i.imgur.com/dSLNTlo.png&quot; class=&quot;img-responsive&quot; /&gt;
+        &lt;span class=&quot;illustration-highlight&quot;&gt;&lt;/span&gt;        
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot;&gt;
+    &lt;h3&gt;Viewing Unlocked Test Results&lt;/h3&gt;
+    &lt;p&gt;
+        Just share the main results URL or the results URL for any of the
+        individual test results with whoever you want to be able to see 
+        the results.
+    &lt;/p&gt;
+    &lt;p&gt;
+        Here&#39;s what that will look like to anyone but you:
+    &lt;/p&gt;
+    &lt;div class=&quot;illustration-inline illustration-inline-test-locked&quot;&gt;
+        &lt;a href=&quot;https://gears.simplytestable.com/http://blog.simplytestable.com//10865/results/&quot;&gt;&lt;img src=&quot;http://i.imgur.com/ZEDPPXb.png&quot; class=&quot;img-responsive&quot; /&gt;&lt;/a&gt;
+    &lt;/div&gt;    
+    &lt;p&gt;
+        Click the above image to be taken to an unlocked test that I just
+        carried out myself.
+    &lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;section&quot; id=&quot;feature-requests&quot;&gt;
+    &lt;h3&gt;Need Something To Make Your Life Easier?&lt;/h3&gt;
+    
+    &lt;p&gt;
+        If there&#39;s any aspect of web testing that would make your life easier,
+        let me know.
+    &lt;/p&gt;
+    
+    &lt;p&gt;
+        Here&#39;s your options for doing that. Use whichever option works
+        best for you:
+    &lt;/p&gt;
+    
+    &lt;ul&gt;
+        &lt;li&gt;
+            &lt;p&gt;
+                Add an idea to the &lt;a href=&quot;https://simplytestable.uservoice.com/forums/175588-tell-us-what-to-make-&quot;&gt;suggestions forum&lt;/a&gt;
+                (or vote on ideas already suggested)
+            &lt;/p&gt;
+        &lt;/li&gt;        
+        &lt;li&gt;
+            &lt;p&gt;
+                &lt;a href=&quot;mailto:&amp;#106;&amp;#111;&amp;#110;&amp;#64;&amp;#115;&amp;#105;&amp;#109;&amp;#112;&amp;#108;&amp;#121;&amp;#116;&amp;#101;&amp;#115;&amp;#116;&amp;#97;&amp;#98;&amp;#108;&amp;#101;&amp;#46;&amp;#99;&amp;#111;&amp;#109;&quot;&gt;Send me an email&lt;/a&gt;
+            &lt;/p&gt;               
+        &lt;/li&gt;        
+        &lt;li&gt;               
+            &lt;p&gt;
+                Send a tweet to &lt;a href=&quot;https://twitter.com/simplytestable/&quot;&gt;@simplytestable&lt;/a&gt;
+            &lt;/p&gt;
+        &lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</description>
+				<pubDate>Tue, 22 Oct 2013 00:00:00 -0700</pubDate>
+				<link>http://blog.simplytestable.com/allowing-public-access-to-private-test-results/</link>
+				<guid isPermaLink="true">http://blog.simplytestable.com/allowing-public-access-to-private-test-results/</guid>
+			</item>
+		
+	</channel>
+</rss>

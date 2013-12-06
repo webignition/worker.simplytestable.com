@@ -12,19 +12,38 @@ class BugFixTest extends ConsoleCommandBaseTestCase {
   
     public function testBugFix() {        
         $this->assertTrue(true);
-        return;
-	
+        return;        
         
-        $taskObject = $this->createTask('http://www.joelonsoftware.com/articles/fog0000000017.html', 'Link integrity');
-   
+        $this->getHttpClientService()->getMemcacheCache()->deleteAll();
+        
+//        $taskObject = $this->createTask('http://www.joelonsoftware.com/articles/fog0000000017.html', 'Link integrity');
 //        $taskObject = $this->createTask('http://www.boxuk.com/blog/dark-patterns-in-ux/', 'Link integrity');
-//        $taskObject = $this->createTask('http://www.joelonsoftware.com/', 'Link integrity');
-
-        $task = $this->getTaskService()->getById($taskObject->id);
+//        $taskObject = $this->createTask('http://www.joelonsoftware.com/', 'Link integrity');        
+//        $taskObject = $this->createTask('http://www.boxuk.com/news/box-uk-to-showcase-digital-solutions-at-tfma-exhibition/', 'Link integrity');
         
-        $this->assertEquals(0, $this->runConsole('simplytestable:task:perform', array(
-            $task->getId() => true
-        )));
+        $urls = array(
+//            'http://sequence.co.uk/tags/design',
+//            'http://www.limegreentangerine.co.uk/about/',
+//            'http://www.imaginet.co.uk/news/awards/hybu-cig-cymru-new-statesman-award/',
+            'http://www.limegreentangerine.co.uk/about/'
+        );
+        
+        foreach ($urls as $url) {
+            $taskObject = $this->createTask($url, 'Link integrity');
+
+            $task = $this->getTaskService()->getById($taskObject->id);
+
+            $this->assertEquals(0, $this->runConsole('simplytestable:task:perform', array(
+                $task->getId() => true
+            )));
+
+//            var_dump($task->getOutput()->getOutput());            
+//            
+//            echo "\n\n";
+        }
+        
+        
+
         
         //var_dump(json_decode($task->getOutput()->getOutput()));
     } 

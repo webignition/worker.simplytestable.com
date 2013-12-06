@@ -1,11 +1,12 @@
-services:
-  simplytestable.services.httpClient:
-    class:  webignition\Http\Mock\Client\Client
-    
+services:    
   simplytestable.services.httpClientService:
     class:  SimplyTestable\WorkerBundle\Services\TestHttpClientService     
     arguments:
         memcacheService: "@simplytestable.services.memcacheService"        
+        
+  simplytestable.services.htmlValidatorWrapperService:
+    class:  webignition\HtmlValidator\Mock\Wrapper\Wrapper         
+    #class:  webignition\HtmlValidator\Wrapper\Wrapper
     
   simplytestable.services.requestservice:
     class:   SimplyTestable\WorkerBundle\Services\TestRequestService    

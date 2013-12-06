@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "19470441e1be78ced4bc38b7802f1c6c",
+    "hash": "d0f39d5d86023349cda1c23c2ea41b33",
     "packages": [
         {
             "name": "doctrine/common",
@@ -2176,16 +2176,16 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "0.5.9",
+            "version": "0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "3f0f94e16c2b097357b4c8bd4b6c51792fa99651"
+                "reference": "67d5e225e3ebdb9c71f811a767616297e837303d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/3f0f94e16c2b097357b4c8bd4b6c51792fa99651",
-                "reference": "3f0f94e16c2b097357b4c8bd4b6c51792fa99651",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/67d5e225e3ebdb9c71f811a767616297e837303d",
+                "reference": "67d5e225e3ebdb9c71f811a767616297e837303d",
                 "shasum": ""
             },
             "require": {
@@ -2219,20 +2219,20 @@
                 "html",
                 "link"
             ],
-            "time": "2013-10-04 16:57:25"
+            "time": "2013-10-30 12:25:05"
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "0.4.2",
+            "version": "0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "ad1b21891222d3a6356f338370345d4028eaf228"
+                "reference": "c0c071207256055a22c4a4ad0db368a1d1b63ff6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/ad1b21891222d3a6356f338370345d4028eaf228",
-                "reference": "ad1b21891222d3a6356f338370345d4028eaf228",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/c0c071207256055a22c4a4ad0db368a1d1b63ff6",
+                "reference": "c0c071207256055a22c4a4ad0db368a1d1b63ff6",
                 "shasum": ""
             },
             "require": {
@@ -2264,20 +2264,20 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2013-10-03 13:41:52"
+            "time": "2013-10-16 08:23:00"
         },
         {
             "name": "webignition/html-document-type-identifier",
-            "version": "0.8",
+            "version": "0.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-type-identifier.git",
-                "reference": "16208b1773e477a529a7fd89cceb98dcadd9733e"
+                "reference": "c0b41de6d23f9e1f11d3f4cdfe67213c798331d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-identifier/zipball/16208b1773e477a529a7fd89cceb98dcadd9733e",
-                "reference": "16208b1773e477a529a7fd89cceb98dcadd9733e",
+                "url": "https://api.github.com/repos/webignition/html-document-type-identifier/zipball/c0b41de6d23f9e1f11d3f4cdfe67213c798331d1",
+                "reference": "c0b41de6d23f9e1f11d3f4cdfe67213c798331d1",
                 "shasum": ""
             },
             "type": "library",
@@ -2303,7 +2303,91 @@
                 "document",
                 "html"
             ],
-            "time": "2013-09-13 14:14:56"
+            "time": "2013-10-24 10:08:08"
+        },
+        {
+            "name": "webignition/html-validator-output-parser",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/html-validator-output-parser.git",
+                "reference": "9dcbc68de04f19001c288dca0a81b3ea45b7ed20"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/html-validator-output-parser/zipball/9dcbc68de04f19001c288dca0a81b3ea45b7ed20",
+                "reference": "9dcbc68de04f19001c288dca0a81b3ea45b7ed20",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "webignition/internet-media-type": ">=0.4.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*",
+                "symfony/class-loader": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "webignition\\Tests": "tests/",
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Parser for W3C HTML validator command line json output ",
+            "homepage": "https://github.com/webignition/html-validator-output-parser",
+            "keywords": [
+                "html",
+                "output",
+                "parser",
+                "validator"
+            ],
+            "time": "2013-12-03 15:09:21"
+        },
+        {
+            "name": "webignition/html-validator-wrapper",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/html-validator-wrapper.git",
+                "reference": "d75adf3435fad0c3732c587961b03b0f41a4fb31"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/html-validator-wrapper/zipball/d75adf3435fad0c3732c587961b03b0f41a4fb31",
+                "reference": "d75adf3435fad0c3732c587961b03b0f41a4fb31",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "webignition/html-validator-output-parser": ">=0.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*",
+                "symfony/class-loader": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "webignition\\Tests": "tests/",
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Wrapper for command-line interaction with W3C HTML validator",
+            "homepage": "https://github.com/webignition/html-validator-wrapper",
+            "keywords": [
+                "html",
+                "validator"
+            ],
+            "time": "2013-12-02 15:30:15"
         },
         {
             "name": "webignition/internet-media-type",
@@ -2353,16 +2437,16 @@
         },
         {
             "name": "webignition/node-jslint-output-parser",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/node-jslint-output-parser.git",
-                "reference": "3560c606249c64fcf327a970c6cfd0accdf86fbe"
+                "reference": "935401588d097fc7d5cff13521d725e5e94de3d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/3560c606249c64fcf327a970c6cfd0accdf86fbe",
-                "reference": "3560c606249c64fcf327a970c6cfd0accdf86fbe",
+                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/935401588d097fc7d5cff13521d725e5e94de3d8",
+                "reference": "935401588d097fc7d5cff13521d725e5e94de3d8",
                 "shasum": ""
             },
             "require": {
@@ -2389,7 +2473,7 @@
             "keywords": [
                 "rss"
             ],
-            "time": "2013-09-13 15:26:15"
+            "time": "2013-10-14 11:58:49"
         },
         {
             "name": "webignition/quoted-string",

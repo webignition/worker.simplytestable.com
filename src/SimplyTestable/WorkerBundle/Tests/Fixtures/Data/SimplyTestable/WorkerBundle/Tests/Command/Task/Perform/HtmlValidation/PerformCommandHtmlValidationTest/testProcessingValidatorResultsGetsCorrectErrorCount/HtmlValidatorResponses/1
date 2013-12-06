@@ -1,0 +1,44 @@
+HTTP/1.1 200 OK
+Content-Type:application/json; charset=UTF-8
+X-W3C-Validator-Errors:3
+X-W3C-Validator-Recursion:1
+X-W3C-Validator-Status:Invalid
+X-W3C-Validator-Warnings:1
+
+{
+    "url": "http://webignition.net/",
+    "messages": [
+        
+          {
+              "lastLine": 59,
+              "lastColumn": 102,
+              "message": "An img element must have an alt attribute, except under certain conditions. For details, consult guidance on providing text alternatives for images.",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=http%3A%2F%2Fwebignition.net%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          },
+        
+          {
+              "lastLine": 105,
+              "lastColumn": 156,
+              "message": "An img element must have an alt attribute, except under certain conditions. For details, consult guidance on providing text alternatives for images.",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=http%3A%2F%2Fwebignition.net%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          },
+        
+          {
+              "lastLine": 114,
+              "lastColumn": 124,
+              "message": "An img element must have an alt attribute, except under certain conditions. For details, consult guidance on providing text alternatives for images.",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=http%3A%2F%2Fwebignition.net%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          }
+        
+        ],
+    "source": {
+        "encoding": "utf-8",
+        "type": "text/html"
+    }
+}

@@ -25,7 +25,7 @@ EOF
     
     public function execute(InputInterface $input, OutputInterface $output)
     {        
-        $queuedTaskIds = $this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState());
+        $queuedTaskIds = $this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState());        
         $output->writeln(count($queuedTaskIds).' queued tasks ready to be performed');
         
         foreach ($queuedTaskIds as $taskId) {            

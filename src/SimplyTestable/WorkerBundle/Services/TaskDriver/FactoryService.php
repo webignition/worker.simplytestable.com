@@ -3,16 +3,16 @@
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
+//use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
-use SimplyTestable\WorkerBundle\Services\TaskService;
-use SimplyTestable\WorkerBundle\Services\TaskTypeService;
-use SimplyTestable\WorkerBundle\Services\StateService;
-use SimplyTestable\WorkerBundle\Services\WebResourceService;
-use SimplyTestable\WorkerBundle\Services\HttpServiceInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
-use SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService;
-use SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService;
+//use SimplyTestable\WorkerBundle\Services\TaskService;
+//use SimplyTestable\WorkerBundle\Services\TaskTypeService;
+//use SimplyTestable\WorkerBundle\Services\StateService;
+//use SimplyTestable\WorkerBundle\Services\WebResourceService;
+//use SimplyTestable\WorkerBundle\Services\HttpServiceInterface;
+//use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
+//use SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService;
+//use SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService;
 
 class FactoryService {
     
@@ -23,52 +23,55 @@ class FactoryService {
      */
     private $taskDrivers = array();
     
-    /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\TaskTypeService 
-     */
-    private $taskTypeService;
-    
     
     /**
      *
      * @param type $engines
      * @param TaskTypeService $taskTypeService 
      */
-    public function __construct(
-            $drivers,
-            TaskTypeService $taskTypeService,
-            StateService $stateService,
-            WebResourceService $webResourceService,
-            Logger $logger,
-            WebResourceTaskOutputService $webResourceTaskOutputService,
-            \JMS\Serializer\Serializer $serializer,
-            TimeCachedTaskOutputService $timeCachedTaskOutputService
-        ) {       
+    public function __construct($drivers, \Symfony\Component\DependencyInjection\Container $container) {
         
-        $this->taskTypeService = $taskTypeService;        
-        
-        foreach ($drivers as $identifier => $properties) {
+        foreach ($drivers as $identifier => $properties) {            
             /* @var $driver TaskDriver */
             $driver = new $properties['class'];
-            $driver->setStateService($stateService);
-            $driver->setWebResourceService($webResourceService);
-            $driver->setTaskTypeService($taskTypeService);
-            $driver->setLogger($logger);
-            $driver->setWebResourceTaskoutputService($webResourceTaskOutputService);
-            $driver->setSerializer($serializer);
-            $driver->setTimeCachedTaskoutputService($timeCachedTaskOutputService);
+            $driver->setStateService($container->get('simplytestable.services.stateservice'));
+            $driver->setWebResourceService($container->get('simplytestable.services.webresourceservice'));
+            $driver->setTaskTypeService($container->get('simplytestable.services.tasktypeservice'));
+            $driver->setLogger($container->get('logger'));
+            $driver->setWebResourceTaskoutputService($container->get('simplytestable.services.webresourcetaskoutputservice'));
+            $driver->setSerializer($container->get('serializer'));
+            $driver->setTimeCachedTaskoutputService($container->get('simplytestable.services.timecachedtaskoutputservice'));
             
             if (isset($properties['properties'])) {
-                $driver->setProperties($properties['properties']);
+                $driverProperties = array();
+                
+                foreach ($properties['properties'] as $key => $value) {
+                    if ($this->isDriverPropertyAsService($key)) {
+                        $driverProperties[str_replace('.service', '', $key)] = $container->get($value);
+                    } else {
+                        $driverProperties[$key] = $value;
+                    }                    
+                }
+                
+                $driver->setProperties($driverProperties);
             }
             
             foreach ($properties['task-types'] as $taskTypeName) {
-                $driver->addTaskType($this->taskTypeService->fetch($taskTypeName));                
+                $driver->addTaskType($container->get('simplytestable.services.tasktypeservice')->fetch($taskTypeName));                
             }
             
             $this->registerTaskDriver($driver);
         }
+    }
+    
+    
+    /**
+     * 
+     * @param string $key
+     * @return boolean
+     */
+    private function isDriverPropertyAsService($key) {
+        return preg_match('/\.service$/', $key) > 0;
     }
     
     

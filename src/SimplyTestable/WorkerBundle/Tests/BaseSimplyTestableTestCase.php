@@ -14,6 +14,11 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     const VERIFY_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\VerifyController';    
     const MAINTENANCE_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\MaintenanceController';        
     
+    public function setUp() {
+        parent::setUp();
+        $this->removeAllWebResourceTaskOutputs();
+    }    
+    
     protected function setActiveState() {
         $this->getWorkerService()->activate();
     }    
@@ -216,6 +221,25 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         $memcacheCache->setMemcache($this->getMemcacheService()->get());
         $memcacheCache->deleteAll();        
     }
+    
+    
+    protected function removeAllTasks() {
+        $this->removeAllForEntity('SimplyTestable\WorkerBundle\Entity\Task\Task');      
+    }     
+    
+    private function removeAllWebResourceTaskOutputs() {
+        $this->removeAllForEntity('SimplyTestable\WorkerBundle\Entity\WebResourceTaskOutput');      
+    }     
+    
+    private function removeAllForEntity($entityName) {
+        $entities = $this->getEntityManager()->getRepository($entityName)->findAll();
+        if (is_array($entities) && count($entities) > 0) {
+            foreach ($entities as $entity) {
+                $this->getEntityManager()->remove($entity);
+                $this->getEntityManager()->flush();                
+            }
+        }        
+    }    
 
 
 }

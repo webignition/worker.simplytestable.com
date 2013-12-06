@@ -284,10 +284,9 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
      * @group integration-html-validation-travis
      */       
     public function testWithSingleSpaceInUrl() {        
-//        $url = 'http://chellasolutions.com/Our projects.html';
         $url = 'http://html-validation.simplytestable.com/url-cases/minimal-no-errors with-single-space.html';
         
-        $taskObject = $this->createTask($url, 'HTML validation');
+        $taskObject = $this->createTask($url, 'CSS validation');
         
         $task = $this->getTaskService()->getById($taskObject->id);
         
@@ -297,7 +296,7 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
 
         $this->assertEquals(0, $response);        
         $this->assertEquals(0, $task->getOutput()->getErrorCount());        
-        $this->assertEquals('{"messages":[]}', $task->getOutput()->getOutput());
+        $this->assertEquals('[]', $task->getOutput()->getOutput());
     }    
 }
 

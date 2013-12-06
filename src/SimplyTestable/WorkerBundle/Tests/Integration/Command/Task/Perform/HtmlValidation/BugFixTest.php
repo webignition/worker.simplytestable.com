@@ -2,14 +2,10 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Integration\Command\Task\Perform\HtmlValidation;
 
-use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Tests\Integration\Command\Task\Perform\HtmlValidation\BaseHtmlValidationIntegrationTest;
 
-class BugFixTest extends ConsoleCommandBaseTestCase {
-    
-    public static function setUpBeforeClass() {
-        self::setupDatabase();        
-    }
-  
+class BugFixTest extends BaseHtmlValidationIntegrationTest {
+
     public function testBugFix() {        
         $this->assertTrue(true);
         return;
