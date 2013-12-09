@@ -12,6 +12,10 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         return self::TASK_TYPE_NAME;
     }
     
+
+    /**
+     * @group standard
+     */        
     public function testProcessingValidatorResultsGetsCorrectErrorCount() {
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
@@ -33,6 +37,10 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         $this->assertEquals(0, $task->getOutput()->getWarningCount());     
     }
     
+    
+    /**
+     * @group standard
+     */        
     public function testFailGracefullyWhenContentIsServedAsTextHtmlButIsNot() {        
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
@@ -53,6 +61,9 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
     }
     
     
+    /**
+     * @group standard
+     */        
     public function testValidatorReturnsHTTP500() {
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
@@ -76,6 +87,9 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
     }
 
 
+    /**
+     * @group standard
+     */        
     public function testCharacterEncodingFailureSetsTaskStateAsFailed() {
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
@@ -97,6 +111,9 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
     } 
     
     
+    /**
+     * @group standard
+     */        
     public function testFailIncorrectWebResourceType() {
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
@@ -111,6 +128,116 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         
         $this->assertEquals(0, $response);        
         $this->assertEquals($this->getTaskService()->getSkippedState(), $task->getState());
-    }     
+    } 
+    
+    
+    /**
+     * @group standard
+     */        
+    public function testOnHttpBasicAuthenticationProtectedUrl() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
+        $this->container->get('simplytestable.services.htmlValidatorWrapperService')->loadFixturesFromPath(
+            $this->getFixturesDataPath(__FUNCTION__ . '/HtmlValidatorResponses')
+        );        
+        
+        $taskObject = $this->createTask('http://unreliable.simplytestable.com/http-auth/index.html', 'HTML validation', json_encode(array(
+            'http-auth' => array(
+                'username' => 'example',
+                'password' => 'password'
+            )
+        )));  
+     
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);        
+        $this->assertEquals('{"messages":[]}', $task->getOutput()->getOutput());      
+    }
+    
+    
+    /**
+     * @group standard
+     */     
+    public function testOnHttpBasicAuthenticationWithInvalidCredentials() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
+        $taskObject = $this->createTask('http://unreliable.simplytestable.com/http-auth/index.html', 'HTML validation', json_encode(array(
+            'http-auth' => array(
+                'username' => 'wrong-username',
+                'password' => 'wrong-password'
+            )
+        )));
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+
+        $this->assertEquals(0, $response);
+        $this->assertEquals('{"messages":[{"message":"Unauthorized","messageId":"http-retrieval-401","type":"error"}]}', $task->getOutput()->getOutput());        
+        $this->assertTrue($task->getParametersObject()->{'http-auth'}->{'has-tried'});
+    }   
+    
+    
+    /**
+     * @group standard
+     */        
+    public function testOnHttpDigestAuthenticationProtectedUrl() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
+        $this->container->get('simplytestable.services.htmlValidatorWrapperService')->loadFixturesFromPath(
+            $this->getFixturesDataPath(__FUNCTION__ . '/HtmlValidatorResponses')
+        );        
+        
+        $taskObject = $this->createTask('http://unreliable.simplytestable.com/http-auth/index.html', 'HTML validation', json_encode(array(
+            'http-auth' => array(
+                'username' => 'example',
+                'password' => 'password'
+            )
+        )));  
+     
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);        
+        $this->assertEquals('{"messages":[]}', $task->getOutput()->getOutput());      
+    }
+    
+    
+    /**
+     * @group standard
+     */        
+    public function testOnHttpDigestAuthenticationWithInvalidCredentials() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+
+        $taskObject = $this->createTask('http://unreliable.simplytestable.com/http-auth/index.html', 'HTML validation', json_encode(array(
+            'http-auth' => array(
+                'username' => 'example',
+                'password' => 'password'
+            )
+        )));  
+     
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);        
+        $this->assertEquals('{"messages":[{"message":"Unauthorized","messageId":"http-retrieval-401","type":"error"}]}', $task->getOutput()->getOutput());
+        $this->assertTrue($task->getParametersObject()->{'http-auth'}->{'has-tried'});
+    }      
     
 }

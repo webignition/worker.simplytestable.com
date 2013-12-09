@@ -151,28 +151,27 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      * @param Task $task
      * @return WebResource 
      */
-    protected function getWebResource(Task $task, $additionalHeaders = array()) {        
+    protected function getWebResource(Task $task, $authenticationScheme = null) {
         try {            
             $request = $this->getWebResourceService()->getHttpClientService()->getRequest($task->getUrl());
             
-            if (is_array($additionalHeaders) && count($additionalHeaders)) {
-                $request->addHeaders($additionalHeaders);
+            if (!is_null($authenticationScheme) && $task->hasParameter('http-auth')) {
+                $httpAuthParameters = $task->getParameter('http-auth');
+                
+                $httpAuthParameters->has_tried = true;
+                $taskParameters = $task->getParametersObject();
+                $taskParameters->{'http-auth'}->{'has-tried'} = true;
+
+                $task->setParameters(json_encode($taskParameters));                
+                
+                $request->setAuth($httpAuthParameters->username, $httpAuthParameters->password, ($authenticationScheme == 'Digest') ? CURLAUTH_DIGEST : CURLAUTH_BASIC);
             }
             
             return $this->getWebResourceService()->get($request);            
         } catch (WebResourceException $webResourceException) {            
-            if ($webResourceException->getResponse()->getStatusCode() == 401 && $task->hasParameter('http-auth')) {
-                $httpAuthParameters = $task->getParameter('http-auth');
-                if (!isset($httpAuthParameters->{'has-tried'})) {
-                    $httpAuthParameters->has_tried = true;
-                    $taskParameters = $task->getParametersObject();
-                    $taskParameters->{'http-auth'}->{'has-tried'} = true;
-                    
-                    $task->setParameters(json_encode($taskParameters));
-                    
-                    return $this->getWebResource($task, array(
-                        'Authorization' => 'Basic ' . base64_encode($httpAuthParameters->username.':'.$httpAuthParameters->password)
-                    ));
+            if ($webResourceException->getResponse()->getStatusCode() == 401 && $task->hasParameter('http-auth')) {                
+                if (!isset($task->getParameter('http-auth')->{'has-tried'})) {                   
+                    return $this->getWebResource($task, $this->getRequestedAuthenticationMethodFrom401Response($webResourceException->getResponse()));
                 }
             }
             
@@ -203,6 +202,28 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             $this->tooManyRedirectsException = $tooManyRedirectsException;
         }
     } 
+    
+    
+    /**
+     * 
+     * @param \Guzzle\Http\Message\Response $response
+     * @return string|null
+     * @throws \InvalidArgumentException
+     */
+    private function getRequestedAuthenticationMethodFrom401Response(\Guzzle\Http\Message\Response $response) {
+        if ($response->getStatusCode() !== 401) {
+            throw new \InvalidArgumentException('Response code is not 401', 1);
+        }
+        
+        if (!$response->hasHeader('www-authenticate')) {
+            throw new \InvalidArgumentException('Response has no www-authenticate header', 2);
+        }
+        
+        $header = $response->getHeader('www-authenticate')->toArray();        
+        $headerParts = explode(' ', $header[0]);
+        
+        return $headerParts[0];      
+    }
     
     
     /**

@@ -77,8 +77,11 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
             'documentUri' => 'file:' . $this->storeTmpFile($fragment),
             'validatorPath' => $this->getProperty('validator-path')
         ));
-
-        $output = $this->getProperty('html-validator-wrapper')->validate();       
+        
+        /* @var $validatorWrapper \webignition\HtmlValidator\Mock\Wrapper\Wrapper */
+        $validatorWrapper = $this->getProperty('html-validator-wrapper');
+        $validatorWrapper->enableDeferToParentIfNoRawOutput();
+        $output = $validatorWrapper->validate();       
         
         if ($output->wasAborted()) {
             $this->response->setHasFailed();
