@@ -79,8 +79,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         ));
         
         /* @var $validatorWrapper \webignition\HtmlValidator\Mock\Wrapper\Wrapper */
-        $validatorWrapper = $this->getProperty('html-validator-wrapper');
-        $validatorWrapper->enableDeferToParentIfNoRawOutput();
+        $validatorWrapper = $this->getProperty('html-validator-wrapper');        
         $output = $validatorWrapper->validate();       
         
         if ($output->wasAborted()) {
