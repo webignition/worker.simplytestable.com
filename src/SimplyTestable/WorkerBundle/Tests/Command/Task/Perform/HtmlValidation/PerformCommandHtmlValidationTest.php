@@ -143,10 +143,8 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         );        
         
         $taskObject = $this->createTask('http://unreliable.simplytestable.com/http-auth/index.html', 'HTML validation', json_encode(array(
-            'http-auth' => array(
-                'username' => 'example',
-                'password' => 'password'
-            )
+            'http-auth-username' => 'example',
+            'http-auth-password' => 'password'
         )));  
      
         $task = $this->getTaskService()->getById($taskObject->id);
@@ -168,10 +166,8 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
         $taskObject = $this->createTask('http://unreliable.simplytestable.com/http-auth/index.html', 'HTML validation', json_encode(array(
-            'http-auth' => array(
-                'username' => 'wrong-username',
-                'password' => 'wrong-password'
-            )
+            'http-auth-username' => 'wrong-username',
+            'http-auth-password' => 'wrong-password'
         )));
         
         $task = $this->getTaskService()->getById($taskObject->id);
@@ -182,7 +178,7 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
 
         $this->assertEquals(0, $response);
         $this->assertEquals('{"messages":[{"message":"Unauthorized","messageId":"http-retrieval-401","type":"error"}]}', $task->getOutput()->getOutput());        
-        $this->assertTrue($task->getParametersObject()->{'http-auth'}->{'has-tried'});
+        $this->assertTrue($task->getParametersObject()->{'http-auth-tried'});
     }   
     
     
@@ -198,10 +194,8 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         );        
         
         $taskObject = $this->createTask('http://unreliable.simplytestable.com/http-auth/index.html', 'HTML validation', json_encode(array(
-            'http-auth' => array(
-                'username' => 'example',
-                'password' => 'password'
-            )
+            'http-auth-username' => 'example',
+            'http-auth-password' => 'password'
         )));  
      
         $task = $this->getTaskService()->getById($taskObject->id);
@@ -212,6 +206,7 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         
         $this->assertEquals(0, $response);        
         $this->assertEquals('{"messages":[]}', $task->getOutput()->getOutput());      
+        $this->assertTrue($task->getParametersObject()->{'http-auth-tried'});
     }
     
     
@@ -223,10 +218,8 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
 
         $taskObject = $this->createTask('http://unreliable.simplytestable.com/http-auth/index.html', 'HTML validation', json_encode(array(
-            'http-auth' => array(
-                'username' => 'example',
-                'password' => 'password'
-            )
+            'http-auth-username' => 'example',
+            'http-auth-password' => 'password'
         )));  
      
         $task = $this->getTaskService()->getById($taskObject->id);
@@ -237,7 +230,7 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         
         $this->assertEquals(0, $response);        
         $this->assertEquals('{"messages":[{"message":"Unauthorized","messageId":"http-retrieval-401","type":"error"}]}', $task->getOutput()->getOutput());
-        $this->assertTrue($task->getParametersObject()->{'http-auth'}->{'has-tried'});
+        $this->assertTrue($task->getParametersObject()->{'http-auth-tried'});
     }      
     
 }

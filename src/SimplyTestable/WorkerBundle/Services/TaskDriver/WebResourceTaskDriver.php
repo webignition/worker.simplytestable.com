@@ -155,22 +155,22 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         try {            
             $request = $this->getWebResourceService()->getHttpClientService()->getRequest($task->getUrl());
             
-            if (!is_null($authenticationScheme) && $task->hasParameter('http-auth')) {
-                $httpAuthParameters = $task->getParameter('http-auth');
+            if (!is_null($authenticationScheme) && $task->hasParameter('http-auth-username') && $task->hasParameter('http-auth-password')) {
+                $username = $task->getParameter('http-auth-username');
+                $password = $task->getParameter('http-auth-password');
                 
-                $httpAuthParameters->has_tried = true;
                 $taskParameters = $task->getParametersObject();
-                $taskParameters->{'http-auth'}->{'has-tried'} = true;
+                $taskParameters->{'http-auth-tried'} = true;
 
                 $task->setParameters(json_encode($taskParameters));                
                 
-                $request->setAuth($httpAuthParameters->username, $httpAuthParameters->password, ($authenticationScheme == 'Digest') ? CURLAUTH_DIGEST : CURLAUTH_BASIC);
+                $request->setAuth($username, $password, ($authenticationScheme == 'Digest') ? CURLAUTH_DIGEST : CURLAUTH_BASIC);
             }
             
             return $this->getWebResourceService()->get($request);            
         } catch (WebResourceException $webResourceException) {            
-            if ($webResourceException->getResponse()->getStatusCode() == 401 && $task->hasParameter('http-auth')) {                
-                if (!isset($task->getParameter('http-auth')->{'has-tried'})) {                   
+            if ($webResourceException->getResponse()->getStatusCode() == 401 && $task->hasParameter('http-auth-username') && $task->hasParameter('http-auth-password')) {                
+                if (!$task->hasParameter('http-auth-tried')) {                   
                     return $this->getWebResource($task, $this->getRequestedAuthenticationMethodFrom401Response($webResourceException->getResponse()));
                 }
             }
