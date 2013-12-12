@@ -178,7 +178,7 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
 
         $this->assertEquals(0, $response);
         $this->assertEquals('{"messages":[{"message":"Unauthorized","messageId":"http-retrieval-401","type":"error"}]}', $task->getOutput()->getOutput());        
-        $this->assertTrue($task->getParametersObject()->{'http-auth-tried'});
+        $this->assertTrue($task->getParametersObject()->{'x-http-auth-tried'});
     }   
     
     
@@ -206,7 +206,7 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         
         $this->assertEquals(0, $response);        
         $this->assertEquals('{"messages":[]}', $task->getOutput()->getOutput());      
-        $this->assertTrue($task->getParametersObject()->{'http-auth-tried'});
+        $this->assertTrue($task->getParametersObject()->{'x-http-auth-tried'});
     }
     
     
@@ -230,7 +230,7 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         
         $this->assertEquals(0, $response);        
         $this->assertEquals('{"messages":[{"message":"Unauthorized","messageId":"http-retrieval-401","type":"error"}]}', $task->getOutput()->getOutput());
-        $this->assertTrue($task->getParametersObject()->{'http-auth-tried'});
+        $this->assertTrue($task->getParametersObject()->{'x-http-auth-tried'});
     }      
     
 }

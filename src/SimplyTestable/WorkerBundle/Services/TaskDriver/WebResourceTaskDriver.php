@@ -160,7 +160,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
                 $password = $task->getParameter('http-auth-password');
                 
                 $taskParameters = $task->getParametersObject();
-                $taskParameters->{'http-auth-tried'} = true;
+                $taskParameters->{'x-http-auth-tried'} = true;
 
                 $task->setParameters(json_encode($taskParameters));                
                 
@@ -170,7 +170,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             return $this->getWebResourceService()->get($request);            
         } catch (WebResourceException $webResourceException) {            
             if ($webResourceException->getResponse()->getStatusCode() == 401 && $task->hasParameter('http-auth-username') && $task->hasParameter('http-auth-password')) {                
-                if (!$task->hasParameter('http-auth-tried')) {                   
+                if (!$task->hasParameter('x-http-auth-tried')) {                   
                     return $this->getWebResource($task, $this->getRequestedAuthenticationMethodFrom401Response($webResourceException->getResponse()));
                 }
             }
