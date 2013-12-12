@@ -414,6 +414,8 @@ class TaskService extends EntityService {
             return true;
         }
         
+        $this->removeTemporaryParameters($task); 
+        
         $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/task/' . urlencode($task->getUrl()) . '/' . urlencode($task->getType()->getName()) . '/' . $task->getParametersHash() . '/complete/');       
         //$requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/task/'.$this->workerService->get()->getHostname().'/'.$task->getId().'/complete/');       
         $httpRequest = $this->httpClientService->postRequest($requestUrl, null, array(
@@ -462,6 +464,31 @@ class TaskService extends EntityService {
      */
     public function getEntityRepository() {
         return parent::getEntityRepository();
-    }      
+    } 
+    
+    
+    /**
+     * 
+     * @param \SimplyTestable\WorkerBundle\Entity\Task\Task $task
+     */
+    private function removeTemporaryParameters(Task $task) {        
+        if (!$task->hasParameters()) {
+            return;
+        }
+        
+        $hasRemovedTemporaryParameters = false;
+        $decodedParameters = json_decode($task->getParameters());
+        
+        foreach ($decodedParameters as $key => $value) {
+            if (substr($key, 0, strlen('x-')) == 'x-') {
+                unset($decodedParameters->$key);                
+                $hasRemovedTemporaryParameters = true;
+            }
+        }
+        
+        if ($hasRemovedTemporaryParameters) {
+            $task->setParameters(json_encode($decodedParameters));
+        }       
+    }
   
 }
