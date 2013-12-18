@@ -55,5 +55,31 @@ class PerformCommandUrlDiscoveryTest extends PerformCommandTaskTypeTest {
         )));
         
         $this->assertEquals(31, count(json_decode($task->getOutput()->getOutput())));
-    } 
+    }
+    
+
+    /**
+     * @group standard
+     */     
+    public function testWithHttpAuthProtectedPage() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+
+        $taskObject = $this->createTask('http://http-auth-04.simplytestable.com/', 'URL discovery', json_encode(array(
+            'scope' => 'http://http-auth-04.simplytestable.com/',
+            'http-auth-username' => 'example',
+            'http-auth-password' => 'password'
+        ))); 
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+
+        $this->assertEquals(0, $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        )));
+        
+        $this->assertEquals(array(
+            'http://http-auth-04.simplytestable.com/two.html',
+            'http://http-auth-04.simplytestable.com/three.html'
+        ), json_decode($task->getOutput()->getOutput()));     
+    }
 }
