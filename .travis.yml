@@ -62,6 +62,8 @@ before_script:
   - mv --force app/config/config_travis.yml app/config/config_test.yml
   - cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
   - php composer.phar install
+  - "sed -i '80s/.*/        $exception = $event['\''exception'\''] instanceof \Guzzle\Http\Exception\CurlException ? $event['\''exception'\''] : null;/' vendor/guzzle/guzzle/src/Guzzle/Plugin/Backoff/BackoffPlugin.php"
+  - cat vendor/guzzle/guzzle/src/Guzzle/Plugin/Backoff/BackoffPlugin.php
   - php app/console doctrine:database:create
   - php app/console doctrine:migrations:migrate --no-interaction
   - php app/console doctrine:fixtures:load --append  
