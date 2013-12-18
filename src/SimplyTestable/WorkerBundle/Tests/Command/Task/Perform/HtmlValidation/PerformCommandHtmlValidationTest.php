@@ -231,6 +231,26 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
         $this->assertEquals(0, $response);        
         $this->assertEquals('{"messages":[{"message":"Unauthorized","messageId":"http-retrieval-401","type":"error"}]}', $task->getOutput()->getOutput());
         $this->assertTrue($task->getParametersObject()->{'x-http-auth-tried'});
-    }      
+    } 
+    
+    
+    /**
+     * @group standard
+     */     
+    public function testBugfixRedmine392() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+
+        $taskObject = $this->createTask('http://www.teksystems.com/http%3A//teksystemsaut-com.allegisgroup.com/', 'HTML validation');  
+     
+        $task = $this->getTaskService()->getById($taskObject->id);
+        
+        $response = $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        ));
+        
+        $this->assertEquals(0, $response);        
+        $this->assertEquals('{"messages":[{"message":"Internal Server Error","messageId":"http-retrieval-500","type":"error"}]}', $task->getOutput()->getOutput());      
+    }
     
 }
