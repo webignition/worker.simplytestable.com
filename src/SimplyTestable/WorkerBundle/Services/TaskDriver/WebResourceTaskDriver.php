@@ -167,6 +167,9 @@ abstract class WebResourceTaskDriver extends TaskDriver {
                 $request->setAuth($username, $password, ($authenticationScheme == 'Digest') ? CURLAUTH_DIGEST : CURLAUTH_BASIC);
             }
             
+            echo $request;
+            exit();
+            
             return $this->getWebResourceService()->get($request);            
         } catch (WebResourceException $webResourceException) {            
             if ($webResourceException->getResponse()->getStatusCode() == 401 && $task->hasParameter('http-auth-username') && $task->hasParameter('http-auth-password')) {                
