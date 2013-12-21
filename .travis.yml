@@ -62,7 +62,7 @@ before_script:
   - mv --force app/config/config_travis.yml app/config/config_test.yml
   - cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
   - php composer.phar install
-  - chmod +x travis-ci/patch.sh
+  #- chmod +x travis-ci/patch.sh
   - travis-ci/patch.sh
   - php app/console doctrine:database:create
   - php app/console doctrine:migrations:migrate --no-interaction
