@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "88ad4719c3658dd2ba8be565420baf1f",
+    "hash": "b5fed41142ada6d172033373c118f6d0",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -356,12 +356,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "d473423d6dd12b476d1507c97d45f2e59809cebf"
+                "reference": "6d0e8e2a8598f121cdb136507022915247fc98b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/d473423d6dd12b476d1507c97d45f2e59809cebf",
-                "reference": "d473423d6dd12b476d1507c97d45f2e59809cebf",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/6d0e8e2a8598f121cdb136507022915247fc98b8",
+                "reference": "6d0e8e2a8598f121cdb136507022915247fc98b8",
                 "shasum": ""
             },
             "require": {
@@ -419,7 +419,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2013-12-28 16:10:52"
+            "time": "2013-12-29 16:46:41"
         },
         {
             "name": "doctrine/doctrine-bundle",
@@ -2622,16 +2622,16 @@
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "0.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "e9e0899b7806d0939ef364ab1748c5712da8db17"
+                "reference": "6b65a6db837d27f48579330b7d618ae9ae2665ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/e9e0899b7806d0939ef364ab1748c5712da8db17",
-                "reference": "e9e0899b7806d0939ef364ab1748c5712da8db17",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/6b65a6db837d27f48579330b7d618ae9ae2665ec",
+                "reference": "6b65a6db837d27f48579330b7d618ae9ae2665ec",
                 "shasum": ""
             },
             "require": {
@@ -2659,7 +2659,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2013-12-29 14:37:42"
+            "time": "2013-12-29 15:53:46"
         },
         {
             "name": "webignition/html-document-link-checker",
