@@ -25,7 +25,12 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
     public static function setUpBeforeClass() {
         self::setupDatabase();        
-    }    
+    } 
+    
+    public function setUp() {
+        parent::setUp();
+        $this->container->get('simplytestable.services.cssValidatorWrapperService')->enableDeferToParentIfNoRawOutput();        
+    }
 
     /**
      * @group integration
@@ -108,7 +113,8 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
         ));
 
         $this->assertEquals(0, $response);
-        $this->assertEquals(1099, $task->getOutput()->getErrorCount());        
+        $this->assertEquals(677, $task->getOutput()->getErrorCount());        
+        $this->assertEquals(423, $task->getOutput()->getWarningCount());
     }     
 
 
@@ -279,9 +285,9 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
     
     /**
      * @group integration
-     * @group integration-html-validation
+     * @group integration-css-validation
      * @group integration-travis
-     * @group integration-html-validation-travis
+     * @group integration-css-validation-travis
      */       
     public function testWithSingleSpaceInUrl() {        
         $url = 'http://html-validation.simplytestable.com/url-cases/minimal-no-errors with-single-space.html';
