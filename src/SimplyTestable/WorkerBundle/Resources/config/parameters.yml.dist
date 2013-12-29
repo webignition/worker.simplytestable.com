@@ -17,7 +17,7 @@ parameters:
         - "CSS validation"        
       properties:
         jar-path: /usr/share/css-validator/2002/css-validator/css-validator.jar
-        validator-output-parser: SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationOutputParser     
+        css-validator-wrapper.service: simplytestable.services.cssValidatorWrapperService  
     js-static-analysis:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver
       task-types:

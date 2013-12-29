@@ -4,7 +4,8 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use webignition\WebResource\WebPage\WebPage;
-use webignition\CssValidatorOutput\Parser as CssValidatorOutputParser;
+use webignition\CssValidatorWrapper\Configuration\Flags as CssValidatorWrapperConfigurationFlags;
+use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel as CssValidatorWrapperConfigurationVextLevel;
 
 class CssValidationTaskDriver extends WebResourceTaskDriver {
     
@@ -57,50 +58,25 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
     }
 
     protected function performValidation() { 
-        $commandOptions = array(
-            'output' => 'ucn'
-        );
-        
-        if ($this->task->getParameter('vendor-extensions') == 'warn') {
-            $commandOptions['vextwarning'] = 'true';
-        }
-        
-        if ($this->task->getParameter('vendor-extensions') == 'error') {
-            $commandOptions['vextwarning'] = 'false';
-        }        
-        
-        $commandOptionsStrings = '';
-        foreach ($commandOptions as $key => $value) {
-            $commandOptionsStrings[] = '-'.$key.' '.$value;
-        }
-        
-        $preparedUrl = str_replace('"', '\"', $this->webResource->getUrl());        
-        
-        $validationOutputLines = array();
-        $command = "java -jar ".$this->getProperty('jar-path')." ".  implode(' ', $commandOptionsStrings)." \"" . $preparedUrl ."\" 2>&1";               
-        exec($command, $validationOutputLines);
-               
-        $cssValidatorOutputParser = new CssValidatorOutputParser();
-        $cssValidatorOutputParser->setIgnoreFalseBackgroundImageDataUrlMessages(true);
-        $cssValidatorOutputParser->setRawOutput(implode("\n", $validationOutputLines));
-        
-        if ($this->task->hasParameter('domains-to-ignore')) {
-            $cssValidatorOutputParser->setRefDomainsToIgnore($this->task->getParameter('domains-to-ignore'));
-        }
+        $this->getProperty('css-validator-wrapper')->createConfiguration(array(
+            'url-to-validate' => $this->webResource->getUrl(),
+            'css-validator-jar-path' => $this->getProperty('jar-path'),
+            'vendor-extension-severity-level' => CssValidatorWrapperConfigurationVextLevel::isValid($this->task->getParameter('vendor-extensions'))
+                ? $this->task->getParameter('vendor-extensions')
+                : CssValidatorWrapperConfigurationVextLevel::LEVEL_WARN,
+            'flags' => array(
+                CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_FALSE_BACKGROUND_IMAGE_DATA_URL_MESSAGES
+            ),
+            'domains-to-ignore' => $this->task->hasParameter('domains-to-ignore')
+                ? $this->task->getParameter('domains-to-ignore') 
+                : array()
+        ));
         
         if ($this->task->isTrue('ignore-warnings')) {
-            $cssValidatorOutputParser->setIgnoreWarnings(true);
+            $this->getProperty('css-validator-wrapper')->getConfiguration()->setFlag(CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_WARNINGS);
         }
         
-        if ($this->task->getParameter('vendor-extensions') == 'ignore') {    
-            $cssValidatorOutputParser->setIgnoreVendorExtensionIssues(true);
-        }
-        
-        if ($this->task->getParameter('vendor-extensions') == 'warn' && $this->task->isTrue('ignore-warnings')) {
-            $cssValidatorOutputParser->setIgnoreVendorExtensionIssues(true);
-        }        
-        
-        $cssValidatorOutput = $cssValidatorOutputParser->getOutput();
+        $cssValidatorOutput = $this->getProperty('css-validator-wrapper')->validate();
         
         if ($cssValidatorOutput->getIsUnknownMimeTypeError()) {
             $this->response->setHasBeenSkipped();
