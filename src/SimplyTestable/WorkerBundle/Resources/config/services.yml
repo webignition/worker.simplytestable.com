@@ -6,6 +6,9 @@ services:
         
   simplytestable.services.htmlValidatorWrapperService:
     class:  webignition\HtmlValidator\Wrapper\Wrapper 
+    
+  simplytestable.services.cssValidatorWrapperService:
+    class:  webignition\CssValidatorWrapper\Wrapper     
   
   simplytestable.services.coreApplicationService:
     class:  SimplyTestable\WorkerBundle\Services\CoreApplicationService
