@@ -65,7 +65,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
                 ? $this->task->getParameter('vendor-extensions')
                 : CssValidatorWrapperConfigurationVextLevel::LEVEL_WARN,
             'flags' => array(
-                CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_FALSE_BACKGROUND_IMAGE_DATA_URL_MESSAGES
+                CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_FALSE_IMAGE_DATA_URL_MESSAGES
             ),
             'domains-to-ignore' => $this->task->hasParameter('domains-to-ignore')
                 ? $this->task->getParameter('domains-to-ignore') 
