@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "b5fed41142ada6d172033373c118f6d0",
+    "hash": "9539e05e61891454bd47e0290cd0b5b2",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2626,12 +2626,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "6b65a6db837d27f48579330b7d618ae9ae2665ec"
+                "reference": "e3dc4da74980de44cca687231874ac277e76cd29"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/6b65a6db837d27f48579330b7d618ae9ae2665ec",
-                "reference": "6b65a6db837d27f48579330b7d618ae9ae2665ec",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/e3dc4da74980de44cca687231874ac277e76cd29",
+                "reference": "e3dc4da74980de44cca687231874ac277e76cd29",
                 "shasum": ""
             },
             "require": {
@@ -2659,7 +2659,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2013-12-29 15:53:46"
+            "time": "2013-12-29 17:12:56"
         },
         {
             "name": "webignition/html-document-link-checker",
