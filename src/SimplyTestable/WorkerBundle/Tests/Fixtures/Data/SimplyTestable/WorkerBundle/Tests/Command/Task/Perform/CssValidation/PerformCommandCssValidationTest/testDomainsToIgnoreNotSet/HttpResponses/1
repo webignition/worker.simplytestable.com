@@ -1,0 +1,16 @@
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Jon Cram</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="//one.cdn.example.com/style.css" rel="stylesheet">    
+        <link href="//two.cdn.example.com/style.css" rel="stylesheet">    
+        <link href="//example.com/style.css" rel="stylesheet">       
+    </head>
+    <body>
+    </body>
+</html>
