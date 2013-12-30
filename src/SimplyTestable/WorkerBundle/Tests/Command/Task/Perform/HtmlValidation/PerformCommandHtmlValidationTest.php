@@ -134,7 +134,7 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
     /**
      * @group standard
      */        
-    public function testOnHttpBasicAuthenticationProtectedUrl() {
+    public function testOnHttpAuthenticationProtectedUrl() {
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
@@ -161,7 +161,7 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
     /**
      * @group standard
      */     
-    public function testOnHttpBasicAuthenticationWithInvalidCredentials() {
+    public function testOnHttpAuthenticationWithInvalidCredentials() {
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
@@ -178,60 +178,7 @@ class PerformCommandHtmlValidationTest extends PerformCommandTaskTypeTest {
 
         $this->assertEquals(0, $response);
         $this->assertEquals('{"messages":[{"message":"Unauthorized","messageId":"http-retrieval-401","type":"error"}]}', $task->getOutput()->getOutput());        
-        $this->assertTrue($task->getParametersObject()->{'x-http-auth-tried'});
-    }   
-    
-    
-    /**
-     * @group standard
-     */        
-    public function testOnHttpDigestAuthenticationProtectedUrl() {
-        $this->clearMemcacheHttpCache();  
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-        
-        $this->container->get('simplytestable.services.htmlValidatorWrapperService')->loadFixturesFromPath(
-            $this->getFixturesDataPath(__FUNCTION__ . '/HtmlValidatorResponses')
-        );        
-        
-        $taskObject = $this->createTask('http://unreliable.simplytestable.com/http-auth/index.html', 'HTML validation', json_encode(array(
-            'http-auth-username' => 'example',
-            'http-auth-password' => 'password'
-        )));  
-     
-        $task = $this->getTaskService()->getById($taskObject->id);
-        
-        $response = $this->runConsole('simplytestable:task:perform', array(
-            $task->getId() => true
-        ));
-        
-        $this->assertEquals(0, $response);        
-        $this->assertEquals('{"messages":[]}', $task->getOutput()->getOutput());      
-        $this->assertTrue($task->getParametersObject()->{'x-http-auth-tried'});
     }
-    
-    
-    /**
-     * @group standard
-     */        
-    public function testOnHttpDigestAuthenticationWithInvalidCredentials() {
-        $this->clearMemcacheHttpCache();  
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-
-        $taskObject = $this->createTask('http://unreliable.simplytestable.com/http-auth/index.html', 'HTML validation', json_encode(array(
-            'http-auth-username' => 'example',
-            'http-auth-password' => 'password'
-        )));  
-     
-        $task = $this->getTaskService()->getById($taskObject->id);
-        
-        $response = $this->runConsole('simplytestable:task:perform', array(
-            $task->getId() => true
-        ));
-        
-        $this->assertEquals(0, $response);        
-        $this->assertEquals('{"messages":[{"message":"Unauthorized","messageId":"http-retrieval-401","type":"error"}]}', $task->getOutput()->getOutput());
-        $this->assertTrue($task->getParametersObject()->{'x-http-auth-tried'});
-    } 
     
     
     /**

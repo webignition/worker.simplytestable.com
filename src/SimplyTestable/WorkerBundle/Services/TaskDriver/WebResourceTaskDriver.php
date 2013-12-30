@@ -151,30 +151,20 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      * @param Task $task
      * @return WebResource 
      */
-    protected function getWebResource(Task $task, $authenticationScheme = null) {
+    protected function getWebResource(Task $task) {
         try {            
             $request = $this->getWebResourceService()->getHttpClientService()->getRequest($task->getUrl());
             
-            if (!is_null($authenticationScheme) && $task->hasParameter('http-auth-username') && $task->hasParameter('http-auth-password')) {
-                $username = $task->getParameter('http-auth-username');
-                $password = $task->getParameter('http-auth-password');
-                
-                $taskParameters = $task->getParametersObject();
-                $taskParameters->{'x-http-auth-tried'} = true;
-
-                $task->setParameters(json_encode($taskParameters));                
-                
-                $request->setAuth($username, $password, ($authenticationScheme == 'Digest') ? CURLAUTH_DIGEST : CURLAUTH_BASIC);
+            if ($task->hasParameter('http-auth-username') || $task->hasParameter('http-auth-password')) {
+                $request->setAuth(
+                    $task->hasParameter('http-auth-username') ? $task->getParameter('http-auth-username') : '',
+                    $task->hasParameter('http-auth-password') ? $task->getParameter('http-auth-password') : '',
+                    'any'
+                );
             }
             
             return $this->getWebResourceService()->get($request);            
-        } catch (WebResourceException $webResourceException) {            
-            if ($webResourceException->getResponse()->getStatusCode() == 401 && $task->hasParameter('http-auth-username') && $task->hasParameter('http-auth-password')) {                
-                if (!$task->hasParameter('x-http-auth-tried')) {                   
-                    return $this->getWebResource($task, $this->getRequestedAuthenticationMethodFrom401Response($webResourceException->getResponse()));
-                }
-            }
-            
+        } catch (WebResourceException $webResourceException) {
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
             
@@ -201,28 +191,6 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             
             $this->tooManyRedirectsException = $tooManyRedirectsException;
         }
-    } 
-    
-    
-    /**
-     * 
-     * @param \Guzzle\Http\Message\Response $response
-     * @return string|null
-     * @throws \InvalidArgumentException
-     */
-    private function getRequestedAuthenticationMethodFrom401Response(\Guzzle\Http\Message\Response $response) {
-        if ($response->getStatusCode() !== 401) {
-            throw new \InvalidArgumentException('Response code is not 401', 1);
-        }
-        
-        if (!$response->hasHeader('www-authenticate')) {
-            throw new \InvalidArgumentException('Response has no www-authenticate header', 2);
-        }
-        
-        $header = $response->getHeader('www-authenticate')->toArray();        
-        $headerParts = explode(' ', $header[0]);
-        
-        return $headerParts[0];      
     }
     
     
