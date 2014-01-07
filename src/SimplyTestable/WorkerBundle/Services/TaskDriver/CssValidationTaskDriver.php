@@ -57,9 +57,19 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
         return true;
     }
 
-    protected function performValidation() { 
+    protected function performValidation() {
+        $baseRequest = $this->getWebResourceService()->getHttpClientService()->get()->get();        
+        if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
+            $baseRequest->setAuth(
+                $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',
+                $this->task->hasParameter('http-auth-password') ? $this->task->getParameter('http-auth-password') : '',
+                'any'
+            );
+        }
+        
         $this->getProperty('css-validator-wrapper')->createConfiguration(array(
             'url-to-validate' => $this->webResource->getUrl(),
+            'content-to-validate' => $this->webResource->getContent(),
             'css-validator-jar-path' => $this->getProperty('jar-path'),
             'vendor-extension-severity-level' => CssValidatorWrapperConfigurationVextLevel::isValid($this->task->getParameter('vendor-extensions'))
                 ? $this->task->getParameter('vendor-extensions')
@@ -69,41 +79,98 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
             ),
             'domains-to-ignore' => $this->task->hasParameter('domains-to-ignore')
                 ? $this->task->getParameter('domains-to-ignore') 
-                : array()
+                : array(),
+            'base-request' => $baseRequest
         ));
         
         if ($this->task->isTrue('ignore-warnings')) {
             $this->getProperty('css-validator-wrapper')->getConfiguration()->setFlag(CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_WARNINGS);
         }
         
+        
+        /* @var $cssValidatorOutput \webignition\CssValidatorOutput\CssValidatorOutput */
         $cssValidatorOutput = $this->getProperty('css-validator-wrapper')->validate();
         
-        if ($cssValidatorOutput->getIsUnknownMimeTypeError()) {
-            $this->response->setHasBeenSkipped();
-            $this->response->setErrorCount(0);
-            $this->response->setIsRetryable(false);
-            return true;            
-        } 
-        
-        if ($cssValidatorOutput->getIsSSlExceptionErrorOutput()) {
-            $this->response->setHasFailed();
-            $this->response->setErrorCount(1); 
-            $this->response->setIsRetryable(false);
-            return json_encode($this->getSslExceptionErrorOutput($this->task));
-        }
-        
-        
-        if ($cssValidatorOutput->getIsUnknownExceptionError()) {            
+        if ($cssValidatorOutput->hasException()) {
+            // Will only get unknown CSS validator exceptions here           
             $this->response->setHasFailed();
             $this->response->setErrorCount(1); 
             $this->response->setIsRetryable(false);
             return json_encode($this->getUnknownExceptionErrorOutput($this->task));
-        }        
+        }
         
         $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
         $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
         
-        return $this->getSerializer()->serialize($cssValidatorOutput->getMessages(), 'json');        
+        return $this->getSerializer()->serialize($this->prepareCssValidatorOutput($cssValidatorOutput), 'json');        
+    }
+    
+    
+    private function prepareCssValidatorOutput(\webignition\CssValidatorOutput\CssValidatorOutput $cssValidatorOutput) {
+        $messages = $cssValidatorOutput->getMessages();
+        
+        foreach ($messages as $index => $message) {
+            if ($message->isError()) {
+                if ($this->isCssValidatorHttpError($message)) {
+                    $message->setMessage('http-retrieval-' . $this->getCssValidatorHttpErrorStatusCode($message));
+                }
+                
+                if ($this->isCssValidatorCurlError($message)) {                    
+                    $message->setMessage('http-retrieval-curl-code-' . $this->getCssValidatorCurlErrorCode($message));
+                }                
+            }
+        }
+        
+        return $messages;
+    }
+    
+    
+    /**
+     * 
+     * @param \webignition\CssValidatorOutput\Message\Error $error
+     * @return boolean
+     */
+    private function isCssValidatorHttpError(\webignition\CssValidatorOutput\Message\Error $error) {
+        $message = $error->getMessage();
+        return substr($message, 0, strlen('http-error:')) === 'http-error:';
+    }    
+
+    /**
+     * 
+     * @param \webignition\CssValidatorOutput\Message\Error $error
+     * @return boolean
+     */
+    private function isCssValidatorCurlError(\webignition\CssValidatorOutput\Message\Error $error) {
+        $message = $error->getMessage();
+        return substr($message, 0, strlen('curl-error:')) === 'curl-error:';
+    }    
+    
+    
+    /**
+     * 
+     * @param \webignition\CssValidatorOutput\Message\Error $error
+     * @return boolean
+     */
+    private function getCssValidatorHttpErrorStatusCode(\webignition\CssValidatorOutput\Message\Error $error) {
+        if (!$this->isCssValidatorHttpError($error)) {
+            return null;
+        }
+        
+        return (int)  str_replace('http-error:', '', $error->getMessage());
+    }    
+    
+    
+    /**
+     * 
+     * @param \webignition\CssValidatorOutput\Message\Error $error
+     * @return boolean
+     */
+    private function getCssValidatorCurlErrorCode(\webignition\CssValidatorOutput\Message\Error $error) {
+        if (!$this->isCssValidatorCurlError($error)) {
+            return null;
+        }
+        
+        return (int)  str_replace('curl-error:', '', $error->getMessage());
     }
     
     
@@ -121,22 +188,5 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
         $outputObjectMessage->line_number = 0;
         
         return array($outputObjectMessage);        
-    } 
-    
-    
-    /**
-     *
-     * @return \stdClass 
-     */
-    protected function getSslExceptionErrorOutput(Task $task) {        
-        $outputObjectMessage = new \stdClass();
-        $outputObjectMessage->message = 'SSL Error';
-        $outputObjectMessage->class = 'css-validation-ss-error';
-        $outputObjectMessage->type = 'error';
-        $outputObjectMessage->context = '';
-        $outputObjectMessage->ref = $task->getUrl();
-        $outputObjectMessage->line_number = 0;
-        
-        return array($outputObjectMessage);        
-    }   
+    }  
 }

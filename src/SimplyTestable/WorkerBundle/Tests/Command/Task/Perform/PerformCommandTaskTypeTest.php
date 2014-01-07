@@ -12,55 +12,112 @@ abstract class PerformCommandTaskTypeTest extends ConsoleCommandBaseTestCase {
     
     abstract protected function getTaskTypeName();    
     
+    
     /**
      * @group standard
-     */    
-    public function testPerformOnNonExistentUrl() {        
-        $this->clearMemcacheHttpCache();  
+     */     
+    public function testInvalidContentType() {
+        $this->clearMemcacheHttpCache();
+        
         $this->setHttpFixtures($this->buildHttpFixtureSet(array(
-            'HTTP/1.1 404 Not Found'
+            'HTTP/1.0 200 Ok'."\n".'Content-Type:invalid/made-it-up'
         )));
         
-        $taskObject = $this->createTask('http://example.com/invalid', $this->getTaskTypeName());
-        
+        $taskObject = $this->createTask('http://example.com/', $this->getTaskTypeName());
+    
         $task = $this->getTaskService()->getById($taskObject->id);
         
         $response = $this->runConsole('simplytestable:task:perform', array(
             $task->getId() => true
         ));
-
-        $this->assertEquals(0, $response);
-        $this->assertEquals(1, $task->getOutput()->getErrorCount());
-        $this->assertEquals('{"messages":[{"message":"Not Found","messageId":"http-retrieval-404","type":"error"}]}', $task->getOutput()->getOutput());
-    }
+        
+        $this->assertEquals(0, $response);  
+        $this->assertEquals(0, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());
+        
+        $this->assertEquals($this->getTaskService()->getSkippedState(), $task->getState());
+    }    
     
     
     /**
      * @group standard
-     */    
-    public function testPerformOnNonExistentHost() {        
-        $this->getWebResourceService()->setRequestSkeletonToCurlErrorMap(array(
-            'http://invalid/' => array(
-                'GET' => array(
-                    'errorMessage' => "Couldn't resolve host. The given remote host was not resolved.",
-                    'errorNumber' => 6                    
-                )
-            )
-        ));
+     */        
+    public function testHttp401() {
+        $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
+    }    
+    
+    /**
+     * @group standard
+     */        
+    public function testHttp404() {
+        $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
+    }
+
+    /**
+     * @group standard
+     */        
+    public function testHttp500() {        
+        $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
+    } 
+    
+    /**
+     * @group standard
+     */        
+    public function testHttp503() {        
+        $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
+    } 
+    
+    
+    /**
+     * @group standard
+     */        
+    public function testCurl6() {        
+        $this->assertCorrectFailureForGivenCurlCode(str_replace('testCurl', '', $this->getName()));
+    }    
+    
+    /**
+     * @group standard
+     */        
+    public function testCurl28() {
+        $this->assertCorrectFailureForGivenCurlCode(str_replace('testCurl', '', $this->getName()));
+    }    
+    
+    private function assertCorrectFailureForGivenHttpStatusCode($statusCode) {        
+        $this->assertCorrectFailureForGivenModeAndCode('http', $statusCode);       
+    } 
+    
+    
+    private function assertCorrectFailureForGivenCurlCode($curlCode) {        
+        $this->assertCorrectFailureForGivenModeAndCode('curl', $curlCode);       
+    }    
+    
+    private function assertCorrectFailureForGivenModeAndCode($mode, $errorCode) {
+        $this->clearMemcacheHttpCache();          
         
-        $taskObject = $this->createTask('http://invalid/', $this->getTaskTypeName());
+        $responseFixtureContent = ($mode === 'http')
+            ? 'HTTP/1.0 ' . $errorCode
+            : 'CURL/' . $errorCode .' Non-relevant worded error';
         
+        $this->setHttpFixtures($this->buildHttpFixtureSet(array(
+            $responseFixtureContent
+        )));
+        $this->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
+        
+        $taskObject = $this->createTask('http://example.com/', $this->getTaskTypeName());
+    
         $task = $this->getTaskService()->getById($taskObject->id);
         
         $response = $this->runConsole('simplytestable:task:perform', array(
             $task->getId() => true
         ));
         
-        $this->assertEquals(0, $response);        
-        $this->assertEquals(1, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $response);  
+        $decodedTaskOutput = json_decode($task->getOutput()->getOutput());
         
-        $this->assertEquals('{"messages":[{"message":"DNS lookup failure resolving resource domain name","messageId":"http-retrieval-curl-code-6","type":"error"}]}', $task->getOutput()->getOutput());        
-    }    
-
-
+        $expectedMessageId = ($mode === 'http')
+            ? 'http-retrieval-' . $errorCode
+            : 'http-retrieval-curl-code-' . $errorCode;
+        
+        $this->assertEquals($expectedMessageId, $decodedTaskOutput->messages[0]->messageId);          
+    }
 }

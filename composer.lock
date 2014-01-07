@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "697ff3f594275a2d6378a90547c94215",
+    "hash": "673a52542c7dcdf32fbe24beb0d62994",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2631,19 +2631,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "fab3b0702944ce981b8b1f9cfe8547b604ba61a9"
+                "reference": "bf6df54f55b52736a92342787a504459801b4688"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/fab3b0702944ce981b8b1f9cfe8547b604ba61a9",
-                "reference": "fab3b0702944ce981b8b1f9cfe8547b604ba61a9",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/bf6df54f55b52736a92342787a504459801b4688",
+                "reference": "bf6df54f55b52736a92342787a504459801b4688",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2",
                 "webignition/absolute-url-deriver": ">=1.4.1",
                 "webignition/css-validator-output-parser": ">=2.1.3",
-                "webignition/web-resource-service": ">=0.2.4"
+                "webignition/web-resource-service": ">=0.2.5"
             },
             "require-dev": {
                 "phpunit/phpunit": "3.7.*",
@@ -2666,7 +2666,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2014-01-07 14:08:00"
+            "time": "2014-01-07 17:14:20"
         },
         {
             "name": "webignition/html-document-link-checker",
@@ -3274,12 +3274,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-service.git",
-                "reference": "f8f8afb8a520de1531bca7b7318941d3d48a521e"
+                "reference": "b12577aed5ef4079f6746aa59952a9ce43ba0e16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/f8f8afb8a520de1531bca7b7318941d3d48a521e",
-                "reference": "f8f8afb8a520de1531bca7b7318941d3d48a521e",
+                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/b12577aed5ef4079f6746aa59952a9ce43ba0e16",
+                "reference": "b12577aed5ef4079f6746aa59952a9ce43ba0e16",
                 "shasum": ""
             },
             "require": {
@@ -3312,7 +3312,7 @@
                 "service",
                 "web"
             ],
-            "time": "2014-01-07 13:28:34"
+            "time": "2014-01-07 16:52:38"
         },
         {
             "name": "winzou/console-bundle",
