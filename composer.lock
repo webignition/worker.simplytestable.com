@@ -3274,12 +3274,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-service.git",
-                "reference": "02839d1e7c0a287a84f8403244db9cb5a440e9c8"
+                "reference": "6f1cfe6aec34be45d9e7bd908080c0a879318662"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/02839d1e7c0a287a84f8403244db9cb5a440e9c8",
-                "reference": "02839d1e7c0a287a84f8403244db9cb5a440e9c8",
+                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/6f1cfe6aec34be45d9e7bd908080c0a879318662",
+                "reference": "6f1cfe6aec34be45d9e7bd908080c0a879318662",
                 "shasum": ""
             },
             "require": {
@@ -3312,7 +3312,7 @@
                 "service",
                 "web"
             ],
-            "time": "2013-12-30 13:21:55"
+            "time": "2014-01-07 00:08:26"
         },
         {
             "name": "winzou/console-bundle",
