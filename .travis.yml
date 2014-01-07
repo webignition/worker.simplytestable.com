@@ -13,9 +13,7 @@ env:
     - REPO="webignition/worker.simplytestable.com"
     - CI_HOME=`pwd`/$REPO  
   
-before_script:
-  - curl http://css-validation.simplytestable.com/twitter-bootstrap/2.3.1.html
-  
+before_script:  
   # Install memcache extension
   - wget http://pecl.php.net/get/memcache-2.2.7.tgz
   - tar -zxf memcache-2.2.7.tgz
