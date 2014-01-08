@@ -14,6 +14,8 @@ env:
     - CI_HOME=`pwd`/$REPO  
   
 before_script:  
+  - sudo apt-get update
+  
   # Install memcache extension
   - wget http://pecl.php.net/get/memcache-2.2.7.tgz
   - tar -zxf memcache-2.2.7.tgz
