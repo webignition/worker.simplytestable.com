@@ -13,6 +13,7 @@ class SingleChildStylesheetHttpErrorTest extends ConsoleCommandBaseTestCase {
         
         $this->setHttpFixtures($this->buildHttpFixtureSet(array(
             file_get_contents($this->getFixturesDataPath() . '/HttpResponses/1'),
+            'HTTP/1.0 ' . str_replace('test', '', $this->getName()),
             'HTTP/1.0 ' . str_replace('test', '', $this->getName())
         )));
         
