@@ -81,7 +81,7 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         $coreApplication = $this->getCoreApplicationService()->get();
         
-        $coreApplication->setUrl('http://invalid');
+        $coreApplication->setUrl('http://example.com/');
         $this->getCoreApplicationService()->getEntityManager()->persist($coreApplication);
         $this->getCoreApplicationService()->getEntityManager()->flush();        
         
