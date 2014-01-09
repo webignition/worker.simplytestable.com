@@ -67,7 +67,9 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
             );
         }
         
-        $this->getProperty('css-validator-wrapper')->createConfiguration(array(
+        /* @var $cssValidatorWrapper \webignition\CssValidatorWrapper\Wrapper */
+        $cssValidatorWrapper = $this->getProperty('css-validator-wrapper');                
+        $cssValidatorWrapper->createConfiguration(array(
             'url-to-validate' => $this->webResource->getUrl(),
             'content-to-validate' => $this->webResource->getContent(),
             'css-validator-jar-path' => $this->getProperty('jar-path'),
@@ -82,6 +84,8 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
                 : array(),
             'base-request' => $baseRequest
         ));
+        
+        $cssValidatorWrapper->getConfiguration()->getWebResourceService()->getConfiguration()->enableRetryWithUrlEncodingDisabled();
         
         if ($this->task->isTrue('ignore-warnings')) {
             $this->getProperty('css-validator-wrapper')->getConfiguration()->setFlag(CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_WARNINGS);
