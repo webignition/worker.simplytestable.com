@@ -17,6 +17,7 @@ class ReportCompletionAllCommandTest extends ConsoleCommandBaseTestCase {
      */    
     public function testReportCompletionAll() {        
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));        
+        $this->removeAllTasks();
         
         $taskProperties = $this->createTask('http://example.com/', 'HTML validation');        
         
