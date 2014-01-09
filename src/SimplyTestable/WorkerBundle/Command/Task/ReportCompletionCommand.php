@@ -44,7 +44,7 @@ EOF
             $output->writeln('Reported task completion ['.$task->getId().']');
             
             /* @var $entityManager \Doctrine\ORM\EntityManager */        
-            $entityManager = $this->getContainer()->get('doctrine')->getEntityManager();
+            $entityManager = $this->getContainer()->get('doctrine')->getManager();
             $entityManager->remove($task);
             $entityManager->remove($task->getOutput());
             $entityManager->remove($task->getTimePeriod());
