@@ -3,7 +3,7 @@
 namespace SimplyTestable\WorkerBundle\Services;
 
 use webignition\InternetMediaType\Parser\Parser as InternetMediaTypeParser;
-use SimplyTestable\WorkerBundle\Exception\WebResourceException;
+use webignition\WebResource\Exception\Exception as WebResourceException;
 
 class WebResourceService {    
     

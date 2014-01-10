@@ -7,7 +7,7 @@ use webignition\WebResource\WebPage\WebPage;
 use webignition\Url\Url;
 use webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver;
 use webignition\WebResource\WebResource;
-use SimplyTestable\WorkerBundle\Exception\WebResourceException;
+use webignition\WebResource\Exception\Exception as WebResourceException;
 
 class JsLintTaskDriver extends WebResourceTaskDriver {  
     
