@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "60e44718e095b3d7d7f9f9b2d8cc7d16",
+    "hash": "3c54d50b762089eb7877090e4d1dfbf9",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1474,12 +1474,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "84d6991eba8f1892a8783c7d4a8dd4cfd550d537"
+                "reference": "3f411c4aef20c485a073b4aa7e055b1ccef05202"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/84d6991eba8f1892a8783c7d4a8dd4cfd550d537",
-                "reference": "84d6991eba8f1892a8783c7d4a8dd4cfd550d537",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/3f411c4aef20c485a073b4aa7e055b1ccef05202",
+                "reference": "3f411c4aef20c485a073b4aa7e055b1ccef05202",
                 "shasum": ""
             },
             "require": {
@@ -1536,7 +1536,7 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2014-01-09 11:03:01"
+            "time": "2014-01-10 11:07:09"
         },
         {
             "name": "jms/serializer-bundle",
@@ -1685,12 +1685,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "a1e98f4e1da5b0235a74d11dcf7cdb2692b28ffc"
+                "reference": "d81ca5a8d2d97bf9d77605359a12399c0ca28653"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/a1e98f4e1da5b0235a74d11dcf7cdb2692b28ffc",
-                "reference": "a1e98f4e1da5b0235a74d11dcf7cdb2692b28ffc",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/d81ca5a8d2d97bf9d77605359a12399c0ca28653",
+                "reference": "d81ca5a8d2d97bf9d77605359a12399c0ca28653",
                 "shasum": ""
             },
             "require": {
@@ -1744,7 +1744,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2014-01-01 18:24:16"
+            "time": "2014-01-10 08:22:47"
         },
         {
             "name": "phpcollection/phpcollection",
@@ -1802,12 +1802,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/php-option.git",
-                "reference": "a807c38edb33c1c527ac0df51c256909f62aa764"
+                "reference": "5d099bcf0393908bf4ad69cc47dafb785d51f7f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/a807c38edb33c1c527ac0df51c256909f62aa764",
-                "reference": "a807c38edb33c1c527ac0df51c256909f62aa764",
+                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/5d099bcf0393908bf4ad69cc47dafb785d51f7f5",
+                "reference": "5d099bcf0393908bf4ad69cc47dafb785d51f7f5",
                 "shasum": ""
             },
             "require": {
@@ -1843,7 +1843,7 @@
                 "php",
                 "type"
             ],
-            "time": "2013-12-22 19:01:07"
+            "time": "2014-01-09 22:37:17"
         },
         {
             "name": "psr/log",
@@ -2631,12 +2631,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "8797a53ba3c3664841df1bddfaeeed50debc7256"
+                "reference": "8e19620e306c8ab469cd8f01cd3787f313996c21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/8797a53ba3c3664841df1bddfaeeed50debc7256",
-                "reference": "8797a53ba3c3664841df1bddfaeeed50debc7256",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/8e19620e306c8ab469cd8f01cd3787f313996c21",
+                "reference": "8e19620e306c8ab469cd8f01cd3787f313996c21",
                 "shasum": ""
             },
             "require": {
@@ -2644,7 +2644,7 @@
                 "webignition/absolute-url-deriver": ">=1.4.1.1",
                 "webignition/css-validator-output-parser": ">=2.1.3",
                 "webignition/web-page-model": "*",
-                "webignition/web-resource-service": ">=0.2.6"
+                "webignition/web-resource-service": ">=0.2.7"
             },
             "require-dev": {
                 "phpunit/phpunit": "3.7.*",
@@ -2667,7 +2667,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2014-01-09 13:43:41"
+            "time": "2014-01-10 11:28:49"
         },
         {
             "name": "webignition/html-document-link-checker",
@@ -3275,12 +3275,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-service.git",
-                "reference": "a8d6b6cad7e4bc2af8857a6057700ced623e85d0"
+                "reference": "426dee2a268d5a9a70fe20b0717f2a5f1000f51c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/a8d6b6cad7e4bc2af8857a6057700ced623e85d0",
-                "reference": "a8d6b6cad7e4bc2af8857a6057700ced623e85d0",
+                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/426dee2a268d5a9a70fe20b0717f2a5f1000f51c",
+                "reference": "426dee2a268d5a9a70fe20b0717f2a5f1000f51c",
                 "shasum": ""
             },
             "require": {
@@ -3313,7 +3313,7 @@
                 "service",
                 "web"
             ],
-            "time": "2014-01-09 09:40:43"
+            "time": "2014-01-10 11:06:09"
         },
         {
             "name": "winzou/console-bundle",
