@@ -58,7 +58,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
     }
 
     protected function performValidation() {
-        $baseRequest = $this->getWebResourceService()->getHttpClientService()->get()->get();        
+        $baseRequest = $this->getHttpClientService()->get()->get();        
         if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
             $baseRequest->setAuth(
                 $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',

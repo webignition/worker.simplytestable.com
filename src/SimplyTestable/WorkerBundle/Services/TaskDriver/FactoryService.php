@@ -3,16 +3,8 @@
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-//use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
-//use SimplyTestable\WorkerBundle\Services\TaskService;
-//use SimplyTestable\WorkerBundle\Services\TaskTypeService;
-//use SimplyTestable\WorkerBundle\Services\StateService;
-//use SimplyTestable\WorkerBundle\Services\WebResourceService;
-//use SimplyTestable\WorkerBundle\Services\HttpServiceInterface;
-//use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
-//use SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService;
-//use SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService;
+
 
 class FactoryService {
     
@@ -36,6 +28,7 @@ class FactoryService {
             $driver = new $properties['class'];
             $driver->setStateService($container->get('simplytestable.services.stateservice'));
             $driver->setWebResourceService($container->get('simplytestable.services.webresourceservice'));
+            $driver->setHttpClientService($container->get('simplytestable.services.httpclientservice'));
             $driver->setTaskTypeService($container->get('simplytestable.services.tasktypeservice'));
             $driver->setLogger($container->get('logger'));
             $driver->setWebResourceTaskoutputService($container->get('simplytestable.services.webresourcetaskoutputservice'));

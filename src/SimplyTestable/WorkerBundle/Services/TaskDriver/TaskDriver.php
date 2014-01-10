@@ -6,11 +6,12 @@ use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\StateService;
-use SimplyTestable\WorkerBundle\Services\WebResourceService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService;
 use SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService;
+use webignition\WebResource\Service\Service as WebResourceService;
 
 abstract class TaskDriver {
     
@@ -31,9 +32,16 @@ abstract class TaskDriver {
     
     /**
      *
-     * @var \SimplyTestable\WorkerBundle\Services\WebResourceService 
+     * @var \webignition\WebResource\Service\Service 
      */    
     private $webResourceService;
+    
+    
+    /**
+     *
+     * @var \SimplyTestable\WorkerBundle\Services\HttpClientService
+     */
+    private $httpClientService;
     
     
     /**
@@ -133,9 +141,9 @@ abstract class TaskDriver {
     
     
     /**
-     * @return \SimplyTestable\WorkerBundle\Services\WebResourceService
+     * @return \webignition\WebResource\Service\Service
      */
-    public function getWebResourceService() {
+    public function getWebResourceService() {    
         return $this->webResourceService;
     }
     
@@ -296,6 +304,24 @@ abstract class TaskDriver {
      */
     public function getSerializer() {
         return $this->serializer;
+    }
+    
+    
+    /**
+     * 
+     * @param \SimplyTestable\WorkerBundle\Services\HttpClientService $httpClientService
+     */
+    public function setHttpClientService(HttpClientService $httpClientService) {
+        $this->httpClientService = $httpClientService;
+    }
+    
+    
+    /**
+     * 
+     * @return \SimplyTestable\WorkerBundle\Services\HttpClientService
+     */
+    public function getHttpClientService() {
+        return $this->httpClientService;
     }
     
     

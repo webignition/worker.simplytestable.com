@@ -13,8 +13,8 @@ services:
   simplytestable.services.requestservice:
     class:   SimplyTestable\WorkerBundle\Services\TestRequestService    
     
-  simplytestable.services.webresourceservice:
-    class:   SimplyTestable\WorkerBundle\Services\TestWebResourceService
-    arguments:
-        httpClientService: "@simplytestable.services.httpClientService"
-        contentTypeWebResourceMap: %content_type_web_resource_map%         
+#  simplytestable.services.webresourceservice:
+#    class:   SimplyTestable\WorkerBundle\Services\TestWebResourceService
+#    arguments:
+#        httpClientService: "@simplytestable.services.httpClientService"
+#        contentTypeWebResourceMap: %content_type_web_resource_map%         

@@ -4,7 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use webignition\WebResource\WebResource;
-use SimplyTestable\WorkerBundle\Exception\WebResourceException;
+use webignition\WebResource\Exception\Exception as WebResourceException;
 
 abstract class WebResourceTaskDriver extends TaskDriver {        
     
@@ -61,12 +61,11 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             return false;
         }
         
-        $this->task = $task;        
+        $this->task = $task;
         
-        /* @var $webResource WebPage */        
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('ST Web Resource Task Driver (http://bit.ly/RlhKCL)');
+        $this->getHttpClientService()->get()->setUserAgent('ST Web Resource Task Driver (http://bit.ly/RlhKCL)');
         $this->webResource = $this->getWebResource($task);        
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);        
+        $this->getHttpClientService()->get()->setUserAgent(null);        
 
         if (!$this->response->hasSucceeded()) {            
             return $this->hasNotSucceedHandler();
@@ -151,9 +150,9 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      * @param Task $task
      * @return WebResource 
      */
-    protected function getWebResource(Task $task) {
-        try {            
-            $request = $this->getWebResourceService()->getHttpClientService()->getRequest($task->getUrl());
+    protected function getWebResource(Task $task) {        
+        try {   
+            $request = $this->getHttpClientService()->getRequest($task->getUrl());
             
             if ($task->hasParameter('http-auth-username') || $task->hasParameter('http-auth-password')) {
                 $request->setAuth(
@@ -221,7 +220,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
                 return 'Redirect loop detected';
             }
             
-            return 'Redirect limit of ' . $this->getWebResourceService()->getMaxRedirects() . ' redirects reached';
+            return 'Redirect limit reached';
         }
         
         if ($this->curlException instanceof \Guzzle\Http\Exception\CurlException) {            
@@ -251,7 +250,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      * @return boolean
      */
     private function isRedirectLoopException() {
-        $history = $this->getWebResourceService()->getHttpClientService()->getHistory();
+        $history = $this->getHttpClientService()->getHistory();
         if (is_null($history)) {
             return false;
         }

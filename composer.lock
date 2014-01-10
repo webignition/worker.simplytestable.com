@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "c4cba57ee60c66c44c1ae14223daf71b",
+    "hash": "2744ced8154ff58a8354bf84257431fc",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -43,7 +43,7 @@
             ],
             "authors": [
                 {
-                    "name": "Jonathan Wage",
+                    "name": "Jonathan H. Wage",
                     "email": "jonwage@gmail.com",
                     "homepage": "http://www.jwage.com/",
                     "role": "Creator"
@@ -185,7 +185,7 @@
             ],
             "authors": [
                 {
-                    "name": "Jonathan Wage",
+                    "name": "Jonathan H. Wage",
                     "email": "jonwage@gmail.com",
                     "homepage": "http://www.jwage.com/",
                     "role": "Creator"
@@ -661,7 +661,7 @@
                     "email": "kontakt@beberlei.de"
                 },
                 {
-                    "name": "Johannes M. Schmitt",
+                    "name": "Johannes Schmitt",
                     "email": "schmittjoh@gmail.com",
                     "homepage": "http://jmsyst.com",
                     "role": "Developer of wrapped JMSSerializerBundle"
@@ -722,7 +722,7 @@
                 {
                     "name": "Johannes Schmitt",
                     "email": "schmittjoh@gmail.com",
-                    "homepage": "http://jmsyst.com",
+                    "homepage": "https://github.com/schmittjoh",
                     "role": "Developer of wrapped JMSSerializerBundle"
                 }
             ],
@@ -2542,7 +2542,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/ContainerAwareMigration/archive/658ae0ede07cc7f280e288b8b92cb0eeb3ded82b.zip",
+                "url": "https://api.github.com/repos/webignition/ContainerAwareMigration/zipball/658ae0ede07cc7f280e288b8b92cb0eeb3ded82b",
                 "reference": "658ae0ede07cc7f280e288b8b92cb0eeb3ded82b",
                 "shasum": ""
             },
@@ -2976,12 +2976,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/quoted-string.git",
-                "reference": "0.1"
+                "reference": "43fa25f8c81eaa5aef4c2376703fe90d1449fdf8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/quoted-string/zipball/0.1",
-                "reference": "0.1",
+                "url": "https://api.github.com/repos/webignition/quoted-string/zipball/43fa25f8c81eaa5aef4c2376703fe90d1449fdf8",
+                "reference": "43fa25f8c81eaa5aef4c2376703fe90d1449fdf8",
                 "shasum": ""
             },
             "require": {
@@ -3009,7 +3009,7 @@
                 "parser",
                 "quoted-string"
             ],
-            "time": "2012-08-15 09:52:06"
+            "time": "2012-08-15 16:52:06"
         },
         {
             "name": "webignition/simplytestable-base-migrations-bundle",
@@ -3064,12 +3064,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/string-parser.git",
-                "reference": "0.2.1"
+                "reference": "a37b2b7d49da4ef6a806ad77b609033b9133bd5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/string-parser/zipball/0.2.1",
-                "reference": "0.2.1",
+                "url": "https://api.github.com/repos/webignition/string-parser/zipball/a37b2b7d49da4ef6a806ad77b609033b9133bd5d",
+                "reference": "a37b2b7d49da4ef6a806ad77b609033b9133bd5d",
                 "shasum": ""
             },
             "require": {
@@ -3147,12 +3147,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-json-model.git",
-                "reference": "0.1.1"
+                "reference": "d6825b8ee0bdc58fdf34f2726d9be7968bdda7ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/web-json-model/zipball/0.1.1",
-                "reference": "0.1.1",
+                "url": "https://api.github.com/repos/webignition/web-json-model/zipball/d6825b8ee0bdc58fdf34f2726d9be7968bdda7ad",
+                "reference": "d6825b8ee0bdc58fdf34f2726d9be7968bdda7ad",
                 "shasum": ""
             },
             "require": {
@@ -3181,7 +3181,7 @@
                 "json",
                 "model"
             ],
-            "time": "2012-08-16 08:18:52"
+            "time": "2012-08-16 15:18:52"
         },
         {
             "name": "webignition/web-page-model",
@@ -3233,12 +3233,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-model.git",
-                "reference": "0.4"
+                "reference": "7402619287aad787b0c5bf94b0ab209f5baf3a01"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/webignition/web-resource-model/zipball/0.4",
-                "reference": "0.4",
+                "url": "https://api.github.com/repos/webignition/web-resource-model/zipball/7402619287aad787b0c5bf94b0ab209f5baf3a01",
+                "reference": "7402619287aad787b0c5bf94b0ab209f5baf3a01",
                 "shasum": ""
             },
             "require": {
@@ -3267,7 +3267,7 @@
                 "modem",
                 "web"
             ],
-            "time": "2012-08-16 08:16:06"
+            "time": "2012-08-16 15:16:06"
         },
         {
             "name": "webignition/web-resource-service",
@@ -3275,12 +3275,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-service.git",
-                "reference": "426dee2a268d5a9a70fe20b0717f2a5f1000f51c"
+                "reference": "0022a5a49e02900f35b58dc5beaf03aefc5bf452"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/426dee2a268d5a9a70fe20b0717f2a5f1000f51c",
-                "reference": "426dee2a268d5a9a70fe20b0717f2a5f1000f51c",
+                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/0022a5a49e02900f35b58dc5beaf03aefc5bf452",
+                "reference": "0022a5a49e02900f35b58dc5beaf03aefc5bf452",
                 "shasum": ""
             },
             "require": {
@@ -3313,7 +3313,7 @@
                 "service",
                 "web"
             ],
-            "time": "2014-01-10 11:06:09"
+            "time": "2014-01-10 16:19:19"
         },
         {
             "name": "winzou/console-bundle",
@@ -3322,12 +3322,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/winzou/ConsoleBundle.git",
-                "reference": "1.0.0"
+                "reference": "f3f1bcccf529c172c49279f686f30fc136a8b099"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/winzou/ConsoleBundle/zipball/1.0.0",
-                "reference": "1.0.0",
+                "url": "https://api.github.com/repos/winzou/ConsoleBundle/zipball/f3f1bcccf529c172c49279f686f30fc136a8b099",
+                "reference": "f3f1bcccf529c172c49279f686f30fc136a8b099",
                 "shasum": ""
             },
             "require": {
@@ -3341,7 +3341,7 @@
                     "CoreSphere\\ConsoleBundle": ""
                 }
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],

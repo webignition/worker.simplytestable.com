@@ -2,7 +2,18 @@ services:
   simplytestable.services.httpClientService:
     class:  SimplyTestable\WorkerBundle\Services\HttpClientService
     arguments:
-        memcacheService: "@simplytestable.services.memcacheService"    
+        memcacheService: "@simplytestable.services.memcacheService"            
+        
+  simplytestable.services.webResourceService:
+    class:  webignition\WebResource\Service\Service
+    calls:
+      - [createConfiguration, [{allow-uknown-resource-types: "true", retry-with-url-encoding-disabled: "true", content-type-web-resource-map: %content_type_web_resource_map% }]]     
+    
+#   simplytestable.services.webresourceservice:
+#    class:   SimplyTestable\WorkerBundle\Services\WebResourceService
+#    arguments:
+#        httpClientService: "@simplytestable.services.httpClientService"
+#        contentTypeWebResourceMap: %content_type_web_resource_map%    
         
   simplytestable.services.htmlValidatorWrapperService:
     class:  webignition\HtmlValidator\Wrapper\Wrapper 
@@ -81,13 +92,7 @@ services:
       queueManager: "@glit_resque.queue_manager"
       logger: "@logger"     
       resqueJobFactoryService: "@simplytestable.services.ResqueJobFactoryService"
-      resquePrefix: "%glit_resque.prefix%"      
-      
-  simplytestable.services.webresourceservice:
-    class:   SimplyTestable\WorkerBundle\Services\WebResourceService
-    arguments:
-        httpClientService: "@simplytestable.services.httpClientService"
-        contentTypeWebResourceMap: %content_type_web_resource_map%
+      resquePrefix: "%glit_resque.prefix%"
         
   simplytestable.services.ResqueJobFactoryService:
     class:  SimplyTestable\WorkerBundle\Services\ResqueJobFactoryService

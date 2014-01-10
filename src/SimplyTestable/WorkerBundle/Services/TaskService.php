@@ -123,13 +123,11 @@ class TaskService extends EntityService {
      * @param string $parameters
      * @return \SimplyTestable\WorkerBundle\Entity\Task\Task
      */
-    public function create($url, TaskType $type, $parameters) {        
-        $encoder = new \webignition\Url\Encoder();
-        
+    public function create($url, TaskType $type, $parameters) {                
         $task = new Task();
         $task->setState($this->getStartingState());
         $task->setType($type);
-        $task->setUrl((string)$encoder->encode(new \webignition\NormalisedUrl\NormalisedUrl(($url))));
+        $task->setUrl($url);
         $task->setParameters($parameters);
         
         if ($this->has($task)) {
