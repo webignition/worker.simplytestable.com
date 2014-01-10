@@ -418,10 +418,10 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return WebResource
      */    
     private function getJavaScriptWebResourceFromUrl($url) {                    
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent('ST Link JS Static Analysis Task Driver (http://bit.ly/RlhKCL)');
-        $request = $this->getWebResourceService()->getHttpClientService()->getRequest((string)$url, array());
+        $this->getHttpClientService()->get()->setUserAgent('ST Link JS Static Analysis Task Driver (http://bit.ly/RlhKCL)');
+        $request = $this->getHttpClientService()->getRequest((string)$url, array());
         $webResource = $this->getWebResourceService()->get($request);        
-        $this->getWebResourceService()->getHttpClientService()->get()->setUserAgent(null);             
+        $this->getHttpClientService()->get()->setUserAgent(null);             
 
         return $webResource;       
     }

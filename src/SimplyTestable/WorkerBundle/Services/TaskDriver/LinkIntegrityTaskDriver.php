@@ -68,10 +68,10 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
             $linkChecker->setDomainsToExclude($this->task->getParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME));
         }                
         
-        $this->getWebResourceService()->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
+        $this->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
         
         $linkChecker->setUserAgents($this->getProperty('user-agents'));
-        $linkChecker->setHttpClient($this->getWebResourceService()->getHttpClientService()->get());
+        $linkChecker->setHttpClient($this->getHttpClientService()->get());
         $linkChecker->setRetryOnBadResponse(false);
        
         $requestOptions = $linkChecker->getRequestOptions();
@@ -81,7 +81,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
 
         $linkCheckResults = $linkChecker->getAll();
         
-        $this->getWebResourceService()->getHttpClientService()->enablePlugins();
+        $this->getHttpClientService()->enablePlugins();
 
         $this->response->setErrorCount(count($linkChecker->getErrored()));                
         return json_encode($this->getOutputOject($linkCheckResults));
