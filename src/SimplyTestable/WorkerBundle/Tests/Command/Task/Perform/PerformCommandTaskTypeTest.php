@@ -99,6 +99,7 @@ abstract class PerformCommandTaskTypeTest extends ConsoleCommandBaseTestCase {
             : 'CURL/' . $errorCode .' Non-relevant worded error';
         
         $this->setHttpFixtures($this->buildHttpFixtureSet(array(
+            $responseFixtureContent,
             $responseFixtureContent
         )));
         $this->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
