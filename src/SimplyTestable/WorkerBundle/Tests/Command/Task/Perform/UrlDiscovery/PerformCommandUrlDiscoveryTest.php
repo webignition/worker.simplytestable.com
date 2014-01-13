@@ -82,4 +82,26 @@ class PerformCommandUrlDiscoveryTest extends PerformCommandTaskTypeTest {
             'http://http-auth-04.simplytestable.com/three.html'
         ), json_decode($task->getOutput()->getOutput()));     
     }
+    
+    
+    public function testDiscoveredRelativeUrlsAreReportedInAbsoluteFormInOutput() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+
+        $taskObject = $this->createTask('http://example.com/', 'URL discovery', json_encode(array(
+            'scope' => 'http://example.com/'
+        ))); 
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+
+        $this->assertEquals(0, $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        )));
+        
+        $this->assertEquals(array(
+            'http://example.com/',
+            'http://example.com/contact.php',
+            'http://example.com/register/',
+        ), json_decode($task->getOutput()->getOutput()));             
+    }
 }

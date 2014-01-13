@@ -60,7 +60,24 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
             $finder->setUrlScope($this->task->getParameter('scope'));
         }
         
-        return json_encode($finder->getUniqueUrls());       
+        $documentUrls = $finder->getUniqueUrls();
+        
+        $urls = array();
+        
+        foreach ($documentUrls as $documentUrl) {
+            $absoluteUrlDeriver = new \webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver(
+                $documentUrl, 
+                $this->task->getUrl()
+            );
+            
+            $absoluteUrl = (string)$absoluteUrlDeriver->getAbsoluteUrl();
+            if (!in_array($absoluteUrl, $urls)) {
+                $urls[] = $absoluteUrl;
+            }
+        }
+        
+        
+        return json_encode($urls);       
     }
     
     /**
