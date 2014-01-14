@@ -38,7 +38,7 @@
         "webignition/html-document-link-checker":">=0.8.1,<1.0",
         "webignition/html-validator-wrapper":">=0.3.1",
         "webignition/html-validator-output-parser":">=0.6",
-        "webignition/css-validator-wrapper":">=0.9.3",
+        "webignition/css-validator-wrapper":">=0.9.4",
         "webignition/web-resource-service":">=0.2.9"
     },
     "scripts": {
