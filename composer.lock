@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "3ed17d0664cb9476ffee44bbca235a32",
+    "hash": "5fa3fe3cd5ff5000a508121a13b69609",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -800,12 +800,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/doctrine2.git",
-                "reference": "93c110673521c18273b885fb9359d049b6676df4"
+                "reference": "b0736b5b6c975b9aafeedb62635e78cf326386cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/93c110673521c18273b885fb9359d049b6676df4",
-                "reference": "93c110673521c18273b885fb9359d049b6676df4",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/b0736b5b6c975b9aafeedb62635e78cf326386cb",
+                "reference": "b0736b5b6c975b9aafeedb62635e78cf326386cb",
                 "shasum": ""
             },
             "require": {
@@ -868,7 +868,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2014-01-08 19:22:29"
+            "time": "2014-01-13 17:52:17"
         },
         {
             "name": "etechnika/idna-convert",
@@ -1104,12 +1104,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jdorn/sql-formatter.git",
-                "reference": "8859d664737492d313c34796731b35eca851b362"
+                "reference": "64990d96e0959dff8e059dfcdc1af130728d92bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jdorn/sql-formatter/zipball/8859d664737492d313c34796731b35eca851b362",
-                "reference": "8859d664737492d313c34796731b35eca851b362",
+                "url": "https://api.github.com/repos/jdorn/sql-formatter/zipball/64990d96e0959dff8e059dfcdc1af130728d92bc",
+                "reference": "64990d96e0959dff8e059dfcdc1af130728d92bc",
                 "shasum": ""
             },
             "require": {
@@ -1146,7 +1146,7 @@
                 "highlight",
                 "sql"
             ],
-            "time": "2013-11-27 22:51:13"
+            "time": "2014-01-12 16:20:24"
         },
         {
             "name": "jms/aop-bundle",
@@ -1474,12 +1474,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "3f411c4aef20c485a073b4aa7e055b1ccef05202"
+                "reference": "39de7a50bbf8ab91b2a3d6a51a645d105dc191f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/3f411c4aef20c485a073b4aa7e055b1ccef05202",
-                "reference": "3f411c4aef20c485a073b4aa7e055b1ccef05202",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/39de7a50bbf8ab91b2a3d6a51a645d105dc191f7",
+                "reference": "39de7a50bbf8ab91b2a3d6a51a645d105dc191f7",
                 "shasum": ""
             },
             "require": {
@@ -1536,7 +1536,7 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2014-01-10 11:07:09"
+            "time": "2014-01-13 10:33:23"
         },
         {
             "name": "jms/serializer-bundle",
@@ -2496,17 +2496,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/absolute-url-deriver.git",
-                "reference": "ea9e63504a812cb27d87f7dda6eff5fb787271af"
+                "reference": "a4095e6a6f72206041baf29db33083d88d78108a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/absolute-url-deriver/zipball/ea9e63504a812cb27d87f7dda6eff5fb787271af",
-                "reference": "ea9e63504a812cb27d87f7dda6eff5fb787271af",
+                "url": "https://api.github.com/repos/webignition/absolute-url-deriver/zipball/a4095e6a6f72206041baf29db33083d88d78108a",
+                "reference": "a4095e6a6f72206041baf29db33083d88d78108a",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0",
-                "webignition/url": ">=1.9.7"
+                "webignition/url": ">=1.9.8"
             },
             "type": "library",
             "autoload": {
@@ -2530,7 +2530,7 @@
                 "absolute",
                 "url"
             ],
-            "time": "2014-01-08 17:25:31"
+            "time": "2014-01-13 18:13:07"
         },
         {
             "name": "webignition/container-aware-migration",
@@ -3101,16 +3101,16 @@
         },
         {
             "name": "webignition/url",
-            "version": "1.9.7",
+            "version": "1.9.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/url.git",
-                "reference": "2c4a23ab1b557f182358a3f22bb5d9125b65ca56"
+                "reference": "ad988e7e5a4eed333b055bba0aac8409137c397c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/url/zipball/2c4a23ab1b557f182358a3f22bb5d9125b65ca56",
-                "reference": "2c4a23ab1b557f182358a3f22bb5d9125b65ca56",
+                "url": "https://api.github.com/repos/webignition/url/zipball/ad988e7e5a4eed333b055bba0aac8409137c397c",
+                "reference": "ad988e7e5a4eed333b055bba0aac8409137c397c",
                 "shasum": ""
             },
             "require": {
@@ -3139,7 +3139,7 @@
             "keywords": [
                 "url"
             ],
-            "time": "2014-01-08 16:43:43"
+            "time": "2014-01-13 18:09:20"
         },
         {
             "name": "webignition/web-json-model",
