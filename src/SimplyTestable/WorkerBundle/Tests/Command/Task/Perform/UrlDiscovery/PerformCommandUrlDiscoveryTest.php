@@ -88,19 +88,19 @@ class PerformCommandUrlDiscoveryTest extends PerformCommandTaskTypeTest {
         $this->clearMemcacheHttpCache();  
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
 
-        $taskObject = $this->createTask('http://example.com/', 'URL discovery', json_encode(array(
+        $taskObject = $this->createTask('http://example.com/foo', 'URL discovery', json_encode(array(
             'scope' => 'http://example.com/'
-        ))); 
+        )));        
         
         $task = $this->getTaskService()->getById($taskObject->id);
 
         $this->assertEquals(0, $this->runConsole('simplytestable:task:perform', array(
             $task->getId() => true
-        )));
+        )));        
         
         $this->assertEquals(array(
             'http://example.com/',
-            'http://example.com/contact.php',
+            'http://example.com/foo/contact.php',
             'http://example.com/register/',
         ), json_decode($task->getOutput()->getOutput()));             
     }
@@ -123,6 +123,32 @@ class PerformCommandUrlDiscoveryTest extends PerformCommandTaskTypeTest {
             'http://example.com/foo/foo.html',
             'http://example.com/bar/',
             'http://example.com/foo/foo/bar/',
+        ), json_decode($task->getOutput()->getOutput()));             
+    }    
+    
+    
+    public function testDiscoveredUrlsWithRelativeBaseHrefAreOfCorrectAbsoluteForm() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
+        
+        $taskObject = $this->createTask('http://example.com/register/single.php', 'URL discovery', json_encode(array(
+            'scope' => array(
+                'http://example.com/',
+                'http://www.example.com/'
+            )
+        )));         
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+
+        $this->assertEquals(0, $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        )));
+        
+        $this->assertEquals(array(
+            'http://example.com/',
+            'http://example.com/one.html',
+            'http://example.com/two',
+            'http://example.com/foo/bar.html',
         ), json_decode($task->getOutput()->getOutput()));             
     }    
 }

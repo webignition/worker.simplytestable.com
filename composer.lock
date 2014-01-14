@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "641e63a5f0ea4475dffb4a129a7d3f13",
+    "hash": "22d6c4ab9e61fa6cb57ab937593438a3",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2719,16 +2719,16 @@
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "0.5",
+            "version": "0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "c0c071207256055a22c4a4ad0db368a1d1b63ff6"
+                "reference": "1be05e5dcc0fd8543584ef33b6c1b6e164bf247b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/c0c071207256055a22c4a4ad0db368a1d1b63ff6",
-                "reference": "c0c071207256055a22c4a4ad0db368a1d1b63ff6",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/1be05e5dcc0fd8543584ef33b6c1b6e164bf247b",
+                "reference": "1be05e5dcc0fd8543584ef33b6c1b6e164bf247b",
                 "shasum": ""
             },
             "require": {
@@ -2739,6 +2739,7 @@
             "type": "library",
             "autoload": {
                 "psr-0": {
+                    "webignition\\Tests": "tests/",
                     "": "src/"
                 }
             },
@@ -2760,7 +2761,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2013-10-16 08:23:00"
+            "time": "2014-01-14 12:46:50"
         },
         {
             "name": "webignition/html-document-type-identifier",
