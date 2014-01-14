@@ -104,4 +104,25 @@ class PerformCommandUrlDiscoveryTest extends PerformCommandTaskTypeTest {
             'http://example.com/register/',
         ), json_decode($task->getOutput()->getOutput()));             
     }
+    
+    public function testDiscoveredUrlsAreOfCorrectAbsoluteForm() {
+        $this->clearMemcacheHttpCache();  
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
+        
+        $taskObject = $this->createTask('http://example.com/foo', 'URL discovery', json_encode(array(
+            'scope' => 'http://example.com/'            
+        )));         
+        
+        $task = $this->getTaskService()->getById($taskObject->id);
+
+        $this->assertEquals(0, $this->runConsole('simplytestable:task:perform', array(
+            $task->getId() => true
+        )));
+        
+        $this->assertEquals(array(
+            'http://example.com/foo/foo.html',
+            'http://example.com/bar/',
+            'http://example.com/foo/foo/bar/',
+        ), json_decode($task->getOutput()->getOutput()));             
+    }    
 }
