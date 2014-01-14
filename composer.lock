@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "22d6c4ab9e61fa6cb57ab937593438a3",
+    "hash": "59e2cc6a8dde7086863b0b1b9a0b6f44",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1685,12 +1685,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "d81ca5a8d2d97bf9d77605359a12399c0ca28653"
+                "reference": "296095fe2ee052161f8226d55df775103bb6c259"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/d81ca5a8d2d97bf9d77605359a12399c0ca28653",
-                "reference": "d81ca5a8d2d97bf9d77605359a12399c0ca28653",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/296095fe2ee052161f8226d55df775103bb6c259",
+                "reference": "296095fe2ee052161f8226d55df775103bb6c259",
                 "shasum": ""
             },
             "require": {
@@ -1744,7 +1744,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2014-01-10 08:22:47"
+            "time": "2014-01-14 13:24:06"
         },
         {
             "name": "phpcollection/phpcollection",
@@ -2672,22 +2672,22 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "0.8.1",
+            "version": "0.8.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "3665be6908fa0d8a6c3004be3682d38ce5e8d1c2"
+                "reference": "9acd80f14f4c13ea80cf8e9a47a771454a8318f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/3665be6908fa0d8a6c3004be3682d38ce5e8d1c2",
-                "reference": "3665be6908fa0d8a6c3004be3682d38ce5e8d1c2",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/9acd80f14f4c13ea80cf8e9a47a771454a8318f3",
+                "reference": "9acd80f14f4c13ea80cf8e9a47a771454a8318f3",
                 "shasum": ""
             },
             "require": {
                 "guzzle/guzzle": ">=3.7.2,<4",
                 "php": ">=5.3.0",
-                "webignition/html-document-link-finder": ">=0.4.2,<1.0",
+                "webignition/html-document-link-finder": ">=0.6,<1.0",
                 "webignition/url": ">=1.9.6",
                 "webignition/web-page-model": "0.6"
             },
@@ -2715,7 +2715,7 @@
                 "html",
                 "link"
             ],
-            "time": "2013-12-21 11:49:00"
+            "time": "2014-01-14 13:19:36"
         },
         {
             "name": "webignition/html-document-link-finder",
