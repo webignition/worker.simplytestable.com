@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "59e2cc6a8dde7086863b0b1b9a0b6f44",
+    "hash": "3aa97de9d4c024e584396bcb527329e7",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -356,12 +356,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "2790ee79ff0fc09dc224e4529c24ff5d9f9a3936"
+                "reference": "0a7df7c58aeab4d1cef55a78e5ca50299a12a62b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/2790ee79ff0fc09dc224e4529c24ff5d9f9a3936",
-                "reference": "2790ee79ff0fc09dc224e4529c24ff5d9f9a3936",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/0a7df7c58aeab4d1cef55a78e5ca50299a12a62b",
+                "reference": "0a7df7c58aeab4d1cef55a78e5ca50299a12a62b",
                 "shasum": ""
             },
             "require": {
@@ -419,7 +419,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2014-01-08 19:26:50"
+            "time": "2014-01-15 00:19:18"
         },
         {
             "name": "doctrine/doctrine-bundle",
@@ -800,12 +800,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/doctrine2.git",
-                "reference": "b0736b5b6c975b9aafeedb62635e78cf326386cb"
+                "reference": "cf43edd6a10ac8b17dc07bd40f9886e582a832b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/b0736b5b6c975b9aafeedb62635e78cf326386cb",
-                "reference": "b0736b5b6c975b9aafeedb62635e78cf326386cb",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/cf43edd6a10ac8b17dc07bd40f9886e582a832b2",
+                "reference": "cf43edd6a10ac8b17dc07bd40f9886e582a832b2",
                 "shasum": ""
             },
             "require": {
@@ -868,7 +868,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2014-01-13 17:52:17"
+            "time": "2014-01-14 22:50:33"
         },
         {
             "name": "etechnika/idna-convert",
@@ -1474,12 +1474,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "39de7a50bbf8ab91b2a3d6a51a645d105dc191f7"
+                "reference": "03842eee9e942796f05365913655a6afddef613e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/39de7a50bbf8ab91b2a3d6a51a645d105dc191f7",
-                "reference": "39de7a50bbf8ab91b2a3d6a51a645d105dc191f7",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/03842eee9e942796f05365913655a6afddef613e",
+                "reference": "03842eee9e942796f05365913655a6afddef613e",
                 "shasum": ""
             },
             "require": {
@@ -1536,7 +1536,7 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2014-01-13 10:33:23"
+            "time": "2014-01-15 06:20:40"
         },
         {
             "name": "jms/serializer-bundle",
@@ -2672,20 +2672,20 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "0.8.1.1",
+            "version": "0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "9acd80f14f4c13ea80cf8e9a47a771454a8318f3"
+                "reference": "a95a6ca667b2798c033728974bfe6e7dfea31bab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/9acd80f14f4c13ea80cf8e9a47a771454a8318f3",
-                "reference": "9acd80f14f4c13ea80cf8e9a47a771454a8318f3",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/a95a6ca667b2798c033728974bfe6e7dfea31bab",
+                "reference": "a95a6ca667b2798c033728974bfe6e7dfea31bab",
                 "shasum": ""
             },
             "require": {
-                "guzzle/guzzle": ">=3.7.2,<4",
+                "guzzle/guzzle": ">=3.8.0,<4",
                 "php": ">=5.3.0",
                 "webignition/html-document-link-finder": ">=0.6,<1.0",
                 "webignition/url": ">=1.9.6",
@@ -2694,6 +2694,7 @@
             "type": "library",
             "autoload": {
                 "psr-0": {
+                    "webignition\\Tests": "tests/",
                     "": "src/"
                 }
             },
@@ -2715,7 +2716,7 @@
                 "html",
                 "link"
             ],
-            "time": "2014-01-14 13:19:36"
+            "time": "2014-01-14 23:19:48"
         },
         {
             "name": "webignition/html-document-link-finder",

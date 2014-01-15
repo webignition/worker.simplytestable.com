@@ -66,7 +66,9 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
         
         if ($this->task->hasParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME)) {
             $linkChecker->setDomainsToExclude($this->task->getParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME));
-        }                
+        }  
+        
+        $linkChecker->enableToggleUrlEncoding();
         
         $this->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
         
