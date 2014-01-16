@@ -36,10 +36,10 @@
         "doctrine/doctrine-fixtures-bundle": "dev-master",
         "webignition/html-document-link-finder":">=0.6,<1.0",
         "webignition/html-document-link-checker":">=0.9,<1.0",
-        "webignition/html-validator-wrapper":">=0.3.1",
+        "webignition/html-validator-wrapper":">=0.4.1",
         "webignition/html-validator-output-parser":">=0.6",
         "webignition/css-validator-wrapper":">=0.9.5",
-        "webignition/web-resource-service":">=0.2.9"
+        "webignition/web-resource-service":">=0.3"
     },
     "scripts": {
         "post-install-cmd": [

@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "1f692effcb0055d2a383c268dbd2be37",
+    "hash": "2ac867a66e65d38d580121f59c3e5ec6",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2852,12 +2852,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-validator-wrapper.git",
-                "reference": "9b80344e0d4c4946a395c218280771957a8875cc"
+                "reference": "892388e52759fc347edd9c105c5daf8b1f72bba5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-validator-wrapper/zipball/9b80344e0d4c4946a395c218280771957a8875cc",
-                "reference": "9b80344e0d4c4946a395c218280771957a8875cc",
+                "url": "https://api.github.com/repos/webignition/html-validator-wrapper/zipball/892388e52759fc347edd9c105c5daf8b1f72bba5",
+                "reference": "892388e52759fc347edd9c105c5daf8b1f72bba5",
                 "shasum": ""
             },
             "require": {
@@ -2885,7 +2885,7 @@
                 "html",
                 "validator"
             ],
-            "time": "2013-12-03 15:18:10"
+            "time": "2014-01-16 18:53:27"
         },
         {
             "name": "webignition/internet-media-type",
@@ -3278,12 +3278,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-service.git",
-                "reference": "0022a5a49e02900f35b58dc5beaf03aefc5bf452"
+                "reference": "cbd30de49996330182847619147b0c9708bc077c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/0022a5a49e02900f35b58dc5beaf03aefc5bf452",
-                "reference": "0022a5a49e02900f35b58dc5beaf03aefc5bf452",
+                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/cbd30de49996330182847619147b0c9708bc077c",
+                "reference": "cbd30de49996330182847619147b0c9708bc077c",
                 "shasum": ""
             },
             "require": {
@@ -3316,7 +3316,7 @@
                 "service",
                 "web"
             ],
-            "time": "2014-01-10 16:19:19"
+            "time": "2014-01-16 18:40:08"
         },
         {
             "name": "winzou/console-bundle",

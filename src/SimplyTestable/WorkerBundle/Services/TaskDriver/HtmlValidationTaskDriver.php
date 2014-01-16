@@ -75,7 +75,8 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         
         $this->getProperty('html-validator-wrapper')->createConfiguration(array(
             'documentUri' => 'file:' . $this->storeTmpFile($fragment),
-            'validatorPath' => $this->getProperty('validator-path')
+            'validatorPath' => $this->getProperty('validator-path'),
+            'documentCharacterSet' => ($this->webResource->getIsDocumentCharacterEncodingValid()) ? $this->webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING
         ));
         
         /* @var $validatorWrapper \webignition\HtmlValidator\Mock\Wrapper\Wrapper */
