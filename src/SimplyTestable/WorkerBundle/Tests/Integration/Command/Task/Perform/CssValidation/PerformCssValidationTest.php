@@ -113,8 +113,8 @@ class PerformCssValidationTest extends ConsoleCommandBaseTestCase {
         ));
 
         $this->assertEquals(0, $response);
-        $this->assertEquals(677, $task->getOutput()->getErrorCount());        
-        $this->assertEquals(423, $task->getOutput()->getWarningCount());
+        $this->assertEquals(670, $task->getOutput()->getErrorCount());        
+        $this->assertEquals(430, $task->getOutput()->getWarningCount());
     }     
 
 
