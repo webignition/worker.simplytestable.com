@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "2ac867a66e65d38d580121f59c3e5ec6",
+    "hash": "d6dc559c19172706212c109b9ce22446",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2766,21 +2766,26 @@
         },
         {
             "name": "webignition/html-document-type-identifier",
-            "version": "0.8.1",
+            "version": "0.8.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-type-identifier.git",
-                "reference": "c0b41de6d23f9e1f11d3f4cdfe67213c798331d1"
+                "reference": "4bc47da2ca462d424b20cd27b707d43795babca2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-identifier/zipball/c0b41de6d23f9e1f11d3f4cdfe67213c798331d1",
-                "reference": "c0b41de6d23f9e1f11d3f4cdfe67213c798331d1",
+                "url": "https://api.github.com/repos/webignition/html-document-type-identifier/zipball/4bc47da2ca462d424b20cd27b707d43795babca2",
+                "reference": "4bc47da2ca462d424b20cd27b707d43795babca2",
                 "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*",
+                "symfony/class-loader": "*"
             },
             "type": "library",
             "autoload": {
                 "psr-0": {
+                    "webignition\\Tests": "tests/",
                     "": "src/"
                 }
             },
@@ -2801,7 +2806,7 @@
                 "document",
                 "html"
             ],
-            "time": "2013-10-24 10:08:08"
+            "time": "2014-01-17 09:00:31"
         },
         {
             "name": "webignition/html-validator-output-parser",
