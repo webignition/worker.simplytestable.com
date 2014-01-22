@@ -4,7 +4,8 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use webignition\WebResource\WebPage\WebPage;
-use webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier;
+use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
+use webignition\HtmlDocumentType\Validator as DoctypeValidator;
 
 class HtmlValidationTaskDriver extends WebResourceTaskDriver {    
     
@@ -51,10 +52,10 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
     protected function performValidation() {        
         $fragment = $this->webResource->getContent();
         
-        $htmlDocumentTypeIdentifier = new HtmlDocumentTypeIdentifier();
-        $htmlDocumentTypeIdentifier->setHtml($fragment);
-        
-        if (!$htmlDocumentTypeIdentifier->hasDocumentType()) {
+        $doctypeExtractor = new DoctypeExtractor();
+        $doctypeExtractor->setHtml($fragment);
+
+        if (!$doctypeExtractor->hasDocumentType()) {
             $this->response->setErrorCount(1);
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);            
@@ -66,11 +67,12 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
             }
         }
         
-        if (!$htmlDocumentTypeIdentifier->hasValidDocumentType()) {            
+        $doctypeValidator = new DoctypeValidator();        
+        if (!$doctypeValidator->isValid($doctypeExtractor->getDocumentTypeString())) {            
             $this->response->setErrorCount(1);
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
-            return json_encode($this->getInvalidDocumentTypeOutput($htmlDocumentTypeIdentifier->getDocumentTypeString()));             
+            return json_encode($this->getInvalidDocumentTypeOutput($doctypeExtractor->getDocumentTypeString()));             
         }
         
         $this->getProperty('html-validator-wrapper')->createConfiguration(array(
