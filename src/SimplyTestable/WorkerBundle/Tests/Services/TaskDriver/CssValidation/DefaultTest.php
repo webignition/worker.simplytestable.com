@@ -1,0 +1,156 @@
+<?php
+
+namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation;
+
+use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\TaskDriverTest;
+
+class DefaultTest extends TaskDriverTest {
+    
+    public function setUp() {
+        parent::setUp();
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath($this->getName() . '/HttpResponses')));
+        $this->container->get('simplytestable.services.cssValidatorWrapperService')->setCssValidatorRawOutput(
+            file_get_contents($this->getFixturesDataPath($this->getName() . '/CssValidatorResponse/1'))
+        );        
+    }
+    
+    /**
+     * @group standard
+     */        
+    public function testDomainsToIgnoreNotSet() {        
+        $task = $this->getDefaultTask();        
+       
+        $this->assertEquals(0, $this->getTaskService()->perform($task));
+        $this->assertEquals(9, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());     
+    }    
+    
+    /**
+     * @group standard
+     */        
+    public function testDomainsToIgnoreOneDomainOfThree() {            
+        $task = $this->getTask('http://example.com/', array(
+            'domains-to-ignore' => array(
+                'one.cdn.example.com'
+            )             
+        ));
+        
+        $this->assertEquals(0, $this->getTaskService()->perform($task));
+        $this->assertEquals(6, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());     
+    }  
+    
+  
+    /**
+     * @group standard
+     */     
+    public function testDomainsToIgnoreTwoDomainsOfThree() {        
+        $task = $this->getTask('http://example.com/', array(
+            'domains-to-ignore' => array(
+                'one.cdn.example.com',
+                'two.cdn.example.com'
+            )               
+        ));
+        
+        $this->assertEquals(0, $this->getTaskService()->perform($task));
+        $this->assertEquals(3, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());     
+    } 
+    
+    
+    /**
+     * @group standard
+     */     
+    public function testIgnoreWarningsNotSet() {
+        $task = $this->getDefaultTask();
+        
+        $this->assertEquals(0, $this->getTaskService()->perform($task));
+        $this->assertEquals(0, $task->getOutput()->getErrorCount());
+        $this->assertEquals(3, $task->getOutput()->getWarningCount());     
+    } 
+    
+    
+    /**
+     * @group standard
+     */     
+    public function testIgnoreWarnings() {             
+        $task = $this->getTask('http://example.com/', array(
+            'ignore-warnings' => true            
+        ));
+        
+        $this->assertEquals(0, $this->getTaskService()->perform($task));        
+        $this->assertEquals(0, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());     
+    }    
+    
+    
+    /**
+     * @group standard
+     */     
+    public function testIgnoreFalseBackgroundImageDataUrlIssues() {     
+        $task = $this->getTask('http://example.com/', array(
+            'ignore-warnings' => true            
+        ));        
+        
+        $this->assertEquals(0, $this->getTaskService()->perform($task));        
+        $this->assertEquals(0, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());     
+    }    
+    
+    
+    /**
+     * @group standard
+     */     
+    public function testVendorExtensionSeverityLevelIgnore() {             
+        $task = $this->getTask('http://example.com/', array(
+            'vendor-extensions' => 'ignore'          
+        ));        
+        
+        $this->assertEquals(0, $this->getTaskService()->perform($task));        
+        $this->assertEquals(0, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());     
+    } 
+    
+    
+    /**
+     * @group standard
+     */     
+    public function testChildCssResourceUnknownMimeType() {              
+        $task = $this->getDefaultTask();
+        
+        $this->assertEquals(0, $this->getTaskService()->perform($task)); 
+        $this->assertEquals(1, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());
+        
+        $decodedTaskOutput = json_decode($task->getOutput()->getOutput());        
+        $this->assertEquals('invalid-content-type:invalid/made-it-up', $decodedTaskOutput[0]->message);
+    }    
+   
+    
+    /**
+     * @group standard
+     */     
+    public function testRootWebResourceUnknownException() {
+        $task = $this->getDefaultTask();
+        
+        $this->assertEquals(0, $this->getTaskService()->perform($task)); 
+        $this->assertEquals(1, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());
+        
+        $decodedTaskOutput = json_decode($task->getOutput()->getOutput());        
+        $this->assertEquals('css-validation-exception-unknown', $decodedTaskOutput[0]->class);
+    }
+    
+    
+    /**
+     * @group standard
+     */     
+    public function testRootWebResourceHasMangledMarkup() {
+        $task = $this->getDefaultTask();
+        
+        $this->assertEquals(0, $this->getTaskService()->perform($task)); 
+        $this->assertEquals(0, $task->getOutput()->getErrorCount());
+        $this->assertEquals(0, $task->getOutput()->getWarningCount());
+    }    
+
+}

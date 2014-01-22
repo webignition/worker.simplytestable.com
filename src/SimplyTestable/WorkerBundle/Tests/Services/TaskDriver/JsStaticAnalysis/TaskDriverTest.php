@@ -1,13 +1,13 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\HtmlValidation;
+namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis;
 
 use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\BaseTest;
 
 abstract class TaskDriverTest extends BaseTest {
 
     protected function getTaskTypeName() {
-        return 'HTML Validation';
+        return 'JS Static Analysis';
     }
 
 }
