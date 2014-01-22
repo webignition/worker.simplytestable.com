@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "d6dc559c19172706212c109b9ce22446",
+    "hash": "99676f91df042f7c2411ddecd426b729",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -740,12 +740,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/migrations.git",
-                "reference": "199cb62a80c7723942d14107c23bc45168e4241c"
+                "reference": "0742fc7167a4deedaabc8639849a3e71082999f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/migrations/zipball/199cb62a80c7723942d14107c23bc45168e4241c",
-                "reference": "199cb62a80c7723942d14107c23bc45168e4241c",
+                "url": "https://api.github.com/repos/doctrine/migrations/zipball/0742fc7167a4deedaabc8639849a3e71082999f1",
+                "reference": "0742fc7167a4deedaabc8639849a3e71082999f1",
                 "shasum": ""
             },
             "require": {
@@ -792,7 +792,7 @@
                 "database",
                 "migrations"
             ],
-            "time": "2014-01-04 09:19:33"
+            "time": "2014-01-20 11:29:43"
         },
         {
             "name": "doctrine/orm",
@@ -800,12 +800,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/doctrine2.git",
-                "reference": "cf43edd6a10ac8b17dc07bd40f9886e582a832b2"
+                "reference": "bba5ec27fbbe35224be48878a0c92827ef2f9733"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/cf43edd6a10ac8b17dc07bd40f9886e582a832b2",
-                "reference": "cf43edd6a10ac8b17dc07bd40f9886e582a832b2",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/bba5ec27fbbe35224be48878a0c92827ef2f9733",
+                "reference": "bba5ec27fbbe35224be48878a0c92827ef2f9733",
                 "shasum": ""
             },
             "require": {
@@ -868,7 +868,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2014-01-14 22:50:33"
+            "time": "2014-01-20 08:36:15"
         },
         {
             "name": "etechnika/idna-convert",
@@ -1474,12 +1474,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "03842eee9e942796f05365913655a6afddef613e"
+                "reference": "67cf0f43799a5009d85df9d87e09cb43ee6afa7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/03842eee9e942796f05365913655a6afddef613e",
-                "reference": "03842eee9e942796f05365913655a6afddef613e",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/67cf0f43799a5009d85df9d87e09cb43ee6afa7e",
+                "reference": "67cf0f43799a5009d85df9d87e09cb43ee6afa7e",
                 "shasum": ""
             },
             "require": {
@@ -1536,7 +1536,7 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2014-01-15 06:20:40"
+            "time": "2014-01-22 12:17:43"
         },
         {
             "name": "jms/serializer-bundle",
@@ -1685,12 +1685,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "296095fe2ee052161f8226d55df775103bb6c259"
+                "reference": "7f783c0ab09dc341f858882e2d2ce6fc36ca1351"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/296095fe2ee052161f8226d55df775103bb6c259",
-                "reference": "296095fe2ee052161f8226d55df775103bb6c259",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/7f783c0ab09dc341f858882e2d2ce6fc36ca1351",
+                "reference": "7f783c0ab09dc341f858882e2d2ce6fc36ca1351",
                 "shasum": ""
             },
             "require": {
@@ -1702,7 +1702,7 @@
                 "doctrine/couchdb": "dev-master",
                 "mlehner/gelf-php": "1.0.*",
                 "phpunit/phpunit": "~3.7.0",
-                "raven/raven": "0.5.*",
+                "raven/raven": "~0.5",
                 "ruflin/elastica": "0.90.*"
             },
             "suggest": {
@@ -1744,7 +1744,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2014-01-14 13:24:06"
+            "time": "2014-01-17 14:16:06"
         },
         {
             "name": "phpcollection/phpcollection",
@@ -1798,7 +1798,7 @@
         },
         {
             "name": "phpoption/phpoption",
-            "version": "dev-master",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/php-option.git",
@@ -1851,12 +1851,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "65f363ac44058796a8e1428cf41e6d92d8a75ddc"
+                "reference": "a78d6504ff5d4367497785ab2ade91db3a9fbe11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/65f363ac44058796a8e1428cf41e6d92d8a75ddc",
-                "reference": "65f363ac44058796a8e1428cf41e6d92d8a75ddc",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/a78d6504ff5d4367497785ab2ade91db3a9fbe11",
+                "reference": "a78d6504ff5d4367497785ab2ade91db3a9fbe11",
                 "shasum": ""
             },
             "type": "library",
@@ -1886,7 +1886,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2013-12-25 11:17:50"
+            "time": "2014-01-18 15:33:09"
         },
         {
             "name": "querypath/querypath",
@@ -2189,12 +2189,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/MonologBundle.git",
-                "reference": "3c4b4c43933f93e6f887df201bdbbb10a1bf5b97"
+                "reference": "890b87e2e88c1d33375816b06a174b06f98ad3c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/MonologBundle/zipball/3c4b4c43933f93e6f887df201bdbbb10a1bf5b97",
-                "reference": "3c4b4c43933f93e6f887df201bdbbb10a1bf5b97",
+                "url": "https://api.github.com/repos/symfony/MonologBundle/zipball/890b87e2e88c1d33375816b06a174b06f98ad3c6",
+                "reference": "890b87e2e88c1d33375816b06a174b06f98ad3c6",
                 "shasum": ""
             },
             "require": {
@@ -2238,7 +2238,7 @@
                 "log",
                 "logging"
             ],
-            "time": "2013-06-05 09:21:54"
+            "time": "2014-01-19 13:19:44"
         },
         {
             "name": "symfony/swiftmailer-bundle",
@@ -2765,17 +2765,63 @@
             "time": "2014-01-14 12:46:50"
         },
         {
-            "name": "webignition/html-document-type-identifier",
-            "version": "0.8.2",
+            "name": "webignition/html-document-type-extractor",
+            "version": "0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webignition/html-document-type-identifier.git",
-                "reference": "4bc47da2ca462d424b20cd27b707d43795babca2"
+                "url": "https://github.com/webignition/html-document-type-extractor.git",
+                "reference": "70e028c10e44e254fc1eac2eb725e0a6cef4a726"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-identifier/zipball/4bc47da2ca462d424b20cd27b707d43795babca2",
-                "reference": "4bc47da2ca462d424b20cd27b707d43795babca2",
+                "url": "https://api.github.com/repos/webignition/html-document-type-extractor/zipball/70e028c10e44e254fc1eac2eb725e0a6cef4a726",
+                "reference": "70e028c10e44e254fc1eac2eb725e0a6cef4a726",
+                "shasum": ""
+            },
+            "require-dev": {
+                "icanboogie/inflector": "1.0",
+                "phpunit/phpunit": "3.7.*",
+                "symfony/class-loader": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "webignition\\Tests": "tests/",
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Extract the doctype from a HTML document",
+            "homepage": "https://github.com/webignition/html-document-type-extractor",
+            "keywords": [
+                "doctype",
+                "document",
+                "extractor",
+                "html"
+            ],
+            "time": "2014-01-21 18:26:30"
+        },
+        {
+            "name": "webignition/html-document-type-generator",
+            "version": "0.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/html-document-type-generator.git",
+                "reference": "f52f5ea8d31f60dfa01b3c79cac995c42996cd54"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/html-document-type-generator/zipball/f52f5ea8d31f60dfa01b3c79cac995c42996cd54",
+                "reference": "f52f5ea8d31f60dfa01b3c79cac995c42996cd54",
                 "shasum": ""
             },
             "require-dev": {
@@ -2799,14 +2845,113 @@
                     "email": "jon@webignition.net"
                 }
             ],
-            "description": "Given the source of an HTML document, identify the document type",
-            "homepage": "https://github.com/webignition/html-document-type-identifier",
+            "description": "Generate a doctype for a given HTML version and variant",
+            "homepage": "https://github.com/webignition/html-document-type-generator",
             "keywords": [
                 "doctype",
                 "document",
+                "generator",
                 "html"
             ],
-            "time": "2014-01-17 09:00:31"
+            "time": "2014-01-22 15:42:49"
+        },
+        {
+            "name": "webignition/html-document-type-parser",
+            "version": "0.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/html-document-type-parser.git",
+                "reference": "8662d14051847bef67c8eee74356bb3818f46e92"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/html-document-type-parser/zipball/8662d14051847bef67c8eee74356bb3818f46e92",
+                "reference": "8662d14051847bef67c8eee74356bb3818f46e92",
+                "shasum": ""
+            },
+            "require-dev": {
+                "icanboogie/inflector": "1.0",
+                "phpunit/phpunit": "3.7.*",
+                "symfony/class-loader": "*",
+                "webignition/html-document-type-generator": ">=0.5.4,<1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "webignition\\Tests": "tests/",
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Parse a public html document type (so many caveats), extract FPI and URI",
+            "homepage": "https://github.com/webignition/html-document-type-parser",
+            "keywords": [
+                "doctype",
+                "document",
+                "html",
+                "parser"
+            ],
+            "time": "2014-01-21 16:42:38"
+        },
+        {
+            "name": "webignition/html-document-type-validator",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/html-document-type-validator.git",
+                "reference": "9ef32f23d8cfbf3699c6680f7491e9bbbf759dd2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/html-document-type-validator/zipball/9ef32f23d8cfbf3699c6680f7491e9bbbf759dd2",
+                "reference": "9ef32f23d8cfbf3699c6680f7491e9bbbf759dd2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "webignition/html-document-type-generator": ">=0.6.1,<1",
+                "webignition/html-document-type-parser": ">=0.1.2,<1"
+            },
+            "require-dev": {
+                "icanboogie/inflector": "1.0",
+                "phpunit/phpunit": "3.7.*",
+                "symfony/class-loader": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "webignition\\Tests": "tests/",
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Check if a given HTML doctype string is valid",
+            "homepage": "https://github.com/webignition/html-document-type-validator",
+            "keywords": [
+                "doctype",
+                "document",
+                "html",
+                "validator"
+            ],
+            "time": "2014-01-22 18:04:58"
         },
         {
             "name": "webignition/html-validator-output-parser",
