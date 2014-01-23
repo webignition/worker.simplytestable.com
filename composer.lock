@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "99676f91df042f7c2411ddecd426b729",
+    "hash": "73391061cd42697877480ca93c37dc00",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1104,12 +1104,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jdorn/sql-formatter.git",
-                "reference": "64990d96e0959dff8e059dfcdc1af130728d92bc"
+                "reference": "38058f6fc48b05bb7a18946e773f9916942dfecd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jdorn/sql-formatter/zipball/64990d96e0959dff8e059dfcdc1af130728d92bc",
-                "reference": "64990d96e0959dff8e059dfcdc1af130728d92bc",
+                "url": "https://api.github.com/repos/jdorn/sql-formatter/zipball/38058f6fc48b05bb7a18946e773f9916942dfecd",
+                "reference": "38058f6fc48b05bb7a18946e773f9916942dfecd",
                 "shasum": ""
             },
             "require": {
@@ -1146,7 +1146,7 @@
                 "highlight",
                 "sql"
             ],
-            "time": "2014-01-12 16:20:24"
+            "time": "2014-01-23 04:54:58"
         },
         {
             "name": "jms/aop-bundle",
@@ -1474,12 +1474,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "67cf0f43799a5009d85df9d87e09cb43ee6afa7e"
+                "reference": "740c63a7805a7ad53e3333d859b8753f68066bb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/67cf0f43799a5009d85df9d87e09cb43ee6afa7e",
-                "reference": "67cf0f43799a5009d85df9d87e09cb43ee6afa7e",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/740c63a7805a7ad53e3333d859b8753f68066bb6",
+                "reference": "740c63a7805a7ad53e3333d859b8753f68066bb6",
                 "shasum": ""
             },
             "require": {
@@ -1536,7 +1536,7 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2014-01-22 12:17:43"
+            "time": "2014-01-22 21:43:11"
         },
         {
             "name": "jms/serializer-bundle",
@@ -2766,16 +2766,16 @@
         },
         {
             "name": "webignition/html-document-type-extractor",
-            "version": "0.1",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-type-extractor.git",
-                "reference": "70e028c10e44e254fc1eac2eb725e0a6cef4a726"
+                "reference": "e5c3d3656ddf3377bbd87f723789d41d0006b3f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-extractor/zipball/70e028c10e44e254fc1eac2eb725e0a6cef4a726",
-                "reference": "70e028c10e44e254fc1eac2eb725e0a6cef4a726",
+                "url": "https://api.github.com/repos/webignition/html-document-type-extractor/zipball/e5c3d3656ddf3377bbd87f723789d41d0006b3f7",
+                "reference": "e5c3d3656ddf3377bbd87f723789d41d0006b3f7",
                 "shasum": ""
             },
             "require-dev": {
@@ -2808,7 +2808,7 @@
                 "extractor",
                 "html"
             ],
-            "time": "2014-01-21 18:26:30"
+            "time": "2014-01-23 16:48:52"
         },
         {
             "name": "webignition/html-document-type-generator",

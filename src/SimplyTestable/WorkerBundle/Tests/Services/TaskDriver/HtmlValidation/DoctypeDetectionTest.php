@@ -91,6 +91,20 @@ class DoctypeDetectionTest extends TaskDriverTest {
 
         $this->assertEquals(0, $this->getTaskService()->perform($this->task));        
         $this->assertEquals($this->getTaskService()->getCompletedState(), $this->task->getState());
-    }    
+    }  
+    
+    
+    public function testWhitespaceInDoctypeFpiDoesNotHinderDoctypeDetectionOrExtraction() {
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
+        
+        $this->container->get('simplytestable.services.htmlValidatorWrapperService')->loadFixturesFromPath(
+            $this->getFixturesDataPath(__FUNCTION__ . '/HtmlValidatorResponses')
+        );          
+        
+        $this->task = $this->getTask('http://site.terradoboi.com/');
+
+        $this->assertEquals(0, $this->getTaskService()->perform($this->task));        
+        $this->assertEquals($this->getTaskService()->getCompletedState(), $this->task->getState());        
+    }
     
 }
