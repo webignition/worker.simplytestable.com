@@ -28,8 +28,7 @@
         "querypath/QueryPath": "3.0.2",
         "webignition/web-page-model":">=0.6,<2.0",
         "webignition/web-json-model":">=0.1,<2.0",
-        "webignition/absolute-url-deriver":">=1.4",
-        "webignition/node-jslint-output-parser":">=1.0.5,<2.0",
+        "webignition/absolute-url-deriver":">=1.4",        
         "winzou/console-bundle":"1.0.0",
         "guzzle/guzzle":"3.8.0",        
         "doctrine/doctrine-fixtures-bundle": "dev-master",
@@ -40,7 +39,8 @@
         "webignition/css-validator-wrapper":">=0.9.5",
         "webignition/web-resource-service":">=0.3",
         "webignition/html-document-type-extractor":">=0.1.1,<1.0",
-        "webignition/html-document-type-validator":">=0.1,<1.0"
+        "webignition/html-document-type-validator":">=0.1,<1.0",
+        "webignition/node-jslint-wrapper":">=0.2.1,<1"
     },
     "scripts": {
         "post-install-cmd": [

@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "73391061cd42697877480ca93c37dc00",
+    "hash": "23999d39a47a6a197b62e2047dfa67df",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -300,12 +300,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/data-fixtures.git",
-                "reference": "4a81be009d8437326acfcdd68888d1c5b8e2fb40"
+                "reference": "d5d0f7d9743df904c1e88f48dbc091b91c23d877"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/data-fixtures/zipball/4a81be009d8437326acfcdd68888d1c5b8e2fb40",
-                "reference": "4a81be009d8437326acfcdd68888d1c5b8e2fb40",
+                "url": "https://api.github.com/repos/doctrine/data-fixtures/zipball/d5d0f7d9743df904c1e88f48dbc091b91c23d877",
+                "reference": "d5d0f7d9743df904c1e88f48dbc091b91c23d877",
                 "shasum": ""
             },
             "require": {
@@ -348,7 +348,7 @@
             "keywords": [
                 "database"
             ],
-            "time": "2013-12-02 21:23:23"
+            "time": "2014-01-24 15:18:31"
         },
         {
             "name": "doctrine/dbal",
@@ -800,12 +800,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/doctrine2.git",
-                "reference": "bba5ec27fbbe35224be48878a0c92827ef2f9733"
+                "reference": "9b7e949025fee7bc48ec5acb4af2a36a38979bdd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/bba5ec27fbbe35224be48878a0c92827ef2f9733",
-                "reference": "bba5ec27fbbe35224be48878a0c92827ef2f9733",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/9b7e949025fee7bc48ec5acb4af2a36a38979bdd",
+                "reference": "9b7e949025fee7bc48ec5acb4af2a36a38979bdd",
                 "shasum": ""
             },
             "require": {
@@ -868,7 +868,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2014-01-20 08:36:15"
+            "time": "2014-01-25 16:36:54"
         },
         {
             "name": "etechnika/idna-convert",
@@ -1752,12 +1752,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/php-collection.git",
-                "reference": "6cb80213a7c919683e20cb664de26d3bf86a66a2"
+                "reference": "cad39389bb3134aca06b1b7fad5d3ecf7c3b7d74"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/php-collection/zipball/6cb80213a7c919683e20cb664de26d3bf86a66a2",
-                "reference": "6cb80213a7c919683e20cb664de26d3bf86a66a2",
+                "url": "https://api.github.com/repos/schmittjoh/php-collection/zipball/cad39389bb3134aca06b1b7fad5d3ecf7c3b7d74",
+                "reference": "cad39389bb3134aca06b1b7fad5d3ecf7c3b7d74",
                 "shasum": ""
             },
             "require": {
@@ -1794,7 +1794,7 @@
                 "sequence",
                 "set"
             ],
-            "time": "2013-12-22 19:23:43"
+            "time": "2014-01-26 10:18:52"
         },
         {
             "name": "phpoption/phpoption",
@@ -2447,12 +2447,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fabpot/Twig.git",
-                "reference": "ae89c8853582f074c1e8f26ac3b67b2c4fff2609"
+                "reference": "9ed963c99d0e5f10eeeb1a135d80389f4a56d866"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fabpot/Twig/zipball/ae89c8853582f074c1e8f26ac3b67b2c4fff2609",
-                "reference": "ae89c8853582f074c1e8f26ac3b67b2c4fff2609",
+                "url": "https://api.github.com/repos/fabpot/Twig/zipball/9ed963c99d0e5f10eeeb1a135d80389f4a56d866",
+                "reference": "9ed963c99d0e5f10eeeb1a135d80389f4a56d866",
                 "shasum": ""
             },
             "require": {
@@ -2488,7 +2488,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2014-01-08 07:21:35"
+            "time": "2014-01-24 15:03:15"
         },
         {
             "name": "webignition/absolute-url-deriver",
@@ -3085,24 +3085,29 @@
         },
         {
             "name": "webignition/node-jslint-output-parser",
-            "version": "1.0.5",
+            "version": "1.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/node-jslint-output-parser.git",
-                "reference": "935401588d097fc7d5cff13521d725e5e94de3d8"
+                "reference": "84ddd7286f7bae6aac29071d051abcde5fcd2d0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/935401588d097fc7d5cff13521d725e5e94de3d8",
-                "reference": "935401588d097fc7d5cff13521d725e5e94de3d8",
+                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/84ddd7286f7bae6aac29071d051abcde5fcd2d0e",
+                "reference": "84ddd7286f7bae6aac29071d051abcde5fcd2d0e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*",
+                "symfony/class-loader": "*"
+            },
             "type": "library",
             "autoload": {
                 "psr-0": {
+                    "webignition\\Tests": "tests/",
                     "": "src/"
                 }
             },
@@ -3119,9 +3124,61 @@
             "description": "Parser for the output of reid / node-jslint, get lovely things such as a list of errors, error counts, % of content scanned, bunnies",
             "homepage": "https://github.com/webignition/node-jslint-output-parser",
             "keywords": [
-                "rss"
+                "jslint",
+                "output",
+                "parser"
             ],
-            "time": "2013-10-14 11:58:49"
+            "time": "2014-01-26 17:23:17"
+        },
+        {
+            "name": "webignition/node-jslint-wrapper",
+            "version": "0.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/node-jslint-wrapper.git",
+                "reference": "38cf33a16242926b9d38a1d8ed5e7b4cc133eb62"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/node-jslint-wrapper/zipball/38cf33a16242926b9d38a1d8ed5e7b4cc133eb62",
+                "reference": "38cf33a16242926b9d38a1d8ed5e7b4cc133eb62",
+                "shasum": ""
+            },
+            "require": {
+                "guzzle/guzzle": ">=3.8.0,<4",
+                "php": ">=5.3.0",
+                "webignition/node-jslint-output-parser": ">=1.0.6,<2.0",
+                "webignition/web-resource-service": ">=0.3,<1"
+            },
+            "require-dev": {
+                "icanboogie/inflector": "1.0",
+                "phpunit/phpunit": "3.7.*",
+                "symfony/class-loader": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "webignition\\Tests": "tests/",
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Wrapper for the nodejs jslint wrapper. I heard you liked wrappers ...",
+            "homepage": "https://github.com/webignition/node-jslint-wrapper",
+            "keywords": [
+                "jslint",
+                "wrapper"
+            ],
+            "time": "2014-01-26 18:18:53"
         },
         {
             "name": "webignition/quoted-string",
@@ -3424,7 +3481,7 @@
         },
         {
             "name": "webignition/web-resource-service",
-            "version": "dev-master",
+            "version": "0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-service.git",
