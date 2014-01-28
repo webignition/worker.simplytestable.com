@@ -20,6 +20,9 @@ services:
     
   simplytestable.services.cssValidatorWrapperService:
     class:  webignition\CssValidatorWrapper\Wrapper     
+    
+  simplytestable.services.nodeJslintWrapperService:
+    class:  webignition\NodeJslint\Wrapper\Wrapper 
   
   simplytestable.services.coreApplicationService:
     class:  SimplyTestable\WorkerBundle\Services\CoreApplicationService

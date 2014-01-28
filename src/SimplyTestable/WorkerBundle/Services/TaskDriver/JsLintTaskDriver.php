@@ -8,10 +8,14 @@ use webignition\Url\Url;
 use webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver;
 use webignition\WebResource\WebResource;
 use webignition\WebResource\Exception\Exception as WebResourceException;
+use webignition\WebResource\Exception\InvalidContentTypeException;
+use webignition\NodeJslint\Wrapper\Configuration\Flag\JsLint as JsLintFlag;
+use webignition\NodeJslint\Wrapper\Configuration\Option\JsLint as JsLintOption;
 
 class JsLintTaskDriver extends WebResourceTaskDriver {  
     
      const JSLINT_PARAMETER_NAME_PREFIX = 'jslint-option-';    
+     const MAXIMUM_FRAGMENT_LENGTH = 256;
     
     /**
      *
@@ -19,60 +23,12 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      */
     private $jsLintCommandOptions = null;
     
+    
     /**
-     * jslint-option-passfail
-     * jslint-option-bitwise
-     * jslint-option-continue
-     * jslint-option-debug
-     * jslint-option-evil
-     * jslint-option-eqeq
-     * jslint-option-es5
-     * jslint-option-forin
-     * jslint-option-newcap
-     * jslint-option-nomen
-     * jslint-option-plusplus
-     * jslint-option-regexp
-     * jslint-option-undef
-     * jslint-option-unparam
-     * jslint-option-sloppy
-     * jslint-option-stupid
-     * jslint-option-sub
-     * jslint-option-vars
-     * jslint-option-white
-     * jslint-option-anon
-     * jslint-option-browser
-     * jslint-option-devel
-     * jslint-option-windows
-     * 
-     * jslint-option-maxerr":"50","jslint-option-indent":"4","jslint-option-maxlen":"256","jslint-option-predef":[""]}
-     * 
-     * @var array
+     *
+     * @var string[]
      */
-    private $jsLintBooleanOptions = array(
-        'passfail',
-        'bitwise',
-        'continue',
-        'debug',
-        'evil',
-        'eqeq',
-        'es5',
-        'forin',
-        'newcap',
-        'nomen',
-        'plusplus',
-        'regexp',
-        'undef',
-        'unparam',
-        'sloppy',
-        'stupid',
-        'sub',
-        'vars',
-        'white',
-        'anon',
-        'browser',
-        'devel',
-        'windows',       
-    );
+    private $localResourcePaths = array();
     
     
     /**
@@ -127,37 +83,80 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     }
 
     protected function performValidation() {
+        $this->configureNodeJslintWrapper();
+        
         $this->jsLintCommandOptions = null;
         $jsLintOutput = array();
-        $scriptUrls = $this->getScriptUrls();              
+        $scriptUrls = $this->getScriptUrls();
+        $scriptValues = $this->getScriptValues();
+        
+        foreach ($scriptValues as $scriptValue) {
+            $localPath = $this->getLocalJavaScriptResourcePathFromContent($scriptValue);
+            file_put_contents($localPath, $scriptValue);
+            
+            $localUrl = new Url();
+            $localUrl->setScheme('file');
+            $localUrl->setPath($localPath);
+            
+            $scriptUrls[] = $localUrl;          
+        }
         
         $errorCount = 0;
         
-        foreach ($scriptUrls as $scriptUrl) {
+        foreach ($scriptUrls as $scriptUrl) {            
             if ($this->isScriptDomainIgnored($scriptUrl)) {
                 continue;
             }
             
             try {
-                $output = $this->getJsLintOutputForUrl($scriptUrl);             
-                $jsLintOutput[(string)$scriptUrl] = $output['output'];
-                $errorCount += $output['errorCount'];
-            } catch (\SimplyTestable\WorkerBundle\Exception\JsLintTaskDriverException $jsLintTaskDriverException) {
-                // JSLint returned unparseable output, likely from unparseable JS                
-                $this->getLogger()->err('JSLintTaskDriver::jslint error: [at '.$scriptUrl.']['.$jsLintTaskDriverException->getMessage().']');
+                $nodeJsLintOutput = $this->validateJsFile((string)$scriptUrl);
+                foreach ($nodeJsLintOutput->getEntries() as $entry) {
+                    /* @var $entry \webignition\NodeJslintOutput\Entry\Entry */
+                    if (strlen($entry->getEvidence()) > self::MAXIMUM_FRAGMENT_LENGTH) {
+                        $entry->setEvidence(substr($entry->getEvidence(), 0, self::MAXIMUM_FRAGMENT_LENGTH));
+                    }            
+                }
+            
+                $jsLintOutput[(string)$scriptUrl] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);
+                $errorCount += $this->getNodeJsErrorCount($nodeJsLintOutput);
+            } catch (\webignition\NodeJslintOutput\Exception $nodeJslintOutputException) {
+                $this->getLogger()->err('JSLintTaskDriver::jslint error: [at '.$scriptUrl.']['.$nodeJslintOutputException->getMessage().']');
+                throw $nodeJslintOutputException;
+            } catch (InvalidContentTypeException $invalidContentTypeException) {                                        
+                $jsLintOutput[(string)$scriptUrl] = array(
+                    'statusLine' => 'failed',
+                    'errorReport' => array(
+                        'reason' => 'InvalidContentTypeException',
+                        'contentType' => $invalidContentTypeException->getResponseContentType()->getTypeSubtypeString()
+                    )
+                );
+                
+                $errorCount++;
+            } catch (WebResourceException $webResourceException) {                
+                $jsLintOutput[(string)$scriptUrl] = array(
+                    'statusLine' => 'failed',
+                    'errorReport' => array(
+                        'reason' => 'webResourceException',
+                        'statusCode' => $webResourceException->getCode()
+                    )
+                );
+                
+                $errorCount++;
+            } catch (\Guzzle\Http\Exception\CurlException $curlException) {
+                $jsLintOutput[(string)$scriptUrl] = array(
+                    'statusLine' => 'failed',
+                    'errorReport' => array(
+                        'reason' => 'curlException',
+                        'statusCode' => $curlException->getErrorNo()
+                    )
+                );
+                
+                $errorCount++;
             }
-        }        
-        
-        $scriptValues = $this->getScriptValues();        
+        }
+              
         foreach ($scriptValues as $scriptValue) {
-            try {
-                $nodeJsLintOutput = $this->validateJsContent($scriptValue); 
-                $jsLintOutput[md5($scriptValue)] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);                
-                $errorCount += $this->getNodeJsErrorCount($nodeJsLintOutput);                
-            } catch (\SimplyTestable\WorkerBundle\Exception\JsLintTaskDriverException $jsLintTaskDriverException) {
-                // JSLint returned unparseable output, likely from unparseable JS                
-                $this->getLogger()->err('JSLintTaskDriver::jslint error: [inline at '.$this->task->getUrl().'][starting "'.substr($scriptValue, 0, 16).'"]['.$jsLintTaskDriverException->getMessage().']');
-            }
+            @unlink($this->getLocalJavaScriptResourcePathFromContent($scriptValue));
         }
         
         $this->response->setErrorCount($errorCount);
@@ -325,8 +324,144 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    private function validateJsContent($js) {        
-        $this->getJsLintCommandOptions();
+    /**
+     * 
+     * @param type $url
+     * @return \webignition\NodeJslintOutput\NodeJslintOutput
+     */
+    private function validateJsFile($url) {
+        /* @var $nodeJslintWrapper \webignition\NodeJslint\Wrapper\Wrapper */
+        $nodeJslintWrapper = $this->getProperty('node-jslint-wrapper');
+        $nodeJslintWrapper->getConfiguration()->setUrlToLint($url);
+        
+        return $nodeJslintWrapper->validate();
+    }
+    
+    /**
+     * ^
+     * @throws \InvalidArgumentException
+     * @throws \webignition\NodeJslintOutput\Exception
+     * @return \webignition\NodeJslintOutput\NodeJslintOutput
+     */    
+    
+    
+    private function configureNodeJslintWrapper() {
+        $baseRequest = $this->getHttpClientService()->get()->get();        
+        if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
+            $baseRequest->setAuth(
+                $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',
+                $this->task->hasParameter('http-auth-password') ? $this->task->getParameter('http-auth-password') : '',
+                'any'
+            );
+        }
+        
+        /* @var $nodeJslintWrapper \webignition\NodeJslint\Wrapper\Wrapper */
+        $nodeJslintWrapper = $this->getProperty('node-jslint-wrapper');
+        $nodeJslintWrapper->getLocalProxy()->getConfiguration()->setBaseRequest($baseRequest);
+        
+//        var_dump($nodeJslintWrapper->getLocalProxy()->getConfiguration()->getBaseRequest()->getClient()->getEventDispatcher()->getListeners('request.before_send'));        
+//        //var_dump($this->getHttpClientService()->get()->getEventDispatcher()->getListeners('request.before_send'));
+//        exit();        
+        
+        $nodeJslintWrapper->getLocalProxy()->getWebResourceService()->getConfiguration()->enableRetryWithUrlEncodingDisabled();
+        
+        $nodeJslintWrapper->getConfiguration()->setNodeJslintPath($this->getProperty('node-jslint-path'));
+        $nodeJslintWrapper->getConfiguration()->setNodePath($this->getProperty('node-path'));        
+        
+        $parametersObject = $this->task->getParametersObject();        
+        foreach ($parametersObject as $key => $value) {
+            if (!$this->isJslintParameter($key)) {
+                continue;
+            }
+            
+            $jsLintKey = str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key);
+            
+            if ($this->isJslintBooleanParameter($jsLintKey)) {
+                if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+                    $nodeJslintWrapper->getConfiguration()->enableFlag($jsLintKey);
+                } else {
+                    $nodeJslintWrapper->getConfiguration()->disableFlag($jsLintKey);
+                }                
+            } elseif ($this->isJsLintSingleOccurrenceOptionParameter($jsLintKey)) {                
+                $nodeJslintWrapper->getConfiguration()->setOption($jsLintKey, $value);
+            } elseif ($this->isJslintCollectionOptionParameter($jsLintKey)) {
+                if (is_array($value)) {
+                    $value = $value[0];
+                }
+                
+                $nodeJslintWrapper->getConfiguration()->setOption($jsLintKey, explode(' ', $value));                   
+            }
+        }
+//        
+//        var_dump($nodeJslintWrapper->getConfiguration());
+//        exit();
+        
+
+//            $parametersObject = $this->task->getParametersObject();            
+//            foreach ($parametersObject as $key => $value) {
+//                if ($this->isJslintParameter($key)) {
+//                    if ($this->isJslintBooleanParameter($key)) {
+//                        $jsLintCommandOptions .= ' --' . str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) . '=';
+//                        $jsLintCommandOptions .= filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+//                    } else {                        
+//                        if (str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) === 'predef') {
+//                            if (is_array($value)) {
+//                                $value = $value[0];
+//                            }
+//                            
+//                            $values = explode(' ', $value);                            
+//                            foreach ($values as $predefValue) {
+//                                $jsLintCommandOptions .= ' --' . str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) . '=' . $predefValue;
+//                            }                        
+//                        } else {
+//                            $jsLintCommandOptions .= ' --' . str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key) . '=' . $value;
+//                        }                        
+//                    }  
+//                }                                              
+//            } 
+        
+        
+        
+        
+//        $nodeJslintWrapper->getConfiguration()->setFlag($name);        
+//        $nodeJslintWrapper->getConfiguration()->setOption($name, $value);
+        
+        
+        
+        
+        
+        
+        //$wrapper = new \webignition\NodeJslint\Wrapper\Wrapper();
+        //$wrapper->getC
+//        
+//        var_dump($this->getJsLintCommandOptions());
+//        exit();        
+    }
+    
+    
+    
+    private function validateJsContent($js) {    
+/**
+    var flags = [
+            'anon', 'bitwise', 'browser', 'cap', 'continue', 'css',
+            'debug', 'devel', 'eqeq', 'es5', 'evil', 'forin', 'fragment',
+            'newcap', 'node', 'nomen', 'on', 'passfail', 'plusplus',
+            'properties', 'regexp', 'rhino', 'undef', 'unparam',
+            'sloppy', 'stupid', 'sub', 'vars', 'white', 'widget', 'windows',
+            'json', 'color', 'terse'
+        ],
+        commandOpts = {
+            'indent' : Number,
+            'maxerr' : Number,
+            'maxlen' : Number,
+            'predef' : [String, Array]
+        };
+ */        
+        
+//        var_dump($this->getJsLintCommandOptions());
+//        exit();
+        
+        
         
         $localPath = $this->getLocalJavaScriptResourcePathFromContent($js);
         
@@ -340,11 +475,12 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $output = implode("\n", $outputLines);    
 
         $outputParser = new \webignition\NodeJslintOutput\Parser();        
-        if (!$outputParser->parse($output)) {
-            throw new \SimplyTestable\WorkerBundle\Exception\JsLintTaskDriverException($output, 1);
-        }
+//        if (!$outputParser->parse($output)) {
+//            throw new \SimplyTestable\WorkerBundle\Exception\JsLintTaskDriverException($output, 1);
+//        }
         
-        $nodeJsLintOutput = $outputParser->getNodeJsLintOutput();
+        $nodeJsLintOutput = $outputParser->parse($output);
+
         unlink($localPath);
         return $nodeJsLintOutput;        
     }
@@ -395,11 +531,48 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     
     /**
      * 
-     * @param string $key
+     * @param string $jsLintKey
      * @return boolean
      */
-    private function isJslintBooleanParameter($key) {        
-        return in_array(str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key), $this->jsLintBooleanOptions);
+    private function isJslintBooleanParameter($jsLintKey) {        
+        return in_array($jsLintKey, JsLintFlag::getList());
+    }
+    
+    /**
+     * 
+     * @param string $jsLintKey
+     * @return boolean
+     */
+    private function isJslintOptionParameter($jsLintKey) {        
+        return in_array($jsLintKey, JsLintOption::getList());
+    }
+            
+    /**
+     * 
+     * @param string $jsLintKey
+     * @return boolean
+     */
+    private function isJsLintSingleOccurrenceOptionParameter($jsLintKey) {        
+        $singleOccurrenceOptions = array(
+            JsLintOption::INDENT,
+            JsLintOption::MAXERR,
+            JsLintOption::MAXLEN,
+        );
+        
+        return $this->isJslintOptionParameter($jsLintKey) && in_array($jsLintKey, $singleOccurrenceOptions);
+    }             
+    
+    /**
+     * 
+     * @param string $jsLintKey
+     * @return boolean
+     */
+    private function isJslintCollectionOptionParameter($jsLintKey) {
+        $singleOccurrenceOptions = array(
+            JsLintOption::PREDEF
+        );
+        
+        return $this->isJslintOptionParameter($jsLintKey) && in_array($jsLintKey, $singleOccurrenceOptions);
     }
     
     
@@ -409,8 +582,24 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return string
      */
     private function getLocalJavaScriptResourcePathFromContent($content) {
-        return sys_get_temp_dir() . '/' . md5($content) . ':' . $this->task->getId() . ':' . microtime(true);
+        $key = $this->getLocalJavaScriptResourcePathKey($content);
+        if (!isset($this->localResourcePaths[$key])) {
+            $this->localResourcePaths[$key] = sys_get_temp_dir() . '/' . $key . ':' . microtime(true) . '.js';
+        }
+        
+        return $this->localResourcePaths[$key];
     }
+    
+
+    /**
+     * 
+     * @param string $content
+     * @return string
+     */    
+    private function getLocalJavaScriptResourcePathKey($content) {
+        return md5($content) . ':' . $this->task->getId();
+    }
+    
     
     /**
      * 
@@ -443,8 +632,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         $thisUrl = new Url($this->task->getUrl());
         
-        $webPage->find('script')->each(function ($index, \DOMElement $domElement) use (&$scriptUrls, $thisUrl) {            
-            $src = trim($domElement->getAttribute('src'));
+        $webPage->find('script')->each(function ($index, \DOMElement $domElement) use (&$scriptUrls, $thisUrl) {                       
+            $src = trim($domElement->getAttribute('src'));           
             if ($src != '') {
                 $absoluteUrlDeriver = new AbsoluteUrlDeriver($src, $thisUrl);
                 $absoluteScriptUrl = $absoluteUrlDeriver->getAbsoluteUrl();

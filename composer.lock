@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "23999d39a47a6a197b62e2047dfa67df",
+    "hash": "2f7e30fbc3ad8c37f84087bd7f2abf09",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -428,12 +428,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/DoctrineBundle.git",
-                "reference": "69fbd69b8b6136e212bdf866a502f4b4d3c110e6"
+                "reference": "5edc3c9a6ca9b5fbff9a3fcb30f8cab356c9aff8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/DoctrineBundle/zipball/69fbd69b8b6136e212bdf866a502f4b4d3c110e6",
-                "reference": "69fbd69b8b6136e212bdf866a502f4b4d3c110e6",
+                "url": "https://api.github.com/repos/doctrine/DoctrineBundle/zipball/5edc3c9a6ca9b5fbff9a3fcb30f8cab356c9aff8",
+                "reference": "5edc3c9a6ca9b5fbff9a3fcb30f8cab356c9aff8",
                 "shasum": ""
             },
             "require": {
@@ -446,7 +446,8 @@
             "require-dev": {
                 "doctrine/orm": "~2.3",
                 "symfony/validator": "~2.2",
-                "symfony/yaml": "~2.2"
+                "symfony/yaml": "~2.2",
+                "twig/twig": "~1"
             },
             "suggest": {
                 "doctrine/orm": "The Doctrine ORM integration is optional in the bundle.",
@@ -489,7 +490,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2014-01-08 13:40:06"
+            "time": "2014-01-28 02:22:34"
         },
         {
             "name": "doctrine/doctrine-fixtures-bundle",
@@ -872,16 +873,16 @@
         },
         {
             "name": "etechnika/idna-convert",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/etechnika/idna-convert.git",
-                "reference": "450db86f2fa58dffa81534fa9826136bcb03d692"
+                "reference": "1ed24693c9983a721862943fde37eb87c62d892b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/etechnika/idna-convert/zipball/450db86f2fa58dffa81534fa9826136bcb03d692",
-                "reference": "450db86f2fa58dffa81534fa9826136bcb03d692",
+                "url": "https://api.github.com/repos/etechnika/idna-convert/zipball/1ed24693c9983a721862943fde37eb87c62d892b",
+                "reference": "1ed24693c9983a721862943fde37eb87c62d892b",
                 "shasum": ""
             },
             "require": {
@@ -922,7 +923,7 @@
             "keywords": [
                 "lib"
             ],
-            "time": "2013-12-05 21:37:00"
+            "time": "2014-01-28 08:16:09"
         },
         {
             "name": "glit/resque",
@@ -2447,12 +2448,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fabpot/Twig.git",
-                "reference": "9ed963c99d0e5f10eeeb1a135d80389f4a56d866"
+                "reference": "46a58528de9d9fba7e281d4180519edb558c8f8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fabpot/Twig/zipball/9ed963c99d0e5f10eeeb1a135d80389f4a56d866",
-                "reference": "9ed963c99d0e5f10eeeb1a135d80389f4a56d866",
+                "url": "https://api.github.com/repos/fabpot/Twig/zipball/46a58528de9d9fba7e281d4180519edb558c8f8f",
+                "reference": "46a58528de9d9fba7e281d4180519edb558c8f8f",
                 "shasum": ""
             },
             "require": {
@@ -2488,7 +2489,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2014-01-24 15:03:15"
+            "time": "2014-01-28 06:09:19"
         },
         {
             "name": "webignition/absolute-url-deriver",
@@ -3132,16 +3133,16 @@
         },
         {
             "name": "webignition/node-jslint-wrapper",
-            "version": "0.2.1",
+            "version": "0.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/node-jslint-wrapper.git",
-                "reference": "38cf33a16242926b9d38a1d8ed5e7b4cc133eb62"
+                "reference": "a18e3d51abaad009d8d42ae856ee6d25c33de4cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-wrapper/zipball/38cf33a16242926b9d38a1d8ed5e7b4cc133eb62",
-                "reference": "38cf33a16242926b9d38a1d8ed5e7b4cc133eb62",
+                "url": "https://api.github.com/repos/webignition/node-jslint-wrapper/zipball/a18e3d51abaad009d8d42ae856ee6d25c33de4cb",
+                "reference": "a18e3d51abaad009d8d42ae856ee6d25c33de4cb",
                 "shasum": ""
             },
             "require": {
@@ -3178,7 +3179,7 @@
                 "jslint",
                 "wrapper"
             ],
-            "time": "2014-01-26 18:18:53"
+            "time": "2014-01-28 08:37:10"
         },
         {
             "name": "webignition/quoted-string",

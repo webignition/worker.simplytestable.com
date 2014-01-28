@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<title>blah</title>
+<script type="text/javascript" src="http://example.com/js/app.js"></script>
+</head>
+<body>
+<p>I'm the content</p>
+</body>
+</html>

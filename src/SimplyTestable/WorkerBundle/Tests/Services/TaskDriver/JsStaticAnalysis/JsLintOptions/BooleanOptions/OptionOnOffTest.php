@@ -24,9 +24,7 @@ abstract class OptionOnOffTest extends TaskDriverTest {
         $expectedErrorCount = ($value === '1') ? 0 : 1;
         
         $this->assertEquals(0, $this->getTaskService()->perform($task));     
-        $this->assertEquals($expectedErrorCount, $task->getOutput()->getErrorCount());           
-        
-        
+        $this->assertEquals($expectedErrorCount, $task->getOutput()->getErrorCount());                   
     }
     
     private function getOptionNameFromClassName($className) {

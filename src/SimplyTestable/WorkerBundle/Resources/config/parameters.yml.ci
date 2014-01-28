@@ -21,7 +21,7 @@ parameters:
         - "JS static analysis"        
       properties:
         node-path: /usr/bin/nodejs
-        node-jslint-path: /usr/share/node-jslint/node_modules/jslint/bin 
+        node-jslint-path: /usr/share/node-jslint/node_modules/jslint/bin/jslint.js 
     url-discovery:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver
       task-types:

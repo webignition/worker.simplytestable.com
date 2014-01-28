@@ -10,6 +10,9 @@ services:
   simplytestable.services.cssValidatorWrapperService:
     class:  webignition\CssValidatorWrapper\Mock\Wrapper
     
+  simplytestable.services.nodeJslintWrapperService:
+    class:  webignition\NodeJslint\Wrapper\Mock\Wrapper     
+    
   simplytestable.services.requestservice:
     class:   SimplyTestable\WorkerBundle\Services\TestRequestService    
     
