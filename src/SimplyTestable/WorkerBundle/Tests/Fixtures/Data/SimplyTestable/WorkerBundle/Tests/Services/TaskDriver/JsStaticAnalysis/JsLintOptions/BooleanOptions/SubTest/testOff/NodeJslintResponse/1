@@ -1,0 +1,1 @@
+["/tmp/e191987cec9f967a597eadd5403641a4:495:1390911528.0482.js",[{"id":"(error)","raw":"['{a}'] is better written in dot notation.","code":"subscript","evidence":"result = collection['a'];","line":4,"character":21,"a":"a","reason":"['a'] is better written in dot notation."}]]

@@ -1,0 +1,1 @@
+["/tmp/2b42e02f90e165fc53c443a15af23254:489:1390911456.2791.js",[{"id":"(error)","raw":"Insecure '{a}'.","code":"insecure_a","evidence":"var foo = /./.match('bar');","line":1,"character":12,"a":".","reason":"Insecure '.'."}]]

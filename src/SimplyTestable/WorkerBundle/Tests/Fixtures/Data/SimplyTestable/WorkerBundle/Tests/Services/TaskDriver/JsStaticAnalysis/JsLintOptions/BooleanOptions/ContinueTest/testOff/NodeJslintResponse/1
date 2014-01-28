@@ -1,0 +1,1 @@
+["/tmp/d9aa6d17f451e0c7f5eee62e74345356:444:1390910918.2632.js",[{"id":"(error)","raw":"Unexpected '{a}'.","code":"unexpected_a","evidence":"        continue;","line":7,"character":9,"a":"continue","reason":"Unexpected 'continue'."}]]

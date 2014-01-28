@@ -4,7 +4,15 @@ namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis
 
 use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\TaskDriverTest;
 
-class DefaultTest extends TaskDriverTest {    
+class DefaultTest extends TaskDriverTest {
+    
+    public function setUp() {
+        parent::setUp();
+        
+        $this->container->get('simplytestable.services.nodeJsLintWrapperService')->setValidatorRawOutput(
+            file_get_contents($this->getFixturesDataPath($this->getName() . '/NodeJslintResponse/1'))
+        );         
+    }
     
     public function testEvidenceIsTruncated() {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath($this->getName()) . '/HttpResponses'));    
@@ -21,10 +29,6 @@ class DefaultTest extends TaskDriverTest {
         $this->setExpectedException('webignition\NodeJslintOutput\Exception', 'node-jslint not found at "/home/example/node_modules/jslint/bin/jslint.js"', 3);
         
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath($this->getName()) . '/HttpResponses'));    
-        
-        $this->container->get('simplytestable.services.nodeJsLintWrapperService')->setValidatorRawOutput(
-            file_get_contents($this->getFixturesDataPath($this->getName() . '/NodeJslintResponse/IncorrectNodeJslintPathOutput.txt'))
-        ); 
         
         $task = $this->getDefaultTask();
         $this->getTaskService()->perform($task);

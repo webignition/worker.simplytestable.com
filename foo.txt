@@ -1,0 +1,10 @@
+PHPUnit 3.7.28 by Sebastian Bergmann.
+
+Configuration read from /home/jon/www/worker.simplytestable.com/app/phpunit.xml.dist
+
+..
+
+Time: 472 ms, Memory: 24.75Mb
+
+[30;42m[2KOK (2 tests, 4 assertions)
+[0m[2K

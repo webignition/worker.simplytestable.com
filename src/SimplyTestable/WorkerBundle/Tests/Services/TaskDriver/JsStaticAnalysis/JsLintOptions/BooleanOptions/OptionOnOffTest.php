@@ -6,6 +6,16 @@ use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\TaskD
 
 abstract class OptionOnOffTest extends TaskDriverTest {
     
+    public function setUp() {
+        parent::setUp();
+        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath() . '/HttpResponses'));
+        
+        $this->container->get('simplytestable.services.nodeJsLintWrapperService')->setValidatorRawOutput(
+            file_get_contents($this->getFixturesDataPath($this->getName() . '/NodeJslintResponse/1'))
+        );   
+    }    
+    
     protected function offTest($className) {          
         $this->withValueTest($className, '0');     
     }    
@@ -14,9 +24,7 @@ abstract class OptionOnOffTest extends TaskDriverTest {
         $this->withValueTest($className, '1');    
     }
     
-    private function withValueTest($className, $value) {
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(null) . '/HttpResponses'));        
-        
+    private function withValueTest($className, $value) {        
         $task = $this->getTask('http://example.com/', array(
             'jslint-option-'.$this->getOptionNameFromClassName($className) => $value
         ));

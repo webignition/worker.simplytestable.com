@@ -1,0 +1,1 @@
+["/tmp/a1695a1ddaf21bf8f88fe41afdbb83b2:499:1390911565.4159.js",[{"id":"(error)","raw":"Expected '{a}' at column {b}, not column {c}.","code":"expected_a_at_b_c","evidence":"  foo = 2;","line":2,"character":3,"a":"foo","b":1,"c":3,"reason":"Expected 'foo' at column 1, not column 3."}]]

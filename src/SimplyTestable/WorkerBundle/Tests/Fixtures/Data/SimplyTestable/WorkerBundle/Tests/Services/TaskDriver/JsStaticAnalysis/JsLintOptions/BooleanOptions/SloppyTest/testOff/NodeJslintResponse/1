@@ -1,0 +1,1 @@
+["/tmp/e96889943468cc30453a1efd037fd716:491:1390911484.7537.js",[{"id":"(error)","raw":"Missing 'use strict' statement.","code":"missing_use_strict","evidence":"    a = a + a;","line":2,"character":5,"a":"a","reason":"Missing 'use strict' statement."}]]
