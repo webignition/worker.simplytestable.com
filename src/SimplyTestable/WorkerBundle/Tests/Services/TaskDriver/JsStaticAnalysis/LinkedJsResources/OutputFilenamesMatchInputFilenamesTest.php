@@ -13,7 +13,11 @@ class OutputFilenamesMatchInputFilenamesTest extends TaskDriverTest {
             file_get_contents($this->getFixturesDataPath() . '/HttpResponses/1_root_resource.200.httpresponse'),
             "HTTP/1.0 200 OK\nContent-Type:application/javascript",
             "HTTP/1.0 200 OK\nContent-Type:application/javascript",
-        )));        
+        )));  
+        
+        $this->container->get('simplytestable.services.nodeJsLintWrapperService')->setValidatorRawOutput(
+            file_get_contents($this->getFixturesDataPath($this->getName()) . '/NodeJslintResponse/1')
+        );         
     }    
     
     public function testOutputFilenamesMatchInputFilenames() {

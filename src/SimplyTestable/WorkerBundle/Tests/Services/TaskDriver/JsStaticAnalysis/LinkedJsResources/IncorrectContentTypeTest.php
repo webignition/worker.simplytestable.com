@@ -6,6 +6,15 @@ use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\TaskD
 
 class IncorrectContentTypeTest extends TaskDriverTest {  
     
+    public function setUp() {
+        parent::setUp();
+        
+        $this->container->get('simplytestable.services.nodeJsLintWrapperService')->setValidatorRawOutput(
+            file_get_contents($this->getFixturesDataPath($this->getName()) . '/NodeJslintResponse/1')
+        );          
+    }
+    
+    
     public function testNoInvalidContentTypes() {
         $this->setHttpFixtures($this->buildHttpFixtureSet(array(
             file_get_contents($this->getFixturesDataPath() . '/HttpResponses/1_root_resource.200.httpresponse'),
