@@ -6,9 +6,14 @@ use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
-class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {    
+class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
     
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
+    
+    private $equivalentSchemes = array(
+        'http',
+        'https'
+    );
 
     
     public function __construct() {
@@ -49,12 +54,13 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    protected function performValidation() {          
-        $fragment = $this->webResource->getContent();
+    protected function performValidation() {         
+        $fragment = $this->webResource->getContent();        
         $finder = new HtmlDocumentLinkUrlFinder();
         $finder->setSourceContent($fragment);
         $finder->setSourceUrl($this->webResource->getUrl());
         $finder->setElementScope('a');
+        $finder->getUrlScopeComparer()->addEquivalentSchemes($this->equivalentSchemes);
         
         if ($this->task->hasParameter('scope')) {
             $finder->setUrlScope($this->task->getParameter('scope'));

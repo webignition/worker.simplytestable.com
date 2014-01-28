@@ -113,6 +113,25 @@ class DefaultTest extends TaskDriverTest {
             'http://example.com/two',
             'http://example.com/foo/bar.html',
         ), json_decode($task->getOutput()->getOutput()));             
-    }     
+    }  
+    
+    
+    public function testDiscoverUrlsWithEquivalentSchemes() {        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
+        
+        $task = $this->getTask('http://example.com/', array(
+            'scope' => array(
+                'http://example.com/',
+                'http://www.example.com/'
+            )
+        ));        
+
+        $this->assertEquals(0, $this->getTaskService()->perform($task)); 
+        
+        $this->assertEquals(array(
+            'https://example.com/',
+            'https://example.com/contact/'
+        ), json_decode($task->getOutput()->getOutput()));           
+    }
     
 }
