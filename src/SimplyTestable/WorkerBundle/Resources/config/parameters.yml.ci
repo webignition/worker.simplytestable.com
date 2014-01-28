@@ -22,6 +22,7 @@ parameters:
       properties:
         node-path: /usr/bin/nodejs
         node-jslint-path: /usr/share/node-jslint/node_modules/jslint/bin/jslint.js 
+        node-jslint-wrapper.service: simplytestable.services.nodeJslintWrapperService
     url-discovery:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver
       task-types:
