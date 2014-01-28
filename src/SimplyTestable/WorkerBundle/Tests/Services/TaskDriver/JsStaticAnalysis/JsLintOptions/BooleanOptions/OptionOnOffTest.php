@@ -2,19 +2,9 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\JsLintOptions\BooleanOptions;
 
-use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\TaskDriverTest;
+use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\JsLintOptions\JsLintOptionsTest;
 
-abstract class OptionOnOffTest extends TaskDriverTest {
-    
-    public function setUp() {
-        parent::setUp();
-        
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath() . '/HttpResponses'));
-        
-        $this->container->get('simplytestable.services.nodeJsLintWrapperService')->setValidatorRawOutput(
-            file_get_contents($this->getFixturesDataPath($this->getName() . '/NodeJslintResponse/1'))
-        );   
-    }    
+abstract class OptionOnOffTest extends JsLintOptionsTest {
     
     protected function offTest($className) {          
         $this->withValueTest($className, '0');     

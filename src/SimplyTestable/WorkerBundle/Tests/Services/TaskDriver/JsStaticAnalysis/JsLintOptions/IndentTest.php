@@ -2,21 +2,9 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\JsLintOptions;
 
-use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\TaskDriverTest;
-
-class IndentTest extends TaskDriverTest {
+class IndentTest extends JsLintOptionsTest {
     
-    const NON_FILTERED_ERROR_COUNT = 1;
-    
-    public function setUp() {
-        parent::setUp();
-        
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath() . '/HttpResponses'));
-        
-        $this->container->get('simplytestable.services.nodeJsLintWrapperService')->setValidatorRawOutput(
-            file_get_contents($this->getFixturesDataPath($this->getName() . '/NodeJslintResponse/1'))
-        );     
-    }     
+    const NON_FILTERED_ERROR_COUNT = 1;   
     
     /**
      * @group standard
