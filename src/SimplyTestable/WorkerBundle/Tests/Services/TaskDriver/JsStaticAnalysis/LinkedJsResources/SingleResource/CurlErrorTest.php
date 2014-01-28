@@ -25,8 +25,20 @@ class CurlErrorTest extends TaskDriverTest {
         $this->assertEquals($this->getTestedStatusCode(), $decodedTaskOutput['http://example.com/js/one.js']['errorReport']['statusCode']);
     }    
     
+    
+    /**
+     * @group standard
+     */      
     public function test6() {}
+    
+    /**
+     * @group standard
+     */      
     public function test28() {}
+    
+    /**
+     * @group standard
+     */      
     public function test55() {}
     
     

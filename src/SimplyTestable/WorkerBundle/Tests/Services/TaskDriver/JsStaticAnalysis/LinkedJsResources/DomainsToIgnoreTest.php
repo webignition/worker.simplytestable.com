@@ -20,6 +20,10 @@ class DomainsToIgnoreTest extends TaskDriverTest {
         );         
     }    
     
+    
+    /**
+     * @group standard
+     */      
     public function testIgnoreNoDomains() {
         $task = $this->getDefaultTask();
         $this->getTaskService()->perform($task);
@@ -28,6 +32,10 @@ class DomainsToIgnoreTest extends TaskDriverTest {
         $this->assertEquals(2, count($decodedTaskOutput));
     }
     
+
+    /**
+     * @group standard
+     */      
     public function testIgnoreDomainsOneOfTwo() {        
         $task = $this->getTask('http://example.com/', array(
             'domains-to-ignore' => array(
@@ -42,6 +50,10 @@ class DomainsToIgnoreTest extends TaskDriverTest {
         $this->assertTrue(isset($decodedTaskOutput['http://two.example.com/js/one.js']));
     }    
     
+    
+    /**
+     * @group standard
+     */      
     public function testIgnoreDomainsTwoOfTwo() {        
         $task = $this->getTask('http://example.com/', array(
             'domains-to-ignore' => array(
@@ -56,6 +68,10 @@ class DomainsToIgnoreTest extends TaskDriverTest {
         $this->assertTrue(isset($decodedTaskOutput['http://one.example.com/js/one.js']));        
     }    
     
+    
+    /**
+     * @group standard
+     */      
     public function testIgnoreDomainsOneAndTwoOfTwo() {        
         $task = $this->getTask('http://example.com/', array(
             'domains-to-ignore' => array(

@@ -20,6 +20,10 @@ class OutputFilenamesMatchInputFilenamesTest extends TaskDriverTest {
         );         
     }    
     
+    
+    /**
+     * @group standard
+     */      
     public function testOutputFilenamesMatchInputFilenames() {
         $task = $this->getDefaultTask();
         $this->getTaskService()->perform($task);

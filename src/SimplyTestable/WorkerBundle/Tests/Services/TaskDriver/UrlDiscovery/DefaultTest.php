@@ -65,6 +65,9 @@ class DefaultTest extends TaskDriverTest {
     }
     
     
+    /**
+     * @group standard
+     */      
     public function testDiscoveredRelativeUrlsAreReportedInAbsoluteFormInOutput() { 
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
@@ -80,6 +83,10 @@ class DefaultTest extends TaskDriverTest {
         ), json_decode($task->getOutput()->getOutput()));             
     }
     
+    
+    /**
+     * @group standard
+     */      
     public function testDiscoveredUrlsAreOfCorrectAbsoluteForm() {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
         
@@ -96,6 +103,9 @@ class DefaultTest extends TaskDriverTest {
     }    
     
     
+    /**
+     * @group standard
+     */      
     public function testDiscoveredUrlsWithRelativeBaseHrefAreOfCorrectAbsoluteForm() { 
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
         
@@ -116,6 +126,9 @@ class DefaultTest extends TaskDriverTest {
     }  
     
     
+    /**
+     * @group standard
+     */      
     public function testDiscoverUrlsWithEquivalentSchemes() {        
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
         

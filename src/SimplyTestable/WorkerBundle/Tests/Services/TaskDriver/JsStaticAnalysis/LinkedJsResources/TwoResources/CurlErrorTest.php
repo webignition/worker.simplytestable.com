@@ -16,7 +16,18 @@ class CurlErrorTest extends TransportErrorTest {
         );
     }    
     
+    /**
+     * @group standard
+     */      
     public function test6() {}
+    
+    /**
+     * @group standard
+     */      
     public function test28() {}
+    
+    /**
+     * @group standard
+     */      
     public function test55() {}
 }

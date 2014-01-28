@@ -4,9 +4,24 @@ namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis
 
 class HttpErrorTest extends TransportErrorTest {   
     
+    /**
+     * @group standard
+     */      
     public function test401() {}
+    
+    /**
+     * @group standard
+     */      
     public function test404() {}
+    
+    /**
+     * @group standard
+     */      
     public function test500() {}
+    
+    /**
+     * @group standard
+     */      
     public function test503() {}    
     
     protected function getTransportFixtures() {

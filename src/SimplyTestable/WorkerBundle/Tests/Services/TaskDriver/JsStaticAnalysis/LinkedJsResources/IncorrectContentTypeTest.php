@@ -15,6 +15,9 @@ class IncorrectContentTypeTest extends TaskDriverTest {
     }
     
     
+    /**
+     * @group standard
+     */      
     public function testNoInvalidContentTypes() {
         $this->setHttpFixtures($this->buildHttpFixtureSet(array(
             file_get_contents($this->getFixturesDataPath() . '/HttpResponses/1_root_resource.200.httpresponse'),
@@ -30,6 +33,10 @@ class IncorrectContentTypeTest extends TaskDriverTest {
         $this->assertEquals(array(), $decodedTaskOutput['http://example.com/js/two.js']['entries']);
     }
     
+    
+    /**
+     * @group standard
+     */      
     public function testInvalidContentTypeOneOfTwo() {
         $invalidContentType = 'foo/bar';        
         $this->setHttpFixtures($this->buildHttpFixtureSet(array(
@@ -49,6 +56,10 @@ class IncorrectContentTypeTest extends TaskDriverTest {
         $this->assertEquals(array(), $decodedTaskOutput['http://example.com/js/two.js']['entries']);
     }
 
+    
+    /**
+     * @group standard
+     */      
     public function testInvalidContentTypeTwoOfTwo() {
         $invalidContentType = 'foo/bar';        
         $this->setHttpFixtures($this->buildHttpFixtureSet(array(
@@ -69,6 +80,10 @@ class IncorrectContentTypeTest extends TaskDriverTest {
         
     } 
     
+    
+    /**
+     * @group standard
+     */      
     public function testInvalidContentTypeOneAndTwoOfTwo() {
         $invalidContentType = 'foo/bar';        
         $this->setHttpFixtures($this->buildHttpFixtureSet(array(

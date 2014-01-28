@@ -14,6 +14,10 @@ class DefaultTest extends TaskDriverTest {
         );         
     }
     
+    
+    /**
+     * @group standard
+     */      
     public function testEvidenceIsTruncated() {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath($this->getName()) . '/HttpResponses'));    
 
@@ -25,6 +29,9 @@ class DefaultTest extends TaskDriverTest {
     }
     
     
+    /**
+     * @group standard
+     */      
     public function testIncorrectPathToNodeJslint() {
         $this->setExpectedException('webignition\NodeJslintOutput\Exception', 'node-jslint not found at "/home/example/node_modules/jslint/bin/jslint.js"', 3);
         

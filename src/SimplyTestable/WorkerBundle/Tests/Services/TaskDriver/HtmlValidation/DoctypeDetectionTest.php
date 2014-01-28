@@ -94,6 +94,9 @@ class DoctypeDetectionTest extends TaskDriverTest {
     }  
     
     
+    /**
+     * @group standard
+     */      
     public function testWhitespaceInDoctypeFpiDoesNotHinderDoctypeDetectionOrExtraction() {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         

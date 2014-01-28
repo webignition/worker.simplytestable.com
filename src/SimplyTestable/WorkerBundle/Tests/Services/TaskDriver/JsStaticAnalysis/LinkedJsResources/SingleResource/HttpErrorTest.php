@@ -26,9 +26,28 @@ class HttpErrorTest extends TaskDriverTest {
         $this->assertEquals($this->getTestedStatusCode(), $decodedTaskOutput['http://example.com/js/one.js']['errorReport']['statusCode']);
     }    
     
+    
+    /**
+     * @group standard
+     */      
     public function test401() {}
+    
+    
+    /**
+     * @group standard
+     */      
     public function test404() {}
+    
+    
+    /**
+     * @group standard
+     */      
     public function test500() {}
+    
+    
+    /**
+     * @group standard
+     */      
     public function test503() {}
     
     

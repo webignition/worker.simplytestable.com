@@ -122,6 +122,9 @@ class DefaultTest extends TaskDriverTest {
     } 
     
     
+    /**
+     * @group standard
+     */      
     public function testPerformWithExcludedUrls() {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         
@@ -175,6 +178,9 @@ class DefaultTest extends TaskDriverTest {
     }    
     
     
+    /**
+     * @group standard
+     */      
     public function testPerformWithExcludedDomains() {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
         

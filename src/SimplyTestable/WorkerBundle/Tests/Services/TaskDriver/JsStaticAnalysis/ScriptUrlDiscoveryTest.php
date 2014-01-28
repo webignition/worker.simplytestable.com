@@ -6,6 +6,10 @@ use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\TaskD
 
 class ScriptUrlDiscoveryTest extends TaskDriverTest {
     
+    
+    /**
+     * @group standard
+     */      
     public function testDiscoveredScriptUrlsAreRelativeToWebPageUrlNotTaskUrl() {
         $this->container->get('simplytestable.services.nodeJsLintWrapperService')->enableDeferToParentIfNoRawOutput();
         
