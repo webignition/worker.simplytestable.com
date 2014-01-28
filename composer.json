@@ -40,7 +40,7 @@
         "webignition/web-resource-service":">=0.3",
         "webignition/html-document-type-extractor":">=0.1.1,<1.0",
         "webignition/html-document-type-validator":">=0.1,<1.0",
-        "webignition/node-jslint-wrapper":">=0.2.2,<1"
+        "webignition/node-jslint-wrapper":">=0.2.2.1,<1"
     },
     "scripts": {
         "post-install-cmd": [
