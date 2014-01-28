@@ -152,11 +152,20 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         $this->response->setErrorCount($errorCount);
         
-        foreach ($jsLintOutput as $sourcePath => $sourcePathOutput) {
-            if (preg_match('/^\/tmp\/[a-z0-9]{32}:[0-9]+:[0-9]+\.[0-9]+$/', $sourcePathOutput['statusLine'])) {
+        foreach ($jsLintOutput as $sourcePath => $sourcePathOutput) {            
+            if (preg_match('/^\/tmp\/[a-z0-9]{32}:[0-9]+:[0-9]+\.[0-9]+\.js$/', $sourcePathOutput['statusLine'])) {
                 $jsLintOutput[$sourcePath]['statusLine'] = substr($sourcePathOutput['statusLine'], 0, strpos($sourcePathOutput['statusLine'], ':'));
             }
         }
+        
+        foreach ($jsLintOutput as $sourcePath => $sourcePathOutput) {            
+            if (preg_match('/^file:\/tmp\/[a-z0-9]{32}:[0-9]+:[0-9]+\.[0-9]+\.js$/', $sourcePath)) {
+                $newSourcePath = preg_replace('/^file:\/tmp\//', '', $sourcePath);
+                $firstColonPosition = strpos($newSourcePath, ':');                
+                $jsLintOutput[substr($newSourcePath, 0, $firstColonPosition)] = $sourcePathOutput;
+                unset($jsLintOutput[$sourcePath]);             
+            }
+        }        
         
         return json_encode($jsLintOutput);
     }
@@ -266,29 +275,31 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $nodeJslintWrapper->getConfiguration()->setNodePath($this->getProperty('node-path'));        
         
         $parametersObject = $this->task->getParametersObject();        
-        foreach ($parametersObject as $key => $value) {
-            if (!$this->isJslintParameter($key)) {
-                continue;
-            }
-            
-            $jsLintKey = str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key);
-            
-            if ($this->isJslintBooleanParameter($jsLintKey)) {
-                if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
-                    $nodeJslintWrapper->getConfiguration()->enableFlag($jsLintKey);
-                } else {
-                    $nodeJslintWrapper->getConfiguration()->disableFlag($jsLintKey);
-                }                
-            } elseif ($this->isJsLintSingleOccurrenceOptionParameter($jsLintKey)) {                
-                $nodeJslintWrapper->getConfiguration()->setOption($jsLintKey, $value);
-            } elseif ($this->isJslintCollectionOptionParameter($jsLintKey)) {
-                if (is_array($value)) {
-                    $value = $value[0];
+        if (!is_null($parametersObject)) {
+            foreach ($parametersObject as $key => $value) {
+                if (!$this->isJslintParameter($key)) {
+                    continue;
                 }
-                
-                $nodeJslintWrapper->getConfiguration()->setOption($jsLintKey, explode(' ', $value));                   
-            }
-        }      
+
+                $jsLintKey = str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key);
+
+                if ($this->isJslintBooleanParameter($jsLintKey)) {
+                    if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+                        $nodeJslintWrapper->getConfiguration()->enableFlag($jsLintKey);
+                    } else {
+                        $nodeJslintWrapper->getConfiguration()->disableFlag($jsLintKey);
+                    }                
+                } elseif ($this->isJsLintSingleOccurrenceOptionParameter($jsLintKey)) {                
+                    $nodeJslintWrapper->getConfiguration()->setOption($jsLintKey, $value);
+                } elseif ($this->isJslintCollectionOptionParameter($jsLintKey)) {
+                    if (is_array($value)) {
+                        $value = $value[0];
+                    }
+
+                    $nodeJslintWrapper->getConfiguration()->setOption($jsLintKey, explode(' ', $value));                   
+                }
+            }             
+        }     
     }
     
     
