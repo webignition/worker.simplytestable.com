@@ -8,12 +8,20 @@ class MaxErrTest extends TaskDriverTest {
     
     const NON_FILTERED_ERROR_COUNT = 5;    
     
+    public function setUp() {
+        parent::setUp();
+        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath() . '/HttpResponses'));
+        
+        $this->container->get('simplytestable.services.nodeJsLintWrapperService')->setValidatorRawOutput(
+            file_get_contents($this->getFixturesDataPath($this->getName() . '/NodeJslintResponse/1'))
+        );     
+    }       
+    
     /**
      * @group standard
      */    
-    public function testNoMaxErr() {        
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath()));
-        
+    public function testNoMaxErr() {                
         $task = $this->getDefaultTask();
         
         $this->assertEquals(0, $this->getTaskService()->perform($task));
@@ -51,9 +59,7 @@ class MaxErrTest extends TaskDriverTest {
     /**
      * @group standard
      */    
-    public function testMaxErr0() {
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath()));
-        
+    public function testMaxErr0() {        
         $task = $this->getTask('http://example.com/', array(
             'jslint-option-maxerr' => 0
         ));
@@ -64,20 +70,11 @@ class MaxErrTest extends TaskDriverTest {
     
     
     private function maxErrTest($maxErr) {                
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath()));        
-                
         $task = $this->getTask('http://example.com/', array(
             'jslint-option-maxerr' => $maxErr
         ));        
         
         $this->assertEquals(0, $this->getTaskService()->perform($task));
         $this->assertEquals($maxErr, $task->getOutput()->getErrorCount());        
-    }   
-    
-    protected function getFixturesDataPath($testName = null) {
-        $fixturesDataPathParts = explode('/', parent::getFixturesDataPath(__FUNCTION__));        
-        return implode('/', array_slice($fixturesDataPathParts, 0, count($fixturesDataPathParts) - 1)) . '/HttpResponses'; 
     }
-
-
 }

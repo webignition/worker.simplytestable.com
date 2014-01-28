@@ -8,12 +8,20 @@ class PassFailTest extends TaskDriverTest {
     
     const NON_FILTERED_ERROR_COUNT = 2;  
     
+    public function setUp() {
+        parent::setUp();
+        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath() . '/HttpResponses'));
+        
+        $this->container->get('simplytestable.services.nodeJsLintWrapperService')->setValidatorRawOutput(
+            file_get_contents($this->getFixturesDataPath($this->getName() . '/NodeJslintResponse/1'))
+        );     
+    }      
+    
     /**
      * @group standard
      */    
-    public function testOff() {
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath()));
-                
+    public function testOff() {                
         $task = $this->getTask('http://example.com/', array(
             'jslint-option-passfail' => 0
         ));
@@ -25,21 +33,12 @@ class PassFailTest extends TaskDriverTest {
     /**
      * @group standard
      */    
-    public function testOn() {        
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath()));
-        
+    public function testOn() {                
         $task = $this->getTask('http://example.com/', array(
             'jslint-option-passfail' => 1
         ));
 
         $this->assertEquals(0, $this->getTaskService()->perform($task));      
         $this->assertEquals(1, $task->getOutput()->getErrorCount());
-    }     
-    
-    protected function getFixturesDataPath($testName = null) {
-        $fixturesDataPathParts = explode('/', parent::getFixturesDataPath(__FUNCTION__));        
-        return implode('/', array_slice($fixturesDataPathParts, 0, count($fixturesDataPathParts) - 1)) . '/HttpResponses'; 
     }
-
-
 }

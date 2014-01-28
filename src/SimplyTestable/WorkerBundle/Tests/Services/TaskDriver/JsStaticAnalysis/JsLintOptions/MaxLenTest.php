@@ -6,12 +6,20 @@ use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\TaskD
 
 class MaxLenTest extends TaskDriverTest {
     
+    public function setUp() {
+        parent::setUp();
+        
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath() . '/HttpResponses'));
+        
+        $this->container->get('simplytestable.services.nodeJsLintWrapperService')->setValidatorRawOutput(
+            file_get_contents($this->getFixturesDataPath($this->getName() . '/NodeJslintResponse/1'))
+        );     
+    }    
+    
     /**
      * @group standard
      */    
-    public function testNoMaxLen() {        
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath()));
-        
+    public function testNoMaxLen() {
         $task = $this->getDefaultTask();
         
         $this->assertEquals(0, $this->getTaskService()->perform($task));
@@ -23,8 +31,6 @@ class MaxLenTest extends TaskDriverTest {
      * @group standard
      */    
     public function testMaxLen32() {          
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath()));
-        
         $task = $this->getTask('http://example.com/', array(
             'jslint-option-maxlen' => 32
         ));
@@ -38,20 +44,11 @@ class MaxLenTest extends TaskDriverTest {
      * @group standard
      */    
     public function testMaxLen31() {         
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath()));
-        
         $task = $this->getTask('http://example.com/', array(
             'jslint-option-maxlen' => 31
         ));
         
         $this->assertEquals(0, $this->getTaskService()->perform($task));
         $this->assertEquals(1, $task->getOutput()->getErrorCount());
-    }    
-    
-    protected function getFixturesDataPath($testName = null) {
-        $fixturesDataPathParts = explode('/', parent::getFixturesDataPath(__FUNCTION__));        
-        return implode('/', array_slice($fixturesDataPathParts, 0, count($fixturesDataPathParts) - 1)) . '/HttpResponses'; 
     }
-
-
 }
