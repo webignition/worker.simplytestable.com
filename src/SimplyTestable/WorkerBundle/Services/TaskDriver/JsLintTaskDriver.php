@@ -389,7 +389,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * 
      * @return array
      */
-    private function getScriptUrls() {
+    private function getScriptUrls() {        
         if ($this->webResource instanceof WebPage) {
             $webPage = clone $this->webResource;
         } else {
@@ -399,7 +399,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         
         $scriptUrls = array();
         
-        $thisUrl = new Url($this->task->getUrl());
+        $thisUrl = new Url($webPage->getUrl());
         
         $webPage->find('script')->each(function ($index, \DOMElement $domElement) use (&$scriptUrls, $thisUrl) {                       
             $src = trim($domElement->getAttribute('src'));           
