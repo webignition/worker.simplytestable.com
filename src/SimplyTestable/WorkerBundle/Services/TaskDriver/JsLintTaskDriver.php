@@ -248,7 +248,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return \webignition\NodeJslintOutput\NodeJslintOutput
      */
     private function validateJsFile($url) {
-        /* @var $nodeJslintWrapper \webignition\NodeJslint\Wrapper\Wrapper */
+        /* @var $nodeJslintWrapper \webignition\NodeJslint\Wrapper\Wrapper */        
         $nodeJslintWrapper = $this->getProperty('node-jslint-wrapper');
         $nodeJslintWrapper->getConfiguration()->setUrlToLint($url);
         
@@ -257,6 +257,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
 
     
     private function configureNodeJslintWrapper() {
+        $this->getHttpClientService()->get()->setUserAgent('ST Link JS Static Analysis Task Driver (http://bit.ly/RlhKCL)');
+        
         $baseRequest = $this->getHttpClientService()->get()->get();        
         if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
             $baseRequest->setAuth(
@@ -265,6 +267,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                 'any'
             );
         }
+        
+        $this->getHttpClientService()->get()->setUserAgent(null, true);
         
         /* @var $nodeJslintWrapper \webignition\NodeJslint\Wrapper\Wrapper */
         $nodeJslintWrapper = $this->getProperty('node-jslint-wrapper');
