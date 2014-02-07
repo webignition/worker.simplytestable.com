@@ -3,12 +3,9 @@
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use webignition\WebResource\WebPage\WebPage;
-use webignition\WebResource\WebResource;
-use webignition\WebResource\JsonDocument\JsonDocument;
-use SimplyTestable\WorkerBundle\Services\TaskDriver\W3cValidatorErrorParser;
-use webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier;
+use webignition\HtmlDocument\LinkChecker\LinkChecker;
+use webignition\HtmlDocument\LinkChecker\Configuration as LinkCheckerConfiguration;
 
 class LinkIntegrityTaskDriver extends WebResourceTaskDriver {    
     
@@ -53,33 +50,8 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    protected function performValidation() {            
-        $linkChecker = new \webignition\HtmlDocumentLinkChecker\HtmlDocumentLinkChecker();
-        $linkChecker->setWebPage($this->webResource);
-        $linkChecker->setHttpMethodList(array(
-            \webignition\HtmlDocumentLinkChecker\HtmlDocumentLinkChecker::HTTP_METHOD_GET
-        ));
-        
-        if ($this->task->hasParameter(self::EXCLUDED_URLS_PARAMETER_NAME)) {
-            $linkChecker->setUrlsToExclude($this->task->getParameter(self::EXCLUDED_URLS_PARAMETER_NAME));
-        }        
-        
-        if ($this->task->hasParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME)) {
-            $linkChecker->setDomainsToExclude($this->task->getParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME));
-        }  
-        
-        $linkChecker->enableToggleUrlEncoding();
-        
-        $this->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
-        
-        $linkChecker->setUserAgents($this->getProperty('user-agents'));
-        $linkChecker->setHttpClient($this->getHttpClientService()->get());
-        $linkChecker->setRetryOnBadResponse(false);
-       
-        $requestOptions = $linkChecker->getRequestOptions();
-        $requestOptions['timeout'] = 10;
-        
-        $linkChecker->setRequestOptions($requestOptions);
+    protected function performValidation() {
+        $linkChecker = $this->getLinkChecker();
 
         $linkCheckResults = $linkChecker->getAll();
         
@@ -87,6 +59,50 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
 
         $this->response->setErrorCount(count($linkChecker->getErrored()));                
         return json_encode($this->getOutputOject($linkCheckResults));
+    }
+    
+    
+    /**
+     * 
+     * @return \webignition\HtmlDocument\LinkChecker\LinkChecker
+     */
+    private function getLinkChecker() {
+        $linkChecker = new LinkChecker();
+        $linkChecker->setWebPage($this->webResource);
+        $linkChecker->getConfiguration()->setHttpMethodList(array(
+            LinkCheckerConfiguration::HTTP_METHOD_GET
+        ));
+        
+        if ($this->task->hasParameter(self::EXCLUDED_URLS_PARAMETER_NAME)) {
+            $linkChecker->getConfiguration()->setUrlsToExclude($this->task->getParameter(self::EXCLUDED_URLS_PARAMETER_NAME));
+        }        
+        
+        if ($this->task->hasParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME)) {
+            $linkChecker->getConfiguration()->setDomainsToExclude($this->task->getParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME));
+        }  
+        
+        $linkChecker->getConfiguration()->enableToggleUrlEncoding();
+        $linkChecker->getConfiguration()->disableRetryOnBadResponse();
+        
+        $this->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
+        
+        $linkChecker->getConfiguration()->setUserAgents($this->getProperty('user-agents'));
+        
+        $baseRequest = $this->getHttpClientService()->get()->createRequest('GET', 'http://www.example.com/', null, null, array(
+            'timeout' => 10
+        ));
+        
+        if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
+            $baseRequest->setAuth(
+                $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',
+                $this->task->hasParameter('http-auth-password') ? $this->task->getParameter('http-auth-password') : '',
+                'any'
+            );
+        }        
+        
+        $linkChecker->getConfiguration()->setBaseRequest($baseRequest);
+
+        return $linkChecker;       
     }
     
     

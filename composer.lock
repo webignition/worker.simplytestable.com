@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "dd0b4afa7ea7ac2967aab8823d5801bc",
+    "hash": "45c3a323f1b099b98c0cbb52c42603bf",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/annotations.git",
-                "reference": "a11349d39d85bef75a71bd69bd604ac4fb993f03"
+                "reference": "218d670dd2fbb96c515e2fb4f8f7104ae4d73edb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/annotations/zipball/a11349d39d85bef75a71bd69bd604ac4fb993f03",
-                "reference": "a11349d39d85bef75a71bd69bd604ac4fb993f03",
+                "url": "https://api.github.com/repos/doctrine/annotations/zipball/218d670dd2fbb96c515e2fb4f8f7104ae4d73edb",
+                "reference": "218d670dd2fbb96c515e2fb4f8f7104ae4d73edb",
                 "shasum": ""
             },
             "require": {
@@ -43,7 +43,7 @@
             ],
             "authors": [
                 {
-                    "name": "Jonathan H. Wage",
+                    "name": "Jonathan Wage",
                     "email": "jonwage@gmail.com",
                     "homepage": "http://www.jwage.com/",
                     "role": "Creator"
@@ -75,7 +75,7 @@
                 "docblock",
                 "parser"
             ],
-            "time": "2013-12-20 21:39:07"
+            "time": "2014-02-03 22:09:20"
         },
         {
             "name": "doctrine/cache",
@@ -157,12 +157,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/collections.git",
-                "reference": "e6d8f1240e10f268c8e8c30e9e88a12853f84695"
+                "reference": "b99c5c46c87126201899afe88ec490a25eedd6a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/collections/zipball/e6d8f1240e10f268c8e8c30e9e88a12853f84695",
-                "reference": "e6d8f1240e10f268c8e8c30e9e88a12853f84695",
+                "url": "https://api.github.com/repos/doctrine/collections/zipball/b99c5c46c87126201899afe88ec490a25eedd6a2",
+                "reference": "b99c5c46c87126201899afe88ec490a25eedd6a2",
                 "shasum": ""
             },
             "require": {
@@ -185,7 +185,7 @@
             ],
             "authors": [
                 {
-                    "name": "Jonathan H. Wage",
+                    "name": "Jonathan Wage",
                     "email": "jonwage@gmail.com",
                     "homepage": "http://www.jwage.com/",
                     "role": "Creator"
@@ -217,7 +217,7 @@
                 "collections",
                 "iterator"
             ],
-            "time": "2014-01-01 23:58:38"
+            "time": "2014-02-03 23:07:43"
         },
         {
             "name": "doctrine/common",
@@ -225,12 +225,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/common.git",
-                "reference": "a45d110f71c323e29f41eb0696fa230e3fa1b1b5"
+                "reference": "64e2a6ae51db05a1ea0525913ed0dcccdc523f01"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/common/zipball/a45d110f71c323e29f41eb0696fa230e3fa1b1b5",
-                "reference": "a45d110f71c323e29f41eb0696fa230e3fa1b1b5",
+                "url": "https://api.github.com/repos/doctrine/common/zipball/64e2a6ae51db05a1ea0525913ed0dcccdc523f01",
+                "reference": "64e2a6ae51db05a1ea0525913ed0dcccdc523f01",
                 "shasum": ""
             },
             "require": {
@@ -295,26 +295,40 @@
                 "persistence",
                 "spl"
             ],
-            "time": "2014-01-12 22:00:08"
+            "time": "2014-02-04 07:51:26"
         },
         {
             "name": "doctrine/data-fixtures",
-            "version": "v1.0.0-ALPHA3",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/data-fixtures.git",
-                "reference": "b29bad9738fada9486961f60542f2d2d77c7b501"
+                "reference": "83a910f62b01715f3ed7317f5a4996417a698177"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/data-fixtures/zipball/b29bad9738fada9486961f60542f2d2d77c7b501",
-                "reference": "b29bad9738fada9486961f60542f2d2d77c7b501",
+                "url": "https://api.github.com/repos/doctrine/data-fixtures/zipball/83a910f62b01715f3ed7317f5a4996417a698177",
+                "reference": "83a910f62b01715f3ed7317f5a4996417a698177",
                 "shasum": ""
             },
             "require": {
+                "doctrine/common": "~2.2",
                 "php": ">=5.3.2"
             },
+            "require-dev": {
+                "doctrine/orm": "~2.2"
+            },
+            "suggest": {
+                "doctrine/mongodb-odm": "For loading MongoDB ODM fixtures",
+                "doctrine/orm": "For loading ORM fixtures",
+                "doctrine/phpcr-odm": "For loading PHPCR ODM fixtures"
+            },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "Doctrine\\Common\\DataFixtures": "lib/"
@@ -337,7 +351,7 @@
             "keywords": [
                 "database"
             ],
-            "time": "2012-09-20 10:26:34"
+            "time": "2014-02-03 22:07:07"
         },
         {
             "name": "doctrine/dbal",
@@ -1458,12 +1472,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "740c63a7805a7ad53e3333d859b8753f68066bb6"
+                "reference": "c93adad8a34e8d06c296b212b8c36cf98f5458e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/740c63a7805a7ad53e3333d859b8753f68066bb6",
-                "reference": "740c63a7805a7ad53e3333d859b8753f68066bb6",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/c93adad8a34e8d06c296b212b8c36cf98f5458e7",
+                "reference": "c93adad8a34e8d06c296b212b8c36cf98f5458e7",
                 "shasum": ""
             },
             "require": {
@@ -1479,7 +1493,7 @@
                 "jackalope/jackalope-doctrine-dbal": "1.0.*",
                 "propel/propel1": "~1.7",
                 "symfony/filesystem": "2.*",
-                "symfony/form": ">=2.1,<2.2-dev",
+                "symfony/form": ">=2.1,<=2.4-dev",
                 "symfony/translation": ">=2.0,<2.2-dev",
                 "symfony/validator": ">=2.0,<2.2-dev",
                 "symfony/yaml": "2.*",
@@ -1520,7 +1534,7 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2014-01-22 21:43:11"
+            "time": "2014-02-05 08:00:03"
         },
         {
             "name": "jms/serializer-bundle",
@@ -2231,12 +2245,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/SwiftmailerBundle.git",
-                "reference": "fcefa9dbd5a1ed20547b0f8a2afd5ad6837ea321"
+                "reference": "1de70e7902fe7bb080f836e6d3f2c549d4397b94"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/SwiftmailerBundle/zipball/fcefa9dbd5a1ed20547b0f8a2afd5ad6837ea321",
-                "reference": "fcefa9dbd5a1ed20547b0f8a2afd5ad6837ea321",
+                "url": "https://api.github.com/repos/symfony/SwiftmailerBundle/zipball/1de70e7902fe7bb080f836e6d3f2c549d4397b94",
+                "reference": "1de70e7902fe7bb080f836e6d3f2c549d4397b94",
                 "shasum": ""
             },
             "require": {
@@ -2277,7 +2291,7 @@
             ],
             "description": "Symfony SwiftmailerBundle",
             "homepage": "http://symfony.com",
-            "time": "2013-11-21 12:29:01"
+            "time": "2014-02-04 14:11:17"
         },
         {
             "name": "symfony/symfony",
@@ -2431,12 +2445,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fabpot/Twig.git",
-                "reference": "46a58528de9d9fba7e281d4180519edb558c8f8f"
+                "reference": "5fd4db64de8398dedf5fcde3ec9c0dfdc910c81b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fabpot/Twig/zipball/46a58528de9d9fba7e281d4180519edb558c8f8f",
-                "reference": "46a58528de9d9fba7e281d4180519edb558c8f8f",
+                "url": "https://api.github.com/repos/fabpot/Twig/zipball/5fd4db64de8398dedf5fcde3ec9c0dfdc910c81b",
+                "reference": "5fd4db64de8398dedf5fcde3ec9c0dfdc910c81b",
                 "shasum": ""
             },
             "require": {
@@ -2463,7 +2477,7 @@
                     "email": "fabien@symfony.com"
                 },
                 {
-                    "name": "Armin Ronacher",
+                    "name": "Armin Ronacher2",
                     "email": "armin.ronacher@active-4.com"
                 }
             ],
@@ -2472,7 +2486,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2014-01-28 06:09:19"
+            "time": "2014-01-31 15:13:11"
         },
         {
             "name": "webignition/absolute-url-deriver",
@@ -2656,16 +2670,16 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "0.9",
+            "version": "0.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "a95a6ca667b2798c033728974bfe6e7dfea31bab"
+                "reference": "8bdb90d5924cd1c4b7f1ec099263a91e0f5ec685"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/a95a6ca667b2798c033728974bfe6e7dfea31bab",
-                "reference": "a95a6ca667b2798c033728974bfe6e7dfea31bab",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/8bdb90d5924cd1c4b7f1ec099263a91e0f5ec685",
+                "reference": "8bdb90d5924cd1c4b7f1ec099263a91e0f5ec685",
                 "shasum": ""
             },
             "require": {
@@ -2700,7 +2714,7 @@
                 "html",
                 "link"
             ],
-            "time": "2014-01-14 23:19:48"
+            "time": "2014-02-06 09:37:19"
         },
         {
             "name": "webignition/html-document-link-finder",
