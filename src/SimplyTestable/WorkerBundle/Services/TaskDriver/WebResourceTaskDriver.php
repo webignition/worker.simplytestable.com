@@ -162,6 +162,12 @@ abstract class WebResourceTaskDriver extends TaskDriver {
                 );
             }
             
+            if ($task->hasParameter('cookies')) {
+                foreach (json_decode($task->getParameter('cookies')) as $name => $value) {
+                    $request->addCookie($name, $value);
+                }          
+            }
+            
             return $this->getWebResourceService()->get($request);            
         } catch (WebResourceException $webResourceException) {
             $this->response->setHasFailed();
