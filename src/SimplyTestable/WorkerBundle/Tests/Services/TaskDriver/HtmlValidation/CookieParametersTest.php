@@ -4,7 +4,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\HtmlValidation;
 
 use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\HtmlValidation\TaskDriverTest;
 
-class CookieParameterTest extends TaskDriverTest {
+class CookieParametersTest extends TaskDriverTest {
     
     private $task;
     
@@ -21,7 +21,7 @@ class CookieParameterTest extends TaskDriverTest {
         ));
     }
     
-    public function testTest() {
+    public function testCookiesAreSetOnRootWebPageRequest() {
         $this->setHttpFixtures($this->buildHttpFixtureSet(array(
             'HTTP/1.0 200 OK'
         )));
@@ -31,8 +31,6 @@ class CookieParameterTest extends TaskDriverTest {
         foreach ($this->getHttpClientService()->getHistory()->getAll() as $httpTransaction) {
             $this->assertEquals($this->cookies, $httpTransaction['request']->getCookies());
         }
-        
-        
     }
     
 }

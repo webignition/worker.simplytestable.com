@@ -56,6 +56,13 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     private $tooManyRedirectsException = null;
     
     
+    /**
+     *
+     * @var \Guzzle\Http\Message\Request
+     */
+    private $baseRequest = null;
+    
+    
     public function execute(Task $task) {                        
         if (!$this->isCorrectTaskType($task)) {
             return false;
@@ -64,7 +71,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
         $this->task = $task;
         
         $this->getHttpClientService()->get()->setUserAgent('ST Web Resource Task Driver (http://bit.ly/RlhKCL)');
-        $this->webResource = $this->getWebResource($task);        
+        $this->webResource = $this->getWebResource();        
         $this->getHttpClientService()->get()->setUserAgent(null);        
 
         if (!$this->response->hasSucceeded()) {            
@@ -145,29 +152,42 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     
     abstract protected function performValidation();
     
+    
     /**
-     *
-     * @param Task $task
-     * @return WebResource 
+     * @return \Guzzle\Http\Message\Request
      */
-    protected function getWebResource(Task $task) {        
-        try {   
-            $request = $this->getHttpClientService()->getRequest($task->getUrl());
+    protected function getBaseRequest() {
+        if (is_null($this->baseRequest)) {
+            $baseRequest = $this->getHttpClientService()->getRequest($this->task->getUrl());
             
-            if ($task->hasParameter('http-auth-username') || $task->hasParameter('http-auth-password')) {
-                $request->setAuth(
-                    $task->hasParameter('http-auth-username') ? $task->getParameter('http-auth-username') : '',
-                    $task->hasParameter('http-auth-password') ? $task->getParameter('http-auth-password') : '',
+            if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
+                $baseRequest->setAuth(
+                    $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',
+                    $this->task->hasParameter('http-auth-password') ? $this->task->getParameter('http-auth-password') : '',
                     'any'
                 );
             }
             
-            if ($task->hasParameter('cookies')) {
-                foreach (json_decode($task->getParameter('cookies')) as $name => $value) {
-                    $request->addCookie($name, $value);
+            if ($this->task->hasParameter('cookies')) {
+                foreach (json_decode($this->task->getParameter('cookies')) as $name => $value) {
+                    $baseRequest->addCookie($name, $value);
                 }          
             }
             
+            $this->baseRequest = $baseRequest;
+        }
+        
+        return $this->baseRequest;
+    }
+    
+    
+    /**
+     *
+     * @return WebResource 
+     */
+    protected function getWebResource() {
+        try {   
+            $request = clone $this->getBaseRequest();            
             return $this->getWebResourceService()->get($request);            
         } catch (WebResourceException $webResourceException) {
             $this->response->setHasFailed();

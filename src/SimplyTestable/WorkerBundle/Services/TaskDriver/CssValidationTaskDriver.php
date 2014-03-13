@@ -58,14 +58,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
     }
 
     protected function performValidation() {
-        $baseRequest = $this->getHttpClientService()->get()->get();        
-        if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
-            $baseRequest->setAuth(
-                $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',
-                $this->task->hasParameter('http-auth-password') ? $this->task->getParameter('http-auth-password') : '',
-                'any'
-            );
-        }
+        $baseRequest = clone $this->getBaseRequest();
         
         /* @var $cssValidatorWrapper \webignition\CssValidatorWrapper\Wrapper */
         $cssValidatorWrapper = $this->getProperty('css-validator-wrapper');                
