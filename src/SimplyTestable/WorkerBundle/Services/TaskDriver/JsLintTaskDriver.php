@@ -259,16 +259,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     private function configureNodeJslintWrapper() {
         $this->getHttpClientService()->get()->setUserAgent('ST Link JS Static Analysis Task Driver (http://bit.ly/RlhKCL)');
         
-        $baseRequest = $this->getHttpClientService()->get()->get();        
-        if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
-            $baseRequest->setAuth(
-                $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',
-                $this->task->hasParameter('http-auth-password') ? $this->task->getParameter('http-auth-password') : '',
-                'any'
-            );
-        }
-        
-        $this->getHttpClientService()->get()->setUserAgent(null, true);
+        $baseRequest = clone $this->getBaseRequest();
         
         /* @var $nodeJslintWrapper \webignition\NodeJslint\Wrapper\Wrapper */
         $nodeJslintWrapper = $this->getProperty('node-jslint-wrapper');
