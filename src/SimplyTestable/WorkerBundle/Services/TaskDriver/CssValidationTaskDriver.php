@@ -60,6 +60,10 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
     protected function performValidation() {
         $baseRequest = clone $this->getBaseRequest();
         
+        foreach ($baseRequest->getCookies() as $name => $value) {
+            $baseRequest->removeCookie($name);
+        }
+        
         /* @var $cssValidatorWrapper \webignition\CssValidatorWrapper\Wrapper */
         $cssValidatorWrapper = $this->getProperty('css-validator-wrapper');                
         $cssValidatorWrapper->createConfiguration(array(
@@ -75,8 +79,9 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
             'domains-to-ignore' => $this->task->hasParameter('domains-to-ignore')
                 ? $this->task->getParameter('domains-to-ignore') 
                 : array(),
-            'base-request' => $baseRequest
-        ));
+            'base-request' => $baseRequest,
+            'cookies' => ($this->task->hasParameter('cookies')) ? json_decode($this->task->getParameter('cookies'), true) : array()
+        ));        
         
         $cssValidatorWrapper->getConfiguration()->getWebResourceService()->getConfiguration()->enableRetryWithUrlEncodingDisabled();
         

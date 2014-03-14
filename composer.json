@@ -36,11 +36,12 @@
         "webignition/html-document-link-checker":">=0.9.1,<1.0",
         "webignition/html-validator-wrapper":">=0.4.1",
         "webignition/html-validator-output-parser":">=0.6",
-        "webignition/css-validator-wrapper":">=0.9.5",
+        "webignition/css-validator-wrapper":">=0.9.6.1",
         "webignition/web-resource-service":">=0.3",
         "webignition/html-document-type-extractor":">=0.1.1,<1.0",
         "webignition/html-document-type-validator":">=0.1,<1.0",
-        "webignition/node-jslint-wrapper":">=0.2.2.1,<1"
+        "webignition/node-jslint-wrapper":">=0.2.2.1,<1",
+        "webignition/cookie-url-matcher":">=0.1,<1"
     },
     "scripts": {
         "post-install-cmd": [
@@ -60,6 +61,7 @@
         "bin-dir": "bin"
     },
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "extra": {
         "symfony-app-dir": "app",
         "symfony-web-dir": "web"

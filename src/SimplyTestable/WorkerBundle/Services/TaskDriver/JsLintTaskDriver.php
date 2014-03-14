@@ -247,12 +247,33 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @param type $url
      * @return \webignition\NodeJslintOutput\NodeJslintOutput
      */
-    private function validateJsFile($url) {
+    private function validateJsFile($url) {        
         /* @var $nodeJslintWrapper \webignition\NodeJslint\Wrapper\Wrapper */        
         $nodeJslintWrapper = $this->getProperty('node-jslint-wrapper');
         $nodeJslintWrapper->getConfiguration()->setUrlToLint($url);
         
-        return $nodeJslintWrapper->validate();
+        $baseRequest = $nodeJslintWrapper->getLocalProxy()->getConfiguration()->getBaseRequest();
+      
+        if (!is_null($baseRequest->getCookies())) {
+            foreach ($baseRequest->getCookies() as $name => $value) {
+                $baseRequest->removeCookie($name);
+            }               
+        }
+       
+        if ($this->task->hasParameter('cookies')) {
+            $cookieUrlMatcher = new \webignition\Cookie\UrlMatcher\UrlMatcher();
+            
+            foreach (json_decode($this->task->getParameter('cookies')) as $cookie) {
+                if ($cookieUrlMatcher->isMatch((array)$cookie, $url)) {
+                    $baseRequest->addCookie($cookie->name, $cookie->value);
+                }
+            }            
+        }
+        
+        $nodeJslintWrapper->getLocalProxy()->getConfiguration()->setBaseRequest($baseRequest);        
+        $response = $nodeJslintWrapper->validate();
+        
+        return $response;
     }
 
     

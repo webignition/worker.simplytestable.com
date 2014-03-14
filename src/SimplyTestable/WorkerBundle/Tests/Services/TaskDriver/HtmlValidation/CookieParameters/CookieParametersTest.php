@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\CookieParameters;
+namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\HtmlValidation\CookieParameters;
 
 use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\TaskDriverTest;
 
@@ -8,25 +8,39 @@ abstract class CookieParametersTest extends TaskDriverTest {
     
     protected $task;
     
-    abstract protected function getExpectedCookies();
+    private $cookies = array(
+        array(
+            'domain' => '.example.com',
+            'secure' => true,
+            'name' => 'key1',
+            'value' => 'value1'
+        ),
+        array(
+            'domain' => '.example.com',
+            'secure' => true,
+            'name' => 'key2',
+            'value' => 'value2'
+        )        
+    );  
+
+    abstract protected function getTaskUrl();
     abstract protected function getExpectedRequestsOnWhichCookiesShouldBeSet();
     abstract protected function getExpectedRequestsOnWhichCookiesShouldNotBeSet();
     
     public function setUp() {
         parent::setUp();
-        $this->task = $this->getTask('http://example.com/', array(
-            'cookies' => json_encode($this->getExpectedCookies())
+        $this->task = $this->getTask($this->getTaskUrl(), array(
+            'cookies' => json_encode($this->cookies)
         ));
         
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath('/HttpResponses')));
-        $this->container->get('simplytestable.services.cssValidatorWrapperService')->setCssValidatorRawOutput(
-            file_get_contents($this->getFixturesDataPath('../CssValidatorResponse/1'))
-        );  
+        $this->setHttpFixtures($this->buildHttpFixtureSet(array(
+            'HTTP/1.0 200 OK'
+        )));
         
         $this->getTaskService()->perform($this->task);
     }
     
-    public function testCookiesAreSetOnExpectedRequests() {  
+    public function testCookiesAreSetOnExpectedRequests() {
         foreach ($this->getExpectedRequestsOnWhichCookiesShouldBeSet() as $request) {         
             $this->assertEquals($this->getExpectedCookieValues(), $request->getCookies());
         }
@@ -36,7 +50,7 @@ abstract class CookieParametersTest extends TaskDriverTest {
         foreach ($this->getExpectedRequestsOnWhichCookiesShouldNotBeSet() as $request) {            
             $this->assertEmpty($request->getCookies());
         }
-    }    
+    }
     
     
     /**
@@ -46,7 +60,7 @@ abstract class CookieParametersTest extends TaskDriverTest {
     private function getExpectedCookieValues() {
         $nameValueArray = array();
         
-        foreach ($this->getExpectedCookies() as $cookie) {
+        foreach ($this->cookies as $cookie) {
             $nameValueArray[$cookie['name']] = $cookie['value'];
         }
         
