@@ -11,6 +11,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
     
     const EXCLUDED_URLS_PARAMETER_NAME = 'excluded-urls';
     const EXCLUDED_DOMAINS_PARAMETER_NAME = 'excluded-domains';
+    const COOKIES_PARAMETER_NAME = 'cookies';
     
     public function __construct() {
         $this->canCacheValidationOutput = false;
@@ -81,6 +82,10 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
             $linkChecker->getConfiguration()->setDomainsToExclude($this->task->getParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME));
         }  
         
+        if ($this->task->hasParameter(self::COOKIES_PARAMETER_NAME)) {
+            $linkChecker->getConfiguration()->setCookies(json_decode($this->task->getParameter(self::COOKIES_PARAMETER_NAME), true));
+        }
+        
         $linkChecker->getConfiguration()->enableToggleUrlEncoding();
         $linkChecker->getConfiguration()->disableRetryOnBadResponse();
         
@@ -88,18 +93,8 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
         
         $linkChecker->getConfiguration()->setUserAgents($this->getProperty('user-agents'));
         
-        $baseRequest = $this->getHttpClientService()->get()->createRequest('GET', 'http://www.example.com/', null, null, array(
-            'timeout' => 10
-        ));
-        
-        if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
-            $baseRequest->setAuth(
-                $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',
-                $this->task->hasParameter('http-auth-password') ? $this->task->getParameter('http-auth-password') : '',
-                'any'
-            );
-        }        
-        
+        $baseRequest = clone $this->getBaseRequest();
+        $baseRequest->getCurlOptions()->set(CURLOPT_TIMEOUT_MS, 10000);        
         $linkChecker->getConfiguration()->setBaseRequest($baseRequest);
 
         return $linkChecker;       

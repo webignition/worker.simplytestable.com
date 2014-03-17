@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "e48f997b45703570e1d9173dd2c45c88",
+    "hash": "42cd6c6b593c2836b9da20797cbf0b06",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2813,21 +2813,22 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "0.9.1",
+            "version": "0.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "8bdb90d5924cd1c4b7f1ec099263a91e0f5ec685"
+                "reference": "821689601bb493155aae8af3352321035970864f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/8bdb90d5924cd1c4b7f1ec099263a91e0f5ec685",
-                "reference": "8bdb90d5924cd1c4b7f1ec099263a91e0f5ec685",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/821689601bb493155aae8af3352321035970864f",
+                "reference": "821689601bb493155aae8af3352321035970864f",
                 "shasum": ""
             },
             "require": {
                 "guzzle/guzzle": ">=3.8.0,<4",
                 "php": ">=5.3.0",
+                "webignition/cookie-url-matcher": ">=0.1,<1",
                 "webignition/html-document-link-finder": ">=0.6,<1.0",
                 "webignition/url": ">=1.9.6",
                 "webignition/web-page-model": "0.6"
@@ -2857,7 +2858,7 @@
                 "html",
                 "link"
             ],
-            "time": "2014-02-06 09:37:19"
+            "time": "2014-03-17 10:19:59"
         },
         {
             "name": "webignition/html-document-link-finder",
