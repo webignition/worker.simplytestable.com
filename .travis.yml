@@ -38,15 +38,15 @@ before_script:
   #- cd $CI_HOME
   
   # Install nodejs and node-jslint
-  - sudo apt-get install python-software-properties python g++ make
-  - echo "yes" | sudo add-apt-repository ppa:chris-lea/node.js
-  - sudo apt-get update
-  - sudo apt-get install nodejs 
-  - sudo mkdir /usr/share/node-jslint && cd /usr/share/node-jslint && sudo npm install jslint@0.2.0
-  - cd $CI_HOME  
+  #- sudo apt-get install python-software-properties python g++ make
+  #- echo "yes" | sudo add-apt-repository ppa:chris-lea/node.js
+  #- sudo apt-get update
+  #- sudo apt-get install nodejs 
+  #- sudo mkdir /usr/share/node-jslint && cd /usr/share/node-jslint && sudo npm install jslint@0.2.0
+  #- cd $CI_HOME  
   
   # Test node-jslint
-  - /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js travis-ci/sample.js
+  #- /usr/bin/nodejs /usr/share/node-jslint/node_modules/jslint/bin/jslint.js travis-ci/sample.js
   
   # Install composer for dependency management
   - wget http://getcomposer.org/composer.phar 
@@ -67,14 +67,15 @@ before_script:
   - php app/console doctrine:fixtures:load --append  
   
   # Update /etc/hosts for html validator
-  - echo "5.9.84.201 html-validator.worker.simplytestable.com" | sudo tee --append /etc/hosts
+  #- echo "5.9.84.201 html-validator.worker.simplytestable.com" | sudo tee --append /etc/hosts
   
 script:
   - phpunit -c app --group standard
-  - phpunit -c app --group integration-standard-travis
+  #- phpunit -c app --group standard
+  #- phpunit -c app --group integration-standard-travis
   #- phpunit -c app --group integration-html-validation-travis
   #- phpunit -c app --group integration-css-validation-travis
-  - phpunit -c app --group integration-js-static-analysis-travis
+  #- phpunit -c app --group integration-js-static-analysis-travis
   
 after_failure:
   #- cat /home/travis/build/webignition/worker.simplytestable.com/app/logs/test.log | grep "response fixture path"
