@@ -6,9 +6,11 @@ use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
 class PerformAllCommandTest extends ConsoleCommandBaseTestCase {
     
-    public static function setUpBeforeClass() {
-        self::setupDatabase();        
-    }
+    protected function getAdditionalCommands() {
+        return array(
+            new \SimplyTestable\WorkerBundle\Command\Task\PerformAllCommand()
+        );
+    } 
 
     
     /**
@@ -28,7 +30,7 @@ class PerformAllCommandTest extends ConsoleCommandBaseTestCase {
             $this->getFixturesDataPath(__FUNCTION__ . '/HtmlValidatorResponses')
         );
         
-        $response = $this->runConsole('simplytestable:task:perform:all');          
+        $response = $this->executeCommand('simplytestable:task:perform:all');          
         
         $this->assertEquals(0, $response);
     } 

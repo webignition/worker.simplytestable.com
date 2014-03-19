@@ -5,8 +5,9 @@ namespace SimplyTestable\WorkerBundle\Tests\Controller;
 
 class MaintenanceControllerTest extends BaseControllerJsonTestCase {
     
-    public static function setUpBeforeClass() {
-        self::setupDatabaseIfNotExists();        
+    public function setUp() {
+        parent::setUp();
+        $this->removeAllTasks();
     }
 
     /**
@@ -32,8 +33,7 @@ class MaintenanceControllerTest extends BaseControllerJsonTestCase {
     /**
      * @group standard
      */    
-    public function testLeaveReadOnlyAction() {        
-        $this->setupDatabase();
+    public function testLeaveReadOnlyAction() {
         $response = $this->getMaintenanceController('leaveReadOnlyAction')->leaveReadOnlyAction();
         $this->assertEquals('["Set state to active","0 completed tasks ready to be enqueued","0 queued tasks ready to be enqueued"]', $response->getContent());
         $this->assertFalse($this->getWorkerService()->isMaintenanceReadOnly());

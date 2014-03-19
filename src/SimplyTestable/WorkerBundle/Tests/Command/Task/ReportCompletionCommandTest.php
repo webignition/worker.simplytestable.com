@@ -6,9 +6,11 @@ use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 
 class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
-    
-    public static function setUpBeforeClass() {
-        self::setupDatabaseIfNotExists();        
+
+    protected function getAdditionalCommands() {
+        return array(
+            new \SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand()
+        );
     }     
     
     
@@ -27,12 +29,11 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $task->setTimePeriod($taskTimePeriod);
 
         $this->createCompletedTaskOutputForTask($task);
+
+        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion', array(
+            'id' => $task->getId()
+        )));     
         
-        $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            $task->getId() => true
-        ));
-        
-        $this->assertEquals(0, $response);        
         $this->assertNull($this->getTaskService()->getById($createdTask->id));
     }
     
@@ -42,11 +43,9 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
      * @group standard
      */    
     public function testReportCompletionForInvalidTaskReturnsStatusCodeMinus2() {        
-        $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            -1 => true
-        ));
-        
-        $this->assertEquals(-2, $response);        
+        $this->assertEquals(-2, $this->executeCommand('simplytestable:task:reportcompletion', array(
+            'id' => -1
+        )));        
     }    
     
     /**
@@ -66,11 +65,9 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
 
         $this->createCompletedTaskOutputForTask($task);
         
-        $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            $task->getId() => true            
-        ));
-        
-        $this->assertEquals(404, $response);      
+        $this->assertEquals(404, $this->executeCommand('simplytestable:task:reportcompletion', array(
+            'id' => $task->getId()          
+        )));      
     }
     
     
@@ -94,13 +91,11 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         
         $task->setTimePeriod($taskTimePeriod);
 
-        $this->createCompletedTaskOutputForTask($task);
+        $this->createCompletedTaskOutputForTask($task);      
         
-        $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            $task->getId() => true            
-        ));
-        
-        $this->assertEquals(6, $response);      
+        $this->assertEquals(6, $this->executeCommand('simplytestable:task:reportcompletion', array(
+            'id' => $task->getId()          
+        )));        
     }
     
     
@@ -110,11 +105,9 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
     public function testReportCompletionInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {        
         $this->getWorkerService()->setReadOnly();
         
-        $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            1 => true
-        ));
-        
-        $this->assertEquals(-1, $response);
+        $this->assertEquals(-1, $this->executeCommand('simplytestable:task:reportcompletion', array(
+            'id' => 1          
+        )));        
     }
     
     
@@ -135,11 +128,9 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
 
         $this->createCompletedTaskOutputForTask($task);
         
-        $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            $task->getId() => true
-        ));
-        
-        $this->assertEquals(503, $response);
+        $this->assertEquals(503, $this->executeCommand('simplytestable:task:reportcompletion', array(
+            'id' => $task->getId()          
+        )));        
     }  
     
     /**
@@ -161,12 +152,11 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->assertNotNull($task->getId());
         $this->assertNotNull($task->getOutput()->getId());
         $this->assertNotNull($task->getTimePeriod()->getId());        
-        
-        $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            $task->getId() => true
-        ));
-        
-        $this->assertEquals(0, $response);        
+
+        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion', array(
+            'id' => $task->getId()          
+        )));        
+             
         $this->assertNull($this->getTaskService()->getById($createdTask->id));
         
         $this->assertNull($task->getId());
@@ -209,11 +199,9 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->assertTrue($task->hasParameter('http-auth-password'));
         $this->assertTrue($task->hasParameter('x-http-auth-tried'));
         
-        $response = $this->runConsole('simplytestable:task:reportcompletion', array(
-            $task->getId() => true
-        ));
-        
-        $this->assertEquals(0, $response);
+        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion', array(
+            'id' => $task->getId()          
+        )));        
         
         $this->assertTrue($task->hasParameter('http-auth-username'));
         $this->assertTrue($task->hasParameter('http-auth-password'));

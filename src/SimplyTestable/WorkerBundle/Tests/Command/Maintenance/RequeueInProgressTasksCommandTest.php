@@ -7,9 +7,17 @@ use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 
 class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase {
     
-    public static function setUpBeforeClass() {
-        self::setupDatabase();        
-    }     
+    public function setUp() {
+        parent::setUp();
+        $this->removeAllTasks();
+        //$this->setupDatabase();  
+    }
+    
+    protected function getAdditionalCommands() {
+        return array(
+            new \SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand(),
+        );
+    }    
 
     
     /**
@@ -22,12 +30,10 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase {
             'http://example.com/two/',
         );
         
-        $taskObjects = array();
-        
-        foreach ($urls as $url) {            
+        foreach ($urls as $index => $url) {            
             $task = $this->getTaskService()->getById($this->createTask($url, 'HTML validation')->id);
             
-            if ($task->getId() > 1) {
+            if ($index > 0) {
                 $task->setState($this->getTaskService()->getInProgressState());
 
                 $timePeriod = new TimePeriod();
@@ -45,9 +51,7 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase {
         
         $this->assertEquals(1, count($this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState())));
         $this->assertEquals(2, count($this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getInProgressState())));
-        
-        $this->assertEquals(0, $this->runConsole('simplytestable:maintenance:requeue-in-progress-tasks'));
-        
+        $this->assertEquals(0, $this->executeCommand('simplytestable:maintenance:requeue-in-progress-tasks'));
         $this->assertEquals(3, count($this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState())));        
     }
 

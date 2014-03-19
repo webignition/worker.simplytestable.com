@@ -7,12 +7,22 @@ use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 
 class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
     
+    public function setUp() {
+        parent::setUp();
+        $this->removeAllTasks();
+    }
+    
+    protected function getAdditionalCommands() {
+        return array(
+            new \SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand()
+        );
+    }
+    
+    
     /**
      * @group standard
      */    
     public function testEnqueueTaskReportCompletionJobs() {
-        $this->setupDatabase();        
-        
         $taskPropertyCollection = array(
             array(
                 'url' => 'http://example.com/1/',
@@ -49,9 +59,8 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
         }
         
         $this->assertTrue($this->clearRedis());
-       
-        $response = $this->runConsole('simplytestable:task:reportcompletion:enqueue');        
-        $this->assertEquals(0, $response);
+        
+        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion:enqueue'));            
         
         foreach ($tasks as $task) {
             $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(

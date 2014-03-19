@@ -7,9 +7,11 @@ use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 
 class ReportCompletionAllCommandTest extends ConsoleCommandBaseTestCase {
     
-    public static function setUpBeforeClass() {
-        self::setupDatabaseIfNotExists();        
-    }    
+    protected function getAdditionalCommands() {
+        return array(
+            new \SimplyTestable\WorkerBundle\Command\Task\ReportCompletionAllCommand()
+        );
+    }   
 
     
     /**
@@ -30,9 +32,7 @@ class ReportCompletionAllCommandTest extends ConsoleCommandBaseTestCase {
         
         $this->createCompletedTaskOutputForTask($task);
         
-        $response = $this->runConsole('simplytestable:task:reportcompletion:all');
-        
-        $this->assertEquals(0, $response);
+        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion:all'));
     }  
 
 

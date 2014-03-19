@@ -6,9 +6,11 @@ use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
 class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase {
     
-    public static function setUpBeforeClass() {
-        self::setupDatabaseIfNotExists();        
-    }     
+    protected function getAdditionalCommands() {
+        return array(
+            new \SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand()
+        );
+    }   
     
     
     /**
@@ -41,10 +43,9 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase {
         $tasks = array();        
         foreach ($taskPropertyCollection as $taskProperties) {
             $tasks[] = $this->createTask($taskProperties['url'], $taskProperties['type']);
-        }
-       
-        $response = $this->runConsole('simplytestable:task:perform:enqueue');        
-        $this->assertEquals(0, $response);
+        }       
+  
+        $this->assertEquals(0, $this->executeCommand('simplytestable:task:perform:enqueue'));
         
         foreach ($tasks as $task) {
             $this->assertTrue($this->getRequeQueueService()->contains('task-perform', array(

@@ -21,7 +21,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
     protected function setActiveState() {
         $this->getWorkerService()->activate();
-    }    
+    }  
     
     /**
      *
@@ -229,7 +229,18 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
     private function removeAllWebResourceTaskOutputs() {
         $this->removeAllForEntity('SimplyTestable\WorkerBundle\Entity\WebResourceTaskOutput');      
-    }     
+    }
+    
+    protected function removeAllTestTaskTypes() {
+        $taskTypes = $this->getEntityManager()->getRepository('SimplyTestable\WorkerBundle\Entity\Task\Type\Type')->findAll();
+        
+        foreach ($taskTypes as $taskType) {
+            if (preg_match('/test-/', $taskType->getName())) {
+                $this->getEntityManager()->remove($taskType);
+                $this->getEntityManager()->flush();                   
+            }
+        }
+    }
     
     private function removeAllForEntity($entityName) {
         $entities = $this->getEntityManager()->getRepository($entityName)->findAll();

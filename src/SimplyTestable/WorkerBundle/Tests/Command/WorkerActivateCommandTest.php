@@ -6,9 +6,11 @@ use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 
 class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
     
-    public static function setUpBeforeClass() {
-        self::setupDatabaseIfNotExists();        
-    }       
+    protected function getAdditionalCommands() {
+        return array(
+            new \SimplyTestable\WorkerBundle\Command\WorkerActivateCommand()
+        );
+    }   
 
     /**
      * @group standard
@@ -21,9 +23,7 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
         $this->getWorkerService()->getEntityManager()->persist($thisWorker);
         $this->getWorkerService()->getEntityManager()->flush();
         
-        $response = $this->runConsole('simplytestable:worker:activate');
-        
-        $this->assertEquals(self::CONSOLE_COMMAND_SUCCESS, $response);
+        $this->assertEquals(self::CONSOLE_COMMAND_SUCCESS, $this->executeCommand('simplytestable:worker:activate'));
     }
     
     /**
@@ -37,9 +37,7 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
         $this->getWorkerService()->getEntityManager()->persist($thisWorker);
         $this->getWorkerService()->getEntityManager()->flush();        
         
-        $response = $this->runConsole('simplytestable:worker:activate');
-        
-        $this->assertEquals(404, $response);
+        $this->assertEquals(404, $this->executeCommand('simplytestable:worker:activate'));
     }
     
     /**
@@ -47,8 +45,8 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
      */    
     public function testActivationInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {
         $this->getWorkerService()->setReadOnly();
-        
-        $this->assertEquals(-1, $this->runConsole('simplytestable:worker:activate'));
+
+        $this->assertEquals(-1, $this->executeCommand('simplytestable:worker:activate'));
     }
     
     /**
@@ -61,8 +59,8 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
         $thisWorker->setState($this->getWorkerService()->getStartingState());
         $this->getWorkerService()->getEntityManager()->persist($thisWorker);
         $this->getWorkerService()->getEntityManager()->flush(); 
-        
-        $this->assertEquals(503, $this->runConsole('simplytestable:worker:activate'));
+
+        $this->assertEquals(503, $this->executeCommand('simplytestable:worker:activate'));
     }    
 
 }

@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Console\Tester\CommandTester;
 
 abstract class BaseTestCase extends WebTestCase {
     
@@ -38,39 +39,44 @@ abstract class BaseTestCase extends WebTestCase {
         $this->container = $this->client->getKernel()->getContainer();        
         $this->application = new Application(self::$kernel);
         $this->application->setAutoExit(false);
-        self::setDefaultSystemState();
-    }
-    
-
-    protected function runConsole($command, Array $options = array()) {
-        $args = array(
-            'app/console',
-            $command,
-            '-e',
-            'test',
-            '-q',
-            '-n'
-        );        
         
-        foreach ($options as $key => $value) {
-            $args[] = $key;
-            
-            if (!is_null($value) && !is_bool($value)) {
-                $args[] = $value;
-            }
-        }
-
-
-        $input = new ArgvInput($args);                 
-        return $this->application->run($input);
+        foreach ($this->getCommands() as $command) {
+            $this->application->add($command);
+        }           
+        
+        $this->setDefaultSystemState();
     }
     
-    protected static function setupDatabase() {
-        exec('php app/console doctrine:database:drop -e test --force && php app/console doctrine:database:create -e test && php app/console doctrine:migrations:migrate -e test --no-interaction && php app/console doctrine:fixtures:load -e test --append');
+    /**
+     * 
+     * @return \Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand[]
+     */
+    protected function getCommands() {
+        return array_merge(array(
+            new \Doctrine\Bundle\FixturesBundle\Command\LoadDataFixturesDoctrineCommand(),
+            new \SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand(),
+        ), $this->getAdditionalCommands());
+    } 
+    
+    /**
+     * 
+     * @return \Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand[]
+     */    
+    protected function getAdditionalCommands() {
+        return array();
+    }       
+    
+    protected function executeCommand($name, $arguments = array()) {
+        $command = $this->application->find($name);
+        $commandTester = new CommandTester($command);        
+        
+        $arguments['command'] = $command->getName();
+        
+        return $commandTester->execute($arguments);
     }
     
-    protected static function setDefaultSystemState() {
-        exec('php app/console simplytestable:maintenance:disable-read-only -e test');
+    protected function setDefaultSystemState() {
+        $this->executeCommand('simplytestable:maintenance:disable-read-only');
     }    
     
     protected static function setupDatabaseIfNotExists() {

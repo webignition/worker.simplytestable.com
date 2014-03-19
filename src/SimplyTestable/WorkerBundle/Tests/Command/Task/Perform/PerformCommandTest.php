@@ -7,10 +7,17 @@ use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 
 class PerformCommandTest extends ConsoleCommandBaseTestCase {
     
-    public static function setUpBeforeClass() {
-        self::setupDatabase();        
-    }    
-
+    public function setUp() {
+        parent::setUp();
+        $this->removeAllTasks();
+        $this->removeAllTestTaskTypes(); 
+    }
+    
+    protected function getAdditionalCommands() {
+        return array(
+            new \SimplyTestable\WorkerBundle\Command\Task\PerformCommand()
+        );
+    }     
     
     /**
      * @group standard
@@ -18,12 +25,10 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
     public function testPerformInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {                 
         $task = $this->createTask('http://example.com/', 'HTML validation');        
         $this->getWorkerService()->setReadOnly();
-        
-        $response = $this->runConsole('simplytestable:task:perform', array(
-            $task->id => true
-        ));
-        
-        $this->assertEquals(-1, $response);
+
+        $this->assertEquals(-1, $this->executeCommand('simplytestable:task:perform', array(
+            'id' => $task->id
+        )));
     }    
     
     
@@ -37,9 +42,9 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
         
         $this->getWorkerService()->setReadOnly();
         
-        $this->runConsole('simplytestable:task:perform', array(
-            $task->id => true
-        ));        
+        $this->executeCommand('simplytestable:task:perform', array(
+            'id' => $task->id
+        ));       
         
         $this->assertTrue($this->getRequeQueueService()->contains('task-perform', array(
             'id' => $task->id
@@ -50,12 +55,10 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
     /**
      * @group standard
      */    
-    public function testPerformInvalidTestReturnsStatusCodeMinus2() {        
-        $response = $this->runConsole('simplytestable:task:perform', array(
-            -1 => true
-        ));
-        
-        $this->assertEquals(-2, $response);
+    public function testPerformInvalidTestReturnsStatusCodeMinus2() {
+        $this->assertEquals(-2, $this->executeCommand('simplytestable:task:perform', array(
+            'id' => -1
+        )));
     }   
     
     
@@ -71,11 +74,9 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
         $this->getEntityManager()->persist($task);
         $this->getEntityManager()->flush();
         
-        $response = $this->runConsole('simplytestable:task:perform', array(
-            $task->getId() => true
-        ));
-        
-        $this->assertEquals(-3, $response);
+        $this->assertEquals(-3, $this->executeCommand('simplytestable:task:perform', array(
+            'id' => $task->getId()
+        )));
     }
     
     
@@ -87,7 +88,7 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
         $task = $this->getTaskService()->getById($taskObject->id);
         
         $unknownTaskType = new TaskType();
-        $unknownTaskType->setName('Unknown task type');
+        $unknownTaskType->setName('test-foo');
         $unknownTaskType->setDescription('Description of unknown task type');
         $unknownTaskType->setClass($task->getType()->getClass());
         $this->getEntityManager()->persist($unknownTaskType);
@@ -97,10 +98,8 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase {
         $this->getEntityManager()->persist($task);
         $this->getEntityManager()->flush();
         
-        $response = $this->runConsole('simplytestable:task:perform', array(
-            $task->getId() => true
-        ));
-        
-        $this->assertEquals(-4, $response);
+        $this->assertEquals(-4, $this->executeCommand('simplytestable:task:perform', array(
+            'id' => $task->getId()
+        )));
     }
 }
