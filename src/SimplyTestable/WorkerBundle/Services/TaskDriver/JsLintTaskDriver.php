@@ -263,9 +263,9 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         if ($this->task->hasParameter('cookies')) {
             $cookieUrlMatcher = new \webignition\Cookie\UrlMatcher\UrlMatcher();
             
-            foreach (json_decode($this->task->getParameter('cookies')) as $cookie) {
-                if ($cookieUrlMatcher->isMatch((array)$cookie, $url)) {
-                    $baseRequest->addCookie($cookie->name, $cookie->value);
+            foreach ($this->task->getParameter('cookies') as $cookie) {
+                if ($cookieUrlMatcher->isMatch($cookie, $url)) {
+                    $baseRequest->addCookie($cookie['name'], $cookie['value']);
                 }
             }            
         }
@@ -290,9 +290,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $nodeJslintWrapper->getConfiguration()->setNodeJslintPath($this->getProperty('node-jslint-path'));
         $nodeJslintWrapper->getConfiguration()->setNodePath($this->getProperty('node-path'));        
         
-        $parametersObject = $this->task->getParametersObject();        
-        if (!is_null($parametersObject)) {
-            foreach ($parametersObject as $key => $value) {
+        if ($this->task->hasParameters()) {
+            foreach ($this->task->getParametersArray() as $key => $value) {
                 if (!$this->isJslintParameter($key)) {
                     continue;
                 }

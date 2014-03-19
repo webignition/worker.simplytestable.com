@@ -83,7 +83,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
         }  
         
         if ($this->task->hasParameter(self::COOKIES_PARAMETER_NAME)) {
-            $linkChecker->getConfiguration()->setCookies(json_decode($this->task->getParameter(self::COOKIES_PARAMETER_NAME), true));
+            $linkChecker->getConfiguration()->setCookies($this->task->getParameter(self::COOKIES_PARAMETER_NAME));
         }
         
         $linkChecker->getConfiguration()->enableToggleUrlEncoding();

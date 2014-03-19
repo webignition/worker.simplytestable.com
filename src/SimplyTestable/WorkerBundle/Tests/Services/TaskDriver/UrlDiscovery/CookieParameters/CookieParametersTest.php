@@ -30,7 +30,7 @@ abstract class CookieParametersTest extends TaskDriverTest {
     public function setUp() {
         parent::setUp();
         $this->task = $this->getTask($this->getTaskUrl(), array(
-            'cookies' => json_encode($this->cookies)
+            'cookies' => $this->cookies
         ));
         
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath('/HttpResponses')));

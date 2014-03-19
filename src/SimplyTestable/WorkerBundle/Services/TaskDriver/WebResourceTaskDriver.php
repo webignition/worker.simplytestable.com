@@ -171,9 +171,9 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             if ($this->task->hasParameter('cookies')) {
                 $cookieUrlMatcher = new \webignition\Cookie\UrlMatcher\UrlMatcher();             
                 
-                foreach (json_decode($this->task->getParameter('cookies')) as $cookie) {                    
-                    if ($cookieUrlMatcher->isMatch((array)$cookie, $this->task->getUrl())) {
-                        $baseRequest->addCookie($cookie->name, $cookie->value);
+                foreach ($this->task->getParameter('cookies') as $cookie) {
+                    if ($cookieUrlMatcher->isMatch($cookie, $this->task->getUrl())) {
+                        $baseRequest->addCookie($cookie['name'], $cookie['value']);
                     }
                 }          
             }

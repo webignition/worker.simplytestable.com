@@ -30,7 +30,7 @@
         "webignition/web-json-model":">=0.1,<2.0",
         "webignition/absolute-url-deriver":">=1.4",        
         "winzou/console-bundle":"1.0.0",
-        "guzzle/guzzle":"3.8.0",        
+        "guzzle/guzzle":">=3.8.0",        
         "doctrine/doctrine-fixtures-bundle": "dev-master",
         "webignition/html-document-link-finder":">=0.6,<1.0",
         "webignition/html-document-link-checker":">=0.9.2,<1.0",

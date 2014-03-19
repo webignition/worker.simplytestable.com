@@ -199,8 +199,8 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
         $this->assertNotNull($task->getOutput()->getId());
         $this->assertNotNull($task->getTimePeriod()->getId());        
         
-        $taskParameters = $task->getParametersObject();
-        $taskParameters->{'x-http-auth-tried'} = true;
+        $taskParameters = $task->getParametersArray();
+        $taskParameters['x-http-auth-tried'] = true;
 
         $task->setParameters(json_encode($taskParameters));           
         $this->getTaskService()->persistAndFlush($task);

@@ -303,8 +303,8 @@ class Task
      * 
      * @return \stdClass
      */
-    public function getParametersObject() {
-        return json_decode($this->getParameters());
+    public function getParametersArray() {
+        return json_decode($this->getParameters(), true);
     }
     
     
@@ -314,11 +314,8 @@ class Task
      * @return boolean
      */
     public function hasParameter($name) {
-        if (!$this->getParametersObject() instanceof \stdClass) {
-            return false;
-        }
-        
-        return isset($this->getParametersObject()->$name);
+        $parameters = $this->getParametersArray();
+        return isset($parameters[$name]);
     }
     
     
@@ -332,7 +329,8 @@ class Task
             return null;
         }
         
-        return $this->getParametersObject()->$name;
+        $parameters = $this->getParametersArray();
+        return $parameters[$name];
     }
     
     
