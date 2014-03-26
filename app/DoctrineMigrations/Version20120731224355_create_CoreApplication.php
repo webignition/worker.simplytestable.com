@@ -2,13 +2,13 @@
 
 namespace Application\Migrations;
 
-use SimplyTestable\BaseMigrationsBundle\Migration\EntityModificationMigration,
+use SimplyTestable\BaseMigrationsBundle\Migration\BaseMigration,
     Doctrine\DBAL\Schema\Schema;
 
 /**
  * Auto-generated Migration: Please modify to your need!
  */
-class Version20120731224355_create_CoreApplication extends EntityModificationMigration
+class Version20120731224355_create_CoreApplication extends BaseMigration
 {
     public function up(Schema $schema)
     {
