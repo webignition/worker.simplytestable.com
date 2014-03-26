@@ -246,9 +246,10 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         $entities = $this->getEntityManager()->getRepository($entityName)->findAll();
         if (is_array($entities) && count($entities) > 0) {
             foreach ($entities as $entity) {
-                $this->getEntityManager()->remove($entity);
-                $this->getEntityManager()->flush();                
+                $this->getEntityManager()->remove($entity);                               
             }
+            
+            $this->getEntityManager()->flush(); 
         }        
     }
     
@@ -360,13 +361,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
                 );
             }
         }
-    } 
-    
-/**
-    public function testCurlOptionsAreSetOnAllRequests() {
-        $this->assertSystemCurlOptionsAreSetOnAllRequests();
-    }
- */    
+    }  
 
 
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\IgnoreWarnings;
+namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\RootWebResourceHasMangledMarkup;
 
 use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\StandardCssValidationTaskDriverTest;
 
-abstract class IgnoreWarningsTest extends StandardCssValidationTaskDriverTest {
+class RootWebResourceHasMangledMarkupTest extends StandardCssValidationTaskDriverTest {    
     
     protected function getFixtureTestName() {
         return null;
@@ -14,7 +14,16 @@ abstract class IgnoreWarningsTest extends StandardCssValidationTaskDriverTest {
         return 1;
     }    
     
+    protected function getTaskParameters() {
+        return array();
+    }
+
     protected function getExpectedErrorCount() {
         return 0;
     }
+
+    protected function getExpectedWarningCount() {
+        return 0;
+    }
+
 }

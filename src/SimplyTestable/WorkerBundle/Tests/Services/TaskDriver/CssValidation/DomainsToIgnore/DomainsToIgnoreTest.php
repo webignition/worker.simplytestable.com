@@ -2,42 +2,19 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\DomainsToIgnore;
 
-use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\TaskDriverTest;
+use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\StandardCssValidationTaskDriverTest;
 
-abstract class DomainsToIgnoreTest extends TaskDriverTest {
+abstract class DomainsToIgnoreTest extends StandardCssValidationTaskDriverTest {
     
-    private $task;
-    private $performResult;    
-    
-    public function setUp() {
-        parent::setUp();
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(null, 1). '/HttpResponses'));
-
-        $this->container->get('simplytestable.services.cssValidatorWrapperService')->setCssValidatorRawOutput(
-            file_get_contents($this->getFixturesDataPath(null, 1) . '/CssValidatorResponse/1')
-        );      
-        
-        $this->task = $this->getTask('http://example.com/', $this->getTaskParameters());
-        $this->performResult = $this->getTaskService()->perform($this->task);        
+    protected function getFixtureTestName() {
+        return null;
     }
     
-    abstract protected function getExpectedErrorCount();
-    abstract protected function getTaskParameters();    
-    
-    public function testTaskIsPerformed() {
-        $this->assertEquals(0, $this->performResult);
+    protected function getFixtureUpLevelsCount() {
+        return 1;
     }    
     
-    public function testErrorCount() {
-        $this->assertEquals($this->getExpectedErrorCount(), $this->task->getOutput()->getErrorCount());
+    protected function getExpectedWarningCount() {
+        return 0;
     }
-    
-    public function testWarningCount() {
-        $this->assertEquals(0, $this->task->getOutput()->getWarningCount());
-    }
-    
-    public function testCurlOptionsAreSetOnAllRequests() {
-        $this->assertSystemCurlOptionsAreSetOnAllRequests();
-    }     
-
 }
