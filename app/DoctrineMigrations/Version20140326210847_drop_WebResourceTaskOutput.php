@@ -13,11 +13,11 @@ class Version20140326210847_drop_WebResourceTaskOutput extends BaseMigration
     public function up(Schema $schema)
     {
         $this->statements['mysql'] = array(
-            "DROP TABLE TimeCachedTaskOutput"
+            "DROP TABLE WebResourceTaskOutput"
         );
         
         $this->statements['sqlite'] = array(
-            "DROP TABLE TimeCachedTaskOutput"
+            "DROP TABLE WebResourceTaskOutput"
         ); 
         
         parent::up($schema);
