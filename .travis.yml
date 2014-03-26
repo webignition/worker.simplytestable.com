@@ -70,7 +70,8 @@ before_script:
   #- echo "5.9.84.201 html-validator.worker.simplytestable.com" | sudo tee --append /etc/hosts
   
 script:
-  - phpunit -c app --group standard
+  - phpunit -c app
+  #- phpunit -c app --group standard
   #- phpunit -c app --group standard
   #- phpunit -c app --group integration-standard-travis
   #- phpunit -c app --group integration-html-validation-travis
