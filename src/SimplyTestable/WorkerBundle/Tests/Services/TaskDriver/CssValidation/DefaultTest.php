@@ -12,33 +12,7 @@ class DefaultTest extends TaskDriverTest {
         $this->container->get('simplytestable.services.cssValidatorWrapperService')->setCssValidatorRawOutput(
             file_get_contents($this->getFixturesDataPath($this->getName() . '/CssValidatorResponse/1'))
         );        
-    } 
-    
-    
-    /**
-     * @group standard
-     */     
-    public function testIgnoreWarningsNotSet() {
-        $task = $this->getDefaultTask();
-        
-        $this->assertEquals(0, $this->getTaskService()->perform($task));
-        $this->assertEquals(0, $task->getOutput()->getErrorCount());
-        $this->assertEquals(3, $task->getOutput()->getWarningCount());     
-    } 
-    
-    
-    /**
-     * @group standard
-     */     
-    public function testIgnoreWarnings() {             
-        $task = $this->getTask('http://example.com/', array(
-            'ignore-warnings' => true            
-        ));
-        
-        $this->assertEquals(0, $this->getTaskService()->perform($task));        
-        $this->assertEquals(0, $task->getOutput()->getErrorCount());
-        $this->assertEquals(0, $task->getOutput()->getWarningCount());     
-    }    
+    }  
     
     
     /**
