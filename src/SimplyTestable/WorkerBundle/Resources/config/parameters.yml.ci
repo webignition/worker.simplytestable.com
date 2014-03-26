@@ -1,4 +1,7 @@
 parameters:
+  curl_options:
+   - {name: "CURLOPT_SSL_VERIFYPEER", value: false}
+   - {name: "CURLOPT_SSL_VERIFYHOST", value: false}
   core_url: http://ci.app.simplytestable.com
   drivers:
     html-validation:
