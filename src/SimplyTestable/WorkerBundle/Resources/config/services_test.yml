@@ -3,6 +3,7 @@ services:
     class:  SimplyTestable\WorkerBundle\Services\TestHttpClientService     
     arguments:
         memcacheService: "@simplytestable.services.memcacheService"        
+        curlOptions: %curl_options%
         
   simplytestable.services.htmlValidatorWrapperService:
     class:  webignition\HtmlValidator\Mock\Wrapper\Wrapper         
