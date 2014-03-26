@@ -145,6 +145,10 @@ class HttpClientService {
         $request = $this->get()->get($uri, $headers, $body);        
         $request->setHeader('Accept-Encoding', 'gzip,deflate');
         
+        foreach ($this->curlOptions as $key => $value) {
+            $request->getCurlOptions()->set($key, $value);
+        }        
+        
         return $request;
     }
     
@@ -158,6 +162,11 @@ class HttpClientService {
      */
     public function postRequest($uri = null, $headers = null, $postBody = null) {
         $request = $this->get()->post($uri, $headers, $postBody);        
+        
+        foreach ($this->curlOptions as $key => $value) {
+            $request->getCurlOptions()->set($key, $value);
+        }
+        
         return $request;        
     }
     

@@ -38,6 +38,10 @@ abstract class CookieParametersTest extends TaskDriverTest {
         }
     }    
     
+    public function testCurlOptionsAreSetOnAllRequests() {
+        $this->assertSystemCurlOptionsAreSetOnAllRequests();
+    }    
+    
     
     /**
      * 

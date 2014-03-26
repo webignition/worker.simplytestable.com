@@ -337,7 +337,36 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         $curlException->setError($curlMessageParts[1], (int)  str_replace('CURL/', '', $curlMessageParts[0]));
         
         return $curlException;
-    }    
+    } 
+    
+    
+    protected function assertSystemCurlOptionsAreSetOnAllRequests() {
+        foreach ($this->getHttpClientService()->getHistory()->getAll() as $httpTransaction) {
+            foreach ($this->container->getParameter('curl_options') as $curlOption) {                                
+                $expectedValueAsString = $curlOption['value'];
+                
+                if (is_string($expectedValueAsString)) {
+                    $expectedValueAsString = '"'.$expectedValueAsString.'"';
+                }                
+                
+                if (is_bool($curlOption['value'])) {
+                    $expectedValueAsString = ($curlOption['value']) ? 'true' : 'false';
+                }
+                
+                $this->assertEquals(
+                    $curlOption['value'],
+                    $httpTransaction['request']->getCurlOptions()->get(constant($curlOption['name'])),
+                    'Curl option "'.$curlOption['name'].'" not set to ' . $expectedValueAsString . ' for ' .$httpTransaction['request']->getMethod() . ' ' . $httpTransaction['request']->getUrl()
+                );
+            }
+        }
+    } 
+    
+/**
+    public function testCurlOptionsAreSetOnAllRequests() {
+        $this->assertSystemCurlOptionsAreSetOnAllRequests();
+    }
+ */    
 
 
 }
