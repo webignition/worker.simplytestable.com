@@ -27,8 +27,7 @@ abstract class IgnoreWarningsTest extends TaskDriverTest {
     
     public function testTaskIsPerformed() {
         $this->assertEquals(0, $this->performResult);
-    }
-    
+    }    
     
     public function testErrorCount() {
         $this->assertEquals(0, $this->task->getOutput()->getErrorCount());

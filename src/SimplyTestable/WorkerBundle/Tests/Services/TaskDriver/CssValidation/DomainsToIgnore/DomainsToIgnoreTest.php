@@ -4,63 +4,40 @@ namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\Do
 
 use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\TaskDriverTest;
 
-class DomainsToIgnoreTest extends TaskDriverTest {
+abstract class DomainsToIgnoreTest extends TaskDriverTest {
+    
+    private $task;
+    private $performResult;    
     
     public function setUp() {
         parent::setUp();
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(). '/HttpResponses'));
+        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(null, 1). '/HttpResponses'));
 
         $this->container->get('simplytestable.services.cssValidatorWrapperService')->setCssValidatorRawOutput(
-            file_get_contents($this->getFixturesDataPath() . '/CssValidatorResponse/1')
-        );        
+            file_get_contents($this->getFixturesDataPath(null, 1) . '/CssValidatorResponse/1')
+        );      
+        
+        $this->task = $this->getTask('http://example.com/', $this->getTaskParameters());
+        $this->performResult = $this->getTaskService()->perform($this->task);        
     }
     
-    /**
-     * @group standard
-     */        
-    public function testDomainsToIgnoreNotSet() {        
-        $task = $this->getDefaultTask();        
-       
-        $this->assertEquals(0, $this->getTaskService()->perform($task));
-        $this->assertEquals(3, $task->getOutput()->getErrorCount());
-        $this->assertEquals(0, $task->getOutput()->getWarningCount());     
+    abstract protected function getExpectedErrorCount();
+    abstract protected function getTaskParameters();    
+    
+    public function testTaskIsPerformed() {
+        $this->assertEquals(0, $this->performResult);
     }    
     
-    /**
-     * @group standard
-     */        
-    public function testDomainsToIgnoreOneDomainOfThree() {            
-        $task = $this->getTask('http://example.com/', array(
-            'domains-to-ignore' => array(
-                'one.cdn.example.com'
-            )             
-        ));
-        
-        $this->assertEquals(0, $this->getTaskService()->perform($task));
-        $this->assertEquals(2, $task->getOutput()->getErrorCount());
-        $this->assertEquals(0, $task->getOutput()->getWarningCount());     
-    }  
-    
-  
-    /**
-     * @group standard
-     */     
-    public function testDomainsToIgnoreTwoDomainsOfThree() {        
-        $task = $this->getTask('http://example.com/', array(
-            'domains-to-ignore' => array(
-                'one.cdn.example.com',
-                'two.cdn.example.com'
-            )               
-        ));
-        
-        $this->assertEquals(0, $this->getTaskService()->perform($task));
-        $this->assertEquals(1, $task->getOutput()->getErrorCount());
-        $this->assertEquals(0, $task->getOutput()->getWarningCount());     
+    public function testErrorCount() {
+        $this->assertEquals($this->getExpectedErrorCount(), $this->task->getOutput()->getErrorCount());
     }
     
+    public function testWarningCount() {
+        $this->assertEquals(0, $this->task->getOutput()->getWarningCount());
+    }
     
     public function testCurlOptionsAreSetOnAllRequests() {
         $this->assertSystemCurlOptionsAreSetOnAllRequests();
-    }      
+    }     
 
 }
