@@ -3,6 +3,7 @@ services:
     class:  SimplyTestable\WorkerBundle\Services\HttpClientService
     arguments:
         memcacheService: "@simplytestable.services.memcacheService"            
+        curlOptions: %curl_options%        
         
   simplytestable.services.webResourceService:
     class:  webignition\WebResource\Service\Service
