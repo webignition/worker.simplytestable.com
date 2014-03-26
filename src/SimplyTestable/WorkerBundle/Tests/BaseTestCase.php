@@ -170,8 +170,18 @@ abstract class BaseTestCase extends WebTestCase {
      * @param string $testName
      * @return string
      */
-    protected function getFixturesDataPath($testName = null) {
+    protected function getFixturesDataPath($testName = null, $upBaseLevels = 0) {
         $path = __DIR__ . self::FIXTURES_DATA_RELATIVE_PATH . '/' . str_replace('\\', DIRECTORY_SEPARATOR, get_class($this));
+        
+        if ($upBaseLevels > 0) {
+            $pathParts = explode('/', $path);
+            
+            for ($count = 0; $count < $upBaseLevels; $count++) {
+                array_pop($pathParts);
+            }
+            
+            $path = implode('/', $pathParts);
+        }
         
         if (!is_null($testName)) {
             $path .=  '/' . $testName;
