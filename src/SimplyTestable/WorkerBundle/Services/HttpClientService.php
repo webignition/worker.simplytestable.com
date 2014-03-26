@@ -33,10 +33,26 @@ class HttpClientService {
     
     /**
      *
-     * @param \SimplyTestable\WorkerBundle\Services\MemcacheService $memcacheService 
+     * @var array
      */
-    public function __construct(\SimplyTestable\WorkerBundle\Services\MemcacheService $memcacheService) {
+    private $curlOptions = array();    
+    
+    
+    /**
+     * 
+     * @param \SimplyTestable\WorkerBundle\Services\MemcacheService $memcacheService
+     * @param array $curlOptions
+     */
+    public function __construct(
+            \SimplyTestable\WorkerBundle\Services\MemcacheService $memcacheService,
+            $curlOptions) {
         $this->memcacheService = $memcacheService;   
+        
+        foreach ($curlOptions as $curlOption) {
+            if (defined($curlOption['name'])) {
+                $this->curlOptions[constant($curlOption['name'])] = $curlOption['value'];
+            }
+        }        
     }      
     
     
