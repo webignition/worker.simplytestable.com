@@ -16,7 +16,6 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
     public function setUp() {
         parent::setUp();
-        $this->removeAllWebResourceTaskOutputs();
     }    
     
     protected function setActiveState() {
@@ -225,10 +224,6 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
     protected function removeAllTasks() {
         $this->removeAllForEntity('SimplyTestable\WorkerBundle\Entity\Task\Task');      
-    }     
-    
-    private function removeAllWebResourceTaskOutputs() {
-        $this->removeAllForEntity('SimplyTestable\WorkerBundle\Entity\WebResourceTaskOutput');      
     }
     
     protected function removeAllTestTaskTypes() {

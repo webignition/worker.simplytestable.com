@@ -11,10 +11,6 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
     
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
     
-    public function __construct() {
-        $this->canCacheValidationOutput = true;
-    }
-    
     
     /**
      * 

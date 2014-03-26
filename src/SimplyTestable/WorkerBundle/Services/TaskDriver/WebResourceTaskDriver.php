@@ -37,20 +37,6 @@ abstract class WebResourceTaskDriver extends TaskDriver {
     
     /**
      *
-     * @var boolean
-     */
-    protected $canCacheValidationOutput = false;
-    
-    
-    /**
-     *
-     * @var string
-     */
-    private $webResourceTaskHash = null;
-    
-    
-    /**
-     *
      * @var \Guzzle\Http\Exception\TooManyRedirectsException
      */
     private $tooManyRedirectsException = null;
@@ -86,46 +72,7 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             return $this->isBlankWebResourceHandler();
         }
         
-        if ($this->canCacheValidationOutput()) {            
-            $hash = $this->getWebResourceTaskHash();                
-            if ($this->getWebResourceTaskOutputService()->has($hash)) {
-                $webResourceTaskOutput = $this->getWebResourceTaskOutputService()->find($hash);
-                $this->response->setErrorCount($webResourceTaskOutput->getErrorCount());
-                return $webResourceTaskOutput->getOutput();
-            }            
-        }
-        
-        $validationOutput = $this->performValidation();
-        
-        if ($this->canCacheValidationOutput()) {
-            $hash = $this->getWebResourceTaskHash();
-            $this->getWebResourceTaskOutputService()->create($hash, $validationOutput, $this->response->getErrorCount());
-        }
-        
-        return $validationOutput;
-    }
-    
-    
-    /**
-     * 
-     * @return string
-     */
-    protected function getWebResourceTaskHash() {
-        if (is_null($this->webResourceTaskHash)) {
-            if (!is_null($this->webResource) && !is_null($this->task)) {
-                $this->webResourceTaskHash = md5($this->webResource->getContent() . $this->task->getType()->getName());
-            }
-        }
-        
-        return $this->webResourceTaskHash;
-    }
-    
-    
-    /**
-     * @return boolean
-     */
-    protected function canCacheValidationOutput() {
-        return $this->canCacheValidationOutput;
+        return $this->performValidation();
     }
 
     

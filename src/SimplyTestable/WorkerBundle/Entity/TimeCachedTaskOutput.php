@@ -96,7 +96,7 @@ class TimeCachedTaskOutput
      * Set hash
      *
      * @param string $hash
-     * @return WebResourceTaskOutput
+     * @return TimeCachedTaskOutput
      */
     public function setHash($hash)
     {
@@ -119,7 +119,7 @@ class TimeCachedTaskOutput
      * Set output
      *
      * @param string $output
-     * @return WebResourceTaskOutput
+     * @return TimeCachedTaskOutput
      */
     public function setOutput($output)
     {
@@ -142,7 +142,7 @@ class TimeCachedTaskOutput
      * Set errorCount
      *
      * @param integer $errorCount
-     * @return WebResourceTaskOutput
+     * @return TimeCachedTaskOutput
      */
     public function setErrorCount($errorCount)
     {
@@ -166,7 +166,7 @@ class TimeCachedTaskOutput
      * Set warningCount
      *
      * @param integer $warningCount
-     * @return WebResourceTaskOutput
+     * @return TimeCachedTaskOutput
      */
     public function setWarningCount($warningCount)
     {
@@ -190,7 +190,7 @@ class TimeCachedTaskOutput
      * Set maxAge
      *
      * @param integer $maxAge
-     * @return WebResourceTaskOutput
+     * @return TimeCachedTaskOutput
      */
     public function setMaxAge($maxAge)
     {

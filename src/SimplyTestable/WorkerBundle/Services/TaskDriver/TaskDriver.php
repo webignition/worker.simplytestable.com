@@ -9,7 +9,6 @@ use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
-use SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService;
 use SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService;
 use webignition\WebResource\Service\Service as WebResourceService;
 
@@ -41,15 +40,7 @@ abstract class TaskDriver {
      *
      * @var \SimplyTestable\WorkerBundle\Services\HttpClientService
      */
-    private $httpClientService;
-    
-    
-    /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService  
-     */
-    private $webResourceTaskOutputService;
-    
+    private $httpClientService;    
     
     /**
      *
@@ -145,24 +136,6 @@ abstract class TaskDriver {
      */
     public function getWebResourceService() {    
         return $this->webResourceService;
-    }
-    
-    
-    /**
-     * 
-     * @param \SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService $webResourceTaskOutputService
-     */
-    public function setWebResourceTaskoutputService(WebResourceTaskOutputService $webResourceTaskOutputService) {
-        $this->webResourceTaskOutputService = $webResourceTaskOutputService;
-    }
-    
-    
-    /**
-     * 
-     * @return \SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService
-     */
-    public function getWebResourceTaskOutputService() {
-        return $this->webResourceTaskOutputService;
     }
     
     

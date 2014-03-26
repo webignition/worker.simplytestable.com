@@ -76,13 +76,6 @@ services:
     arguments:
         drivers: %drivers%  
         container: "@service_container"
-        #taskTypeService: "@simplytestable.services.tasktypeservice"
-        #stateService: "@simplytestable.services.stateservice"
-        #webResourceService: "@simplytestable.services.webresourceservice"        
-        #logger: "@logger"
-        #webResourceTaskOutputService: "@simplytestable.services.webresourcetaskoutputservice"
-        #serializer: "@serializer"
-        #timeCachedTaskOutputService: "@simplytestable.services.timecachedtaskoutputservice"
         
   simplytestable.services.resqueQueueService:
     class:   SimplyTestable\WorkerBundle\Services\ResqueQueueService
@@ -96,11 +89,6 @@ services:
     class:  SimplyTestable\WorkerBundle\Services\ResqueJobFactoryService
     arguments:
       jobClassMap: "%resque-job-class-map%"   
-      
-  simplytestable.services.webresourcetaskoutputservice:
-    class:   SimplyTestable\WorkerBundle\Services\WebResourceTaskOutputService
-    arguments:
-        entityManager: "@doctrine.orm.entity_manager"       
         
   simplytestable.services.timecachedtaskoutputservice:
     class:   SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService

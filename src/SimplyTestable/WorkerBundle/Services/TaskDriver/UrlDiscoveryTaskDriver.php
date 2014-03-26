@@ -14,11 +14,6 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
         'http',
         'https'
     );
-
-    
-    public function __construct() {
-        $this->canCacheValidationOutput = true;
-    }
     
     
     /**

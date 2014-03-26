@@ -12,11 +12,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
     const EXCLUDED_URLS_PARAMETER_NAME = 'excluded-urls';
     const EXCLUDED_DOMAINS_PARAMETER_NAME = 'excluded-domains';
     const COOKIES_PARAMETER_NAME = 'cookies';
-    
-    public function __construct() {
-        $this->canCacheValidationOutput = false;
-    }
-    
+
     
     /**
      * 

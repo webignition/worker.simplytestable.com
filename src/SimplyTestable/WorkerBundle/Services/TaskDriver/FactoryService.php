@@ -31,7 +31,6 @@ class FactoryService {
             $driver->setHttpClientService($container->get('simplytestable.services.httpclientservice'));
             $driver->setTaskTypeService($container->get('simplytestable.services.tasktypeservice'));
             $driver->setLogger($container->get('logger'));
-            $driver->setWebResourceTaskoutputService($container->get('simplytestable.services.webresourcetaskoutputservice'));
             $driver->setSerializer($container->get('serializer'));
             $driver->setTimeCachedTaskoutputService($container->get('simplytestable.services.timecachedtaskoutputservice'));
             
