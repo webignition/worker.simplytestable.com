@@ -16,7 +16,9 @@ class PerformAllCommandTest extends ConsoleCommandBaseTestCase {
     /**
      * @group standard
      */    
-    public function testPerformAll() {        
+    public function testPerformAll() {
+        $this->removeAllTasks();
+        
         $taskProperties = $this->createTask('http://example.com/', 'HTML validation');        
         
         $task = $this->getTaskService()->getById($taskProperties->id);
