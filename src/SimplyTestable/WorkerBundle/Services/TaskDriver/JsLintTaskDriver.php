@@ -407,9 +407,9 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     private function getScriptUrls() {        
         if ($this->webResource instanceof WebPage) {
             $webPage = clone $this->webResource;
-        } else {
+        } else {            
             $webPage = new WebPage();
-            $webPage->setContent($this->webResource->getContent());            
+            $webPage->setHttpResponse(\Guzzle\Http\Message\Response::fromMessage("HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $this->webResource->getContent()));
         }
         
         $scriptUrls = array();
@@ -438,7 +438,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      */
     private function getScriptValues() {        
         $webPage = new WebPage();
-        $webPage->setContent($this->webResource->getContent());
+        $webPage->setHttpResponse(\Guzzle\Http\Message\Response::fromMessage("HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $this->webResource->getContent()));
         
         $scriptValues = array();
         

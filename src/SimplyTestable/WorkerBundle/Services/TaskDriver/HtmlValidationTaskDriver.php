@@ -45,21 +45,19 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    protected function performValidation() {        
-        $fragment = $this->webResource->getContent();
-        
+    protected function performValidation() {
         $doctypeExtractor = new DoctypeExtractor();
-        $doctypeExtractor->setHtml($fragment);
+        $doctypeExtractor->setHtml($this->getWebPage()->getContent());
 
         if (!$doctypeExtractor->hasDocumentType()) {
             $this->response->setErrorCount(1);
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);            
             
-            if ($this->isMarkup($fragment)) {
+            if ($this->isMarkup($this->getWebPage()->getContent())) {
                 return json_encode($this->getMissingDocumentTypeOutput());
             } else {                
-                return json_encode($this->getIsNotMarkupOutput($fragment));
+                return json_encode($this->getIsNotMarkupOutput($this->getWebPage()->getContent()));
             }
         }
         
@@ -72,9 +70,9 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         }
         
         $this->getProperty('html-validator-wrapper')->createConfiguration(array(
-            'documentUri' => 'file:' . $this->storeTmpFile($fragment),
+            'documentUri' => 'file:' . $this->storeTmpFile($this->getWebPage()->getHttpResponse()->getBody(true)),
             'validatorPath' => $this->getProperty('validator-path'),
-            'documentCharacterSet' => ($this->webResource->getIsDocumentCharacterEncodingValid()) ? $this->webResource->getCharacterEncoding() : self::DEFAULT_CHARACTER_ENCODING
+            'documentCharacterSet' => (is_null($this->getWebPage()->getCharacterSet())) ? self::DEFAULT_CHARACTER_ENCODING : $this->getWebPage()->getCharacterSet()
         ));
         
         /* @var $validatorWrapper \webignition\HtmlValidator\Mock\Wrapper\Wrapper */
@@ -93,6 +91,15 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver {
         //$this->response->setWarningCount($output->getWarningCount());
 
         return json_encode($outputObject);      
+    }
+    
+    
+    /**
+     * 
+     * @return \webignition\WebResource\WebPage\WebPage
+     */
+    private function getWebPage() {
+        return $this->webResource;
     }
     
     
