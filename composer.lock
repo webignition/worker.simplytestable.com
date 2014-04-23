@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "b6125fa13f198ed76ac37ae4b0b6dd68",
+    "hash": "44874fbb24173e9ddb19fe0e4bd94a39",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -3703,21 +3703,21 @@
         },
         {
             "name": "webignition/web-resource-service",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-service.git",
-                "reference": "ec709510f522bc7164ca33901b196031e8a260b4"
+                "reference": "1df7f669fb345109082bdb166738598d80fdd7d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/ec709510f522bc7164ca33901b196031e8a260b4",
-                "reference": "ec709510f522bc7164ca33901b196031e8a260b4",
+                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/1df7f669fb345109082bdb166738598d80fdd7d1",
+                "reference": "1df7f669fb345109082bdb166738598d80fdd7d1",
                 "shasum": ""
             },
             "require": {
                 "guzzle/guzzle": ">=3.8.0",
-                "php": ">=5.3.2",
+                "php": ">=5.4.0",
                 "webignition/internet-media-type": ">=0.4.4,<2.0",
                 "webignition/web-json-model": ">=1.0.1,<2.0",
                 "webignition/web-page-model": ">=1.0.1,<2.0",
@@ -3745,7 +3745,7 @@
                 "service",
                 "web"
             ],
-            "time": "2014-04-23 12:13:29"
+            "time": "2014-04-23 13:05:29"
         },
         {
             "name": "winzou/console-bundle",
@@ -3860,7 +3860,7 @@
         "doctrine/doctrine-fixtures-bundle": 20
     },
     "platform": {
-        "php": ">=5.3.3"
+        "php": ">=5.4.0"
     },
     "platform-dev": [
 
