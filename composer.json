@@ -37,7 +37,7 @@
         "webignition/html-validator-wrapper":">=0.4.1",
         "webignition/html-validator-output-parser":">=0.6",
         "webignition/css-validator-wrapper":">=0.9.7",
-        "webignition/web-resource-service":">=1.0.1,<2.0",
+        "webignition/web-resource-service":">=1.0.2,<2.0",
         "webignition/html-document-type-extractor":">=0.1.1,<1.0",
         "webignition/html-document-type-validator":">=0.1,<1.0",
         "webignition/node-jslint-wrapper":">=0.3,<1",
