@@ -12,3 +12,4 @@ src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
 
 # IDE meta
 /nbproject
+/.idea
