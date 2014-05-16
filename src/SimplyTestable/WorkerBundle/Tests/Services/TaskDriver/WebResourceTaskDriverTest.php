@@ -30,12 +30,13 @@ class WebResourceTaskDriverTest extends BaseTest {
      * @group standard
      */     
     public function testInvalidContentType() {
+
         foreach ($this->taskTypeNames as $taskTypeName) {
-            $this->taskTypeName = $taskTypeName;
-            
             $this->setHttpFixtures($this->buildHttpFixtureSet(array(
-                'HTTP/1.0 200 Ok'."\n".'Content-Type:invalid/made-it-up'
+                'HTTP/1.0 200'."\n".'Content-Type:invalid/made-it-up'
             )));
+
+            $this->taskTypeName = $taskTypeName;
 
             $task = $this->getDefaultTask();
 
@@ -51,46 +52,46 @@ class WebResourceTaskDriverTest extends BaseTest {
     
     /**
      * @group standard
-     */        
+     */
     public function testHttp401() {
         $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
-    }    
-    
+    }
+
     /**
      * @group standard
-     */        
+     */
     public function testHttp404() {
         $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
     }
 
     /**
      * @group standard
-     */        
-    public function testHttp500() {        
+     */
+    public function testHttp500() {
         $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
-    } 
-    
+    }
+
     /**
      * @group standard
-     */        
-    public function testHttp503() {        
+     */
+    public function testHttp503() {
         $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
-    } 
-    
-    
+    }
+
+
     /**
      * @group standard
-     */        
-    public function testCurl6() {        
+     */
+    public function testCurl6() {
         $this->assertCorrectFailureForGivenCurlCode(str_replace('testCurl', '', $this->getName()));
-    }    
-    
+    }
+
     /**
      * @group standard
-     */        
+     */
     public function testCurl28() {
         $this->assertCorrectFailureForGivenCurlCode(str_replace('testCurl', '', $this->getName()));
-    }    
+    }
     
     private function assertCorrectFailureForGivenHttpStatusCode($statusCode) {        
         $this->assertCorrectFailureForGivenModeAndCode('http', $statusCode);       

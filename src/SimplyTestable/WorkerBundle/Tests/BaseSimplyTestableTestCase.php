@@ -93,7 +93,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
     /**
      *
-     * @return \SimplyTestable\WorkerBundle\Services\HttpClientService
+     * @return \SimplyTestable\WorkerBundle\Services\TestHttpClientService
      */
     protected function getHttpClientService() {
         return $this->container->get('simplytestable.services.httpclientservice');
@@ -250,18 +250,14 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
     
     
-    protected function setHttpFixtures($fixtures) {        
-        $plugin = new \Guzzle\Plugin\Mock\MockPlugin();
-        
+    protected function setHttpFixtures($fixtures) {
         foreach ($fixtures as $fixture) {
             if ($fixture instanceof \Exception) {
-                $plugin->addException($fixture);
+                $this->getHttpClientService()->getMockPlugin()->addException($fixture);
             } else {
-                $plugin->addResponse($fixture);
+                $this->getHttpClientService()->getMockPlugin()->addResponse($fixture);
             }
         }
-         
-        $this->getHttpClientService()->get()->addSubscriber($plugin);              
     }
     
     

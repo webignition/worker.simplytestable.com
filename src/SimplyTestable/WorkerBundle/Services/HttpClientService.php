@@ -213,5 +213,24 @@ class HttpClientService {
         
         return null;     
     }
+
+
+    /**
+     *
+     * @return \Guzzle\Plugin\Mock\MockPlugin
+     */
+    public function getMockPlugin() {
+        $listenerCollections = $this->get()->getEventDispatcher()->getListeners('request.before_send');
+
+        foreach ($listenerCollections as $listener) {
+            if ($listener[0] instanceof \Guzzle\Plugin\Mock\MockPlugin) {
+                return $listener[0];
+            }
+        }
+
+        $plugin = new \Guzzle\Plugin\Mock\MockPlugin();
+        $this->get()->addSubscriber($plugin);
+        return $plugin;
+    }
     
 }
