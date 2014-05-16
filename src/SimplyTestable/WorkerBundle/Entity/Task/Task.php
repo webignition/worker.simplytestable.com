@@ -231,7 +231,7 @@ class Task
     /**
      * Get output
      *
-     * @return SimplyTestable\WorkerBundle\Entity\Task\Output 
+     * @return \SimplyTestable\WorkerBundle\Entity\Task\Output
      */
     public function getOutput()
     {
