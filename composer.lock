@@ -1,7 +1,8 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
     ],
     "hash": "44874fbb24173e9ddb19fe0e4bd94a39",
     "packages": [
@@ -3513,16 +3514,16 @@
         },
         {
             "name": "webignition/url",
-            "version": "1.9.10",
+            "version": "1.9.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/url.git",
-                "reference": "7df6141958c65957d3c692791eb8e07ace0cf147"
+                "reference": "3dba19db24468eadcca4d7ea1ad884ec12d8981b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/url/zipball/7df6141958c65957d3c692791eb8e07ace0cf147",
-                "reference": "7df6141958c65957d3c692791eb8e07ace0cf147",
+                "url": "https://api.github.com/repos/webignition/url/zipball/3dba19db24468eadcca4d7ea1ad884ec12d8981b",
+                "reference": "3dba19db24468eadcca4d7ea1ad884ec12d8981b",
                 "shasum": ""
             },
             "require": {
@@ -3551,7 +3552,7 @@
             "keywords": [
                 "url"
             ],
-            "time": "2014-03-25 09:43:12"
+            "time": "2014-06-30 15:12:08"
         },
         {
             "name": "webignition/web-json-model",
