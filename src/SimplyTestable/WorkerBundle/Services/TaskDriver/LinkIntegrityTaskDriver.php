@@ -84,6 +84,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
         
         $linkChecker->getConfiguration()->enableToggleUrlEncoding();
         $linkChecker->getConfiguration()->disableRetryOnBadResponse();
+        $linkChecker->getConfiguration()->enableIgnoreFragmentInUrlComparison();
         
         $this->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
         

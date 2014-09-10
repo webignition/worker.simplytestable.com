@@ -52,15 +52,16 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
     protected function performValidation() {         
         $fragment = $this->webResource->getContent();        
         $finder = new HtmlDocumentLinkUrlFinder();
-        $finder->setSourceContent($fragment);
-        $finder->setSourceUrl($this->webResource->getUrl());
-        $finder->setElementScope('a');
+        $finder->getConfiguration()->setSourceContent($fragment);
+        $finder->getConfiguration()->setSourceUrl($this->webResource->getUrl());
+        $finder->getConfiguration()->setElementScope('a');
+        $finder->getConfiguration()->enableIgnoreFragmentInUrlComparison();
         $finder->getUrlScopeComparer()->addEquivalentSchemes($this->equivalentSchemes);
         
         if ($this->task->hasParameter('scope')) {
-            $finder->setUrlScope($this->task->getParameter('scope'));
+            $finder->getConfiguration()->setUrlScope($this->task->getParameter('scope'));
         }
-        
+
         return json_encode($finder->getUniqueUrls());       
     }
     
