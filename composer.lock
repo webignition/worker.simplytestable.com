@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4af12f7308838e82bd025cf0beb658a0",
+    "hash": "de1c5222a5915ee51e7fad4d82157288",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2869,24 +2869,24 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "0.9.5",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "2cdc9092317f5eaa08774a90b26ae94c10b5aa5f"
+                "reference": "236ea7f837a0f97ec64c2950709a4eb8fdd4aa66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/2cdc9092317f5eaa08774a90b26ae94c10b5aa5f",
-                "reference": "2cdc9092317f5eaa08774a90b26ae94c10b5aa5f",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/236ea7f837a0f97ec64c2950709a4eb8fdd4aa66",
+                "reference": "236ea7f837a0f97ec64c2950709a4eb8fdd4aa66",
                 "shasum": ""
             },
             "require": {
                 "guzzle/guzzle": ">=3.8.0,<4",
                 "php": ">=5.4.0",
-                "webignition/cookie-url-matcher": ">=0.1,<1",
                 "webignition/html-document-link-finder": ">=1.0.1,<2.0",
                 "webignition/url": ">=1.9.6",
+                "webignition/url-health-checker": ">=0.1.1,<1.0",
                 "webignition/web-page-model": ">=1.0,<2.0"
             },
             "require-dev": {
@@ -2917,7 +2917,7 @@
                 "html",
                 "link"
             ],
-            "time": "2014-09-10 10:58:01"
+            "time": "2014-09-11 11:51:37"
         },
         {
             "name": "webignition/html-document-link-finder",
@@ -3563,6 +3563,53 @@
                 "url"
             ],
             "time": "2014-09-04 13:22:46"
+        },
+        {
+            "name": "webignition/url-health-checker",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/url-health-checker.git",
+                "reference": "187b1a962e095f07294d59368d04c0bb8c2ad2b5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/url-health-checker/zipball/187b1a962e095f07294d59368d04c0bb8c2ad2b5",
+                "reference": "187b1a962e095f07294d59368d04c0bb8c2ad2b5",
+                "shasum": ""
+            },
+            "require": {
+                "guzzle/guzzle": ">=3.8.0,<4",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "webignition\\Tests": "tests/",
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Check the health of a URL. Does it return 200 OK? 404 Not Found? Does in redirect indefinitely?",
+            "homepage": "https://github.com/webignition/url-health-checker",
+            "keywords": [
+                "checker",
+                "health",
+                "url"
+            ],
+            "time": "2014-09-11 10:53:07"
         },
         {
             "name": "webignition/web-json-model",

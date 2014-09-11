@@ -66,7 +66,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
     private function getLinkChecker() {
         $linkChecker = new LinkChecker();
         $linkChecker->setWebPage($this->webResource);
-        $linkChecker->getConfiguration()->setHttpMethodList(array(
+        $linkChecker->getUrlHealthChecker()->getConfiguration()->setHttpMethodList(array(
             LinkCheckerConfiguration::HTTP_METHOD_GET
         ));
         
@@ -76,23 +76,19 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
         
         if ($this->task->hasParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME)) {
             $linkChecker->getConfiguration()->setDomainsToExclude($this->task->getParameter(self::EXCLUDED_DOMAINS_PARAMETER_NAME));
-        }  
-        
-        if ($this->task->hasParameter(self::COOKIES_PARAMETER_NAME)) {
-            $linkChecker->getConfiguration()->setCookies($this->task->getParameter(self::COOKIES_PARAMETER_NAME));
         }
         
-        $linkChecker->getConfiguration()->enableToggleUrlEncoding();
-        $linkChecker->getConfiguration()->disableRetryOnBadResponse();
+        $linkChecker->getUrlHealthChecker()->getConfiguration()->enableToggleUrlEncoding();
+        $linkChecker->getUrlHealthChecker()->getConfiguration()->disableRetryOnBadResponse();
         $linkChecker->getConfiguration()->enableIgnoreFragmentInUrlComparison();
         
         $this->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
         
-        $linkChecker->getConfiguration()->setUserAgents($this->getProperty('user-agents'));
-        
+        $linkChecker->getUrlHealthChecker()->getConfiguration()->setUserAgents($this->getProperty('user-agents'));
+
         $baseRequest = clone $this->getBaseRequest();
-        $baseRequest->getCurlOptions()->set(CURLOPT_TIMEOUT_MS, 10000);        
-        $linkChecker->getConfiguration()->setBaseRequest($baseRequest);
+        $baseRequest->getCurlOptions()->set(CURLOPT_TIMEOUT_MS, 10000);
+        $linkChecker->getUrlHealthChecker()->getConfiguration()->setBaseRequest($baseRequest);
 
         return $linkChecker;       
     }

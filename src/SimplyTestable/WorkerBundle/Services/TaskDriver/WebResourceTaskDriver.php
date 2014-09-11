@@ -5,6 +5,9 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use webignition\WebResource\WebResource;
 use webignition\WebResource\Exception\Exception as WebResourceException;
+use Guzzle\Plugin\Cookie\CookiePlugin;
+use Guzzle\Plugin\Cookie\CookieJar\ArrayCookieJar;
+use Guzzle\Plugin\Cookie\Cookie;
 
 abstract class WebResourceTaskDriver extends TaskDriver {        
     
@@ -105,6 +108,9 @@ abstract class WebResourceTaskDriver extends TaskDriver {
      */
     protected function getBaseRequest() {
         if (is_null($this->baseRequest)) {
+            $cookiePlugin = new CookiePlugin(new ArrayCookieJar());
+            $this->getHttpClientService()->get()->addSubscriber($cookiePlugin);
+
             $baseRequest = $this->getHttpClientService()->getRequest($this->task->getUrl());
             
             if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
@@ -116,13 +122,9 @@ abstract class WebResourceTaskDriver extends TaskDriver {
             }
             
             if ($this->task->hasParameter('cookies')) {
-                $cookieUrlMatcher = new \webignition\Cookie\UrlMatcher\UrlMatcher();             
-                
                 foreach ($this->task->getParameter('cookies') as $cookie) {
-                    if ($cookieUrlMatcher->isMatch($cookie, $this->task->getUrl())) {
-                        $baseRequest->addCookie($cookie['name'], $cookie['value']);
-                    }
-                }          
+                    $cookiePlugin->getCookieJar()->add(new Cookie($cookie));
+                }
             }
             
             $this->baseRequest = $baseRequest;
