@@ -79,8 +79,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
             'domains-to-ignore' => $this->task->hasParameter('domains-to-ignore')
                 ? $this->task->getParameter('domains-to-ignore') 
                 : array(),
-            'base-request' => $baseRequest,
-            'cookies' => ($this->task->hasParameter('cookies')) ? $this->task->getParameter('cookies') : array()
+            'base-request' => $baseRequest
         ));        
         
         $cssValidatorWrapper->getConfiguration()->getWebResourceService()->getConfiguration()->enableRetryWithUrlEncodingDisabled();

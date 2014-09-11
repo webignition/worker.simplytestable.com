@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "de1c5222a5915ee51e7fad4d82157288",
+    "hash": "f0981c595590407117907004be72a737",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2822,21 +2822,21 @@
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "0.9.7",
+            "version": "0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "f36e2f7557f0526f93f7fc03f2e1d2ccccf8c331"
+                "reference": "567f4384cad289358d92b40b03d30c13a370e276"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/f36e2f7557f0526f93f7fc03f2e1d2ccccf8c331",
-                "reference": "f36e2f7557f0526f93f7fc03f2e1d2ccccf8c331",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/567f4384cad289358d92b40b03d30c13a370e276",
+                "reference": "567f4384cad289358d92b40b03d30c13a370e276",
                 "shasum": ""
             },
             "require": {
                 "guzzle/guzzle": ">=3.8.1,<4.0",
-                "php": ">=5.3.2",
+                "php": ">=5.4",
                 "webignition/absolute-url-deriver": ">=1.4.1.2",
                 "webignition/cookie-url-matcher": ">=0.1,<1",
                 "webignition/css-validator-output-parser": ">=2.1.4",
@@ -2845,8 +2845,7 @@
                 "webignition/web-resource-service": ">=1.0.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "*"
+                "phpunit/phpunit": "~4.0"
             },
             "type": "library",
             "autoload": {
@@ -2865,7 +2864,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2014-03-28 00:00:21"
+            "time": "2014-09-11 13:58:04"
         },
         {
             "name": "webignition/html-document-link-checker",
