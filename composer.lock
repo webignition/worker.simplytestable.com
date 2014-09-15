@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f0981c595590407117907004be72a737",
+    "hash": "1c4649aec3747e9e69d7c9477cc8597e",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2920,22 +2920,22 @@
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "1.0.1",
+            "version": "1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "7f8e2bd009c21e2192553a60e718fe4abb0a3bef"
+                "reference": "8f05d988eea1998f87592377190c50f2ef84eec2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/7f8e2bd009c21e2192553a60e718fe4abb0a3bef",
-                "reference": "7f8e2bd009c21e2192553a60e718fe4abb0a3bef",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/8f05d988eea1998f87592377190c50f2ef84eec2",
+                "reference": "8f05d988eea1998f87592377190c50f2ef84eec2",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0",
                 "webignition/absolute-url-deriver": ">=1.4",
-                "webignition/url": "*"
+                "webignition/url": ">=1.9.13,<2.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "~4.0"
@@ -2965,7 +2965,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2014-09-09 17:46:00"
+            "time": "2014-09-15 14:37:50"
         },
         {
             "name": "webignition/html-document-type-extractor",
@@ -3520,16 +3520,16 @@
         },
         {
             "name": "webignition/url",
-            "version": "1.9.12",
+            "version": "1.9.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/url.git",
-                "reference": "4e9e10c907841cb232fca9f53cb6539ac50253ca"
+                "reference": "1b322b7421595c263deb0ec6de70a2c401ce1ce0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/url/zipball/4e9e10c907841cb232fca9f53cb6539ac50253ca",
-                "reference": "4e9e10c907841cb232fca9f53cb6539ac50253ca",
+                "url": "https://api.github.com/repos/webignition/url/zipball/1b322b7421595c263deb0ec6de70a2c401ce1ce0",
+                "reference": "1b322b7421595c263deb0ec6de70a2c401ce1ce0",
                 "shasum": ""
             },
             "require": {
@@ -3561,7 +3561,7 @@
             "keywords": [
                 "url"
             ],
-            "time": "2014-09-04 13:22:46"
+            "time": "2014-09-15 14:09:41"
         },
         {
             "name": "webignition/url-health-checker",

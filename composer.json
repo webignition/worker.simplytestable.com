@@ -32,7 +32,7 @@
         "winzou/console-bundle":"1.0.0",
         "guzzle/guzzle":">=3.8.0",        
         "doctrine/doctrine-fixtures-bundle": "dev-master",
-        "webignition/html-document-link-finder":">=1.0.1,<2.0",
+        "webignition/html-document-link-finder":">=1.1,<2.0",
         "webignition/html-document-link-checker":">=1.0,<2.0",
         "webignition/html-validator-wrapper":">=0.4.2",
         "webignition/html-validator-output-parser":">=0.7,<1.0",
