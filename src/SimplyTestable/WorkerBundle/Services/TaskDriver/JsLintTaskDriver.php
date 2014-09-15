@@ -251,26 +251,6 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         /* @var $nodeJslintWrapper \webignition\NodeJslint\Wrapper\Wrapper */        
         $nodeJslintWrapper = $this->getProperty('node-jslint-wrapper');
         $nodeJslintWrapper->getConfiguration()->setUrlToLint($url);
-        
-        $baseRequest = $nodeJslintWrapper->getLocalProxy()->getConfiguration()->getBaseRequest();
-      
-        if (!is_null($baseRequest->getCookies())) {
-            foreach ($baseRequest->getCookies() as $name => $value) {
-                $baseRequest->removeCookie($name);
-            }               
-        }
-       
-        if ($this->task->hasParameter('cookies')) {
-            $cookieUrlMatcher = new \webignition\Cookie\UrlMatcher\UrlMatcher();
-            
-            foreach ($this->task->getParameter('cookies') as $cookie) {
-                if ($cookieUrlMatcher->isMatch($cookie, $url)) {
-                    $baseRequest->addCookie($cookie['name'], $cookie['value']);
-                }
-            }            
-        }
-        
-        $nodeJslintWrapper->getLocalProxy()->getConfiguration()->setBaseRequest($baseRequest);        
         $response = $nodeJslintWrapper->validate();
         
         return $response;
