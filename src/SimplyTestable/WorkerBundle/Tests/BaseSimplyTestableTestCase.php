@@ -159,7 +159,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      * @return \Doctrine\ORM\EntityManager
      */
     protected function getEntityManager() {
-        return $this->container->get('doctrine.orm.entitymanager');
+        return $this->container->get('doctrine')->getManager();
     }
     
     
