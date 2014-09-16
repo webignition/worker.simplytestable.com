@@ -82,10 +82,8 @@ services:
     arguments:
       resque: "@bcc_resque.resque"
       environment: "%kernel.environment%"
-#      queueManager: "@glit_resque.queue_manager"
       logger: "@logger"
       jobFactoryService: "@simplytestable.services.resque.jobFactoryService"
-#      resquePrefix: "%glit_resque.prefix%"
         
   simplytestable.services.resque.jobFactoryService:
     class:  SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService
