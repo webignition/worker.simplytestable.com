@@ -10,15 +10,19 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase {
     public function setUp() {
         parent::setUp();
         $this->removeAllTasks();
-        //$this->setupDatabase();  
+        $this->clearRedis();
+    }
+
+    public function tearDown() {
+        $this->clearRedis();
+        parent::tearDown();
     }
     
     protected function getAdditionalCommands() {
         return array(
             new \SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand(),
         );
-    }    
-
+    }
     
     /**
      * @group standard
@@ -43,14 +47,15 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase {
 
                 $this->getTaskService()->getEntityManager()->persist($task);                
             }
-            
-
         }
         
         $this->getTaskService()->getEntityManager()->flush();
         
         $this->assertEquals(1, count($this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState())));
         $this->assertEquals(2, count($this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getInProgressState())));
+
+        $this->clearRedis();
+
         $this->assertEquals(0, $this->executeCommand('simplytestable:maintenance:requeue-in-progress-tasks'));
         $this->assertEquals(3, count($this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState())));        
     }

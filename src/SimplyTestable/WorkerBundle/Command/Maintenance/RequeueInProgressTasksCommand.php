@@ -63,12 +63,12 @@ EOF
                 $this->getTaskService()->getEntityManager()->persist($inProgressTask);                
                 $this->getTaskService()->getEntityManager()->flush();
 
-                $this->getResqueQueueService()->add(
-                    'task-perform',
-                    array(
-                        'id' => $inProgressTask->getId()
-                    )                
-                );                
+                $this->getResqueQueueService()->enqueue(
+                    $this->getResqueJobFactoryService()->create(
+                        'task-perform',
+                        ['id' => $inProgressTask->getId()]
+                    )
+                );
             }
             
 
@@ -106,12 +106,21 @@ EOF
         
         return $age;
     }
-    
+
     /**
      *
-     * @return \SimplyTestable\WorkerBundle\Services\ResqueQueueService
+     * @return \SimplyTestable\WorkerBundle\Services\Resque\QueueService
      */
     private function getResqueQueueService() {
-        return $this->getContainer()->get('simplytestable.services.resquequeueservice');
-    }      
+        return $this->getContainer()->get('simplytestable.services.resque.queueservice');
+    }
+
+
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService
+     */
+    private function getResqueJobFactoryService() {
+        return $this->getContainer()->get('simplytestable.services.resque.jobFactoryService');
+    }
 }
