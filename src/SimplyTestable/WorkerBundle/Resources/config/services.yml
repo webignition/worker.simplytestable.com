@@ -79,11 +79,11 @@ services:
         
   simplytestable.services.resqueQueueService:
     class:   SimplyTestable\WorkerBundle\Services\ResqueQueueService
-    arguments:
-      queueManager: "@glit_resque.queue_manager"
-      logger: "@logger"     
-      resqueJobFactoryService: "@simplytestable.services.ResqueJobFactoryService"
-      resquePrefix: "%glit_resque.prefix%"
+#    arguments:
+#      queueManager: "@glit_resque.queue_manager"
+#      logger: "@logger"
+#      resqueJobFactoryService: "@simplytestable.services.ResqueJobFactoryService"
+#      resquePrefix: "%glit_resque.prefix%"
         
   simplytestable.services.ResqueJobFactoryService:
     class:  SimplyTestable\WorkerBundle\Services\ResqueJobFactoryService

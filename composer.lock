@@ -4,8 +4,179 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1c32033c1603470e42613f9be119e3cf",
+    "hash": "c1aab333693de83a0ec0fe81b26a498f",
     "packages": [
+        {
+            "name": "bcc/resque-bundle",
+            "version": "dev-master",
+            "target-dir": "BCC/ResqueBundle",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/michelsalib/BCCResqueBundle.git",
+                "reference": "eab84a526b6c2b303de04ab2b38114389e62ff7b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/michelsalib/BCCResqueBundle/zipball/eab84a526b6c2b303de04ab2b38114389e62ff7b",
+                "reference": "eab84a526b6c2b303de04ab2b38114389e62ff7b",
+                "shasum": ""
+            },
+            "require": {
+                "chrisboulton/php-resque": "dev-master",
+                "chrisboulton/php-resque-scheduler": "dev-master",
+                "symfony/framework-bundle": ">=2.0,<3.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-0": {
+                    "BCC\\ResqueBundle": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michel Salib",
+                    "email": "michelsalib@hotmail.com",
+                    "homepage": "http://www.michelsalib.com"
+                }
+            ],
+            "description": "BCCResqueBundle",
+            "homepage": "http://github.com/michelsalib/BCCResqueBundle",
+            "keywords": [
+                "resque job queue management"
+            ],
+            "time": "2014-06-16 07:53:00"
+        },
+        {
+            "name": "chrisboulton/php-resque",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chrisboulton/php-resque.git",
+                "reference": "80d1c4be1972acd2059d302331c6c2f7db13aae0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chrisboulton/php-resque/zipball/80d1c4be1972acd2059d302331c6c2f7db13aae0",
+                "reference": "80d1c4be1972acd2059d302331c6c2f7db13aae0",
+                "shasum": ""
+            },
+            "require": {
+                "colinmollenhour/credis": "~1.2",
+                "ext-pcntl": "*",
+                "php": ">=5.3.0",
+                "psr/log": "1.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "suggest": {
+                "ext-proctitle": "Allows php-resque to rename the title of UNIX processes to show the status of a worker.",
+                "ext-redis": "Native PHP extension for Redis connectivity. Credis will automatically utilize when available."
+            },
+            "bin": [
+                "bin/resque"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Resque": "lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Boulton",
+                    "email": "chris@bigcommerce.com"
+                }
+            ],
+            "description": "Redis backed library for creating background jobs and processing them later. Based on resque for Ruby.",
+            "homepage": "http://www.github.com/chrisboulton/php-resque/",
+            "keywords": [
+                "background",
+                "job",
+                "redis",
+                "resque"
+            ],
+            "time": "2014-09-07 07:23:16"
+        },
+        {
+            "name": "chrisboulton/php-resque-scheduler",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chrisboulton/php-resque-scheduler.git",
+                "reference": "ab8bd52949cac1f815bbb97aa39f51c7b5766a86"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chrisboulton/php-resque-scheduler/zipball/ab8bd52949cac1f815bbb97aa39f51c7b5766a86",
+                "reference": "ab8bd52949cac1f815bbb97aa39f51c7b5766a86",
+                "shasum": ""
+            },
+            "require": {
+                "chrisboulton/php-resque": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "ResqueScheduler": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Chris Boulton",
+                    "email": "chris@bgigcommerce.com"
+                }
+            ],
+            "description": "php-resque-scheduler is a PHP port of resque-scheduler, which adds support for scheduling items in the future to Resque.",
+            "time": "2013-09-16 09:21:26"
+        },
+        {
+            "name": "colinmollenhour/credis",
+            "version": "1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/colinmollenhour/credis.git",
+                "reference": "2079564c61cc49867eddc3cc918c711564164d65"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/colinmollenhour/credis/zipball/2079564c61cc49867eddc3cc918c711564164d65",
+                "reference": "2079564c61cc49867eddc3cc918c711564164d65",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "Client.php",
+                    "Cluster.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Colin Mollenhour",
+                    "email": "colin@mollenhour.com"
+                }
+            ],
+            "description": "Credis is a lightweight interface to the Redis key-value store which wraps the phpredis library when available for better performance.",
+            "homepage": "https://github.com/colinmollenhour/credis",
+            "time": "2014-05-05 19:31:30"
+        },
         {
             "name": "doctrine/annotations",
             "version": "v1.2.0",
@@ -498,12 +669,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/DoctrineFixturesBundle.git",
-                "reference": "3ffa2184c94d94477d5bb625b94597ed0d44ebe0"
+                "reference": "9a5b5289eb22079ec139ba1eb06043d4b89c6677"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/DoctrineFixturesBundle/zipball/3ffa2184c94d94477d5bb625b94597ed0d44ebe0",
-                "reference": "3ffa2184c94d94477d5bb625b94597ed0d44ebe0",
+                "url": "https://api.github.com/repos/doctrine/DoctrineFixturesBundle/zipball/9a5b5289eb22079ec139ba1eb06043d4b89c6677",
+                "reference": "9a5b5289eb22079ec139ba1eb06043d4b89c6677",
                 "shasum": ""
             },
             "require": {
@@ -547,7 +718,7 @@
                 "Fixture",
                 "persistence"
             ],
-            "time": "2014-08-20 20:34:54"
+            "time": "2014-09-16 05:03:04"
         },
         {
             "name": "doctrine/doctrine-migrations-bundle",
@@ -911,88 +1082,6 @@
                 "lib"
             ],
             "time": "2014-02-15 12:42:32"
-        },
-        {
-            "name": "glit/resque",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/glit/php-resque.git",
-                "reference": "dababc0735ce7d1e2c515a902e447bb1aabc0f84"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/glit/php-resque/zipball/dababc0735ce7d1e2c515a902e447bb1aabc0f84",
-                "reference": "dababc0735ce7d1e2c515a902e447bb1aabc0f84",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Resque": "lib"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "William POTTIER",
-                    "email": "wpottier@allprogrammic.com"
-                }
-            ],
-            "description": "PHP port of the ruby resque library. And some enhancement to delegate instanciation of job (usefull to work with the Symfony2 DIC for exemple). ",
-            "keywords": [
-                "resque"
-            ],
-            "time": "2013-03-03 23:53:48"
-        },
-        {
-            "name": "glit/resque-bundle",
-            "version": "dev-master",
-            "target-dir": "Glit/ResqueBundle",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/glit/ResqueBundle.git",
-                "reference": "310469595f3680bf6190f64570340b21881becf5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/glit/ResqueBundle/zipball/310469595f3680bf6190f64570340b21881becf5",
-                "reference": "310469595f3680bf6190f64570340b21881becf5",
-                "shasum": ""
-            },
-            "require": {
-                "glit/resque": "dev-master",
-                "symfony/framework-bundle": ">=2.2"
-            },
-            "type": "symfony-bundle",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Glit\\ResqueBundle": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache"
-            ],
-            "authors": [
-                {
-                    "name": "William POTTIER",
-                    "email": "wpottier@allprogrammic.com"
-                }
-            ],
-            "description": "Adds php-resque to Symfony2",
-            "keywords": [
-                "resque"
-            ],
-            "time": "2014-03-25 13:54:49"
         },
         {
             "name": "guzzle/guzzle",
@@ -3935,9 +4024,10 @@
         "doctrine/migrations": 20,
         "doctrine/doctrine-migrations-bundle": 20,
         "jms/serializer-bundle": 20,
-        "glit/resque": 20,
-        "glit/resque-bundle": 20,
-        "doctrine/doctrine-fixtures-bundle": 20
+        "doctrine/doctrine-fixtures-bundle": 20,
+        "chrisboulton/php-resque": 20,
+        "chrisboulton/php-resque-scheduler": 20,
+        "bcc/resque-bundle": 20
     },
     "prefer-stable": true,
     "platform": {
