@@ -18,10 +18,8 @@ use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService;
  */
 class QueueService {
 
-//
-//    const RESQUE_KEY = 'resque';
     const QUEUE_KEY = 'queue';
-//
+
     /**
      *
      * @var Resque
@@ -55,24 +53,7 @@ class QueueService {
         $this->jobFactoryService = $jobFactoryService;
     }
 
-//
-//
-//    /**
-//     *
-//     * @param string $queue_name
-//     * @param array $args
-//     * @return boolean
-//     */
-//    public function remove($queue_name, $args = null) {
-//        try {
-//            return \Resque\Resque::redis()->lrem(self::QUEUE_KEY . ':' . $queue_name, 1, $this->findRedisValue($queue_name, $args)) == 1;
-//        } catch (\Exception $exception) {
-//            $this->logger->warn('ResqueQueueService::add: Redis error ['.$exception->getMessage().']');
-//            return false;
-//        }
-//    }
-//
-//
+
     /**
      *
      * @param string $queue_name
