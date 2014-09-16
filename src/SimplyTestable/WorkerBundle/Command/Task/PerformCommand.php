@@ -14,13 +14,6 @@ class PerformCommand extends Command
     const RETURN_CODE_FAILED_NO_TASK_DRIVER_FOUND = -4;
     const RETURN_CODE_UNKNOWN_ERROR = -5;
     
-    /**
-     *
-     * @var string
-     */
-    //private $httpFixturePath;    
-    
-    
     protected function configure()
     {
         $this
@@ -45,7 +38,13 @@ EOF
         
         $this->getContainer()->get('logger')->info("TaskPerformCommand::execute: [".$task->getId()."] [".$task->getState()->getName()."]");        
 
-        if ($this->getWorkerService()->isMaintenanceReadOnly()) {            
+        if ($this->getWorkerService()->isMaintenanceReadOnly()) {
+            if (!$this->getResqueQueueService()->contains('task-perform', ['id' => $task->getId()])) {
+                $this->getResqueQueueService()->enqueue(
+                    $this->getResqueJobFactoryService()->create('task-perform', ['id' => $task->getId()])
+                );
+            }
+
             $output->writeln('Unable to perform task, worker application is in maintenance read-only mode');
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }
@@ -60,12 +59,12 @@ EOF
         }        
         
         if ($performResult === 0) {
-            $this->getContainer()->get('simplytestable.services.resqueQueueService')->add(
-                'task-report-completion',
-                array(
-                    'id' => $task->getId()
-                )                
-            );        
+            $this->getResqueQueueService()->enqueue(
+                $this->getResqueJobFactoryService()->create(
+                    'task-report-completion',
+                    ['id' => $task->getId()]
+                )
+            );
             
             $output->writeln('Performed ['.$task->getId().']');
             $this->getContainer()->get('logger')->info('TaskPerformCommand::Performed ['.$task->getId().'] ['.$task->getState().'] ['.($task->hasOutput() ? 'has output' : 'no output').']');
@@ -85,6 +84,6 @@ EOF
         
         $output->writeln('Task perform failed, unknown error');
         return self::RETURN_CODE_UNKNOWN_ERROR;       
-    }    
+    }
 
 }

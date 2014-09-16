@@ -17,13 +17,23 @@ abstract class Command extends BaseCommand
      */
     protected function getTaskService() {
         return $this->getContainer()->get('simplytestable.services.taskservice');
-    }  
-    
+    }
+
+
     /**
      *
-     * @return \SimplyTestable\WorkerBundle\Services\ResqueQueueService
+     * @return \SimplyTestable\WorkerBundle\Services\Resque\QueueService
      */
     protected function getResqueQueueService() {
-        return $this->getContainer()->get('simplytestable.services.resquequeueservice');
+        return $this->getContainer()->get('simplytestable.services.resque.queueservice');
+    }
+
+
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService
+     */
+    protected function getResqueJobFactoryService() {
+        return $this->getContainer()->get('simplytestable.services.resque.jobFactoryService');
     }     
 }

@@ -60,12 +60,12 @@ class TaskController extends BaseController
         
         $this->getTaskService()->getEntityManager()->persist($task);
         $this->getTaskService()->getEntityManager()->flush();
-        
-        $this->container->get('simplytestable.services.resqueQueueService')->add(
-            'task-perform',
-            array(
-                'id' => $task->getId()
-            )                
+
+        $this->get('simplytestable.services.resque.queueService')->enqueue(
+            $this->get('simplytestable.services.resque.jobFactoryService')->create(
+                'task-perform',
+                ['id' => $task->getId()]
+            )
         );
         
         return $this->sendResponse($task);
