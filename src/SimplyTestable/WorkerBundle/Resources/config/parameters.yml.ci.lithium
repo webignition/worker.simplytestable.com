@@ -1,5 +1,2 @@
+  bcc_resque_prefix: worker-lithium
   hostname: lithium.ci.worker.simplytestable.com
-  resque_pid: "simplytestable_workerbundle_lithium"
-
-glit_resque:
-  prefix: "SimplyTestable\WorkerBundle\Lithium"
