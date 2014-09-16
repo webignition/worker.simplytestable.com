@@ -77,16 +77,18 @@ services:
         drivers: %drivers%  
         container: "@service_container"
         
-  simplytestable.services.resqueQueueService:
-    class:   SimplyTestable\WorkerBundle\Services\ResqueQueueService
-#    arguments:
+  simplytestable.services.resque.queueService:
+    class:   SimplyTestable\WorkerBundle\Services\Resque\QueueService
+    arguments:
+      resque: "@bcc_resque.resque"
+      environment: "%kernel.environment%"
 #      queueManager: "@glit_resque.queue_manager"
-#      logger: "@logger"
-#      resqueJobFactoryService: "@simplytestable.services.ResqueJobFactoryService"
+      logger: "@logger"
+      jobFactoryService: "@simplytestable.services.resque.jobFactoryService"
 #      resquePrefix: "%glit_resque.prefix%"
         
-  simplytestable.services.ResqueJobFactoryService:
-    class:  SimplyTestable\WorkerBundle\Services\ResqueJobFactoryService
+  simplytestable.services.resque.jobFactoryService:
+    class:  SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService
     arguments:
       jobClassMap: "%resque-job-class-map%"   
         
