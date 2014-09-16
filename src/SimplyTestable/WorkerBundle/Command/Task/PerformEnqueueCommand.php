@@ -29,13 +29,14 @@ EOF
             if ($this->getResqueQueueService()->contains('task-perform', array('id' => $taskId))) {
                 $output->writeln('Task ['.$taskId.'] is already enqueued');
             } else {
-                $output->writeln('Enqueuing task ['.$taskId.']');                
-                $this->getResqueQueueService()->add(
-                    'task-perform',
-                    array(
-                        'id' => $taskId
-                    )                
-                );                 
+                $output->writeln('Enqueuing task ['.$taskId.']');
+
+                $this->getResqueQueueService()->enqueue(
+                    $this->getResqueJobFactoryService()->create(
+                        'task-perform',
+                        ['id' => $taskId]
+                    )
+                );
             }           
         }
         

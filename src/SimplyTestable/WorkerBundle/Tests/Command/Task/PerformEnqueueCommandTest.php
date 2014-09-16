@@ -10,7 +10,18 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase {
         return array(
             new \SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand()
         );
-    }   
+    }
+
+
+    public function setUp() {
+        parent::setUp();
+        $this->clearRedis();
+    }
+
+    public function tearDown() {
+        $this->clearRedis();
+        parent::tearDown();
+    }
     
     
     /**
@@ -43,7 +54,9 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase {
         $tasks = array();        
         foreach ($taskPropertyCollection as $taskProperties) {
             $tasks[] = $this->createTask($taskProperties['url'], $taskProperties['type']);
-        }       
+        }
+
+        $this->clearRedis();
   
         $this->assertEquals(0, $this->executeCommand('simplytestable:task:perform:enqueue'));
         
