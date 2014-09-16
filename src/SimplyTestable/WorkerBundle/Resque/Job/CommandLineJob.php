@@ -2,9 +2,7 @@
 
 namespace SimplyTestable\WorkerBundle\Resque\Job;
 
-use SimplyTestable\WorkerBundle\Exception\JobPrepareException;
-
-abstract class CommandLineJob extends AbstractJob {    
+abstract class CommandLineJob extends Job {
     
     abstract protected function getQueueName();
     abstract protected function getArgumentOrder();
@@ -16,22 +14,21 @@ abstract class CommandLineJob extends AbstractJob {
         $this->setQueue($this->getQueueName());
     }
     
-    public function perform() {
+    public function run($args) {
         $output = array();
-        $returnValue = null;       
-        
+        $returnValue = null;
+
         exec($this->buildCommand(), $output, $returnValue);
-        
+
         if ($returnValue !== 0) {
             $this->failureHandler($output, $returnValue);
         }
     }
-    
-    
+
     /**
      * The command line command to run, including all arguments in the correct
      * order
-     * 
+     *
      * @return string
      */
     private function buildCommand() {
