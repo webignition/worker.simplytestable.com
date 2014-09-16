@@ -35,12 +35,13 @@ EOF
             } else {
                 $output->writeln('Enqueuing task ['.$taskId.']');                
                 $this->getContainer()->get('logger')->info('TaskReportCompletionEnqueueCommand::Enqueuing task ['.$taskId.']');
-                $this->getResqueQueueService()->add(
-                    'task-report-completion',
-                    array(
-                        'id' => $taskId
-                    )                
-                );                 
+
+                $this->getResqueQueueService()->enqueue(
+                    $this->getResqueJobFactoryService()->create(
+                        'task-report-completion',
+                        ['id' => $taskId]
+                    )
+                );
             }           
         }
                
