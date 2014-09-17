@@ -61,7 +61,13 @@ class QueueService {
      * @return boolean
      */
     public function contains($queue_name, $args = null) {
-        return !is_null($this->findRedisValue($queue_name, $args));
+        try {
+            return !is_null($this->findRedisValue($queue_name, $args));
+        } catch (\CredisException $credisException) {
+            $this->logger->warn('ResqueQueueService::enqueue: Redis error ['.$credisException->getMessage().']');
+        }
+
+        return false;
     }
 
 
