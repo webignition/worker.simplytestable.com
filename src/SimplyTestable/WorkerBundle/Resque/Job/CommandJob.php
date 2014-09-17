@@ -14,15 +14,26 @@ abstract class CommandJob extends Job {
     abstract protected function getCommand();
 
 
+    /**
+     * Get the arguments required by the to-be-run command.
+     *
+     * This may differ from the arguments passed to this job, specifically when being run via resque as some additional
+     * container-relevant args will be added to the job that are not relevant to the command.
+     *
+     * return array
+     */
+    abstract protected function getCommandArgs();
+
+
     public function run($args) {
         $command = $this->getCommand();
         $command->setContainer($this->getContainer());
 
-        $input = new ArrayInput($args);
+        $input = new ArrayInput($this->getCommandArgs());
         $output = new StringOutput();
 
         $returnCode = ($this->isTestEnvironment()) ? $this->args['returnCode'] : $command->run($input, $output);
-
+        
         if ($returnCode === 0) {
             return true;
         }

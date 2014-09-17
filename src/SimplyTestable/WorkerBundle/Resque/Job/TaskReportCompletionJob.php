@@ -15,4 +15,10 @@ class TaskReportCompletionJob extends CommandJob {
     protected function getCommand() {
         return new ReportCompletionCommand();
     }
+
+    protected function getCommandArgs() {
+        return [
+            $this->args['id']
+        ];
+    }
 }

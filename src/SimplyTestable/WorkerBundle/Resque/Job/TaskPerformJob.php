@@ -15,4 +15,11 @@ class TaskPerformJob extends CommandJob {
     protected function getCommand() {
         return new PerformCommand();
     }
+
+    protected function getCommandArgs() {
+        return [
+            $this->args['id']
+        ];
+    }
+
 }
