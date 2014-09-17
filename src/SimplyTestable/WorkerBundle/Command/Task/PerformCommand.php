@@ -54,7 +54,6 @@ EOF
         } catch (\Exception $e) {
             var_dump('Exception calling $this->getTaskService()->perform');
             var_dump('Exception class: '.get_class($e));
-            var_dump($e);
             exit();
         }        
         
