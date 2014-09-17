@@ -52,9 +52,9 @@ EOF
         try {
             $performResult = $this->getTaskService()->perform($task);            
         } catch (\Exception $e) {
-            var_dump('Exception calling $this->getTaskService()->perform');
-            var_dump('Exception class: '.get_class($e));
-            exit();
+            $this->getContainer()->get('logger')->error('TaskPerformCommand: Exception: taskId: [' . $task->getId() . ']');
+            $this->getContainer()->get('logger')->error('TaskPerformCommand: Exception: exception class: [' . get_class($e) . ']');
+            return -6;
         }        
         
         if ($performResult === 0) {
