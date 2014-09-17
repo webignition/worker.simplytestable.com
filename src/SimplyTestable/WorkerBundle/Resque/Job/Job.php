@@ -2,12 +2,15 @@
 
 namespace SimplyTestable\WorkerBundle\Resque\Job;
 
-use BCC\ResqueBundle\Job as BaseJob;
+use BCC\ResqueBundle\ContainerAwareJob as BaseJob;
 
 abstract class Job extends BaseJob {
 
+    abstract protected function getQueueName();
+
     public function __construct($args = []) {
         $this->args = $args;
+        $this->setQueue($this->getQueueName());
     }
 
 

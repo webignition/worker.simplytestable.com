@@ -2,26 +2,17 @@
 
 namespace SimplyTestable\WorkerBundle\Resque\Job;
 
-use SimplyTestable\WorkerBundle\Exception\TaskPerformException;
+use SimplyTestable\WorkerBundle\Command\Task\PerformCommand;
 
-class TaskPerformJob extends CommandLineJob {    
-    
+class TaskPerformJob extends CommandJob {
+
     const QUEUE_NAME = 'task-perform';
-    const COMMAND = 'php app/console simplytestable:task:perform';
-    
+
     protected function getQueueName() {
         return self::QUEUE_NAME;
     }
-    
-    protected function getArgumentOrder() {
-        return array('id');
-    }
-    
+
     protected function getCommand() {
-        return self::COMMAND;
+        return new PerformCommand();
     }
-    
-    protected function failureHandler($output, $returnValue) {
-        throw new TaskPerformException(implode("\n", $output), $returnValue);
-    }   
 }
