@@ -8,7 +8,7 @@ use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService;
 
 
 /**
- * Wrapper for \Glit\ResqueBundle\Resque\Queue that handles exceptions
+ * Wrapper for \BCC\ResqueBundle\Resque that handles exceptions
  * when trying to interact with queues.
  * 
  * Exceptions generally occur when trying to establish a socket connection to
@@ -146,21 +146,8 @@ class QueueService {
         try {
             return $this->resque->enqueue($job, $trackStatus);
         } catch (\CredisException $credisException) {
-            if ($this->isProduction()) {
-                throw $credisException;
-            }
-
             $this->logger->warn('ResqueQueueService::enqueue: Redis error ['.$credisException->getMessage().']');
         }
     }
-
-
-    /**
-     * @return bool
-     */
-    private function isProduction() {
-        return $this->environment == 'prod';
-    }
-    
     
 }
