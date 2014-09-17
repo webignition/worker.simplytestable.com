@@ -13,7 +13,7 @@ class MultipleChildStylesheetCurlErrorTest extends TransportErrorTest {
     }
     
     protected function getOutputTemplate() {
-        return '[{"message":"http-retrieval-curl-code-{{failure-code}}","context":"","ref":"http:\/\/example.com\/style2.css","line_number":0,"type":"error"}]';
+        return '[{"message":"http-retrieval-curl-code-{{failure-code}}","context":"","line_number":0,"type":"error","ref":"http:\/\/example.com\/style2.css"}]';
     }
     
     
