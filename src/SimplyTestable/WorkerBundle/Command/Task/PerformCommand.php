@@ -54,6 +54,8 @@ EOF
         } catch (\Exception $e) {
             $this->getContainer()->get('logger')->error('TaskPerformCommand: Exception: taskId: [' . $task->getId() . ']');
             $this->getContainer()->get('logger')->error('TaskPerformCommand: Exception: exception class: [' . get_class($e) . ']');
+            $this->getContainer()->get('logger')->error('TaskPerformCommand: Exception: exception code: [' . $e->getCode() . ']');
+            $this->getContainer()->get('logger')->error('TaskPerformCommand: Exception: exception msg: [' . $e->getMessage() . ']');
             return -6;
         }        
         
