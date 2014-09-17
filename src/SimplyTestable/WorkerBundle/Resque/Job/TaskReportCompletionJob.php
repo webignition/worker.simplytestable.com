@@ -18,7 +18,7 @@ class TaskReportCompletionJob extends CommandJob {
 
     protected function getCommandArgs() {
         return [
-            $this->args['id']
+            'id' => $this->args['id']
         ];
     }
 }
