@@ -102,27 +102,37 @@ class CssValidationTaskDriver extends WebResourceTaskDriver {
         
         $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
         $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
-        
-        return $this->getSerializer()->serialize($this->prepareCssValidatorOutput($cssValidatorOutput), 'json');        
+
+        return $this->getSerializer()->serialize($this->prepareCssValidatorOutput($cssValidatorOutput), 'json');
     }
-    
-    
+
     private function prepareCssValidatorOutput(\webignition\CssValidatorOutput\CssValidatorOutput $cssValidatorOutput) {
+        $serializableMessages = [];
         $messages = $cssValidatorOutput->getMessages();
         
         foreach ($messages as $index => $message) {
+            /* @var $message \webignition\CssValidatorOutput\Message\Message */
+
             if ($message->isError()) {
                 if ($this->isCssValidatorHttpError($message)) {
                     $message->setMessage('http-retrieval-' . $this->getCssValidatorHttpErrorStatusCode($message));
                 }
-                
-                if ($this->isCssValidatorCurlError($message)) {                    
+
+                if ($this->isCssValidatorCurlError($message)) {
                     $message->setMessage('http-retrieval-curl-code-' . $this->getCssValidatorCurlErrorCode($message));
-                }                
+                }
             }
+
+            $serializableMessages[] = [
+                'message' => $message->getMessage(),
+                'context' => $message->getContext(),
+                'line_number' => $message->getLineNumber(),
+                'type' => $message->getSerializedType(),
+                'ref' => $message->getRef()
+            ];
         }
         
-        return $messages;
+        return $serializableMessages;
     }
     
     
