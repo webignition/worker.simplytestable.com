@@ -22,7 +22,7 @@ before_script:
   #- tar -zxf memcache-2.2.7.tgz
   #- sh -c "cd memcache-2.2.7 && phpize && ./configure && make --quiet && sudo make --quiet install"
   #- echo "extension=memcache.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s/.*:\s*//"`
-  echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   
   #- printf "yes\n" | pecl install memcache
   #- echo "extension=\"memcache.so\"" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`  
