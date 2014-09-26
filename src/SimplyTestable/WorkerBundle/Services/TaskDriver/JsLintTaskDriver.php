@@ -11,10 +11,14 @@ use webignition\WebResource\Exception\InvalidContentTypeException;
 use webignition\NodeJslint\Wrapper\Configuration\Flag\JsLint as JsLintFlag;
 use webignition\NodeJslint\Wrapper\Configuration\Option\JsLint as JsLintOption;
 
-class JsLintTaskDriver extends WebResourceTaskDriver {  
+class JsLintTaskDriver extends WebResourceTaskDriver {
     
-     const JSLINT_PARAMETER_NAME_PREFIX = 'jslint-option-';    
-     const MAXIMUM_FRAGMENT_LENGTH = 256;    
+    const JSLINT_PARAMETER_NAME_PREFIX = 'jslint-option-';
+    const MAXIMUM_FRAGMENT_LENGTH = 256;
+
+    private $disallowedScriptUrlSchemes = [
+        'resource'
+    ];
     
     /**
      *
@@ -391,7 +395,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
             $webPage = new WebPage();
             $webPage->setHttpResponse(\Guzzle\Http\Message\Response::fromMessage("HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $this->webResource->getContent()));
         }
-        
+
         $scriptUrls = array();
         
         $thisUrl = new Url($webPage->getUrl());
@@ -401,8 +405,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
             if ($src != '') {
                 $absoluteUrlDeriver = new AbsoluteUrlDeriver($src, $thisUrl);
                 $absoluteScriptUrl = $absoluteUrlDeriver->getAbsoluteUrl();
-                
-                if (!in_array($absoluteScriptUrl, $scriptUrls)) {
+
+                if (!in_array($absoluteScriptUrl->getScheme(), $this->disallowedScriptUrlSchemes) && !in_array($absoluteScriptUrl, $scriptUrls)) {
                     $scriptUrls[] = $absoluteScriptUrl;
                 }
             }
