@@ -16,6 +16,14 @@ install:
 before_script:
   - echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   #- php -r 'new \Memcache;'
+  - mv app/config/parameters.yml.travis app/config/parameters.yml
+  - cp app/config/security_credentials.yml.dist app/config/security_credentials.yml
+  - mv --force app/config/config_travis.yml app/config/config_test.yml
+  - cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
+  - php composer.phar install
+  - php app/console doctrine:database:create
+  - php app/console doctrine:migrations:migrate --no-interaction
+  - php app/console doctrine:fixtures:load --append
 
 script:
   - phpunit -c app
