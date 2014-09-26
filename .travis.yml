@@ -9,13 +9,6 @@ before_install:
   - composer self-update
   - "mkdir -p ~/.composer"
   - cp .travis.composer.config.json ~/.composer/config.json
-  
-install: 
-  - composer install
-
-before_script:
-  - echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  #- php -r 'new \Memcache;'
   - mv app/config/parameters.yml.travis app/config/parameters.yml
   - cp app/config/security_credentials.yml.dist app/config/security_credentials.yml
   - mv --force app/config/config_travis.yml app/config/config_test.yml
@@ -24,6 +17,13 @@ before_script:
   - php app/console doctrine:database:create
   - php app/console doctrine:migrations:migrate --no-interaction
   - php app/console doctrine:fixtures:load --append
+  
+install: 
+  - composer install
+
+before_script:
+  - echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  #- php -r 'new \Memcache;'
 
 script:
   - phpunit -c app
