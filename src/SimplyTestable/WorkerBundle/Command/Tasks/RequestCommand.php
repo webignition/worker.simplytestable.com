@@ -38,10 +38,12 @@ EOF
 
 
     private function requeue() {
-        $this->getResqueQueueService()->enqueue(
-            $this->getResqueJobFactoryService()->create(
-                'tasks-request'
-            )
-        );
+        if ($this->getResqueQueueService()->isEmpty('tasks-perform')) {
+            $this->getResqueQueueService()->enqueue(
+                $this->getResqueJobFactoryService()->create(
+                    'tasks-request'
+                )
+            );
+        }
     }
 }

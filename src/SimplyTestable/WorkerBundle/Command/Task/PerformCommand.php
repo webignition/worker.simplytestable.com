@@ -67,11 +67,14 @@ EOF
                 )
             );
 
-            $this->getResqueQueueService()->enqueue(
-                $this->getResqueJobFactoryService()->create(
-                    'tasks-request'
-                )
-            );
+            if ($this->getResqueQueueService()->isEmpty('tasks-request')) {
+                $this->getResqueQueueService()->enqueue(
+                    $this->getResqueJobFactoryService()->create(
+                        'tasks-request'
+                    )
+                );
+            }
+
             
             $output->writeln('Performed ['.$task->getId().']');
             $this->getContainer()->get('logger')->info('TaskPerformCommand::Performed ['.$task->getId().'] ['.$task->getState().'] ['.($task->hasOutput() ? 'has output' : 'no output').']');
