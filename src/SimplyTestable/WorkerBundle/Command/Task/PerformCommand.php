@@ -66,6 +66,12 @@ EOF
                     ['id' => $task->getId()]
                 )
             );
+
+            $this->getResqueQueueService()->enqueue(
+                $this->getResqueJobFactoryService()->create(
+                    'tasks-request'
+                )
+            );
             
             $output->writeln('Performed ['.$task->getId().']');
             $this->getContainer()->get('logger')->info('TaskPerformCommand::Performed ['.$task->getId().'] ['.$task->getState().'] ['.($task->hasOutput() ? 'has output' : 'no output').']');
