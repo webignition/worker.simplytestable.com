@@ -11,13 +11,13 @@ services:
       - [createConfiguration, [{allow-uknown-resource-types: "true", retry-with-url-encoding-disabled: "true", content-type-web-resource-map: %content_type_web_resource_map% }]]     
         
   simplytestable.services.htmlValidatorWrapperService:
-    class:  webignition\HtmlValidator\Wrapper\Wrapper 
+    class:  webignition\HtmlValidator\Wrapper\Wrapper
     
   simplytestable.services.cssValidatorWrapperService:
-    class:  webignition\CssValidatorWrapper\Wrapper     
+    class:  webignition\CssValidatorWrapper\Wrapper
     
   simplytestable.services.nodeJslintWrapperService:
-    class:  webignition\NodeJslint\Wrapper\Wrapper 
+    class:  webignition\NodeJslint\Wrapper\Wrapper
   
   simplytestable.services.coreApplicationService:
     class:  SimplyTestable\WorkerBundle\Services\CoreApplicationService
@@ -42,13 +42,13 @@ services:
         urlService: "@simplytestable.services.urlService"
         
   simplytestable.services.urlService:
-    class:  SimplyTestable\WorkerBundle\Services\UrlService     
+    class:  SimplyTestable\WorkerBundle\Services\UrlService
     
   simplytestable.services.requestservice:
-    class:   SimplyTestable\WorkerBundle\Services\RequestService    
+    class:   SimplyTestable\WorkerBundle\Services\RequestService
     
   simplytestable.controller.action_listener:
-    class: SimplyTestable\WorkerBundle\EventListener\BeforeListener    
+    class: SimplyTestable\WorkerBundle\EventListener\BeforeListener
     arguments:
         logger: "@logger"
     tags:
