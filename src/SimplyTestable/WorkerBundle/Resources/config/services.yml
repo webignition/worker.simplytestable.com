@@ -98,4 +98,15 @@ services:
       container: "@service_container"    
       
   simplytestable.services.memcacheService:
-    class:   SimplyTestable\WorkerBundle\Services\MemcacheService     
+    class:   SimplyTestable\WorkerBundle\Services\MemcacheService
+
+  simplytestable.services.tasksservice:
+    class:   SimplyTestable\WorkerBundle\Services\TasksService
+    arguments:
+        logger: "@logger"
+        urlService: "@simplytestable.services.urlservice"
+        coreApplicationService: "@simplytestable.services.coreapplicationservice"
+        workerService: "@simplytestable.services.workerservice"
+        httpClientService: "@simplytestable.services.httpClientService"
+    calls:
+      - [setTaskRequestLimit, [%task_request_limit%]]
