@@ -8,7 +8,10 @@ class CoreApplicationServerErrorTest extends FailureTest {
         parent::setUp();
 
         $this->setHttpFixtures($this->buildHttpFixtureSet([
-            'HTTP/1.1 500'
+            'HTTP/1.1 500',
+            'HTTP/1.1 500',
+            'HTTP/1.1 500',
+            'HTTP/1.1 500',
         ]));
     }
 }
