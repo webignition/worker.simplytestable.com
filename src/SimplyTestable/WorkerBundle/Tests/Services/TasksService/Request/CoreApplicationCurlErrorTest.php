@@ -8,7 +8,10 @@ class CoreApplicationCurlErrorTest extends FailureTest {
         parent::setUp();
 
         $this->setHttpFixtures($this->buildHttpFixtureSet([
-            'CURL/28 Foo'
+            'CURL/28 Foo',
+            'CURL/28 Foo',
+            'CURL/28 Foo',
+            'CURL/28 Foo',
         ]));
     }
 
