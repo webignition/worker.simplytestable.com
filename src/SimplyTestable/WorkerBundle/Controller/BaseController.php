@@ -8,20 +8,11 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputDefinition;
-use SimplyTestable\WorkerBundle\Services\RequestService;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 
 abstract class BaseController extends Controller
 {      
-    
-    /**
-     *
-     * @var RequestService
-     */
-    private $requestService;
-    
-    
     /**
      *
      * @var ParameterBag 
@@ -72,30 +63,7 @@ abstract class BaseController extends Controller
         
         return $response;
     }
-    
-    
-    /**
-     *
-     * @return RequestService
-     */
-    protected function getRequestService() {
-        if (is_null($this->requestService)) {
-            $this->requestService = $this->container->get('simplytestable.services.requestservice');
-            $this->requestService->setRequest($this->get('request'));
-        }
-        
-        return $this->requestService;
-    }
-    
-    
-    /**
-     *
-     * @return Request
-     */
-    public function getRequest() {
-        return $this->getRequestService()->getRequest();
-    }
-    
+
     
     /**
      *
