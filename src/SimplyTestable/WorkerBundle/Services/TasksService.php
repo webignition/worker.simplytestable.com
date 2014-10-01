@@ -122,8 +122,6 @@ class TasksService {
             $this->logger->error('TaskService:request:CurlException [' . $curlException->getErrorNo() . ']');
         }
 
-        // TODO pop resque job in queue to try again
-
         return false;
     }
 }
