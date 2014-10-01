@@ -21,8 +21,7 @@ EOF
         );
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
-    {
+    public function execute(InputInterface $input, OutputInterface $output) {
         if ($this->getWorkerService()->isMaintenanceReadOnly()) {
             $this->requeue();
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
@@ -38,7 +37,7 @@ EOF
 
 
     private function requeue() {
-        if ($this->getResqueQueueService()->isEmpty('tasks-perform')) {
+        if ($this->getResqueQueueService()->isEmpty('tasks-request')) {
             $this->getResqueQueueService()->enqueue(
                 $this->getResqueJobFactoryService()->create(
                     'tasks-request'
