@@ -93,7 +93,7 @@ class TasksService {
     }
 
 
-    public function request($currentTaskCount) {
+    public function request($currentTaskCount = 0) {
         $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/tasks/request/');
 
         if (!$this->getLimit($currentTaskCount)) {
