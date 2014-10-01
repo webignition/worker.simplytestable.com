@@ -14,6 +14,7 @@ abstract class FailureTest extends RequestCommandTest {
     }
 
     public function testReturnsResqueJobToQueue() {
-        // TODO: this
+        $this->executeCommand('simplytestable:tasks:request');
+        $this->assertTrue($this->getRequeQueueService()->contains('tasks-request'));
     }
 }

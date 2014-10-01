@@ -38,6 +38,10 @@ EOF
 
 
     private function requeue() {
-        // TODO pop resque job in queue to try again
+        $this->getResqueQueueService()->enqueue(
+            $this->getResqueJobFactoryService()->create(
+                'tasks-request'
+            )
+        );
     }
 }
