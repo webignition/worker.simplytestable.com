@@ -58,7 +58,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      * 
      * @param string $controllerName
      * @param string $methodName
-     * @return Symfony\Bundle\FrameworkBundle\Controller\Controller
+     * @return \Symfony\Bundle\FrameworkBundle\Controller\Controller
      */
     private function getController($controllerName, $methodName, array $postData = array(), array $queryData = array()) {        
         return $this->createController($controllerName, $methodName, $postData, $queryData);
@@ -98,17 +98,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     protected function getHttpClientService() {
         return $this->container->get('simplytestable.services.httpclientservice');
     }     
-    
-    
-    /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\TestWebResourceService
-     */
-    protected function getWebResourceService() {
-        return $this->container->get('simplytestable.services.webresourceservice');
-    }     
-        
-    
+
     
     /**
      *
