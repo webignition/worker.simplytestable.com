@@ -106,9 +106,18 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      */
     protected function getTaskService() {
         return $this->container->get('simplytestable.services.taskservice');
-    }       
-    
-    
+    }
+
+
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Services\TasksService
+     */
+    protected function getTasksService() {
+        return $this->container->get('simplytestable.services.tasksservice');
+    }
+
+
     /**
      *
      * @return \SimplyTestable\WorkerBundle\Services\CoreApplicationService

@@ -6,6 +6,11 @@ use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
 
 abstract class RequestCommandTest extends ConsoleCommandBaseTestCase {
+
+    public function setUp() {
+        parent::setUp();
+        $this->removeAllTasks();
+    }
     
     public function tearDown() {
         $this->clearRedis();

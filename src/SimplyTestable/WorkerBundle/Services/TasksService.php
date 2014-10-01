@@ -93,14 +93,18 @@ class TasksService {
     }
 
 
-    public function request() {
+    public function request($currentTaskCount) {
         $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/tasks/request/');
+
+        if (!$this->getLimit($currentTaskCount)) {
+            return false;
+        }
 
         $request = $this->httpClientService->getRequest($requestUrl . '?' . http_build_query([
                 'worker_hostname' => $this->workerService->get()->getHostname(),
                 'worker_token' => $this->workerService->get()->getActivationToken(),
-                'limit' => $this->getTaskRequestLimit()
-            ]));
+                'limit' => $this->getLimit($currentTaskCount)
+        ]));
 
         try {
             $response = $request->send();
@@ -123,5 +127,14 @@ class TasksService {
         }
 
         return false;
+    }
+
+
+    /**
+     * @param $currentTaskCount
+     * @return int
+     */
+    private function getLimit($currentTaskCount) {
+        return (int)max(0, $this->getTaskRequestLimit() - $currentTaskCount);
     }
 }
