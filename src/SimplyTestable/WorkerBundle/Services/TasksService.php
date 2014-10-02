@@ -127,6 +127,8 @@ class TasksService {
 
 
     public function request() {
+        var_dump("isWithinThreshold: " . ($this->isWithinThreshold() ? 'true' : 'false'));
+
         if (!$this->isWithinThreshold()) {
             return false;
         }
@@ -140,6 +142,8 @@ class TasksService {
 
         try {
             $response = $request->send();
+
+            var_dump("Response status code: " . $response->getStatusCode());
 
             if ($response->getStatusCode() !== 200) {
                 if ($response->isClientError()) {
