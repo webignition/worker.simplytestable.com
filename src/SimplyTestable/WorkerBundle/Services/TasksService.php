@@ -127,8 +127,6 @@ class TasksService {
 
 
     public function request() {
-        var_dump("isWithinThreshold: " . ($this->isWithinThreshold() ? 'true' : 'false'));
-
         if (!$this->isWithinThreshold()) {
             return false;
         }
@@ -143,8 +141,6 @@ class TasksService {
         try {
             $response = $request->send();
 
-            var_dump("Response status code: " . $response->getStatusCode());
-
             if ($response->getStatusCode() !== 200) {
                 if ($response->isClientError()) {
                     throw ClientErrorResponseException::factory($request, $response);
@@ -155,16 +151,10 @@ class TasksService {
 
             return true;
         } catch (ClientErrorResponseException $clientErrorResponseException) {
-            var_dump("ClientErrorResponseException: " . $clientErrorResponseException->getResponse()->getStatusCode());
-
             $this->logger->error('TaskService:request:ClientErrorResponseException [' . $clientErrorResponseException->getResponse()->getStatusCode() . ']');
         } catch (ServerErrorResponseException $serverErrorResponseException) {
-            var_dump("ServerErrorResponseException: " . $serverErrorResponseException->getResponse()->getStatusCode());
-
             $this->logger->error('TaskService:request:ServerErrorResponseException [' . $serverErrorResponseException->getResponse()->getStatusCode() . ']');
         } catch (CurlException $curlException) {
-            var_dump("CurlException: " . $curlException->getErrorNo());
-
             $this->logger->error('TaskService:request:CurlException [' . $curlException->getErrorNo() . ']');
         }
 

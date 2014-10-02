@@ -20,11 +20,6 @@ abstract class SuccessTest extends RequestCommandTest {
             $this->createTask('http://foo.example.com/' . $index, 'HTML Validation');
         }
 
-        $classNameParts = explode('\\', get_class($this));
-        var_dump(array_pop($classNameParts));
-        var_dump($this->getName());
-        var_dump("Task count: " . $this->getTaskService()->getEntityRepository()->getCount());
-
         $this->setHttpFixtures($this->buildHttpFixtureSet([
             'HTTP/1.1 200'
         ]));
@@ -32,8 +27,6 @@ abstract class SuccessTest extends RequestCommandTest {
         $this->clearRedis();
 
         $this->returnCode = $this->executeCommand('simplytestable:tasks:request');
-
-        var_dump("Return code: " . $this->returnCode);
     }
 
     abstract protected function getExpectedReturnStatusCode();
@@ -48,12 +41,10 @@ abstract class SuccessTest extends RequestCommandTest {
     }
 
     public function testReturnStatusCode() {
-        var_dump("testReturnStatusCode");
         $this->assertEquals($this->getExpectedReturnStatusCode(), $this->returnCode);
     }
 
     public function testResqueJobToQueueIsEmpty() {
-        var_dump("testResqueJobToQueueIsEmpty");
         $this->assertEquals($this->getExpectedResqueQueueIsEmpty(), $this->getRequeQueueService()->isEmpty('tasks-request'));
     }
 }
