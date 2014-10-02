@@ -20,6 +20,8 @@ abstract class SuccessTest extends RequestCommandTest {
             $this->createTask('http://foo.example.com/' . $index, 'HTML Validation');
         }
 
+        $classNameParts = explode('\\', get_class($this));
+        var_dump(array_pop($classNameParts));
         var_dump($this->getName());
         var_dump("Task count: " . $this->getTaskService()->getEntityRepository()->getCount());
 
