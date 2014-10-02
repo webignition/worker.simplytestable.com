@@ -26,6 +26,9 @@ abstract class SuccessTest extends RequestCommandTest {
 
         $this->clearRedis();
 
+        $classNameParts = explode('\\', get_class($this));
+        var_dump(array_pop($classNameParts));
+
         $this->returnCode = $this->executeCommand('simplytestable:tasks:request');
     }
 
