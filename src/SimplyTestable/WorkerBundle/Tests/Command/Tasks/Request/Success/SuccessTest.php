@@ -23,7 +23,7 @@ abstract class SuccessTest extends RequestCommandTest {
         $classNameParts = explode('\\', get_class($this));
         var_dump(array_pop($classNameParts));
 
-        var_dump($this->getTaskService()->getEntityRepository()->getCount());
+        var_dump("Task count: " . $this->getTaskService()->getEntityRepository()->getCount());
 
         $this->setHttpFixtures($this->buildHttpFixtureSet([
             'HTTP/1.1 200'
