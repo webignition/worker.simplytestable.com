@@ -31,9 +31,9 @@ abstract class SuccessTest extends RequestCommandTest {
 
         $this->clearRedis();
 
-
-
         $this->returnCode = $this->executeCommand('simplytestable:tasks:request');
+
+        var_dump("Return code: " . $this->returnCode);
     }
 
     abstract protected function getExpectedReturnStatusCode();
