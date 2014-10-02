@@ -1,2 +1,4 @@
   bcc_resque_prefix: worker-hydrogen
   hostname: hydrogen.ci.worker.simplytestable.com
+  worker_process_count: 3
+  max_tasks_request_factor: 2
