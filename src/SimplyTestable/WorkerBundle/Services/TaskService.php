@@ -10,7 +10,6 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface as Logger;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
-use webignition\Http\Client\CurlException;
 
 class TaskService extends EntityService {
     
@@ -48,21 +47,21 @@ class TaskService extends EntityService {
     
     /**
      *
-     * @var \SimplyTestable\WorkerBundle\Service\UrlService $urlService
+     * @var \SimplyTestable\WorkerBundle\Services\UrlService $urlService
      */
     private $urlService;
     
     
     /**
      *
-     * @var \SimplyTestable\WorkerBundle\Service\CoreApplicationService $coreApplicationService
+     * @var \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService
      */
     private $coreApplicationService;   
     
     
     /**
      *
-     * @var \SimplyTestable\WorkerBundle\Service\WorkerService $workerService
+     * @var \SimplyTestable\WorkerBundle\Services\WorkerService $workerService
      */
     private $workerService;
     
@@ -487,6 +486,25 @@ class TaskService extends EntityService {
         if ($hasRemovedTemporaryParameters) {
             $task->setParameters(json_encode($decodedParameters));
         }       
+    }
+
+
+    /**
+     * @return State[]
+     */
+    public function getIncompleteStates() {
+        return [
+            $this->getQueuedState(),
+            $this->getInProgressState()
+        ];
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getInCompleteCount() {
+        return $this->getEntityRepository()->getCountByStates($this->getIncompleteStates());
     }
   
 }

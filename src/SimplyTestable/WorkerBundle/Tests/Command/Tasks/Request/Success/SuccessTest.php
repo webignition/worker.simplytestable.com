@@ -9,7 +9,7 @@ abstract class SuccessTest extends RequestCommandTest {
     /**
      * @var int
      */
-    private $returnCode;
+    protected $returnCode;
 
     public function setUp() {
         parent::setUp();
@@ -29,30 +29,22 @@ abstract class SuccessTest extends RequestCommandTest {
         $this->returnCode = $this->executeCommand('simplytestable:tasks:request');
     }
 
+    abstract protected function getExpectedReturnStatusCode();
+    abstract protected function getExpectedResqueQueueIsEmpty();
+
     /**
      * @return int
      */
-    private function getRequiredCurrentTaskCount() {
+    protected function getRequiredCurrentTaskCount() {
         $classNameParts = explode('\\', get_class($this));
         return (int)str_replace(['Task', 'Test'], '', $classNameParts[count($classNameParts) - 1]);
     }
 
-    /**
-     * @return int
-     */
-    private function getExpectedRequestedTaskCount() {
-        return $this->getTasksService()->getTaskRequestLimit() - $this->getRequiredCurrentTaskCount();
-    }
-
     public function testReturnStatusCode() {
-        $this->assertEquals(0, $this->returnCode);
+        $this->assertEquals($this->getExpectedReturnStatusCode(), $this->returnCode);
     }
 
     public function testResqueJobToQueueIsEmpty() {
-        $this->assertFalse($this->getRequeQueueService()->contains('tasks-request'));
-    }
-
-    public function testRequestedTaskCount() {
-        $this->assertTrue(substr_count($this->getHttpClientService()->getHistory()->getLastRequest()->getUrl(), '&limit=' . $this->getExpectedRequestedTaskCount()) > 0);
+        $this->assertEquals($this->getExpectedResqueQueueIsEmpty(), $this->getRequeQueueService()->isEmpty('tasks-request'));
     }
 }

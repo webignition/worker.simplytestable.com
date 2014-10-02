@@ -48,5 +48,5 @@ parameters:
     "task-report-completion": "SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob"
     "tasks-request": "SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob"
   admin_password: password
-  task_request_limit: 10
+  worker_process_count: 3
 

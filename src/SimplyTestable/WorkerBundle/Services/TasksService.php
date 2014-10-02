@@ -9,9 +9,11 @@ use SimplyTestable\WorkerBundle\Services\UrlService;
 use SimplyTestable\WorkerBundle\Services\CoreApplicationService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
-
+use SimplyTestable\WorkerBundle\Services\TaskService;
 
 class TasksService {
+
+    const PROCESS_LIMIT_THRESHOLD_FACTOR = 2;
 
     /**
      * @var Logger
@@ -47,31 +49,38 @@ class TasksService {
 
 
     /**
+     * @var TaskService
+     */
+    private $taskService;
+
+
+    /**
      * @var int
      */
-    private $taskRequestLimit = null;
+    private $workerProcessCount = null;
 
-    
     /**
-     *
      * @param Logger $logger
      * @param UrlService $urlService
      * @param CoreApplicationService $coreApplicationService
      * @param WorkerService $workerService
      * @param HttpClientService $httpClientService
+     * @param TaskService $taskService
      */
     public function __construct(
         Logger $logger,
         UrlService $urlService,
         CoreApplicationService $coreApplicationService,
         WorkerService $workerService,
-        HttpClientService $httpClientService)
+        HttpClientService $httpClientService,
+        TaskService $taskService)
     {
         $this->logger = $logger;
         $this->urlService = $urlService;
         $this->coreApplicationService = $coreApplicationService;
         $this->workerService = $workerService;
         $this->httpClientService = $httpClientService;
+        $this->taskService = $taskService;
     }
 
 
@@ -79,8 +88,8 @@ class TasksService {
      * @param $limit
      * @return $this
      */
-    public function setTaskRequestLimit($limit) {
-        $this->taskRequestLimit = $limit;
+    public function setWorkerProcessCount($limit) {
+        $this->workerProcessCount = $limit;
         return $this;
     }
 
@@ -88,22 +97,21 @@ class TasksService {
     /**
      * @return int
      */
-    public function getTaskRequestLimit() {
-        return $this->taskRequestLimit;
+    public function getWorkerProcessCount() {
+        return $this->workerProcessCount;
     }
 
 
-    public function request($currentTaskCount = 0) {
-        $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/tasks/request/');
-
-        if (!$this->getLimit($currentTaskCount)) {
+    public function request() {
+        if (!$this->isWithinThreshold()) {
             return false;
         }
 
+        $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/tasks/request/');
         $request = $this->httpClientService->getRequest($requestUrl . '?' . http_build_query([
                 'worker_hostname' => $this->workerService->get()->getHostname(),
                 'worker_token' => $this->workerService->get()->getActivationToken(),
-                'limit' => $this->getLimit($currentTaskCount)
+                'limit' => $this->getLimit()
         ]));
 
         try {
@@ -131,10 +139,33 @@ class TasksService {
 
 
     /**
-     * @param $currentTaskCount
+     * @return bool
+     */
+    private function isWithinThreshold() {
+        return $this->taskService->getInCompleteCount() <= $this->getLowerLimit();
+    }
+
+
+    /**
      * @return int
      */
-    private function getLimit($currentTaskCount) {
-        return (int)max(0, $this->getTaskRequestLimit() - $currentTaskCount);
+    private function getUpperLimit() {
+        return (int)round($this->getWorkerProcessCount() * self::PROCESS_LIMIT_THRESHOLD_FACTOR);
+    }
+
+
+    /**
+     * @return int
+     */
+    private function getLowerLimit() {
+        return $this->getWorkerProcessCount();
+    }
+
+
+    /**
+     * @return int
+     */
+    private function getLimit() {
+        return $this->getUpperLimit() - $this->taskService->getInCompleteCount();
     }
 }

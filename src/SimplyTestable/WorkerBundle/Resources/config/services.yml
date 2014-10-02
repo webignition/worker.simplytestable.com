@@ -108,5 +108,6 @@ services:
         coreApplicationService: "@simplytestable.services.coreapplicationservice"
         workerService: "@simplytestable.services.workerservice"
         httpClientService: "@simplytestable.services.httpClientService"
+        taskService: "@simplytestable.services.taskservice"
     calls:
-      - [setTaskRequestLimit, [%task_request_limit%]]
+      - [setWorkerProcessCount, [%worker_process_count%]]

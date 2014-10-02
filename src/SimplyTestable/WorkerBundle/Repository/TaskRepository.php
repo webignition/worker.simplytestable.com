@@ -77,11 +77,17 @@ class TaskRepository extends EntityRepository
 
 
     /**
+     * @param array $states
      * @return int
      */
-    public function getCount() {
+    public function getCountByStates($states = []) {
         $queryBuilder = $this->createQueryBuilder('Task');
         $queryBuilder->select('COUNT(Task.id)');
+
+        if (count($states)) {
+            $queryBuilder->andWhere('Task.state IN (:TaskStates)')
+                ->setParameter('TaskStates', $states);
+        }
 
         return (int)$queryBuilder->getQuery()->getResult()[0][1];
     }

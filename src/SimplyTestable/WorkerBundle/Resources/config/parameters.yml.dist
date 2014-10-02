@@ -51,4 +51,4 @@ parameters:
   resque_pid: "simplytestable_workerbundle"
   hostname: hydrogen.worker.simplytestable.com  
   admin_password: password
-  task_request_limit: 10
+  worker_process_count: 10

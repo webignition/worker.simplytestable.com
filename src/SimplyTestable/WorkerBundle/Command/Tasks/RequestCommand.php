@@ -27,7 +27,7 @@ EOF
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }
 
-        if ($this->getTasksService()->request($this->getTaskService()->getEntityRepository()->getCount())) {
+        if ($this->getTasksService()->request()) {
             return self::RETURN_CODE_OK;
         }
 
@@ -46,12 +46,4 @@ EOF
         }
     }
 
-
-    /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\TaskService
-     */
-    private function getTaskService() {
-        return $this->getContainer()->get('simplytestable.services.taskservice');
-    }
 }
