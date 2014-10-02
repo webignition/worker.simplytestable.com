@@ -132,11 +132,20 @@ class TasksService {
         }
 
         $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/tasks/request/');
-        $request = $this->httpClientService->getRequest($requestUrl . '?' . http_build_query([
-                'worker_hostname' => $this->workerService->get()->getHostname(),
-                'worker_token' => $this->workerService->get()->getActivationToken(),
-                'limit' => $this->getLimit()
-        ]));
+//        $request = $this->httpClientService->getRequest($requestUrl . '?' . http_build_query([
+//                'worker_hostname' => $this->workerService->get()->getHostname(),
+//                'worker_token' => $this->workerService->get()->getActivationToken(),
+//                'limit' => $this->getLimit()
+//        ]));
+
+        $request = $this->httpClientService->postRequest($requestUrl, null, [
+            'worker_hostname' => $this->workerService->get()->getHostname(),
+            'worker_token' => $this->workerService->get()->getActivationToken(),
+            'limit' => $this->getLimit()
+        ]);
+//
+//        echo $request;
+//        exit();
 
         try {
             $response = $request->send();

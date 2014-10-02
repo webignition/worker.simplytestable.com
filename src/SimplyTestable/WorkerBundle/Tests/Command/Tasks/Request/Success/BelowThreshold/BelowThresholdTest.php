@@ -22,7 +22,7 @@ abstract class BelowThresholdTest extends SuccessTest {
     }
 
     public function testRequestedTaskCount() {
-        $this->assertTrue(substr_count($this->getHttpClientService()->getHistory()->getLastRequest()->getUrl(), '&limit=' . $this->getExpectedRequestedTaskCount()) > 0);
+        $this->assertEquals($this->getExpectedRequestedTaskCount(), $this->getHttpClientService()->getHistory()->getLastRequest()->getPostFields()->get('limit'));
     }
 
 }
