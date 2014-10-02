@@ -1,6 +1,8 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Command\Tasks\Request\Success;
+namespace SimplyTestable\WorkerBundle\Tests\Command\Tasks\Request\Success\AboveThreshold;
+
+use SimplyTestable\WorkerBundle\Tests\Command\Tasks\Request\Success\SuccessTest;
 
 abstract class AboveThresholdTest extends SuccessTest {
 
