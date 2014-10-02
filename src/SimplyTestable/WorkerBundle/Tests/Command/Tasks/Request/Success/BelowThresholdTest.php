@@ -16,7 +16,7 @@ abstract class BelowThresholdTest extends SuccessTest {
      * @return int
      */
     private function getExpectedRequestedTaskCount() {
-        return ($this->getTasksService()->getWorkerProcessCount() * 2) - $this->getRequiredCurrentTaskCount();
+        return ($this->getTasksService()->getWorkerProcessCount() * $this->getTasksService()->getMaxTasksRequestFactor()) - $this->getRequiredCurrentTaskCount();
     }
 
     public function testRequestedTaskCount() {

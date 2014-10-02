@@ -111,3 +111,4 @@ services:
         taskService: "@simplytestable.services.taskservice"
     calls:
       - [setWorkerProcessCount, [%worker_process_count%]]
+      - [setMaxTasksRequestFactor, [%max_tasks_request_factor%]]

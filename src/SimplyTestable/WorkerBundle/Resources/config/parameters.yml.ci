@@ -49,4 +49,5 @@ parameters:
     "tasks-request": "SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob"
   admin_password: password
   worker_process_count: 3
+  max_tasks_request_factor: 2
 

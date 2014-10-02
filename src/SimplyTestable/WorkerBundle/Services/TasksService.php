@@ -13,8 +13,6 @@ use SimplyTestable\WorkerBundle\Services\TaskService;
 
 class TasksService {
 
-    const PROCESS_LIMIT_THRESHOLD_FACTOR = 2;
-
     /**
      * @var Logger
      */
@@ -59,6 +57,14 @@ class TasksService {
      */
     private $workerProcessCount = null;
 
+
+    /**
+     * @var int
+     */
+    private $maxTasksRequestFactor = null;
+
+
+
     /**
      * @param Logger $logger
      * @param UrlService $urlService
@@ -95,10 +101,28 @@ class TasksService {
 
 
     /**
+     * @param $factor
+     * @return $this
+     */
+    public function setMaxTasksRequestFactor($factor) {
+        $this->maxTasksRequestFactor = $factor;
+        return $this;
+    }
+
+
+    /**
      * @return int
      */
     public function getWorkerProcessCount() {
         return $this->workerProcessCount;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getMaxTasksRequestFactor() {
+        return $this->maxTasksRequestFactor;
     }
 
 
@@ -150,7 +174,7 @@ class TasksService {
      * @return int
      */
     private function getUpperLimit() {
-        return (int)round($this->getWorkerProcessCount() * self::PROCESS_LIMIT_THRESHOLD_FACTOR);
+        return (int)round($this->getWorkerProcessCount() * $this->getMaxTasksRequestFactor());
     }
 
 

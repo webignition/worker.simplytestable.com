@@ -52,3 +52,4 @@ parameters:
   hostname: hydrogen.worker.simplytestable.com  
   admin_password: password
   worker_process_count: 10
+  max_tasks_request_factor: 2

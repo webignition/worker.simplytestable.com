@@ -13,7 +13,7 @@ class TooManyCurrentTasksTest extends RequestCommandTest {
         parent::setUp();
         $this->clearRedis();
 
-        for ($index = 0; $index < ($this->getTasksService()->getWorkerProcessCount() * 2); $index++) {
+        for ($index = 0; $index < ($this->getTasksService()->getWorkerProcessCount() * $this->getTasksService()->getMaxTasksRequestFactor()); $index++) {
             $this->createTask('http://foo.example.com/' . $index, 'HTML Validation');
         }
 
