@@ -3,6 +3,7 @@ namespace SimplyTestable\WorkerBundle\Command\Tasks;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
 
 class RequestCommand extends Command {
 
@@ -27,8 +28,11 @@ EOF
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }
 
-        if ($this->getTasksService()->request()) {
-            return self::RETURN_CODE_OK;
+        try {
+            if ($this->getTasksService()->request()) {
+                return self::RETURN_CODE_OK;
+            }
+        } catch (RequestException $requestException) {
         }
 
         $this->requeue();
