@@ -47,12 +47,10 @@ class SuccessTest extends PerformCommandTest {
         ));
     }
 
-
     public function testResqueTasksRequestJobIsCreated() {
         $this->assertTrue($this->getRequeQueueService()->contains(
             'tasks-request'
         ));
     }
-
 
 }

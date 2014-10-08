@@ -57,7 +57,15 @@ EOF
             $this->getContainer()->get('logger')->error('TaskPerformCommand: Exception: exception code: [' . $e->getCode() . ']');
             $this->getContainer()->get('logger')->error('TaskPerformCommand: Exception: exception msg: [' . $e->getMessage() . ']');
             return -6;
-        }        
+        }
+
+        if ($this->getResqueQueueService()->isEmpty('tasks-request')) {
+            $this->getResqueQueueService()->enqueue(
+                $this->getResqueJobFactoryService()->create(
+                    'tasks-request'
+                )
+            );
+        }
         
         if ($performResult === 0) {
             $this->getResqueQueueService()->enqueue(
@@ -66,15 +74,6 @@ EOF
                     ['id' => $task->getId()]
                 )
             );
-
-            if ($this->getResqueQueueService()->isEmpty('tasks-request')) {
-                $this->getResqueQueueService()->enqueue(
-                    $this->getResqueJobFactoryService()->create(
-                        'tasks-request'
-                    )
-                );
-            }
-
             
             $output->writeln('Performed ['.$task->getId().']');
             $this->getContainer()->get('logger')->info('TaskPerformCommand::Performed ['.$task->getId().'] ['.$task->getState().'] ['.($task->hasOutput() ? 'has output' : 'no output').']');
