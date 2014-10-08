@@ -13,6 +13,12 @@ class CoreApplicationServerErrorTest extends FailureTest {
             'HTTP/1.1 500',
             'HTTP/1.1 500',
         ]));
+
+        $this->setExpectedException(
+            'SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException',
+            'ServerErrorResponseException',
+            '500'
+        );
     }
 
 }

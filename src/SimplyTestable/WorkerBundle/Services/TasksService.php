@@ -10,6 +10,7 @@ use SimplyTestable\WorkerBundle\Services\CoreApplicationService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
+use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
 
 class TasksService {
 
@@ -152,13 +153,30 @@ class TasksService {
             return true;
         } catch (ClientErrorResponseException $clientErrorResponseException) {
             $this->logger->error('TaskService:request:ClientErrorResponseException [' . $clientErrorResponseException->getResponse()->getStatusCode() . ']');
+
+            throw new RequestException(
+                'ClientErrorResponseException',
+                $clientErrorResponseException->getResponse()->getStatusCode(),
+                $clientErrorResponseException
+            );
+
         } catch (ServerErrorResponseException $serverErrorResponseException) {
             $this->logger->error('TaskService:request:ServerErrorResponseException [' . $serverErrorResponseException->getResponse()->getStatusCode() . ']');
+
+            throw new RequestException(
+                'ServerErrorResponseException',
+                $serverErrorResponseException->getResponse()->getStatusCode(),
+                $serverErrorResponseException
+            );
         } catch (CurlException $curlException) {
             $this->logger->error('TaskService:request:CurlException [' . $curlException->getErrorNo() . ']');
-        }
 
-        return false;
+            throw new RequestException(
+                'CurlException',
+                $curlException->getErrorNo(),
+                $curlException
+            );
+        }
     }
 
 

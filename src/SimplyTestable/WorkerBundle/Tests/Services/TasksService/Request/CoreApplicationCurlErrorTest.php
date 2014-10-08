@@ -13,6 +13,12 @@ class CoreApplicationCurlErrorTest extends FailureTest {
             'CURL/28 Foo',
             'CURL/28 Foo',
         ]));
+
+        $this->setExpectedException(
+            'SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException',
+            'CurlException',
+            '28'
+        );
     }
 
 }

@@ -9,8 +9,9 @@ abstract class FailureTest extends RequestTest {
         $this->getHttpClientService()->getMockPlugin()->clearQueue();
     }
 
-    public function testSuccessfulRequestReturnsFalse() {
-        $this->assertFalse($this->getService()->request());
+    public function testExceptionIsThrow() {
+        $this->getService()->request();
+        $this->fail('RequestException not thrown');
     }
 
 }

@@ -10,6 +10,12 @@ class CoreApplicationClientErrorTest extends FailureTest {
         $this->setHttpFixtures($this->buildHttpFixtureSet([
             'HTTP/1.1 400'
         ]));
+
+        $this->setExpectedException(
+            'SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException',
+            'ClientErrorResponseException',
+            '400'
+        );
     }
 
 }

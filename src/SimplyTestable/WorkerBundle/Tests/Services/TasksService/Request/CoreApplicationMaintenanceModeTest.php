@@ -13,6 +13,12 @@ class CoreApplicationMaintenanceModeTest extends FailureTest {
             'HTTP/1.1 503',
             'HTTP/1.1 503',
         ]));
+
+        $this->setExpectedException(
+            'SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException',
+            'ServerErrorResponseException',
+            '503'
+        );
     }
 
 }
