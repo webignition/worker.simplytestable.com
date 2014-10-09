@@ -26,11 +26,25 @@ abstract class SuccessTest extends RequestCommandTest {
 
         $this->clearRedis();
 
-        $this->returnCode = $this->executeCommand('simplytestable:tasks:request');
+        $arguments = [];
+        if ($this->hasLimit()) {
+            $arguments['limit'] = $this->getLimit();
+        }
+
+        $this->returnCode = $this->executeCommand('simplytestable:tasks:request', $arguments);
     }
 
     abstract protected function getExpectedReturnStatusCode();
     abstract protected function getExpectedResqueQueueIsEmpty();
+
+    protected function hasLimit() {
+        return false;
+    }
+
+    protected function getLimit() {
+        return null;
+    }
+
 
     /**
      * @return int
