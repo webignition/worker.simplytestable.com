@@ -127,7 +127,13 @@ class TasksService {
     }
 
 
-    public function request() {
+    /**
+     * @param null|int $requestedLimit
+     * @return bool
+     * @throws \SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException
+     * @throws \Guzzle\Http\Exception\BadResponseException
+     */
+    public function request($requestedLimit = null) {
         if (!$this->isWithinThreshold()) {
             return false;
         }
@@ -136,7 +142,7 @@ class TasksService {
         $request = $this->httpClientService->postRequest($requestUrl, null, [
             'worker_hostname' => $this->workerService->get()->getHostname(),
             'worker_token' => $this->workerService->get()->getActivationToken(),
-            'limit' => $this->getLimit()
+            'limit' => $this->getLimit($requestedLimit)
         ]);
 
         try {
@@ -205,9 +211,19 @@ class TasksService {
 
 
     /**
+     * @param int $requestedLimit
      * @return int
      */
-    private function getLimit() {
-        return $this->getUpperLimit() - $this->taskService->getInCompleteCount();
+    private function getLimit($requestedLimit = null) {
+        $calculatedLimit = $this->getUpperLimit() - $this->taskService->getInCompleteCount();
+        if (is_null($requestedLimit)) {
+            return $calculatedLimit;
+        }
+
+        if ($requestedLimit < 1) {
+            $requestedLimit = 1;
+        }
+
+        return min($requestedLimit, $calculatedLimit);
     }
 }
