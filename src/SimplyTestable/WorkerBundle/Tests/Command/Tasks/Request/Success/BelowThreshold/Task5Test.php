@@ -2,4 +2,4 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Command\Tasks\Request\Success\BelowThreshold;
 
-class Task10Test extends BelowThresholdTest {}
+class Task5Test extends BelowThresholdTest {}
