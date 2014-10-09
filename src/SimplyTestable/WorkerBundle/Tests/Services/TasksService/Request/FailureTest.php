@@ -6,6 +6,9 @@ abstract class FailureTest extends RequestTest {
 
     public function setUp() {
         parent::setUp();
+
+        $this->removeAllTasks();
+
         $this->getHttpClientService()->getMockPlugin()->clearQueue();
     }
 
