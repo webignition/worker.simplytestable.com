@@ -43,4 +43,8 @@ SimplyTestableWorkerBundle_task_perform_enqueue:
     
 SimplyTestableWorkerBundle_leave_readonly:
     pattern: /maintenance/leave-read-only/
-    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:leaveReadOnly, _format: json }           
+    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:leaveReadOnly, _format: json }
+
+tasks_notify:
+    pattern: /tasks/notify/
+    defaults: { _controller: SimplyTestableWorkerBundle:Tasks:notify }

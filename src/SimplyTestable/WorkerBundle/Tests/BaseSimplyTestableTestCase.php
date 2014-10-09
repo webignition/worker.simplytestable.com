@@ -10,7 +10,8 @@ use Doctrine\Common\Cache\MemcacheCache;
 
 abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
-    const TASK_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TaskController';    
+    const TASK_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TaskController';
+    const TASKS_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TasksController';
     const VERIFY_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\VerifyController';    
     const MAINTENANCE_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\MaintenanceController';        
     
@@ -30,6 +31,17 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      */
     protected function getTaskController($methodName, $postData = array()) {
         return $this->getController(self::TASK_CONTROLLER_NAME, $methodName, $postData);
+    }
+
+
+    /**
+     *
+     * @param string $methodName
+     * @param array $postData
+     * @return \SimplyTestable\WorkerBundle\Controller\TasksController
+     */
+    protected function getTasksController($methodName, $postData = array()) {
+        return $this->getController(self::TASKS_CONTROLLER_NAME, $methodName, $postData);
     }
     
 
