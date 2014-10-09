@@ -136,7 +136,7 @@ class QueueService {
      * @param string $queue
      * @return int
      */
-    private function getQueueLength($queue) {
+    public function getQueueLength($queue) {
         return \Resque::redis()->llen(self::QUEUE_KEY . ':' . $queue);
     }
 

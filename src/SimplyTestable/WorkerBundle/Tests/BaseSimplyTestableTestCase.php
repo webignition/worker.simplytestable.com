@@ -88,9 +88,18 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      */
     protected function getRequeQueueService() {
         return $this->container->get('simplytestable.services.resque.queueservice');
-    }    
-    
-    
+    }
+
+
+    /**
+     *
+     * @return \SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService
+     */
+    protected function getResqueJobFactoryService() {
+        return $this->container->get('simplytestable.services.resque.jobFactoryService');
+    }
+
+
     /**
      *
      * @return \SimplyTestable\WorkerBundle\Services\TestHttpClientService
