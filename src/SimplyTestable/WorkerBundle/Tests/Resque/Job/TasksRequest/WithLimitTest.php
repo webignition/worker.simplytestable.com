@@ -4,10 +4,12 @@ namespace SimplyTestable\WorkerBundle\Tests\Resque\Job\TasksRequest;
 
 use SimplyTestable\WorkerBundle\Tests\Resque\Job\JobTest as BaseJobTest;
 
-class JobTest extends BaseJobTest {
+class WithLimitTest extends BaseJobTest {
 
     protected function getArgs() {
-        return [];
+        return [
+            'limit' => 5
+        ];
     }
 
 

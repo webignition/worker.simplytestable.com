@@ -17,6 +17,12 @@ class TasksRequestJob extends CommandJob {
     }
 
     protected function getCommandArgs() {
+        if (isset($this->args['limit'])) {
+            return [
+                'limit' => $this->args['limit']
+            ];
+        }
+
         return [];
     }
 }
