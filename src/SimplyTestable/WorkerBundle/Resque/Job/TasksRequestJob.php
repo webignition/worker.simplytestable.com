@@ -25,4 +25,8 @@ class TasksRequestJob extends CommandJob {
 
         return [];
     }
+
+    protected function getIdentifier() {
+        return 'default';
+    }
 }

@@ -22,4 +22,8 @@ class TaskPerformJob extends CommandJob {
         ];
     }
 
+    protected function getIdentifier() {
+        return $this->args['id'];
+    }
+
 }
