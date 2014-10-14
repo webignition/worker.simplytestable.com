@@ -49,10 +49,9 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
     }
     
     
-    protected function performValidation() {         
-        $fragment = $this->webResource->getContent();        
+    protected function performValidation() {
         $finder = new HtmlDocumentLinkUrlFinder();
-        $finder->getConfiguration()->setSourceContent($fragment);
+        $finder->getConfiguration()->setSource($this->webResource);
         $finder->getConfiguration()->setSourceUrl($this->webResource->getUrl());
         $finder->getConfiguration()->setElementScope('a');
         $finder->getConfiguration()->enableIgnoreFragmentInUrlComparison();
