@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "cb28abf7dd594369f771c3d4ea55e7be",
+    "hash": "5bd1376c648bdee53dc061ee463a8ce0",
     "packages": [
         {
             "name": "bcc/resque-bundle",
@@ -3018,22 +3018,22 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "1.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "236ea7f837a0f97ec64c2950709a4eb8fdd4aa66"
+                "reference": "df3287e5c7c1b26ebb880cee81325fd220afefe4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/236ea7f837a0f97ec64c2950709a4eb8fdd4aa66",
-                "reference": "236ea7f837a0f97ec64c2950709a4eb8fdd4aa66",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/df3287e5c7c1b26ebb880cee81325fd220afefe4",
+                "reference": "df3287e5c7c1b26ebb880cee81325fd220afefe4",
                 "shasum": ""
             },
             "require": {
                 "guzzle/guzzle": ">=3.8.0,<4",
                 "php": ">=5.4.0",
-                "webignition/html-document-link-finder": ">=1.0.1,<2.0",
+                "webignition/html-document-link-finder": ">=1.2,<2.0",
                 "webignition/url": ">=1.9.6",
                 "webignition/url-health-checker": ">=0.1.1,<1.0",
                 "webignition/web-page-model": ">=1.0,<2.0"
@@ -3066,7 +3066,7 @@
                 "html",
                 "link"
             ],
-            "time": "2014-09-11 11:51:37"
+            "time": "2014-10-14 17:34:26"
         },
         {
             "name": "webignition/html-document-link-finder",
