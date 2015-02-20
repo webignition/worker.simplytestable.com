@@ -5,21 +5,19 @@ namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\LinkIntegrity\Co
 use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\LinkIntegrity\TaskDriverTest;
 
 abstract class CookieParametersTest extends TaskDriverTest {
-    
-    protected $task;
-    
+
     abstract protected function getExpectedCookies();
     abstract protected function getExpectedRequestsOnWhichCookiesShouldBeSet();
     abstract protected function getExpectedRequestsOnWhichCookiesShouldNotBeSet();
-    
-    public function setUp() {
-        parent::setUp();
-        $this->task = $this->getTask('http://example.com/', array(
+
+    protected function getTaskParameters() {
+        return [
             'cookies' => $this->getExpectedCookies()
-        ));
-        
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath('/HttpResponses')));        
-        $this->getTaskService()->perform($this->task);
+        ];
+    }
+
+    protected function getExpectedErrorCount() {
+        return 0;
     }
     
     public function testCookiesAreSetOnExpectedRequests() {  
