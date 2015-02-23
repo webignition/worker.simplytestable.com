@@ -11,6 +11,7 @@ class RequestCommand extends Command {
     const RETURN_CODE_OK = 0;
     const RETURN_CODE_FAILED = 1;
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = 2;
+    const RETURN_CODE_TASK_WORKLOAD_EXCEEDS_REQUEST_THRESHOLD = 3;
 
     protected function configure()
     {
@@ -34,6 +35,9 @@ EOF
             if ($this->getTasksService()->request($input->getArgument('limit'))) {
                 return self::RETURN_CODE_OK;
             }
+
+            $this->requeue();
+            return self::RETURN_CODE_TASK_WORKLOAD_EXCEEDS_REQUEST_THRESHOLD;
         } catch (RequestException $requestException) {
         }
 

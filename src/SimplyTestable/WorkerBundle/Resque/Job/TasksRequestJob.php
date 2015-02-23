@@ -29,4 +29,15 @@ class TasksRequestJob extends CommandJob {
     protected function getIdentifier() {
         return 'default';
     }
+
+    protected function handleNonZeroReturnCode($returnCode, $output) {
+        $command = $this->getCommand();
+
+        if ($returnCode == $command::RETURN_CODE_TASK_WORKLOAD_EXCEEDS_REQUEST_THRESHOLD) {
+            $this->getContainer()->get('logger')->info(get_class($this) . ': task [' . $this->getIdentifier() . '] returned ' . $returnCode);
+            return true;
+        }
+
+        return parent::handleNonZeroReturnCode($returnCode, $output);
+    }
 }

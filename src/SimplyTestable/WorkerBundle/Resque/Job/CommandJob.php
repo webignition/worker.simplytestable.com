@@ -39,13 +39,19 @@ abstract class CommandJob extends Job {
         $output = new StringOutput();
 
         $returnCode = ($this->isTestEnvironment()) ? $this->args['returnCode'] : $command->run($input, $output);
-        
+
         if ($returnCode === 0) {
             return true;
         }
 
+        return $this->handleNonZeroReturnCode($returnCode, $output);
+    }
+
+    protected function handleNonZeroReturnCode($returnCode, $output) {
         $this->getContainer()->get('logger')->error(get_class($this) . ': task [' . $this->getIdentifier() . '] returned ' . $returnCode);
         $this->getContainer()->get('logger')->error(get_class($this) . ': task [' . $this->getIdentifier() . '] output ' . trim($output->getBuffer()));
+
+        return $returnCode;
     }
 
 

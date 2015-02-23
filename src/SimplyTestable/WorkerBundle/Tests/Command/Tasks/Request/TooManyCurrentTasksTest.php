@@ -21,7 +21,7 @@ class TooManyCurrentTasksTest extends RequestCommandTest {
     }
 
     public function testReturnStatusCode() {
-        $this->assertEquals(1, $this->returnCode);
+        $this->assertEquals(3, $this->returnCode);
     }
 
     public function testReturnsResqueJobToQueue() {
