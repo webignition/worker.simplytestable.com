@@ -82,7 +82,7 @@ abstract class BaseController extends Controller
      */    
     public function getArguments($methodName) {        
         if (is_null($this->arguments)) {                                    
-            if ($this->getRequestType($methodName) === \Guzzle\Http\Message\RequestInterface::POST) {                
+            if ($this->getRequestType($methodName) === 'POST') {
                 $this->arguments = $this->get('request')->request;
             } else {
                 $this->arguments = $this->get('request')->query;
