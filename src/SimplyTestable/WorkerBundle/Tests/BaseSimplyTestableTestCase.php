@@ -7,6 +7,10 @@ use SimplyTestable\WorkerBundle\Entity\Task\Output as TaskOutput;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use webignition\InternetMediaType\Parser\Parser as InternetMediaTypeParser;
 use Doctrine\Common\Cache\MemcacheCache;
+use GuzzleHttp\Message\MessageFactory as HttpMessageFactory;
+use GuzzleHttp\Message\ResponseInterface as HttpResponse;
+use GuzzleHttp\Message\Request as HttpRequest;
+use GuzzleHttp\Exception\ConnectException;
 
 abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     
@@ -313,7 +317,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         foreach ($items as $item) {
             switch ($this->getHttpFixtureItemType($item)) {
                 case 'httpMessage':
-                    $fixtures[] = \Guzzle\Http\Message\Response::fromMessage($item);
+                    $fixtures[] = $this->getHttpResponseFromMessage($item);
                     break;
                 
                 case 'curlException':
@@ -372,7 +376,17 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
                 );
             }
         }
-    }  
+    }
+
+
+    /**
+     * @param $message
+     * @return HttpResponse
+     */
+    protected function getHttpResponseFromMessage($message) {
+        $factory = new HttpMessageFactory();
+        return $factory->fromMessage($message);
+    }
 
 
 }
