@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<p><script src="file://foo"></script></p>
+</body>
+</html>

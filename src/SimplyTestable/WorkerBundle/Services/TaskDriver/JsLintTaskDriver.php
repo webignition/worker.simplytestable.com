@@ -17,7 +17,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     const MAXIMUM_FRAGMENT_LENGTH = 256;
 
     private $disallowedScriptUrlSchemes = [
-        'resource'
+        'resource',
+        'file'
     ];
     
     /**
