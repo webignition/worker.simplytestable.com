@@ -10,6 +10,9 @@ use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
+use GuzzleHttp\Exception\BadResponseException as HttpBadResponseException;
+use GuzzleHttp\Exception\ConnectException as HttpConnectException;
+use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
 class TaskService extends EntityService {
 
@@ -430,7 +433,7 @@ class TaskService extends EntityService {
         $this->removeTemporaryParameters($task);
 
         $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/task/' . urlencode($task->getUrl()) . '/' . rawurlencode($task->getType()->getName()) . '/' . $task->getParametersHash() . '/complete/');
-        //$requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/task/'.$this->workerService->get()->getHostname().'/'.$task->getId().'/complete/');
+
         $httpRequest = $this->httpClientService->postRequest($requestUrl, null, array(
             'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
             'output' => $task->getOutput()->getOutput(),
@@ -443,32 +446,30 @@ class TaskService extends EntityService {
         $this->logger->info("TaskService::reportCompletion: Reporting completion state to " . $requestUrl);
 
         try {
+            /* @var $response \GuzzleHttp\Message\Response */
             $response = $this->httpClientService->get()->send($httpRequest);
-        } catch (\Guzzle\Http\Exception\CurlException $curlException) {
-            $this->logger->error("TaskService::reportCompletion: " . $requestUrl . ": " . $curlException->getErrorNo());
-            return $curlException->getErrorNo();
-        } catch (\Guzzle\Http\Exception\ClientErrorResponseException $clientErrorResponseException) {
-            /* @var $response \Guzzle\Http\Message\Response */
-            $response = $clientErrorResponseException->getResponse();
-        } catch (\Guzzle\Http\Exception\ServerErrorResponseException $serverErrorResponseException) {
-            $response = $serverErrorResponseException->getResponse();
-        }
+            $this->logger->notice("TaskService::reportCompletion: " . $requestUrl . ": " . $response->getStatusCode()." ".$response->getReasonPhrase());
 
-        $this->logger->info("TaskService::reportCompletion: " . $requestUrl . ": " . $response->getStatusCode()." ".$response->getReasonPhrase());
+            $task->setNextState();
+            $this->persistAndFlush($task);
 
-        if (!$response->isSuccessful()) {
+            return true;
+        } catch (HttpBadResponseException $badResponseException) {
+            $response = $badResponseException->getResponse();
+
             $this->logger->error("TaskService::reportCompletion: Completion reporting failed for [".$task->getId()."] [".$task->getUrl()."]");
             $this->logger->error("TaskService::reportCompletion: [".$task->getId()."] " . $requestUrl . ": " . $response->getStatusCode()." ".$response->getReasonPhrase());
 
             if ($response->getStatusCode() !== 410) {
                 return $response->getStatusCode();
             }
+        } catch (HttpConnectException $connectException) {
+            $curlExceptionFactory = new CurlExceptionFactory();
+
+            if ($curlExceptionFactory::isCurlException($connectException)) {
+                return $curlExceptionFactory::fromConnectException($connectException)->getCurlCode();
+            }
         }
-
-        $task->setNextState();
-        $this->persistAndFlush($task);
-
-        return true;
     }
 
     /**

@@ -321,7 +321,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
                     break;
                 
                 case 'curlException':
-                    $fixtures[] = $this->getCurlExceptionFromCurlMessage($item);                    
+                    $fixtures[] = $this->getCurlExceptionFromCurlMessage($item);
                     break;
                 
                 default:
@@ -344,15 +344,15 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     /**
      * 
      * @param string $curlMessage
-     * @return \Guzzle\Http\Exception\CurlException
+     * @return ConnectException
      */
     private function getCurlExceptionFromCurlMessage($curlMessage) {
         $curlMessageParts = explode(' ', $curlMessage, 2);
-        
-        $curlException = new \Guzzle\Http\Exception\CurlException();
-        $curlException->setError($curlMessageParts[1], (int)  str_replace('CURL/', '', $curlMessageParts[0]));
-        
-        return $curlException;
+
+        return new ConnectException(
+            'cURL error ' . str_replace('CURL/', '', $curlMessageParts[0]) . ': ' . $curlMessageParts[1],
+            new HttpRequest('GET', 'http://example.com/')
+        );
     } 
     
     
