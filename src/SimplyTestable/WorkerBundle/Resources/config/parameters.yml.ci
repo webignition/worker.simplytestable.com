@@ -14,22 +14,22 @@ parameters:
     css-validation:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
       task-types:
-        - "CSS validation"        
+        - "CSS validation"
       properties:
         jar-path: /usr/share/css-validator/2002/css-validator/css-validator.jar
-        css-validator-wrapper.service: simplytestable.services.cssValidatorWrapperService  
+        css-validator-wrapper.service: simplytestable.services.cssValidatorWrapperService
     js-static-analysis:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver
       task-types:
-        - "JS static analysis"        
+        - "JS static analysis"
       properties:
         node-path: /usr/bin/nodejs
-        node-jslint-path: /usr/share/node-jslint/node_modules/jslint/bin/jslint.js 
+        node-jslint-path: /usr/share/node-jslint/node_modules/jslint/bin/jslint.js
         node-jslint-wrapper.service: simplytestable.services.nodeJslintWrapperService
     url-discovery:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver
       task-types:
-        - "URL discovery" 
+        - "URL discovery"
     link-integrity:
       class: SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver
       task-types:
@@ -37,15 +37,15 @@ parameters:
       properties:
         user-agents:
           - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
-          - Mozilla/5.0   
+          - Mozilla/5.0
   content_type_web_resource_map:
     default: webignition\WebResource\WebResource
     text/html: webignition\WebResource\WebPage\WebPage
     application/xhtml+xml: webignition\WebResource\WebPage\WebPage
-    application/json: webignition\WebResource\JsonDocument\JsonDocument 
+    application/json: webignition\WebResource\JsonDocument\JsonDocument
   resque-job-class-map:
-    "task-perform": "SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob"
-    "task-report-completion": "SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob"
-    "tasks-request": "SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob"
+    "task-perform": SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob
+    "task-report-completion": SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob
+    "tasks-request": SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob
   admin_password: password
 
