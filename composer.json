@@ -5,7 +5,7 @@
         "psr-0": { "": "src/" }
     },
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.5.0",
         "symfony/symfony": "2.3.*",
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "1.2.*",
@@ -26,9 +26,9 @@
         "querypath/QueryPath": "3.0.2",
         "webignition/web-page-model":">=1.0.2,<2.0",
         "webignition/web-json-model":">=1.0.1,<2.0",
-        "webignition/absolute-url-deriver":">=1.4",        
+        "webignition/absolute-url-deriver":">=1.4",
         "winzou/console-bundle":"1.0.0",
-        "guzzle/guzzle":">=3.8.0",        
+        "guzzle/guzzle":">=3.8.0",
         "doctrine/doctrine-fixtures-bundle": "dev-master",
         "webignition/html-document-link-finder":">=1.2,<2.0",
         "webignition/html-document-link-checker":">=1.0.1,<2.0",
