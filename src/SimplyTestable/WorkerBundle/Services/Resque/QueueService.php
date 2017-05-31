@@ -3,18 +3,18 @@ namespace SimplyTestable\WorkerBundle\Services\Resque;
 
 use BCC\ResqueBundle\Resque;
 use SimplyTestable\WorkerBundle\Resque\Job\Job;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService;
 
 
 /**
  * Wrapper for \BCC\ResqueBundle\Resque that handles exceptions
  * when trying to interact with queues.
- * 
+ *
  * Exceptions generally occur when trying to establish a socket connection to
  * a redis server that does not exist. This can happen as in some environments
  * where the integration with redis is optional.
- * 
+ *
  */
 class QueueService {
 
@@ -64,7 +64,7 @@ class QueueService {
         try {
             return !is_null($this->findRedisValue($queue_name, $args));
         } catch (\CredisException $credisException) {
-            $this->logger->warn('ResqueQueueService::enqueue: Redis error ['.$credisException->getMessage().']');
+            $this->logger->warning('ResqueQueueService::enqueue: Redis error ['.$credisException->getMessage().']');
         }
 
         return false;
@@ -152,7 +152,7 @@ class QueueService {
         try {
             return $this->resque->enqueue($job, $trackStatus);
         } catch (\CredisException $credisException) {
-            $this->logger->warn('ResqueQueueService::enqueue: Redis error ['.$credisException->getMessage().']');
+            $this->logger->warning('ResqueQueueService::enqueue: Redis error ['.$credisException->getMessage().']');
         }
     }
 
@@ -165,5 +165,5 @@ class QueueService {
     public function isEmpty($queue) {
         return $this->getQueueLength($queue) == 0;
     }
-    
+
 }
