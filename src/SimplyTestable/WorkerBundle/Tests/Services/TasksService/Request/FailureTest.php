@@ -9,7 +9,7 @@ abstract class FailureTest extends RequestTest {
 
         $this->removeAllTasks();
 
-        $this->getHttpClientService()->getMockPlugin()->clearQueue();
+        $this->getHttpClientService()->getMockSubscriber()->clearQueue();
     }
 
     public function testExceptionIsThrow() {

@@ -13,20 +13,20 @@ use GuzzleHttp\Message\Request as HttpRequest;
 use GuzzleHttp\Exception\ConnectException;
 
 abstract class BaseSimplyTestableTestCase extends BaseTestCase {
-    
+
     const TASK_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TaskController';
     const TASKS_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TasksController';
-    const VERIFY_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\VerifyController';    
-    const MAINTENANCE_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\MaintenanceController';        
-    
+    const VERIFY_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\VerifyController';
+    const MAINTENANCE_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\MaintenanceController';
+
     public function setUp() {
         parent::setUp();
-    }    
-    
+    }
+
     protected function setActiveState() {
         $this->getWorkerService()->activate();
-    }  
-    
+    }
+
     /**
      *
      * @param string $methodName
@@ -47,7 +47,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     protected function getTasksController($methodName, $postData = array()) {
         return $this->getController(self::TASKS_CONTROLLER_NAME, $methodName, $postData);
     }
-    
+
 
     /**
      *
@@ -57,8 +57,8 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      */
     protected function getVerifyController($methodName, $postData = array()) {
         return $this->getController(self::VERIFY_CONTROLLER_NAME, $methodName, $postData);
-    }    
-    
+    }
+
     /**
      *
      * @param string $methodName
@@ -67,37 +67,37 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      */
     protected function getMaintenanceController($methodName, $postData = array()) {
         return $this->getController(self::MAINTENANCE_CONTROLLER_NAME, $methodName, $postData);
-    }       
-    
-    
+    }
+
+
     /**
-     * 
+     *
      * @param string $controllerName
      * @param string $methodName
      * @return \Symfony\Bundle\FrameworkBundle\Controller\Controller
      */
-    private function getController($controllerName, $methodName, array $postData = array(), array $queryData = array()) {        
+    private function getController($controllerName, $methodName, array $postData = array(), array $queryData = array()) {
         return $this->createController($controllerName, $methodName, $postData, $queryData);
     }
-    
+
     /**
      *
      * @return \SimplyTestable\WorkerBundle\Services\StateService
      */
     protected function getStateService() {
         return $this->container->get('simplytestable.services.stateservice');
-    }  
-    
-    
+    }
+
+
     /**
      *
      * @return \SimplyTestable\WorkerBundle\Services\WorkerService
      */
     protected function getWorkerService() {
         return $this->container->get('simplytestable.services.workerservice');
-    }  
-    
-    
+    }
+
+
     /**
      *
      * @return \SimplyTestable\WorkerBundle\Services\Resque\QueueService
@@ -122,9 +122,9 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      */
     protected function getHttpClientService() {
         return $this->container->get('simplytestable.services.httpclientservice');
-    }     
+    }
 
-    
+
     /**
      *
      * @return \SimplyTestable\WorkerBundle\Services\TaskService
@@ -149,20 +149,20 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      */
     protected function getCoreApplicationService() {
         return $this->container->get('simplytestable.services.coreapplicationservice');
-    }      
-    
-    
+    }
+
+
     /**
      *
      * @return \SimplyTestable\WorkerBundle\Services\MemcacheService
      */
     protected function getMemcacheService() {
         return $this->container->get('simplytestable.services.memcacheservice');
-    }      
-    
-    
+    }
+
+
     /**
-     * 
+     *
      * @param string $url
      * @param string $type
      * @return \stdClass
@@ -173,20 +173,20 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
             'type' => $type,
             'parameters' => $parameters
         ))->createAction();
-        
+
         return json_decode($response->getContent());
     }
-    
-    
+
+
     /**
-     * 
+     *
      * @return \Doctrine\ORM\EntityManager
      */
     protected function getEntityManager() {
         return $this->container->get('doctrine')->getManager();
     }
-    
-    
+
+
     protected function createCompletedTaskOutputForTask(
             Task $task,
             $output = '1',
@@ -199,150 +199,151 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     ) {
         $mediaTypeParser = new InternetMediaTypeParser();
         $contentType = $mediaTypeParser->parse($contentTypeString);
-        
+
         $taskOutput = new TaskOutput();
         $taskOutput->setContentType($contentType);
         $taskOutput->setErrorCount($errorCount);
         $taskOutput->setOutput($output);
         $taskOutput->setState($this->getStateService()->fetch('taskoutput-queued'));
-        $taskOutput->setWarningCount($warningCount);        
-        
+        $taskOutput->setWarningCount($warningCount);
+
         $taskDriverResponse = new TaskDriverResponse();
-        
+
         $taskDriverResponse->setTaskOutput($taskOutput);
         $taskDriverResponse->setErrorCount($taskOutput->getErrorCount());
         $taskDriverResponse->setWarningCount($taskOutput->getWarningCount());
-        
+
         switch ($result) {
             case 'skipped':
                 $taskDriverResponse->setHasBeenSkipped();
                 break;
-            
+
             case 'failed':
                 $taskDriverResponse->setHasFailed();
                 break;
-            
+
             default:
                 $taskDriverResponse->setHasSucceeded();
                 break;
         }
-        
+
         if ($isRetryable) {
             $taskDriverResponse->setIsRetryable(true);
         }
-        
+
         if ($isRetryLimitReached) {
             $taskDriverResponse->setIsRetryLimitReached(true);
         }
-        
+
         $this->getTaskService()->complete($task, $taskDriverResponse);
     }
-    
-    
+
+
     protected function clearMemcacheHttpCache() {
         $memcacheCache = new MemcacheCache();
         $memcacheCache->setMemcache($this->getMemcacheService()->get());
-        $memcacheCache->deleteAll();        
+        $memcacheCache->deleteAll();
     }
-    
-    
+
+
     protected function removeAllTasks() {
-        $this->removeAllForEntity('SimplyTestable\WorkerBundle\Entity\Task\Task');      
+        $this->removeAllForEntity('SimplyTestable\WorkerBundle\Entity\Task\Task');
     }
-    
+
     protected function removeAllTestTaskTypes() {
         $taskTypes = $this->getEntityManager()->getRepository('SimplyTestable\WorkerBundle\Entity\Task\Type\Type')->findAll();
-        
+
         foreach ($taskTypes as $taskType) {
             if (preg_match('/test-/', $taskType->getName())) {
                 $this->getEntityManager()->remove($taskType);
-                $this->getEntityManager()->flush();                   
+                $this->getEntityManager()->flush();
             }
         }
     }
-    
+
     private function removeAllForEntity($entityName) {
         $entities = $this->getEntityManager()->getRepository($entityName)->findAll();
         if (is_array($entities) && count($entities) > 0) {
             foreach ($entities as $entity) {
-                $this->getEntityManager()->remove($entity);                               
+                $this->getEntityManager()->remove($entity);
             }
-            
-            $this->getEntityManager()->flush(); 
-        }        
+
+            $this->getEntityManager()->flush();
+        }
     }
-    
-    
-    
-    protected function setHttpFixtures($fixtures) {
+
+
+
+    protected function setHttpFixtures($fixtures)
+    {
         foreach ($fixtures as $fixture) {
             if ($fixture instanceof \Exception) {
-                $this->getHttpClientService()->getMockPlugin()->addException($fixture);
+                $this->getHttpClientService()->getMockSubscriber()->addException($fixture);
             } else {
-                $this->getHttpClientService()->getMockPlugin()->addResponse($fixture);
+                $this->getHttpClientService()->getMockSubscriber()->addResponse($fixture);
             }
         }
     }
-    
-    
+
+
     protected function getHttpFixtures($path) {
         $httpMessages = array();
 
         $fixturesDirectory = new \DirectoryIterator($path);
         $fixturePaths = array();
         foreach ($fixturesDirectory as $directoryItem) {
-            if ($directoryItem->isFile()) {                
+            if ($directoryItem->isFile()) {
                 $fixturePaths[] = $directoryItem->getPathname();
             }
-        }        
-        
+        }
+
         sort($fixturePaths);
-        
+
         foreach ($fixturePaths as $fixturePath) {
             $httpMessages[] = file_get_contents($fixturePath);
         }
-        
+
         return $this->buildHttpFixtureSet($httpMessages);
     }
-    
-    
+
+
     /**
-     * 
+     *
      * @param array $httpMessages
      * @return array
      */
     protected function buildHttpFixtureSet($items) {
         $fixtures = array();
-        
+
         foreach ($items as $item) {
             switch ($this->getHttpFixtureItemType($item)) {
                 case 'httpMessage':
                     $fixtures[] = $this->getHttpResponseFromMessage($item);
                     break;
-                
+
                 case 'curlException':
                     $fixtures[] = $this->getCurlExceptionFromCurlMessage($item);
                     break;
-                
+
                 default:
                     throw new \LogicException();
             }
         }
-        
+
         return $fixtures;
     }
-    
+
     private function getHttpFixtureItemType($item) {
         if (substr($item, 0, strlen('HTTP')) == 'HTTP') {
             return 'httpMessage';
         }
-        
+
         return 'curlException';
     }
-    
-    
+
+
     /**
-     * 
+     *
      * @param string $curlMessage
      * @return ConnectException
      */
@@ -353,22 +354,22 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
             'cURL error ' . str_replace('CURL/', '', $curlMessageParts[0]) . ': ' . $curlMessageParts[1],
             new HttpRequest('GET', 'http://example.com/')
         );
-    } 
-    
-    
+    }
+
+
     protected function assertSystemCurlOptionsAreSetOnAllRequests() {
         foreach ($this->getHttpClientService()->getHistory()->getAll() as $httpTransaction) {
-            foreach ($this->container->getParameter('curl_options') as $curlOption) {                                
+            foreach ($this->container->getParameter('curl_options') as $curlOption) {
                 $expectedValueAsString = $curlOption['value'];
-                
+
                 if (is_string($expectedValueAsString)) {
                     $expectedValueAsString = '"'.$expectedValueAsString.'"';
-                }                
-                
+                }
+
                 if (is_bool($curlOption['value'])) {
                     $expectedValueAsString = ($curlOption['value']) ? 'true' : 'false';
                 }
-                
+
                 $this->assertEquals(
                     $curlOption['value'],
                     $httpTransaction['request']->getCurlOptions()->get(constant($curlOption['name'])),
