@@ -2,6 +2,7 @@
 namespace SimplyTestable\WorkerBundle\Services;
 
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Message\RequestInterface;
 use GuzzleHttp\Subscriber\Retry\RetrySubscriber;
 use GuzzleHttp\Subscriber\Cache\CacheSubscriber;
 use GuzzleHttp\Subscriber\Cache\CacheStorage;
@@ -215,47 +216,48 @@ class HttpClientService {
         return $cacheSubscriber;
     }
 
-
     /**
+     * @param string $url
+     * @param array $options
      *
-     * @param string $uri
-     * @param array $headers
-     * @param string $body
-     * @return \Guzzle\Http\Message\Request
+     * @return RequestInterface
      */
-    public function getRequest($uri = null, $headers = null, $body = null) {
-        $request = $this->get()->get($uri, $headers, $body);
-        $request->setHeader('Accept-Encoding', 'gzip,deflate');
-
-        foreach ($this->curlOptions as $key => $value) {
-            $request->getCurlOptions()->set($key, $value);
-        }
-
-        return $request;
+    public function getRequest($url, array $options = [])
+    {
+        return $this->createRequest('GET', $url, $options);
     }
 
 
     /**
+     * @param string $url
+     * @param array $options
      *
-     * @param string $uri
-     * @param array $headers
-     * @param array $postBody
-     * @return HttpRequest
+     * @return RequestInterface
      */
-    public function postRequest($uri = null, $headers = null, $postBody = null) {
-        /* @var $request HttpRequest */
-        $request = $this->get()->createRequest(
-            'POST',
-            $uri
+    public function postRequest($url, array $options = [])
+    {
+        return $this->createRequest('POST', $url, $options);
+    }
+
+    /**
+     * @param string $method
+     * @param string $url
+     * @param array $options
+     *
+     * @return RequestInterface
+     */
+    private function createRequest($method, $url, $options)
+    {
+        $options['config'] = [
+            'curl' => $this->curlOptions
+        ];
+
+        return $this->get()->createRequest(
+            $method,
+            $url,
+            $options
         );
-
-        foreach ($postBody as $key => $value) {
-            $request->getBody()->setField($key, $value);
-        }
-
-        return $request;
     }
-
 
     /**
      *
@@ -285,15 +287,15 @@ class HttpClientService {
 
 
     /**
-     *
-     * @return \Guzzle\Plugin\History\HistoryPlugin|null
+     * @return HttpHistorySubscriber
      */
-    public function getHistory() {
-        $listenerCollections = $this->get()->getEventDispatcher()->getListeners('request.sent');
+    public function getHistory()
+    {
+        $subscriberCollections = $this->get()->getEmitter()->listeners('complete');
 
-        foreach ($listenerCollections as $listener) {
-            if ($listener[0] instanceof \Guzzle\Plugin\History\HistoryPlugin) {
-                return $listener[0];
+        foreach ($subscriberCollections as $subcriberCollection) {
+            if ($subcriberCollection[0] instanceof HttpHistorySubscriber) {
+                return $subcriberCollection[0];
             }
         }
 

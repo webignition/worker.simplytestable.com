@@ -2,6 +2,7 @@
 
 namespace SimplyTestable\WorkerBundle\Tests;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -11,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Console\Tester\CommandTester;
 
 abstract class BaseTestCase extends WebTestCase {
-    
+
     const FIXTURES_DATA_RELATIVE_PATH = '/Fixtures/Data';
 
     /**
@@ -25,30 +26,52 @@ abstract class BaseTestCase extends WebTestCase {
      * @var \Symfony\Component\DependencyInjection\Container
      */
     protected $container;
-    
-    
+
+
     /**
      *
      * @var Symfony\Bundle\FrameworkBundle\Console\Application
      */
     private $application;
-    
 
-    public function setUp() {        
+
+    protected function setUp() {
         $this->client = static::createClient();
-        $this->container = $this->client->getKernel()->getContainer();        
+        $this->container = $this->client->getKernel()->getContainer();
         $this->application = new Application(self::$kernel);
         $this->application->setAutoExit(false);
-        
+
         foreach ($this->getCommands() as $command) {
             $this->application->add($command);
-        }           
-        
+        }
+
         $this->setDefaultSystemState();
     }
-    
+
     /**
-     * 
+     * @return array
+     */
+    protected static function getMockServices()
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function createClient(array $options = array(), array $server = array())
+    {
+        $client = parent::createClient($options, $server);
+
+        foreach (static::getMockServices() as $serviceId => $serviceClass) {
+            $client->getContainer()->set($serviceId, \Mockery::mock($serviceClass));
+        }
+
+        return $client;
+    }
+
+    /**
+     *
      * @return \Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand[]
      */
     protected function getCommands() {
@@ -56,39 +79,39 @@ abstract class BaseTestCase extends WebTestCase {
             new \Doctrine\Bundle\FixturesBundle\Command\LoadDataFixturesDoctrineCommand(),
             new \SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand(),
         ), $this->getAdditionalCommands());
-    } 
-    
+    }
+
     /**
-     * 
+     *
      * @return \Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand[]
-     */    
+     */
     protected function getAdditionalCommands() {
         return array();
-    }       
-    
+    }
+
     protected function executeCommand($name, $arguments = array()) {
         $command = $this->application->find($name);
-        $commandTester = new CommandTester($command);        
-        
+        $commandTester = new CommandTester($command);
+
         $arguments['command'] = $command->getName();
-        
+
         return $commandTester->execute($arguments);
     }
-    
+
     protected function setDefaultSystemState() {
         $this->executeCommand('simplytestable:maintenance:disable-read-only');
-    }    
-    
+    }
+
     protected static function setupDatabaseIfNotExists() {
         if (self::areDatabaseMigrationsNeeded()) {
             self::setupDatabase();
         }
     }
-    
+
     private static function areDatabaseMigrationsNeeded() {
         $migrationStatusOutputLines = array();
         exec('php app/console doctrine:migrations:status', $migrationStatusOutputLines);
-        
+
         foreach ($migrationStatusOutputLines as $migrationStatusOutputLine) {
             if (substr_count($migrationStatusOutputLine, '>> New Migrations:')) {
                 //var_dump($migrationStatusOutputLine, (int)trim(str_replace('>> Available Migrations:', '', $migrationStatusOutputLine)));
@@ -97,28 +120,28 @@ abstract class BaseTestCase extends WebTestCase {
                 }
             }
         }
-        
-        return false;      
-    }    
-    
+
+        return false;
+    }
+
     protected function clearRedis() {
         $output = array();
         $returnValue = null;
-        
+
         exec('redis-cli -r 1 flushall', $output, $returnValue);
-        
+
         if ($output !== array('OK')) {
             return false;
         }
-        
+
         return $returnValue === 0;
-    }    
-    
+    }
+
     /**
-     * 
+     *
      * Builds a Controller object and the request to satisfy it. Attaches the request
      * to the object and to the container.
-     * 
+     *
      * @param string $controllerClass The full path to the controller class
      * @param string $controllerMethod Name of the controller method to be called
      * @param array $postData Array of post values
@@ -131,10 +154,10 @@ abstract class BaseTestCase extends WebTestCase {
         $request->request->add($postData);
         $request->query->add($queryData);
         $this->container->set('request', $request);
-              
-        $controllerCallable = $this->getControllerCallable($request);        
+
+        $controllerCallable = $this->getControllerCallable($request);
         $controllerCallable[0]->setContainer($this->container);
-        
+
         $dispatcher = $this->container->get('event_dispatcher');
         $dispatcher->dispatch('kernel.controller', new \Symfony\Component\HttpKernel\Event\FilterControllerEvent(
                 self::$kernel,
@@ -145,10 +168,10 @@ abstract class BaseTestCase extends WebTestCase {
 
         return $controllerCallable[0];
     }
-    
+
     private function getControllerCallable(Request $request) {
-        $controllerResolver = new \Symfony\Component\HttpKernel\Controller\ControllerResolver();        
-        return $controllerResolver->getController($request);                
+        $controllerResolver = new \Symfony\Component\HttpKernel\Controller\ControllerResolver();
+        return $controllerResolver->getController($request);
     }
 
     /**
@@ -157,14 +180,14 @@ abstract class BaseTestCase extends WebTestCase {
      *
      * @return \Symfony\Component\HttpFoundation\Request The hydrated Request object.
      */
-    protected function createWebRequest() {        
+    protected function createWebRequest() {
         $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
         $request->server->set('REMOTE_ADDR', '127.0.0.1');
 
         return $request;
     }
-    
-    
+
+
     /**
      *
      * @param string $testName
@@ -172,27 +195,27 @@ abstract class BaseTestCase extends WebTestCase {
      */
     protected function getFixturesDataPath($testName = null, $upBaseLevels = 0) {
         $path = __DIR__ . self::FIXTURES_DATA_RELATIVE_PATH . '/' . str_replace('\\', DIRECTORY_SEPARATOR, get_class($this));
-        
+
         if ($upBaseLevels > 0) {
             $pathParts = explode('/', $path);
-            
+
             for ($count = 0; $count < $upBaseLevels; $count++) {
                 array_pop($pathParts);
             }
-            
+
             $path = implode('/', $pathParts);
         }
-        
+
         if (!is_null($testName)) {
             $path .=  '/' . $testName;
         }
-        
+
         return $path;
-    } 
-    
+    }
+
     public function tearDown() {
         $this->container->get('doctrine')->getConnection()->close();
         parent::tearDown();
-    }    
+    }
 
 }

@@ -19,10 +19,6 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     const VERIFY_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\VerifyController';
     const MAINTENANCE_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\MaintenanceController';
 
-    public function setUp() {
-        parent::setUp();
-    }
-
     protected function setActiveState() {
         $this->getWorkerService()->activate();
     }
@@ -118,7 +114,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
 
     /**
      *
-     * @return \SimplyTestable\WorkerBundle\Services\TestHttpClientService
+     * @return \SimplyTestable\WorkerBundle\Services\HttpClientService
      */
     protected function getHttpClientService() {
         return $this->container->get('simplytestable.services.httpclientservice');
@@ -276,13 +272,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
 
     protected function setHttpFixtures($fixtures)
     {
-        foreach ($fixtures as $fixture) {
-            if ($fixture instanceof \Exception) {
-                $this->getHttpClientService()->getMockSubscriber()->addException($fixture);
-            } else {
-                $this->getHttpClientService()->getMockSubscriber()->addResponse($fixture);
-            }
-        }
+        $this->getHttpClientService()->getMockSubscriber()->addMultiple($fixtures);
     }
 
 

@@ -1,70 +1,53 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Services;
 
-use Guzzle\Http\Exception\CurlException;
-use \Psr\Log\LoggerInterface;
-use Guzzle\Http\Exception\ClientErrorResponseException;
-use Guzzle\Http\Exception\ServerErrorResponseException;
-use SimplyTestable\WorkerBundle\Services\UrlService;
-use SimplyTestable\WorkerBundle\Services\CoreApplicationService;
-use SimplyTestable\WorkerBundle\Services\WorkerService;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
-use SimplyTestable\WorkerBundle\Services\TaskService;
+use GuzzleHttp\Exception\ConnectException;
+use Psr\Log\LoggerInterface;
+use GuzzleHttp\Exception\RequestException as HttpRequestException;
 use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
+use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptionFactory;
 
-class TasksService {
-
+class TasksService
+{
     /**
      * @var LoggerInterface
      */
     private $logger;
 
     /**
-     *
      * @var UrlService $urlService
      */
     private $urlService;
 
-
     /**
-     *
      * @var CoreApplicationService $coreApplicationService
      */
     private $coreApplicationService;
 
-
     /**
-     *
      * @var WorkerService $workerService
      */
     private $workerService;
 
-
     /**
-     *
      * @var HttpClientService
      */
     private $httpClientService;
-
 
     /**
      * @var TaskService
      */
     private $taskService;
 
-
     /**
      * @var int
      */
     private $workerProcessCount = null;
 
-
     /**
      * @var int
      */
     private $maxTasksRequestFactor = null;
-
-
 
     /**
      * @param LoggerInterface $logger
@@ -80,8 +63,8 @@ class TasksService {
         CoreApplicationService $coreApplicationService,
         WorkerService $workerService,
         HttpClientService $httpClientService,
-        TaskService $taskService)
-    {
+        TaskService $taskService
+    ) {
         $this->logger = $logger;
         $this->urlService = $urlService;
         $this->coreApplicationService = $coreApplicationService;
@@ -90,131 +73,106 @@ class TasksService {
         $this->taskService = $taskService;
     }
 
-
     /**
      * @param $limit
-     * @return $this
      */
-    public function setWorkerProcessCount($limit) {
+    public function setWorkerProcessCount($limit)
+    {
         $this->workerProcessCount = $limit;
-        return $this;
     }
-
 
     /**
      * @param $factor
-     * @return $this
      */
-    public function setMaxTasksRequestFactor($factor) {
+    public function setMaxTasksRequestFactor($factor)
+    {
         $this->maxTasksRequestFactor = $factor;
-        return $this;
     }
-
 
     /**
      * @return int
      */
-    public function getWorkerProcessCount() {
+    public function getWorkerProcessCount()
+    {
         return $this->workerProcessCount;
     }
 
-
     /**
      * @return int
      */
-    public function getMaxTasksRequestFactor() {
+    public function getMaxTasksRequestFactor()
+    {
         return $this->maxTasksRequestFactor;
     }
 
-
     /**
      * @param null|int $requestedLimit
+     *
+     * @throws RequestException
+     *
      * @return bool
-     * @throws \SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException
-     * @throws \Guzzle\Http\Exception\BadResponseException
      */
-    public function request($requestedLimit = null) {
+    public function request($requestedLimit = null)
+    {
         if (!$this->isWithinThreshold()) {
             return false;
         }
 
-        $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/worker/tasks/request/');
-        $request = $this->httpClientService->postRequest($requestUrl, null, [
-            'worker_hostname' => $this->workerService->get()->getHostname(),
-            'worker_token' => $this->workerService->get()->getActivationToken(),
-            'limit' => $this->getLimit($requestedLimit)
+        $requestUrl = $this->urlService->prepare(
+            $this->coreApplicationService->get()->getUrl() . '/worker/tasks/request/'
+        );
+
+        $request = $this->httpClientService->postRequest($requestUrl, [
+            'body' => [
+                'worker_hostname' => $this->workerService->get()->getHostname(),
+                'worker_token' => $this->workerService->get()->getActivationToken(),
+                'limit' => $this->getLimit($requestedLimit)
+            ],
         ]);
 
         try {
-            $response = $request->send();
+            $this->httpClientService->get()->send($request);
+        } catch (HttpRequestException $httpRequestException) {
+            $requestException = $this->createRequestException($httpRequestException);
+            $this->logHttpRequestException($requestException);
 
-            if ($response->getStatusCode() !== 200) {
-                if ($response->isClientError()) {
-                    throw ClientErrorResponseException::factory($request, $response);
-                } elseif ($response->isServerError()) {
-                    throw ServerErrorResponseException::factory($request, $response);
-                }
-            }
-
-            return true;
-        } catch (ClientErrorResponseException $clientErrorResponseException) {
-            $this->logger->error('TaskService:request:ClientErrorResponseException [' . $clientErrorResponseException->getResponse()->getStatusCode() . ']');
-
-            throw new RequestException(
-                'ClientErrorResponseException',
-                $clientErrorResponseException->getResponse()->getStatusCode(),
-                $clientErrorResponseException
-            );
-
-        } catch (ServerErrorResponseException $serverErrorResponseException) {
-            $this->logger->error('TaskService:request:ServerErrorResponseException [' . $serverErrorResponseException->getResponse()->getStatusCode() . ']');
-
-            throw new RequestException(
-                'ServerErrorResponseException',
-                $serverErrorResponseException->getResponse()->getStatusCode(),
-                $serverErrorResponseException
-            );
-        } catch (CurlException $curlException) {
-            $this->logger->error('TaskService:request:CurlException [' . $curlException->getErrorNo() . ']');
-
-            throw new RequestException(
-                'CurlException',
-                $curlException->getErrorNo(),
-                $curlException
-            );
+            throw $requestException;
         }
-    }
 
+        return true;
+    }
 
     /**
      * @return bool
      */
-    private function isWithinThreshold() {
+    private function isWithinThreshold()
+    {
         return $this->taskService->getInCompleteCount() <= $this->getLowerLimit();
     }
 
-
     /**
      * @return int
      */
-    private function getUpperLimit() {
+    private function getUpperLimit()
+    {
         return (int)round($this->getWorkerProcessCount() * $this->getMaxTasksRequestFactor());
     }
 
-
     /**
      * @return int
      */
-    private function getLowerLimit() {
+    private function getLowerLimit()
+    {
         return $this->getWorkerProcessCount();
     }
 
-
     /**
      * @param int $requestedLimit
+     *
      * @return int
      */
-    private function getLimit($requestedLimit = null) {
+    private function getLimit($requestedLimit = null)
+    {
         $calculatedLimit = $this->getUpperLimit() - $this->taskService->getInCompleteCount();
         if (is_null($requestedLimit)) {
             return $calculatedLimit;
@@ -225,5 +183,43 @@ class TasksService {
         }
 
         return min($requestedLimit, $calculatedLimit);
+    }
+
+
+    /**
+     * @param HttpRequestException $requestException
+     *
+     * @return RequestException
+     */
+    private function createRequestException(HttpRequestException $requestException)
+    {
+        $exceptionCode = null;
+
+        if ($requestException instanceof ConnectException &&
+            GuzzleCurlExceptionFactory::isCurlException($requestException)
+        ) {
+            $curlException = GuzzleCurlExceptionFactory::fromConnectException($requestException);
+            $exceptionCode = $curlException->getCurlCode();
+        } else {
+            $exceptionCode = $requestException->getResponse()->getStatusCode();
+        }
+
+        return new RequestException(
+            get_class($requestException),
+            $exceptionCode,
+            $requestException
+        );
+    }
+
+    /**
+     * @param RequestException $requestException
+     */
+    private function logHttpRequestException(RequestException $requestException)
+    {
+        $this->logger->error(sprintf(
+            'TasksService:request:%s [%s]',
+            get_class($requestException->getPrevious()),
+            $requestException->getCode()
+        ));
     }
 }
