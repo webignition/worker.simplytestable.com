@@ -2,7 +2,7 @@
 namespace SimplyTestable\WorkerBundle\Services;
 
 use Guzzle\Http\Exception\CurlException;
-use \Psr\Log\LoggerInterface as Logger;
+use \Psr\Log\LoggerInterface;
 use Guzzle\Http\Exception\ClientErrorResponseException;
 use Guzzle\Http\Exception\ServerErrorResponseException;
 use SimplyTestable\WorkerBundle\Services\UrlService;
@@ -15,31 +15,31 @@ use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException
 class TasksService {
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
-    
+
     /**
      *
      * @var UrlService $urlService
      */
     private $urlService;
-    
-    
+
+
     /**
      *
      * @var CoreApplicationService $coreApplicationService
      */
-    private $coreApplicationService;   
-    
-    
+    private $coreApplicationService;
+
+
     /**
      *
      * @var WorkerService $workerService
      */
     private $workerService;
-    
-    
+
+
     /**
      *
      * @var HttpClientService
@@ -67,7 +67,7 @@ class TasksService {
 
 
     /**
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      * @param UrlService $urlService
      * @param CoreApplicationService $coreApplicationService
      * @param WorkerService $workerService
@@ -75,7 +75,7 @@ class TasksService {
      * @param TaskService $taskService
      */
     public function __construct(
-        Logger $logger,
+        LoggerInterface $logger,
         UrlService $urlService,
         CoreApplicationService $coreApplicationService,
         WorkerService $workerService,
