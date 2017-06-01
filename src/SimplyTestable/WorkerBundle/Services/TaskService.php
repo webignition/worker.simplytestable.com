@@ -9,13 +9,20 @@ use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
+use SimplyTestable\WorkerBundle\Repository\TaskRepository;
+use SimplyTestable\WorkerBundle\Services\CoreApplicationService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use SimplyTestable\WorkerBundle\Services\StateService;
+use SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService as TaskDriverFactoryService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use GuzzleHttp\Exception\BadResponseException as HttpBadResponseException;
 use GuzzleHttp\Exception\ConnectException as HttpConnectException;
+use SimplyTestable\WorkerBundle\Services\UrlService;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
-class TaskService extends EntityService {
-
+class TaskService extends EntityService
+{
     const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\Task\Task';
     const TASK_STARTING_STATE = 'task-queued';
     const TASK_IN_PROGRESS_STATE = 'task-in-progress';
@@ -28,42 +35,32 @@ class TaskService extends EntityService {
 
 
     /**
-     *
      * @var LoggerInterface
      */
     private $logger;
 
-
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\StateService
+     * @var StateService
      */
     private $stateService;
 
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\UrlService $urlService
+     * @var UrlService $urlService
      */
     private $urlService;
 
-
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService
+     * @var CoreApplicationService
      */
     private $coreApplicationService;
 
-
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\WorkerService $workerService
+     * @var WorkerService
      */
     private $workerService;
 
-
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\HttpClientService
+     * @var HttpClientService
      */
     private $httpClientService;
 
@@ -73,17 +70,15 @@ class TaskService extends EntityService {
     private $taskDrivers;
 
     /**
-     *
      * @return string
      */
-    protected function getEntityName() {
+    protected function getEntityName()
+    {
         return self::ENTITY_NAME;
     }
 
-
     /**
-     *
-     * @param \Doctrine\ORM\EntityManager $entityManager
+     * @param EntityManager $entityManager
      * @param LoggerInterface $logger
      * @param \SimplyTestable\WorkerBundle\Services\StateService $stateService
      * @param \SimplyTestable\WorkerBundle\Services\UrlService $urlService
@@ -110,15 +105,15 @@ class TaskService extends EntityService {
         $this->httpClientService = $httpClientService;
     }
 
-
     /**
-     *
      * @param string $url
      * @param TaskType $type
      * @param string $parameters
-     * @return \SimplyTestable\WorkerBundle\Entity\Task\Task
+     *
+     * @return Task
      */
-    public function create($url, TaskType $type, $parameters) {
+    public function create($url, TaskType $type, $parameters)
+    {
         $task = new Task();
         $task->setState($this->getStartingState());
         $task->setType($type);
@@ -132,158 +127,171 @@ class TaskService extends EntityService {
         return $task;
     }
 
-
     /**
-     *
      * @param Task $task
+     *
      * @return Task
      */
-    private function fetch(Task $task) {
-        return $this->getEntityRepository()->findOneBy(array(
+    private function fetch(Task $task)
+    {
+        /* @var $task Task */
+        $task = $this->getEntityRepository()->findOneBy(array(
             'state' => $task->getState(),
             'type' => $task->getType(),
             'url' => $task->getUrl()
         ));
+
+        return $task;
     }
 
-
     /**
-     *
      * @param int $id
-     * @return \SimplyTestable\WorkerBundle\Entity\Task\Task
+     *
+     * @return Task
      */
-    public function getById($id) {
-        return $this->getEntityRepository()->find($id);
+    public function getById($id)
+    {
+        /* @var $task Task */
+        $task = $this->getEntityRepository()->find($id);
+
+        return $task;
     }
 
-
     /**
-     *
      * @param Task $task
+     *
      * @return boolean
      */
-    private function has(Task $task) {
+    private function has(Task $task)
+    {
         return !is_null($this->fetch($task));
     }
 
     /**
-     *
      * @param Task $task
-     * @return \SimplyTestable\WorkerBundle\Entity\Task\Task
+     *
+     * @return Task
      */
-    public function persistAndFlush(Task $task) {
+    public function persistAndFlush(Task $task)
+    {
         $this->getEntityManager()->persist($task);
         $this->getEntityManager()->flush();
         return $task;
     }
 
-
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
+     * @return State
      */
-    public function getStartingState() {
+    public function getStartingState()
+    {
         return $this->stateService->fetch(self::TASK_STARTING_STATE);
     }
 
-
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
+     * @return State
      */
-    public function getQueuedState() {
+    public function getQueuedState()
+    {
         return $this->getStartingState();
     }
 
-
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
+     * @return State
      */
-    public function getInProgressState() {
+    public function getInProgressState()
+    {
         return $this->stateService->fetch(self::TASK_IN_PROGRESS_STATE);
     }
 
-
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
+     * @return State
      */
-    public function getCompletedState() {
+    public function getCompletedState()
+    {
         return $this->stateService->fetch(self::TASK_COMPLETED_STATE);
     }
 
-
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
+     * @return State
      */
-    public function getCancelledState() {
+    public function getCancelledState()
+    {
         return $this->stateService->fetch(self::TASK_CANCELLED_STATE);
     }
 
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
+     * @return State
      */
-    public function getFailedNoRetryAvailableState() {
+    public function getFailedNoRetryAvailableState()
+    {
         return $this->stateService->fetch(self::TASK_FAILED_NO_RETRY_AVAILABLE_STATE);
     }
 
-
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
+     * @return State
      */
-    public function getFailedRetryAvailableState() {
+    public function getFailedRetryAvailableState()
+    {
         return $this->stateService->fetch(self::TASK_FAILED_RETRY_AVAILABLE_STATE);
     }
 
-
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
+     * @return State
      */
-    public function getFailedRetryLimitReachedState() {
+    public function getFailedRetryLimitReachedState()
+    {
         return $this->stateService->fetch(self::TASK_FAILED_RETRY_LIMIT_REACHED_STATE);
     }
 
-
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
+     * @return State
      */
-    public function getSkippedState() {
+    public function getSkippedState()
+    {
         return $this->stateService->fetch(self::TASK_SKIPPED_STATE);
     }
 
-
     /**
-     *
      * @param Task $task
+     *
      * @return int
      */
-    public function perform(Task $task) {
-        $this->logger->info("TaskService::perform: [".$task->getId()."] [".$task->getState()->getName()."] Initialising");
+    public function perform(Task $task)
+    {
+        $this->logger->info(sprintf(
+            'TaskService::perform: [%i] [%s] Initialising',
+            $task->getId(),
+            $task->getState())
+        );
 
         if (!$this->isQueued($task)) {
-            $this->logger->info("TaskService::perform: [".$task->getId()."] Task state is [".$task->getState()->getName()."] and cannot be performed");
+            $this->logger->info(sprintf(
+                'TaskService::perform: [%i] Task state is [%s] and cannot be performed',
+                $task->getId(),
+                $task->getState()
+            ));
+
             return 1;
         }
 
         $taskDriver = $this->getDriverForTask($task);
 
         if ($taskDriver === false) {
-            $this->logger->info("TaskService::perform: [".$task->getId()."] No driver found for task type \"".$task->getType()->getName()."\"");
+            $this->logger->info(sprintf(
+                'TaskService::perform: [%i] No driver found for task type "%s"',
+                $task->getId(),
+                $task->getType()
+            ));
+
             return 2;
         }
 
         $this->start($task);
 
-        /* @var $output \SimplyTestable\WorkerBundle\Entity\Task\Output */
         $taskDriverResponse = $taskDriver->perform($task);
 
         $this->complete($task, $taskDriverResponse);
+
         return 0;
     }
 
@@ -313,11 +321,12 @@ class TaskService extends EntityService {
     }
 
     /**
-     *
      * @param Task $task
+     *
      * @return Task
      */
-    private function start(Task $task) {
+    private function start(Task $task)
+    {
         $timePeriod = new TimePeriod();
         $timePeriod->setStartDateTime(new \DateTime());
         $task->setTimePeriod($timePeriod);
@@ -326,113 +335,142 @@ class TaskService extends EntityService {
         return $this->persistAndFlush($task);
     }
 
-
     /**
-     *
      * @param Task $task
      * @param TaskDriverResponse $taskDriverResponse
+     *
      * @return Task
      */
-    public function complete(Task $task, TaskDriverResponse $taskDriverResponse) {
+    public function complete(Task $task, TaskDriverResponse $taskDriverResponse)
+    {
         if (!$task->getTimePeriod()->hasEndDateTime()) {
             $task->getTimePeriod()->setEndDateTime(new \DateTime());
         }
 
         $task->setOutput($taskDriverResponse->getTaskOutput());
 
-        if ($taskDriverResponse->hasBeenSkipped()) {
-            $completionState = $this->getSkippedState();
-        } elseif ($taskDriverResponse->hasSucceeded()) {
-            $completionState = $this->getCompletedState();
-        } else {
-            if ($taskDriverResponse->isRetryLimitReached()) {
-                $completionState = $this->getFailedRetryLimitReachedState();
-            } elseif ($taskDriverResponse->isRetryable()) {
-                $completionState = $this->getFailedRetryAvailableState();
-            } else {
-                $completionState = $this->getFailedNoRetryAvailableState();
-            }
-        }
-
-        return $this->finish($task, $completionState);
+        return $this->finish(
+            $task,
+            $this->getCompletionStateFromTaskDriverResponse($taskDriverResponse)
+        );
     }
 
+    /**
+     * @param TaskDriverResponse $taskDriverResponse
+     *
+     * @return State
+     */
+    private function getCompletionStateFromTaskDriverResponse(TaskDriverResponse $taskDriverResponse)
+    {
+        if ($taskDriverResponse->hasBeenSkipped()) {
+            return $this->getSkippedState();
+        }
+
+        if ($taskDriverResponse->hasSucceeded()) {
+            return $this->getCompletedState();
+        }
+
+        if ($taskDriverResponse->isRetryLimitReached()) {
+            return $this->getFailedRetryLimitReachedState();
+        }
+
+        if ($taskDriverResponse->isRetryable()) {
+            return $this->getFailedRetryAvailableState();
+        }
+
+        return $this->getFailedNoRetryAvailableState();
+    }
 
     /**
-     *
      * @param Task $task
+     *
      * @return Task
      */
-    public function cancel(Task $task) {
+    public function cancel(Task $task)
+    {
         if ($this->isCancelled($task)) {
             return $task;
         }
 
-        if  ($this->isCompleted($task)) {
+        if ($this->isCompleted($task)) {
             return $task;
         }
 
         return $this->finish($task, $this->getCancelledState());
     }
 
-
     /**
-     *
      * @param Task $task
+     *
      * @return boolean
      */
-    private function isCancelled(Task $task) {
+    private function isCancelled(Task $task)
+    {
         return $task->getState()->equals($this->getCancelledState());
     }
 
-
     /**
-     *
      * @param Task $task
+     *
      * @return boolean
      */
-    private function isCompleted(Task $task) {
+    private function isCompleted(Task $task)
+    {
         return $task->getState()->equals($this->getCompletedState());
     }
 
     /**
-     *
      * @param Task $task
+     *
      * @return boolean
      */
-    private function isQueued(Task $task) {
+    private function isQueued(Task $task)
+    {
         return $task->getState()->equals($this->getStartingState());
     }
 
-
     /**
-     *
      * @param Task $task
      * @param State $state
+     *
      * @return Task
      */
-    private function finish(Task $task, State $state) {
+    private function finish(Task $task, State $state)
+    {
         $task->setState($state);
         return $this->persistAndFlush($task);
     }
 
-
     /**
-     *
      * @param Task $task
      * @return boolean
      */
-    public function reportCompletion(Task $task) {
-        $this->logger->info("TaskService::reportCompletion: Initialising [".$task->getId()."]");
+    public function reportCompletion(Task $task)
+    {
+        $this->logger->info(sprintf(
+            'TaskService::reportCompletion: Initialising [%i]',
+            $task->getId()
+        ));
 
         if (!$task->hasOutput()) {
-            $this->logger->info("TaskService::reportCompletion: Task state is [".$task->getState()->getName()."], we can't report back just yet");
+            $this->logger->info(sprintf(
+                'TaskService::reportCompletion: Task state is [%s], we can\'t report back just yet',
+                $task->getState()
+            ));
             return true;
         }
 
         $this->removeTemporaryParameters($task);
 
-        $requestUrl = $this->urlService->prepare($this->coreApplicationService->get()->getUrl() . '/task/' . urlencode($task->getUrl()) . '/' . rawurlencode($task->getType()->getName()) . '/' . $task->getParametersHash() . '/complete/');
+        $requestUrl = $this->urlService->prepare(
+            $this->coreApplicationService->get()->getUrl()
+            . '/task/'
+            . urlencode($task->getUrl())
+            . '/'
+            . rawurlencode($task->getType()->getName())
+            . '/' . $task->getParametersHash()
+            . '/complete/'
+        );
 
         $httpRequest = $this->httpClientService->postRequest($requestUrl, null, array(
             'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
@@ -448,7 +486,13 @@ class TaskService extends EntityService {
         try {
             /* @var $response \GuzzleHttp\Message\Response */
             $response = $this->httpClientService->get()->send($httpRequest);
-            $this->logger->notice("TaskService::reportCompletion: " . $requestUrl . ": " . $response->getStatusCode()." ".$response->getReasonPhrase());
+
+            $this->logger->notice(sprintf(
+                'TaskService::reportCompletion: %s: %s %s',
+                $requestUrl,
+                $response->getStatusCode(),
+                $response->getReasonPhrase()
+            ));
 
             $task->setNextState();
             $this->persistAndFlush($task);
@@ -457,8 +501,19 @@ class TaskService extends EntityService {
         } catch (HttpBadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
 
-            $this->logger->error("TaskService::reportCompletion: Completion reporting failed for [".$task->getId()."] [".$task->getUrl()."]");
-            $this->logger->error("TaskService::reportCompletion: [".$task->getId()."] " . $requestUrl . ": " . $response->getStatusCode()." ".$response->getReasonPhrase());
+            $this->logger->error(sprintf(
+                'TaskService::reportCompletion: Completion reporting failed for [%i] [%s]',
+                $task->getId(),
+                $task->getUrl()
+            ));
+
+            $this->logger->error(sprintf(
+                'TaskService::reportCompletion: [%i] %s: %s %s',
+                $task->getId(),
+                $requestUrl,
+                $response->getStatusCode(),
+                $response->getReasonPhrase()
+            ));
 
             if ($response->getStatusCode() !== 410) {
                 return $response->getStatusCode();
@@ -473,19 +528,21 @@ class TaskService extends EntityService {
     }
 
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Repository\TaskRepository
+     * @return TaskRepository
      */
-    public function getEntityRepository() {
-        return parent::getEntityRepository();
+    public function getEntityRepository()
+    {
+        /* @var $entityRepository TaskRepository */
+        $entityRepository = parent::getEntityRepository();
+
+        return $entityRepository;
     }
 
-
     /**
-     *
-     * @param \SimplyTestable\WorkerBundle\Entity\Task\Task $task
+     * @param Task $task
      */
-    private function removeTemporaryParameters(Task $task) {
+    private function removeTemporaryParameters(Task $task)
+    {
         if (!$task->hasParameters()) {
             return;
         }
@@ -505,23 +562,22 @@ class TaskService extends EntityService {
         }
     }
 
-
     /**
      * @return State[]
      */
-    public function getIncompleteStates() {
+    public function getIncompleteStates()
+    {
         return [
             $this->getQueuedState(),
             $this->getInProgressState()
         ];
     }
 
-
     /**
      * @return int
      */
-    public function getInCompleteCount() {
+    public function getInCompleteCount()
+    {
         return $this->getEntityRepository()->getCountByStates($this->getIncompleteStates());
     }
-
 }

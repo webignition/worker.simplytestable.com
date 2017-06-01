@@ -129,6 +129,14 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         return $this->container->get('simplytestable.services.taskservice');
     }
 
+    /**
+     * @return \SimplyTestable\WorkerBundle\Services\TaskTypeService
+     */
+    protected function getTaskTypeService()
+    {
+        return $this->container->get('simplytestable.services.tasktypeservice');
+    }
+
 
     /**
      *
@@ -156,23 +164,32 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         return $this->container->get('simplytestable.services.memcacheservice');
     }
 
-
     /**
+     * @param string[] $taskValues
      *
-     * @param string $url
-     * @param string $type
-     * @return \stdClass
+     * @return Task
      */
-    protected function createTask($url, $type, $parameters = null) {
-        $response = $this->getTaskController('createAction', array(
-            'url' => $url,
-            'type' => $type,
-            'parameters' => $parameters
-        ))->createAction();
+    protected function createTask($taskValues)
+    {
+        if (!isset($taskValues['parameters'])) {
+            $taskValues['parameters'] = '';
+        }
 
-        return json_decode($response->getContent());
+        $response = $this->getTaskController('createAction', $taskValues)->createAction();
+        $taskData = json_decode($response->getContent());
+
+        $task = $this->getTaskService()->getById($taskData->id);
+
+        if (isset($taskValues['state'])) {
+            $state = $this->getStateService()->fetch($taskValues['state']);
+            $task->setState($state);
+
+            $this->getEntityManager()->persist($task);
+            $this->getEntityManager()->flush();
+        }
+
+        return $task;
     }
-
 
     /**
      *
