@@ -3,41 +3,13 @@ parameters:
    - {name: "CURLOPT_SSL_VERIFYPEER", value: false}
    - {name: "CURLOPT_SSL_VERIFYHOST", value: false}
   core_url: http://ci.app.simplytestable.com
-  drivers:
-    html-validation:
-      class: SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver
-      task-types:
-        - "HTML validation"
-      properties:
-        validator-path:  /usr/lib/cgi-bin/w3c-markup-validator/check
-        html-validator-wrapper.service: simplytestable.services.htmlValidatorWrapperService
-    css-validation:
-      class: SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
-      task-types:
-        - "CSS validation"
-      properties:
-        jar-path: /usr/share/css-validator/2002/css-validator/css-validator.jar
-        css-validator-wrapper.service: simplytestable.services.cssValidatorWrapperService
-    js-static-analysis:
-      class: SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver
-      task-types:
-        - "JS static analysis"
-      properties:
-        node-path: /usr/bin/nodejs
-        node-jslint-path: /usr/share/node-jslint/node_modules/jslint/bin/jslint.js
-        node-jslint-wrapper.service: simplytestable.services.nodeJslintWrapperService
-    url-discovery:
-      class: SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver
-      task-types:
-        - "URL discovery"
-    link-integrity:
-      class: SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver
-      task-types:
-        - "Link integrity"
-      properties:
-        user-agents:
-          - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
-          - Mozilla/5.0
+  html-validator-path: /usr/lib/cgi-bin/w3c-markup-validator/check
+  css-validator-jar-path: /usr/share/css-validator/2002/css-validator/css-validator.jar
+  node-path: /usr/bin/nodejs
+  node-jslint-path: /usr/share/node-jslint/node_modules/jslint/bin/jslint.js
+  link-integrity-user-agents:
+    - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
+    - Mozilla/5.0
   content_type_web_resource_map:
     default: webignition\WebResource\WebResource
     text/html: webignition\WebResource\WebPage\WebPage

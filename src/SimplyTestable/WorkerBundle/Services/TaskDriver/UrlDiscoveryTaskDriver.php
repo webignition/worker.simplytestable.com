@@ -3,52 +3,74 @@
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use SimplyTestable\WorkerBundle\Services\StateService;
+use SimplyTestable\WorkerBundle\Services\TaskTypeService;
+use webignition\WebResource\Service\Service as WebResourceService;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
 class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
-    
+
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
-    
+
     private $equivalentSchemes = array(
         'http',
         'https'
     );
-    
-    
+
     /**
-     * 
+     * @param TaskTypeService $taskTypeService
+     * @param HttpClientService $httpClientService
+     * @param WebResourceService $webResourceService
+     * @param StateService $stateService
+     */
+    public function __construct(
+        TaskTypeService $taskTypeService,
+        HttpClientService $httpClientService,
+        WebResourceService $webResourceService,
+        StateService $stateService
+    ) {
+        $this->setTaskTypeService($taskTypeService);
+        $this->setHttpClientService($httpClientService);
+        $this->setWebResourceService($webResourceService);
+        $this->setStateService($stateService);
+    }
+
+
+    /**
+     *
      * @param \SimplyTestable\WorkerBundle\Entity\Task\Task $task
      * @return boolean
      */
-    protected function isCorrectTaskType(Task $task) {        
+    protected function isCorrectTaskType(Task $task) {
         return $task->getType()->equals($this->getTaskTypeService()->getUrlDiscoveryTaskType());
     }
-    
-    
+
+
     /**
-     * 
+     *
      * @return string
      */
     protected function hasNotSucceedHandler() {
         $this->response->setErrorCount(1);
-        return json_encode($this->getWebResourceExceptionOutput());        
+        return json_encode($this->getWebResourceExceptionOutput());
     }
-    
+
     protected function isNotCorrectWebResourceTypeHandler() {
         $this->response->setHasBeenSkipped();
         $this->response->setErrorCount(0);
         return true;
     }
-    
-    
+
+
     protected function isBlankWebResourceHandler() {
         $this->response->setHasBeenSkipped();
         $this->response->setErrorCount(0);
-        return true;        
+        return true;
     }
-    
-    
+
+
     protected function performValidation() {
         $finder = new HtmlDocumentLinkUrlFinder();
         $finder->getConfiguration()->setSource($this->webResource);
@@ -56,26 +78,26 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
         $finder->getConfiguration()->setElementScope('a');
         $finder->getConfiguration()->enableIgnoreFragmentInUrlComparison();
         $finder->getUrlScopeComparer()->addEquivalentSchemes($this->equivalentSchemes);
-        
+
         if ($this->task->hasParameter('scope')) {
             $finder->getConfiguration()->setUrlScope($this->task->getParameter('scope'));
         }
 
-        return json_encode($finder->getUniqueUrls());       
+        return json_encode($finder->getUniqueUrls());
     }
-    
+
     /**
-     * 
+     *
      * @return boolean
      */
     protected function isCorrectWebResourceType() {
         return $this->webResource instanceof WebPage;
     }
-    
-    
+
+
     /**
      *
-     * @return \webignition\InternetMediaType\InternetMediaType 
+     * @return \webignition\InternetMediaType\InternetMediaType
      */
     protected function getOutputContentType()
     {
@@ -84,5 +106,5 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
     }
 
 
-    
+
 }

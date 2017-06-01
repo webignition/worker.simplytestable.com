@@ -2,7 +2,13 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
+use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use SimplyTestable\WorkerBundle\Services\StateService;
+use SimplyTestable\WorkerBundle\Services\TaskTypeService;
+use webignition\NodeJslint\Wrapper\Wrapper as NodeJsLintWrapper;
+use webignition\WebResource\Service\Service as WebResourceService;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\Url\Url;
 use webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver;
@@ -26,6 +32,56 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @var string[]
      */
     private $localResourcePaths = array();
+
+    /**
+     * @var NodeJsLintWrapper
+     */
+    private $nodeJsLintWrapper;
+
+    /**
+     * @var string
+     */
+    private $nodePath;
+
+    /**
+     * @var string
+     */
+    private $nodeJsLintPath;
+
+    public function __construct(
+        TaskTypeService $taskTypeService,
+        HttpClientService $httpClientService,
+        WebResourceService $webResourceService,
+        NodeJsLintWrapper $nodeJsLintWrapper,
+        StateService $stateService,
+        LoggerInterface $logger,
+        $nodePath,
+        $nodeJsLintPath
+    ) {
+        $this->setTaskTypeService($taskTypeService);
+        $this->setHttpClientService($httpClientService);
+        $this->setWebResourceService($webResourceService);
+        $this->setNodeJsLintWrapper($nodeJsLintWrapper);
+        $this->setStateService($stateService);
+        $this->setLogger($logger);
+        $this->setNodePath($nodePath);
+        $this->setNodeJsLintPath($nodeJsLintPath);
+    }
+
+    public function setNodeJsLintWrapper(NodeJsLintWrapper $wrapper)
+    {
+        $this->nodeJsLintWrapper = $wrapper;
+    }
+
+    private function setNodePath($nodePath)
+    {
+        $this->nodePath = $nodePath;
+    }
+
+    private function setNodeJsLintPath($nodeJsLintPath)
+    {
+        $this->nodeJsLintPath = $nodeJsLintPath;
+    }
 
 
     /**
@@ -253,10 +309,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      * @return \webignition\NodeJslintOutput\NodeJslintOutput
      */
     private function validateJsFile($url) {
-        /* @var $nodeJslintWrapper \webignition\NodeJslint\Wrapper\Wrapper */
-        $nodeJslintWrapper = $this->getProperty('node-jslint-wrapper');
-        $nodeJslintWrapper->getConfiguration()->setUrlToLint($url);
-        $response = $nodeJslintWrapper->validate();
+        $this->nodeJsLintWrapper->getConfiguration()->setUrlToLint($url);
+        $response = $this->nodeJsLintWrapper->validate();
 
         return $response;
     }
@@ -267,13 +321,12 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
 
         $baseRequest = clone $this->getBaseRequest();
 
-        /* @var $nodeJslintWrapper \webignition\NodeJslint\Wrapper\Wrapper */
-        $nodeJslintWrapper = $this->getProperty('node-jslint-wrapper');
+        $nodeJslintWrapper = $this->nodeJsLintWrapper;
         $nodeJslintWrapper->getLocalProxy()->getConfiguration()->setBaseRequest($baseRequest);
         $nodeJslintWrapper->getLocalProxy()->getWebResourceService()->getConfiguration()->enableRetryWithUrlEncodingDisabled();
 
-        $nodeJslintWrapper->getConfiguration()->setNodeJslintPath($this->getProperty('node-jslint-path'));
-        $nodeJslintWrapper->getConfiguration()->setNodePath($this->getProperty('node-path'));
+        $nodeJslintWrapper->getConfiguration()->setNodeJslintPath($this->nodeJsLintPath);
+        $nodeJslintWrapper->getConfiguration()->setNodePath($this->nodePath);
 
         if ($this->task->hasParameters()) {
             foreach ($this->task->getParametersArray() as $key => $value) {
