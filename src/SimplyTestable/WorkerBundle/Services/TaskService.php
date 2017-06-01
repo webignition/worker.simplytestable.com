@@ -37,14 +37,6 @@ class TaskService extends EntityService {
      */
     private $stateService;
 
-
-    /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService
-     */
-    private $taskDriverFactoryService;
-
-
     /**
      *
      * @var \SimplyTestable\WorkerBundle\Services\UrlService $urlService
@@ -72,6 +64,10 @@ class TaskService extends EntityService {
      */
     private $httpClientService;
 
+    /**
+     * @var TaskDriver[]
+     */
+    private $taskDrivers;
 
     /**
      *
@@ -87,7 +83,6 @@ class TaskService extends EntityService {
      * @param \Doctrine\ORM\EntityManager $entityManager
      * @param LoggerInterface $logger
      * @param \SimplyTestable\WorkerBundle\Services\StateService $stateService
-     * @param \SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService $taskDriverFactoryService
      * @param \SimplyTestable\WorkerBundle\Services\UrlService $urlService
      * @param \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService
      * @param \SimplyTestable\WorkerBundle\Services\WorkerService $workerService
@@ -97,7 +92,6 @@ class TaskService extends EntityService {
             EntityManager $entityManager,
             LoggerInterface $logger,
             \SimplyTestable\WorkerBundle\Services\StateService $stateService,
-            \SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService $taskDriverFactoryService,
             \SimplyTestable\WorkerBundle\Services\UrlService $urlService,
             \SimplyTestable\WorkerBundle\Services\CoreApplicationService$coreApplicationService,
             \SimplyTestable\WorkerBundle\Services\WorkerService $workerService,
@@ -107,7 +101,6 @@ class TaskService extends EntityService {
 
         $this->logger = $logger;
         $this->stateService = $stateService;
-        $this->taskDriverFactoryService = $taskDriverFactoryService;
         $this->urlService = $urlService;
         $this->coreApplicationService = $coreApplicationService;
         $this->workerService = $workerService;
@@ -275,8 +268,7 @@ class TaskService extends EntityService {
             return 1;
         }
 
-        /*  @var $taskDriver TaskDriver */
-        $taskDriver = $this->taskDriverFactoryService->getTaskDriver($task);
+        $taskDriver = $this->getDriverForTask($task);
 
         if ($taskDriver === false) {
             $this->logger->info("TaskService::perform: [".$task->getId()."] No driver found for task type \"".$task->getType()->getName()."\"");
@@ -292,6 +284,30 @@ class TaskService extends EntityService {
         return 0;
     }
 
+    /**
+     * @param Task $task
+     *
+     * @return bool|TaskDriver
+     */
+    private function getDriverForTask(Task $task)
+    {
+        $taskTypeName = strtolower($task->getType());
+
+        if (isset($this->taskDrivers[$taskTypeName])) {
+            return $this->taskDrivers[$taskTypeName];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $taskTypeName
+     * @param TaskDriver $taskDriver
+     */
+    public function addTaskDriver($taskTypeName, TaskDriver $taskDriver)
+    {
+        $this->taskDrivers[$taskTypeName] = $taskDriver;
+    }
 
     /**
      *
