@@ -11,6 +11,10 @@ use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
+use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorOutputFactory;
+use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+use webignition\HtmlValidator\Output\Output as HtmlValidatorOutput;
+use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 
 class TaskServiceTest extends BaseSimplyTestableTestCase
 {
@@ -18,16 +22,6 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     const DEFAULT_TASK_PARAMETERS = '';
     const DEFAULT_TASK_TYPE = TaskTypeService::HTML_VALIDATION_NAME;
     const DEFAULT_TASK_STATE = TaskService::TASK_STARTING_STATE;
-
-    /**
-     * @var array
-     */
-    private $defaultTaskValues = [
-        'url' => self::DEFAULT_TASK_URL,
-        'type' => self::DEFAULT_TASK_TYPE,
-        'parameters' => self::DEFAULT_TASK_PARAMETERS,
-        'state' => self::DEFAULT_TASK_STATE,
-    ];
 
     /**
      * @inheritdoc
@@ -47,7 +41,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
      */
     public function testCancel(array $taskValues, $expectedEndState)
     {
-        $task = $this->createTask($taskValues);
+        $task = $this->getTaskFactory()->create($taskValues);
         $this->assertEquals($taskValues['state'], $task->getState());
 
         $this->getTaskService()->cancel($task);
@@ -61,23 +55,23 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     {
         return [
             'state: cancelled' => [
-                'task' => $this->createTaskValuesFromDefaults([
+                'task' => TaskFactory::createTaskValuesFromDefaults([
                     'state' => TaskService::TASK_CANCELLED_STATE,
                 ]),
                 'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
             ],
             'state: completed' => [
-                'task' => $this->createTaskValuesFromDefaults([
+                'task' => TaskFactory::createTaskValuesFromDefaults([
                     'state' => TaskService::TASK_COMPLETED_STATE,
                 ]),
                 'expectedEndState' => TaskService::TASK_COMPLETED_STATE,
             ],
             'state: queued' => [
-                'task' => $this->createTaskValuesFromDefaults(),
+                'task' => TaskFactory::createTaskValuesFromDefaults(),
                 'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
             ],
             'state: in-progress' => [
-                'task' => $this->createTaskValuesFromDefaults([
+                'task' => TaskFactory::createTaskValuesFromDefaults([
                     'state' => TaskService::TASK_IN_PROGRESS_STATE,
                 ]),
                 'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
@@ -100,7 +94,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     ) {
         $taskDriverResponse = $this->createTaskDriverResponse($taskDriverResponseValues);
 
-        $task = $this->createTask($taskValues);
+        $task = $this->getTaskFactory()->create($taskValues);
         $this->startTask($task);
         $this->assertEquals(TaskService::TASK_IN_PROGRESS_STATE, $task->getState());
         $this->assertNull($task->getOutput());
@@ -119,13 +113,13 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     {
         return [
             'completed' => [
-                'taskValues' => $this->createTaskValuesFromDefaults(),
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
                 'taskDriverResponse' => [],
                 'expectedEndState' => TaskService::TASK_COMPLETED_STATE,
                 'expectedTaskOutput' => '',
             ],
             'completed with non-empty output' => [
-                'taskValues' => $this->createTaskValuesFromDefaults(),
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
                 'taskDriverResponse' => [
                     'taskOutputValues' => [
                         'output' => 'foo'
@@ -135,7 +129,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
                 'expectedTaskOutput' => 'foo',
             ],
             'skipped' => [
-                'taskValues' => $this->createTaskValuesFromDefaults(),
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
                 'taskDriverResponse' => [
                     'hasBeenSkipped' => true,
                 ],
@@ -143,7 +137,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
                 'expectedTaskOutput' => '',
             ],
             'failed, retry limit reached' => [
-                'taskValues' => $this->createTaskValuesFromDefaults(),
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
                 'taskDriverResponse' => [
                     'hasSucceeded' => false,
                     'retryLimitReached' => true,
@@ -152,7 +146,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
                 'expectedTaskOutput' => '',
             ],
             'failed, retry available' => [
-                'taskValues' => $this->createTaskValuesFromDefaults(),
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
                 'taskDriverResponse' => [
                     'hasSucceeded' => false,
                     'retryLimitReached' => false,
@@ -162,7 +156,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
                 'expectedTaskOutput' => '',
             ],
             'failed, no retry available' => [
-                'taskValues' => $this->createTaskValuesFromDefaults(),
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
                 'taskDriverResponse' => [
                     'hasSucceeded' => false,
                     'retryLimitReached' => false,
@@ -308,9 +302,37 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
      */
     public function testPerform($taskValues)
     {
-        $task = $this->createTask($taskValues);
+        $this->clearMemcacheHttpCache();
+        $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html><head></head><body></body>"
+        ]);
+
+        $task = $this->getTaskFactory()->create($taskValues);
+
+        $htmlValidatorWrapper = \Mockery::mock(HtmlValidatorWrapper::class);
+        $htmlValidatorWrapper
+            ->shouldReceive('createConfiguration')
+            ->with(array(
+                'documentUri' => 'file:/tmp/e64c6d8aa780860f5adf9e82d25f8313.html',
+                'validatorPath' => '/usr/local/validator/cgi-bin/check',
+                'documentCharacterSet' => 'UTF-8',
+            ));
+
+        $htmlValidatorOutputFactory = new HtmlValidatorOutputFactory();
+        $htmlValidatorOutput = $htmlValidatorOutputFactory->create(
+            HtmlValidatorOutput::STATUS_VALID
+        );
+        $htmlValidatorWrapper
+            ->shouldReceive('validate')
+            ->andReturn($htmlValidatorOutput);
+
+        /* @var $htmlValidationTaskDriver HtmlValidationTaskDriver */
+        $htmlValidationTaskDriver = $this->getTaskService()->getTaskDriver($task);
+        $htmlValidationTaskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
 
         $this->getTaskService()->perform($task);
+
+        $this->assertEquals(TaskService::TASK_COMPLETED_STATE, $task->getState());
     }
 
     /**
@@ -320,19 +342,9 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     {
         return [
             'foo' => [
-                'taskValues' => $this->createTaskValuesFromDefaults([]),
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
             ],
         ];
-    }
-
-    /**
-     * @param array $taskValues
-     *
-     * @return array
-     */
-    private function createTaskValuesFromDefaults(array $taskValues = [])
-    {
-        return array_merge($this->defaultTaskValues, $taskValues);
     }
 
     /**

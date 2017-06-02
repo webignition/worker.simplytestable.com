@@ -37,17 +37,6 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
         $this->setStateService($stateService);
     }
 
-
-    /**
-     *
-     * @param \SimplyTestable\WorkerBundle\Entity\Task\Task $task
-     * @return boolean
-     */
-    protected function isCorrectTaskType(Task $task) {
-        return $task->getType()->equals($this->getTaskTypeService()->getUrlDiscoveryTaskType());
-    }
-
-
     /**
      *
      * @return string

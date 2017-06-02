@@ -213,7 +213,7 @@ abstract class BaseTestCase extends WebTestCase {
         return $path;
     }
 
-    public function tearDown() {
+    protected function tearDown() {
         $this->container->get('doctrine')->getConnection()->close();
         parent::tearDown();
     }

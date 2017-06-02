@@ -274,7 +274,7 @@ class TaskService extends EntityService
             return 1;
         }
 
-        $taskDriver = $this->getDriverForTask($task);
+        $taskDriver = $this->getTaskDriver($task);
 
         if ($taskDriver === false) {
             $this->logger->info(sprintf(
@@ -300,7 +300,7 @@ class TaskService extends EntityService
      *
      * @return bool|TaskDriver
      */
-    private function getDriverForTask(Task $task)
+    public function getTaskDriver(Task $task)
     {
         $taskTypeName = strtolower($task->getType());
 
@@ -317,7 +317,7 @@ class TaskService extends EntityService
      */
     public function addTaskDriver($taskTypeName, TaskDriver $taskDriver)
     {
-        $this->taskDrivers[$taskTypeName] = $taskDriver;
+        $this->taskDrivers[strtolower($taskTypeName)] = $taskDriver;
     }
 
     /**

@@ -83,17 +83,6 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $this->nodeJsLintPath = $nodeJsLintPath;
     }
 
-
-    /**
-     *
-     * @param \SimplyTestable\WorkerBundle\Entity\Task\Task $task
-     * @return boolean
-     */
-    protected function isCorrectTaskType(Task $task) {
-        return $task->getType()->equals($this->getTaskTypeService()->getJavaScriptStatisAnalysisTaskType());
-    }
-
-
     /**
      *
      * @return boolean

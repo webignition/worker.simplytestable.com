@@ -5,6 +5,9 @@ namespace SimplyTestable\WorkerBundle\Tests;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\Task\Output as TaskOutput;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
+use SimplyTestable\WorkerBundle\Services\TaskService;
+use SimplyTestable\WorkerBundle\Services\TaskTypeService;
+use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 use webignition\InternetMediaType\Parser\Parser as InternetMediaTypeParser;
 use Doctrine\Common\Cache\MemcacheCache;
 use GuzzleHttp\Message\MessageFactory as HttpMessageFactory;
@@ -18,6 +21,25 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
     const TASKS_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TasksController';
     const VERIFY_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\VerifyController';
     const MAINTENANCE_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\MaintenanceController';
+
+    /**
+     * @var TaskFactory
+     */
+    private $taskFactory;
+
+    protected function getTaskFactory()
+    {
+        if (is_null($this->taskFactory)) {
+            $this->taskFactory = new TaskFactory(
+                $this->getTaskService(),
+                $this->getTaskTypeService(),
+                $this->getStateService(),
+                $this->getEntityManager()
+            );
+        }
+
+        return $this->taskFactory;
+    }
 
     protected function setActiveState() {
         $this->getWorkerService()->activate();
@@ -162,33 +184,6 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      */
     protected function getMemcacheService() {
         return $this->container->get('simplytestable.services.memcacheservice');
-    }
-
-    /**
-     * @param string[] $taskValues
-     *
-     * @return Task
-     */
-    protected function createTask($taskValues)
-    {
-        if (!isset($taskValues['parameters'])) {
-            $taskValues['parameters'] = '';
-        }
-
-        $response = $this->getTaskController('createAction', $taskValues)->createAction();
-        $taskData = json_decode($response->getContent());
-
-        $task = $this->getTaskService()->getById($taskData->id);
-
-        if (isset($taskValues['state'])) {
-            $state = $this->getStateService()->fetch($taskValues['state']);
-            $task->setState($state);
-
-            $this->getEntityManager()->persist($task);
-            $this->getEntityManager()->flush();
-        }
-
-        return $task;
     }
 
     /**
@@ -395,6 +390,4 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         $factory = new HttpMessageFactory();
         return $factory->fromMessage($message);
     }
-
-
 }

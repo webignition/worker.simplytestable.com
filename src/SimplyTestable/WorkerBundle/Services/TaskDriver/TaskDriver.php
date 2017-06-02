@@ -216,16 +216,6 @@ abstract class TaskDriver {
      */
     abstract protected function getOutputContentType();
 
-
-    /**
-     *
-     * @param \SimplyTestable\WorkerBundle\Entity\Task\Task $task
-     * @return boolean
-     */
-    abstract protected function isCorrectTaskType(Task $task);
-
-
-
     /**
      *
      * @return string
