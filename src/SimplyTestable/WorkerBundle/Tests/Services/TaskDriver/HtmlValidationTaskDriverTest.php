@@ -2,6 +2,10 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Message\RequestInterface;
+use GuzzleHttp\Message\ResponseInterface;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorOutputFactory;
@@ -17,6 +21,7 @@ class HtmlValidationTaskDriverTest extends BaseSimplyTestableTestCase
     protected function setUp()
     {
         parent::setUp();
+        $this->removeAllTasks();
         $this->clearMemcacheHttpCache();
     }
 
@@ -78,6 +83,25 @@ class HtmlValidationTaskDriverTest extends BaseSimplyTestableTestCase
                 ],
             ]
         ];
+    }
+
+    public function testPerformNonCurlConnectException()
+    {
+        $this->setHttpFixtures($this->buildHttpFixtureSet([
+            new ConnectException('foo', \Mockery::mock(RequestInterface::class))
+        ]));
+
+        $task = $this->getTaskFactory()->create(
+            TaskFactory::createTaskValuesFromDefaults()
+        );
+
+        $this->setExpectedException(
+            ConnectException::class,
+            'foo',
+            0
+        );
+
+        $this->getHtmlValidationTaskDriver()->perform($task);
     }
 
     /**
@@ -181,9 +205,43 @@ class HtmlValidationTaskDriverTest extends BaseSimplyTestableTestCase
                     ],
                 ]
             ],
+            'curl 3' => [
+                'httpResponseFixtures' => [
+                    'CURL/3: foo',
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'Invalid resource URL',
+                            'messageId' => 'http-retrieval-curl-code-3',
+                            'type' => 'error',
+                        ],
+                    ],
+                ]
+            ],
             'curl 6' => [
                 'httpResponseFixtures' => [
-                    'CURL/28: Operation timed out.',
+                    'CURL/6: foo',
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'DNS lookup failure resolving resource domain name',
+                            'messageId' => 'http-retrieval-curl-code-6',
+                            'type' => 'error',
+                        ],
+                    ],
+                ]
+            ],
+            'curl 28' => [
+                'httpResponseFixtures' => [
+                    'CURL/28: foo',
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -193,6 +251,23 @@ class HtmlValidationTaskDriverTest extends BaseSimplyTestableTestCase
                         [
                             'message' => 'Timeout reached retrieving resource',
                             'messageId' => 'http-retrieval-curl-code-28',
+                            'type' => 'error',
+                        ],
+                    ],
+                ]
+            ],
+            'curl unknown' => [
+                'httpResponseFixtures' => [
+                    'CURL/55: foo',
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => '',
+                            'messageId' => 'http-retrieval-curl-code-55',
                             'type' => 'error',
                         ],
                     ],
@@ -290,7 +365,153 @@ class HtmlValidationTaskDriverTest extends BaseSimplyTestableTestCase
         ];
     }
 
-    public function test
+    /**
+     * @dataProvider cookiesDataProvider
+     *
+     * @param $taskValues
+     * @param $expectedRequestCookieHeader
+     */
+    public function testSetCookiesOnHttpClient($taskValues, $expectedRequestCookieHeader)
+    {
+        $this->setHttpFixtures($this->buildHttpFixtureSet(array(
+            "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html>"
+        )));
+
+        $task = $this->getTaskFactory()->create($taskValues);
+
+        $htmlValidatorWrapper = \Mockery::mock(HtmlValidatorWrapper::class);
+        $htmlValidatorWrapper
+            ->shouldReceive('createConfiguration');
+
+        $htmlValidatorWrapper
+            ->shouldReceive('validate')
+            ->andReturn(HtmlValidatorOutputFactory::create(
+                HtmlValidatorOutput::STATUS_VALID
+            ));
+
+        $htmlValidationTaskDriver = $this->getHtmlValidationTaskDriver();
+        $htmlValidationTaskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
+
+        $htmlValidationTaskDriver->perform($task);
+
+        $request = $this->getHttpClientService()->getHistory()->getLastRequest();
+        $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
+    }
+
+    /**
+     * @return array
+     */
+    public function cookiesDataProvider()
+    {
+        return [
+            'no cookies' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'parameters' => json_encode([]),
+                ]),
+                'expectedRequestCookieHeader' => '',
+            ],
+            'single cookie' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'parameters' => json_encode([
+                        'cookies' => [
+                            [
+                                'Name' => 'foo',
+                                'Value' => 'bar',
+                                'Domain' => '.example.com',
+                            ],
+                        ],
+                    ]),
+                ]),
+                'expectedRequestCookieHeader' => 'foo=bar',
+            ],
+            'multiple cookies' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'parameters' => json_encode([
+                        'cookies' => [
+                            [
+                                'Name' => 'foo1',
+                                'Value' => 'bar1',
+                                'Domain' => '.example.com',
+                            ],
+                            [
+                                'Name' => 'foo2',
+                                'Value' => 'bar2',
+                                'Domain' => '.example.com',
+                            ],
+                            [
+                                'Name' => 'foo3',
+                                'Value' => 'bar3',
+                                'Domain' => '.example.com',
+                            ],
+                        ],
+                    ]),
+                ]),
+                'expectedRequestCookieHeader' => 'foo1=bar1; foo2=bar2; foo3=bar3',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider httpAuthDataProvider
+     *
+     * @param array $taskValues
+     * @param string $expectedRequestAuthorizationHeaderValue
+     */
+    public function testSetHttpAuthOnHttpClient($taskValues, $expectedRequestAuthorizationHeaderValue)
+    {
+        $this->setHttpFixtures($this->buildHttpFixtureSet(array(
+            "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html>"
+        )));
+
+        $task = $this->getTaskFactory()->create($taskValues);
+
+        $htmlValidatorWrapper = \Mockery::mock(HtmlValidatorWrapper::class);
+        $htmlValidatorWrapper
+            ->shouldReceive('createConfiguration');
+
+        $htmlValidatorWrapper
+            ->shouldReceive('validate')
+            ->andReturn(HtmlValidatorOutputFactory::create(
+                HtmlValidatorOutput::STATUS_VALID
+            ));
+
+        $htmlValidationTaskDriver = $this->getHtmlValidationTaskDriver();
+        $htmlValidationTaskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
+
+        $htmlValidationTaskDriver->perform($task);
+
+        $request = $this->getHttpClientService()->getHistory()->getLastRequest();
+
+        $decodedAuthorizationHeaderValue = base64_decode(
+            str_replace('Basic', '', $request->getHeader('authorization'))
+        );
+
+        $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
+    }
+
+    /**
+     * @return array
+     */
+    public function httpAuthDataProvider()
+    {
+        return [
+            'no auth' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'parameters' => json_encode([]),
+                ]),
+                'expectedRequestAuthorizationHeaderValue' => '',
+            ],
+            'has auth' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'parameters' => json_encode([
+                        'http-auth-username' => 'foouser',
+                        'http-auth-password' => 'foopassword',
+                    ]),
+                ]),
+                'expectedRequestAuthorizationHeaderValue' => 'foouser:foopassword',
+            ],
+        ];
+    }
 
     /**
      * @dataProvider storeTmpFileDataProvider

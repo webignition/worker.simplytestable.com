@@ -9,13 +9,8 @@ use webignition\GuzzleHttp\Exception\CurlException\Exception as CurlException;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 use webignition\WebResource\WebResource;
 use webignition\WebResource\Exception\Exception as WebResourceException;
-//use Guzzle\Plugin\Cookie\CookiePlugin;
-//use Guzzle\Plugin\Cookie\CookieJar\ArrayCookieJar;
-//use Guzzle\Plugin\Cookie\Cookie;
-use GuzzleHttp\Subscriber\Cookie as HttpCookieSubscriber;
-use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Message\Request as HttpRequest;
+use webignition\WebResource\Service\Service as WebResourceService;
 
 abstract class WebResourceTaskDriver extends TaskDriver
 {
@@ -53,76 +48,38 @@ abstract class WebResourceTaskDriver extends TaskDriver
      */
     private $baseRequest = null;
 
-    private function init() {
-        // cookies
-        $cookieJar = new CookieJar();
+    /**
+     * @var WebResourceService
+     */
+    private $webResourceService;
 
-        if ($this->task->hasParameter('cookies')) {
-            foreach ($this->task->getParameter('cookies') as $cookie) {
-                var_dump($cookie);
-                exit();
-
-                //$cookiePlugin->getCookieJar()->add(new Cookie($cookie));
-            }
-
-
-//            foreach ($this->task->getParameter('cookies') as $cookie) {
-//                $cookiePlugin->getCookieJar()->add(new Cookie($cookie));
-//            }
-        }
-
-        $this->getHttpClientService()->get()->getEmitter()->attach(new HttpCookieSubscriber($cookieJar));
-
-        // auth
-//            if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
-//                $baseRequest->setAuth(
-//                    $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',
-//                    $this->task->hasParameter('http-auth-password') ? $this->task->getParameter('http-auth-password') : '',
-//                    'any'
-//                );
-//            }
-
-
-        // old
-
-//        $cookieJar = new CookieJar();
-//
-//        foreach ($this->getCookies() as $cookieData) {
-//            $cookieJar->setCookie(new SetCookie($cookieData));
-//        }
-//
-//        $this->getHttpClient()->getEmitter()->attach(new HttpCookieSubscriber($cookieJar));
-
-
-//            $cookiePlugin = new CookiePlugin(new ArrayCookieJar());
-//            $this->getHttpClientService()->get()->addSubscriber($cookiePlugin);
-//
-//            $baseRequest = $this->getHttpClientService()->getRequest($this->task->getUrl());
-//
-//            if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
-//                $baseRequest->setAuth(
-//                    $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',
-//                    $this->task->hasParameter('http-auth-password') ? $this->task->getParameter('http-auth-password') : '',
-//                    'any'
-//                );
-//            }
-//
-//            if ($this->task->hasParameter('cookies')) {
-//                foreach ($this->task->getParameter('cookies') as $cookie) {
-//                    $cookiePlugin->getCookieJar()->add(new Cookie($cookie));
-//                }
-//            }
-
-//        exit();
+    /**
+     * @param WebResourceService $webResourceService
+     */
+    protected function setWebResourceService(WebResourceService $webResourceService)
+    {
+        $this->webResourceService = $webResourceService;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function execute(Task $task)
     {
         $this->task = $task;
 
         $this->getHttpClientService()->setUserAgent('ST Web Resource Task Driver (http://bit.ly/RlhKCL)');
+        $this->getHttpClientService()->setCookies($this->task->getParameter('cookies'));
+        $this->getHttpClientService()->setBasicHttpAuthorization(
+            $this->task->getParameter('http-auth-username'),
+            $this->task->getParameter('http-auth-password')
+        );
+
         $this->webResource = $this->getWebResource();
+
         $this->getHttpClientService()->resetUserAgent();
+        $this->getHttpClientService()->clearCookies();
+        $this->getHttpClientService()->clearBasicHttpAuthorization();
 
         if (!$this->response->hasSucceeded()) {
             return $this->hasNotSucceedHandler();
@@ -153,76 +110,16 @@ abstract class WebResourceTaskDriver extends TaskDriver
     abstract protected function isBlankWebResourceHandler();
     abstract protected function performValidation();
 
-//    /**
-//     * @return \Guzzle\Http\Message\Request
-//     */
-//    protected function getBaseRequest() {
-//        if (is_null($this->baseRequest)) {
-//            $cookiePlugin = new CookiePlugin(new ArrayCookieJar());
-//            $this->getHttpClientService()->get()->addSubscriber($cookiePlugin);
-//
-//            $baseRequest = $this->getHttpClientService()->getRequest($this->task->getUrl());
-//
-//            if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
-//                $baseRequest->setAuth(
-//                    $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',
-//                    $this->task->hasParameter('http-auth-password') ? $this->task->getParameter('http-auth-password') : '',
-//                    'any'
-//                );
-//            }
-//
-//            if ($this->task->hasParameter('cookies')) {
-//                foreach ($this->task->getParameter('cookies') as $cookie) {
-//                    $cookiePlugin->getCookieJar()->add(new Cookie($cookie));
-//                }
-//            }
-//
-//            $this->baseRequest = $baseRequest;
-//        }
-//
-//        return $this->baseRequest;
-//    }
-
-
     /**
      * @return HttpRequest
      */
     protected function getBaseRequest()
     {
         if (is_null($this->baseRequest)) {
-            // cookies
-            $cookieJar = new CookieJar();
-
-            if ($this->task->hasParameter('cookies')) {
-                foreach ($this->task->getParameter('cookies') as $cookie) {
-                    var_dump($cookie);
-                    exit();
-
-                    //$cookiePlugin->getCookieJar()->add(new Cookie($cookie));
-                }
-
-
-//            foreach ($this->task->getParameter('cookies') as $cookie) {
-//                $cookiePlugin->getCookieJar()->add(new Cookie($cookie));
-//            }
-            }
-
-            $this->getHttpClientService()->get()->getEmitter()->attach(new HttpCookieSubscriber($cookieJar));
-
-            // auth ?
-//            $this->getHttpClient()->setDefaultOption(
-//                'auth',
-//                ['example_user', 'example_password']
-//            );
-
-            // other
-
             $this->baseRequest = $this->getHttpClientService()->get()->createRequest(
                 'GET',
                 $this->task->getUrl()
             );
-
-
         }
 
         return $this->baseRequest;
@@ -234,7 +131,7 @@ abstract class WebResourceTaskDriver extends TaskDriver
     protected function getWebResource()
     {
         try {
-            return $this->getWebResourceService()->get(clone $this->getBaseRequest());
+            return $this->webResourceService->get(clone $this->getBaseRequest());
         } catch (WebResourceException $webResourceException) {
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
@@ -302,13 +199,11 @@ abstract class WebResourceTaskDriver extends TaskDriver
             if (self::CURL_CODE_INVALID_URL == $this->curlException->getCurlCode()) {
                 return 'Invalid resource URL';
             }
+
+            return '';
         }
 
-        if (!empty($this->webResourceException)) {
-            return $this->webResourceException->getResponse()->getReasonPhrase();
-        }
-
-        return '';
+        return $this->webResourceException->getResponse()->getReasonPhrase();
     }
 
     /**
@@ -328,11 +223,7 @@ abstract class WebResourceTaskDriver extends TaskDriver
             return 'curl-code-' . $this->curlException->getCurlCode();
         }
 
-        if (!empty($this->webResourceException)) {
-            return $this->webResourceException->getResponse()->getStatusCode();
-        }
-
-        return '';
+        return $this->webResourceException->getResponse()->getStatusCode();
     }
 
     /**
@@ -341,10 +232,6 @@ abstract class WebResourceTaskDriver extends TaskDriver
     private function isRedirectLoopException()
     {
         $history = $this->getHttpClientService()->getHistory();
-        if (is_null($history)) {
-            return false;
-        }
-
         $urlHistory = array();
 
         $history->getRequests();

@@ -48,8 +48,12 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      */
     private $nodeJsLintPath;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     public function __construct(
-        TaskTypeService $taskTypeService,
         HttpClientService $httpClientService,
         WebResourceService $webResourceService,
         NodeJsLintWrapper $nodeJsLintWrapper,
@@ -58,12 +62,11 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $nodePath,
         $nodeJsLintPath
     ) {
-        $this->setTaskTypeService($taskTypeService);
         $this->setHttpClientService($httpClientService);
         $this->setWebResourceService($webResourceService);
         $this->setNodeJsLintWrapper($nodeJsLintWrapper);
         $this->setStateService($stateService);
-        $this->setLogger($logger);
+        $this->logger = $logger;
         $this->setNodePath($nodePath);
         $this->setNodeJsLintPath($nodeJsLintPath);
     }
@@ -161,7 +164,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                 $jsLintOutput[(string)$scriptUrl] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);
                 $errorCount += $this->getNodeJsErrorCount($nodeJsLintOutput);
             } catch (\webignition\NodeJslintOutput\Exception $nodeJslintOutputException) {
-                $this->getLogger()->error('JSLintTaskDriver::jslint error: [at '.$scriptUrl.']['.$nodeJslintOutputException->getMessage().']');
+                $this->logger->error('JSLintTaskDriver::jslint error: [at '.$scriptUrl.']['.$nodeJslintOutputException->getMessage().']');
                 throw $nodeJslintOutputException;
             } catch (InvalidContentTypeException $invalidContentTypeException) {
                 $jsLintOutput[(string)$scriptUrl] = array(

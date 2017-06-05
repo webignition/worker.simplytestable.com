@@ -27,7 +27,6 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
     private $validatorPath;
 
     /**
-     * @param TaskTypeService $taskTypeService
      * @param HttpClientService $httpClientService
      * @param WebResourceService $webResourceService
      * @param HtmlValidatorWrapper $htmlValidatorWrapper
@@ -35,19 +34,17 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
      * @param string $validatorPath
      */
     public function __construct(
-        TaskTypeService $taskTypeService,
         HttpClientService $httpClientService,
         WebResourceService $webResourceService,
         HtmlValidatorWrapper $htmlValidatorWrapper,
         StateService $stateService,
         $validatorPath
     ) {
-        $this->setTaskTypeService($taskTypeService);
         $this->setHttpClientService($httpClientService);
         $this->setWebResourceService($webResourceService);
         $this->setHtmlValidatorWrapper($htmlValidatorWrapper);
         $this->setStateService($stateService);
-        $this->setValidatorPath($validatorPath);
+        $this->validatorPath = $validatorPath;
     }
 
     /**
@@ -56,14 +53,6 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
     public function setHtmlValidatorWrapper(HtmlValidatorWrapper $wrapper)
     {
         $this->htmlValidatorWrapper = $wrapper;
-    }
-
-    /**
-     * @param string $validatorPath
-     */
-    private function setValidatorPath($validatorPath)
-    {
-        $this->validatorPath = $validatorPath;
     }
 
     /**

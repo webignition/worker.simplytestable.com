@@ -2,65 +2,26 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
+use SimplyTestable\WorkerBundle\Entity\Task\Output as TaskOutput;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
-use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
-use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
-use SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService;
-use webignition\WebResource\Service\Service as WebResourceService;
+use webignition\InternetMediaType\InternetMediaType;
 
-abstract class TaskDriver {
-
+abstract class TaskDriver
+{
     const OUTPUT_STARTING_STATE = 'taskoutput-queued';
 
     /**
-     * Collection of task types that this task engine can handle
-     *
-     * @var array
-     */
-    private $taskTypes = array();
-
-    /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\StateService
+     * @var StateService
      */
     private $stateService;
 
     /**
-     *
-     * @var \webignition\WebResource\Service\Service
-     */
-    private $webResourceService;
-
-
-    /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\HttpClientService
+     * @var HttpClientService
      */
     private $httpClientService;
-
-    /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\TaskTypeService
-     */
-    private $taskTypeService;
-
-    /**
-     *
-     * @var LoggerInterface
-     */
-    private $logger;
-
-
-    /**
-     * Arbitrary properties to be used by a concrete implementation
-     *
-     * @var array
-     */
-    private $properties;
 
     /**
      *
@@ -68,131 +29,26 @@ abstract class TaskDriver {
      */
     protected $response = null;
 
-
     /**
-     *
-     * @var \JMS\Serializer\Serializer
-     */
-    private $serializer;
-
-
-
-    /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService
-     */
-    private $timeCachedTaskOutputService;
-
-
-    /**
-     *
-     * @param array $properties
-     */
-    public function setProperties($properties) {
-        $this->properties = $properties;
-    }
-
-
-    /**
-     *
-     * @param string $propertyName
-     * @return mixed
-     */
-    public function getProperty($propertyName) {
-        return (isset($this->properties[$propertyName])) ? $this->properties[$propertyName] : null;
-    }
-
-
-
-    /**
-     *
      * @param StateService $stateService
      */
-    public function setStateService(StateService $stateService) {
+    protected function setStateService(StateService $stateService)
+    {
         $this->stateService = $stateService;
     }
 
-
-    /**
-     *
-     * @param WebResourceService $webResourceService
-     */
-    public function setWebResourceService(WebResourceService $webResourceService) {
-        $this->webResourceService = $webResourceService;
-    }
-
-
-    /**
-     *
-     * @param TaskTypeService $taskTypeService
-     */
-    public function setTaskTypeService(TaskTypeService $taskTypeService) {
-        $this->taskTypeService = $taskTypeService;
-    }
-
-
-    /**
-     * @return \webignition\WebResource\Service\Service
-     */
-    public function getWebResourceService() {
-        return $this->webResourceService;
-    }
-
-
-    /**
-     *
-     * @param \SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService $timeCachedTaskOutputService
-     */
-    public function setTimeCachedTaskoutputService(TimeCachedTaskOutputService $timeCachedTaskOutputService) {
-        $this->timeCachedTaskOutputService = $timeCachedTaskOutputService;
-    }
-
-
-    /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService
-     */
-    public function getTimeCachedTaskOutputService() {
-        return $this->timeCachedTaskOutputService;
-    }
-
-
-    /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\TaskTypeService
-     */
-    public function getTaskTypeService() {
-        return $this->taskTypeService;
-    }
-
-
-    /**
-     *
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger) {
-        $this->logger = $logger;
-    }
-
-    /**
-     *
-     * @return LoggerInterface
-     */
-    public function getLogger() {
-        return $this->logger;
-    }
-
-
     /**
      * @param Task $task
+     *
      * @return TaskDriverResponse
      */
-    public function perform(Task $task) {
+    public function perform(Task $task)
+    {
         $this->response = new TaskDriverResponse();
 
         $rawOutput = $this->execute($task);
 
-        $output = new \SimplyTestable\WorkerBundle\Entity\Task\Output();
+        $output = new TaskOutput();
         $output->setOutput($rawOutput);
         $output->setContentType($this->getOutputContentType());
         $output->setState($this->stateService->fetch(self::OUTPUT_STARTING_STATE));
@@ -204,88 +60,32 @@ abstract class TaskDriver {
         return $this->response;
     }
 
-
     /**
+     * @param Task $task
+     *
      * @return string
      */
     abstract protected function execute(Task $task);
 
-
     /**
-     * @return \webignition\InternetMediaType\InternetMediaType
+     * @return InternetMediaType
      */
     abstract protected function getOutputContentType();
 
     /**
-     *
-     * @return string
+     * @param HttpClientService $httpClientService
      */
-    public function getOutput() {
-        return $this->output;
-    }
-
-
-    /**
-     *
-     * @param TaskType $taskType
-     */
-    public function addTaskType(TaskType $taskType) {
-        if (!$this->handles($taskType)) {
-            $this->taskTypes[] = $taskType;
-        }
-    }
-
-
-    /**
-     *
-     * @param TaskType $taskType
-     * @return boolean
-     */
-    public function handles(TaskType $taskType) {
-        foreach ($this->taskTypes as $currentTaskType) {
-            /* @var $currentTaskType TaskType */
-            if ($currentTaskType->equals($taskType)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
-    /**
-     *
-     * @param \JMS\Serializer\Serializer $serializer
-     */
-    public function setSerializer(\JMS\Serializer\Serializer $serializer) {
-        $this->serializer = $serializer;
-    }
-
-    /**
-     *
-     * @return \JMS\Serializer\Serializer
-     */
-    public function getSerializer() {
-        return $this->serializer;
-    }
-
-
-    /**
-     *
-     * @param \SimplyTestable\WorkerBundle\Services\HttpClientService $httpClientService
-     */
-    public function setHttpClientService(HttpClientService $httpClientService) {
+    protected function setHttpClientService(HttpClientService $httpClientService)
+    {
         $this->httpClientService = $httpClientService;
     }
 
-
     /**
      *
-     * @return \SimplyTestable\WorkerBundle\Services\HttpClientService
+     * @return HttpClientService
      */
-    public function getHttpClientService() {
+    protected function getHttpClientService()
+    {
         return $this->httpClientService;
     }
-
-
 }

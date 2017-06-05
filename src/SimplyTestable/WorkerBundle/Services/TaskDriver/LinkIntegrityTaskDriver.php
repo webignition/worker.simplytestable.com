@@ -23,20 +23,17 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver {
     private $userAgents;
 
     /**
-     * @param TaskTypeService $taskTypeService
      * @param HttpClientService $httpClientService
      * @param WebResourceService $webResourceService
      * @param StateService $stateService
      * @param string[] $userAgents
      */
     public function __construct(
-        TaskTypeService $taskTypeService,
         HttpClientService $httpClientService,
         WebResourceService $webResourceService,
         StateService $stateService,
         $userAgents
     ) {
-        $this->setTaskTypeService($taskTypeService);
         $this->setHttpClientService($httpClientService);
         $this->setWebResourceService($webResourceService);
         $this->setStateService($stateService);

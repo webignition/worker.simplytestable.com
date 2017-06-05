@@ -1,58 +1,66 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Services;
 
+use Doctrine\Common\Cache\MemcacheCache;
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Message\RequestInterface;
-use GuzzleHttp\Subscriber\Retry\RetrySubscriber;
 use GuzzleHttp\Subscriber\Cache\CacheSubscriber;
 use GuzzleHttp\Subscriber\Cache\CacheStorage;
-use Doctrine\Common\Cache\MemcacheCache;
+use GuzzleHttp\Subscriber\Cookie as HttpCookieSubscriber;
+use GuzzleHttp\Subscriber\Retry\RetrySubscriber;
 use GuzzleHttp\Subscriber\History as HttpHistorySubscriber;
-use GuzzleHttp\Event\SubscriberInterface as HttpSubscriberInterface;
-use SimplyTestable\WorkerBundle\Services\MemcacheService;
-use GuzzleHttp\Subscriber\Mock as HttpMockSubscriber;
-use GuzzleHttp\Event\SubscriberInterface;
-use GuzzleHttp\Message\Request as HttpRequest;
 
-class HttpClientService {
-
-
+class HttpClientService
+{
     /**
-     *
      * @var HttpClient
      */
     protected $httpClient = null;
 
-
     /**
-     *
-     * @var (\SimplyTestable\WorkerBundle\Services\MemcacheService
+     * @var MemcacheService
      */
     private $memcacheService = null;
 
-
     /**
-     *
-     * @var \Doctrine\Common\Cache\MemcacheCache
+     * @var MemcacheCache
      */
     private $memcacheCache = null;
 
-
     /**
-     *
      * @var array
      */
     private $curlOptions = array();
 
+    /**
+     * @var HttpHistorySubscriber
+     */
+    private $historySubscriber;
 
     /**
-     *
+     * @var CacheSubscriber
+     */
+    private $cacheSubscriber;
+
+    /**
+     * @var RetrySubscriber
+     */
+    private $retrySubscriber;
+
+    /**
+     * @var HttpCookieSubscriber
+     */
+    private $cookieSubscriber;
+
+    /**
      * @param MemcacheService $memcacheService
      * @param array $curlOptions
      */
     public function __construct(
-            MemcacheService $memcacheService,
-            $curlOptions
+        MemcacheService $memcacheService,
+        $curlOptions
     ) {
         $this->memcacheService = $memcacheService;
 
@@ -61,19 +69,28 @@ class HttpClientService {
                 $this->curlOptions[constant($curlOption['name'])] = $curlOption['value'];
             }
         }
-    }
 
+        $this->historySubscriber = new HttpHistorySubscriber();
+        $this->cacheSubscriber = $this->createCacheSubscriber();
+        $this->retrySubscriber = $this->createRetrySubscriber();
+        $this->cookieSubscriber = new HttpCookieSubscriber();
+    }
 
     /**
      * @param array $defaultRequestOptions
+     *
      * @return HttpClient
      */
-    public function get($defaultRequestOptions = []) {
+    public function get($defaultRequestOptions = [])
+    {
         $defaultRequestOptions = $this->buildHttpClientOptions($defaultRequestOptions);
 
         if (is_null($this->httpClient)) {
             $this->httpClient = new HttpClient($defaultRequestOptions);
-            $this->enableSubscribers();
+            $this->httpClient->getEmitter()->attach($this->cacheSubscriber);
+            $this->httpClient->getEmitter()->attach($this->retrySubscriber);
+            $this->httpClient->getEmitter()->attach($this->historySubscriber);
+            $this->httpClient->getEmitter()->attach($this->cookieSubscriber);
         }
 
         if (!empty($defaultRequestOptions)) {
@@ -85,8 +102,8 @@ class HttpClientService {
         return $this->httpClient;
     }
 
-
-    private function buildHttpClientOptions($defaultRequestOptions = []) {
+    private function buildHttpClientOptions($defaultRequestOptions = [])
+    {
         if (!isset($defaultRequestOptions['config'])) {
             $defaultRequestOptions['config'] = [];
         }
@@ -102,86 +119,28 @@ class HttpClientService {
         return $defaultRequestOptions;
     }
 
-
-    public function setUserAgent($userAgent) {
+    /**
+     * @param string $userAgent
+     */
+    public function setUserAgent($userAgent)
+    {
         $defaultHeaders = $this->get()->getDefaultOption('headers');
         $defaultHeaders['User-Agent'] = $userAgent;
 
         $this->get()->setDefaultOption('headers', $defaultHeaders);
     }
 
-
-    public function resetUserAgent() {
+    public function resetUserAgent()
+    {
         $client = $this->get();
         $this->setUserAgent($client::getDefaultUserAgent());
     }
 
-
-    public function enableSubscribers() {
-        foreach ($this->getSubscribers() as $subscriber) {
-            if (!$this->hasSubscriber(get_class($subscriber))) {
-                $this->httpClient->getEmitter()->attach($subscriber);
-            }
-        }
-    }
-
-
-    public function removeSubscriber($subscriberClassName) {
-        if (!$this->hasSubscriber($subscriberClassName)) {
-            return true;
-        }
-
-        $this->get()->getEventDispatcher()->removeSubscriber($this->getPluginListener($subscriberClassName));
-    }
-
-
-    /**
-     * @param $subscriberClassName
-     * @return SubscriberInterface|null
-     */
-    private function getSubscriber($subscriberClassName) {
-        if (is_null($this->httpClient)) {
-            return null;
-        }
-
-        foreach ($this->httpClient->getEmitter()->listeners() as $eventName => $eventListeners) {
-            foreach ($eventListeners as $eventListener) {
-                if (get_class($eventListener[0]) == $subscriberClassName) {
-                    return $eventListener[0];
-                }
-            }
-        }
-
-        return null;
-    }
-
-
-    /**
-     *
-     * @param string $subscriberClassName
-     * @return boolean
-     */
-    public function hasSubscriber($subscriberClassName) {
-        return !is_null($this->getSubscriber($subscriberClassName));
-    }
-
-
-    /**
-     * @return HttpSubscriberInterface[]
-     */
-    protected function getSubscribers() {
-        return [
-            $this->getRetrySubscriber(),
-            $this->getCacheSubscriber(),
-            new HttpHistorySubscriber()
-        ];
-    }
-
-
     /**
      * @return RetrySubscriber
      */
-    protected function getRetrySubscriber() {
+    protected function createRetrySubscriber()
+    {
         $filter = RetrySubscriber::createChainFilter([
             // Does early filter to force non-idempotent methods to NOT be retried.
             RetrySubscriber::createIdempotentFilter(),
@@ -195,11 +154,11 @@ class HttpClientService {
         return new RetrySubscriber(['filter' => $filter]);
     }
 
-
     /**
      * @return CacheSubscriber|null
      */
-    protected function getCacheSubscriber() {
+    private function createCacheSubscriber()
+    {
         $memcacheCache = $this->getMemcacheCache();
         if (is_null($memcacheCache)) {
             return null;
@@ -260,10 +219,10 @@ class HttpClientService {
     }
 
     /**
-     *
      * @return MemcacheCache
      */
-    public function getMemcacheCache() {
+    public function getMemcacheCache()
+    {
         if (is_null($this->memcacheCache)) {
             $memcache = $this->memcacheService->get();
             if (!is_null($memcache)) {
@@ -275,44 +234,59 @@ class HttpClientService {
         return $this->memcacheCache;
     }
 
-
     /**
-     *
      * @return boolean
      */
-    public function hasMemcacheCache() {
+    public function hasMemcacheCache()
+    {
         return !is_null($this->getMemcacheCache());
     }
-
-
 
     /**
      * @return HttpHistorySubscriber
      */
     public function getHistory()
     {
-        $subscriberCollections = $this->get()->getEmitter()->listeners('complete');
-
-        foreach ($subscriberCollections as $subcriberCollection) {
-            if ($subcriberCollection[0] instanceof HttpHistorySubscriber) {
-                return $subcriberCollection[0];
-            }
-        }
-
-        return null;
+        return $this->historySubscriber;
     }
-
 
     /**
+     * Set cookies to be sent on all requests (dependent on cookie domain/secure matching rules)
      *
-     * @return HttpMockSubscriber
+     * @param array $cookies
      */
-    public function getMockSubscriber() {
-        if (!$this->hasSubscriber('GuzzleHttp\Subscriber\Mock')) {
-            $this->get()->getEmitter()->attach(new HttpMockSubscriber());
+    public function setCookies($cookies = [])
+    {
+        $this->cookieSubscriber->getCookieJar()->clear();
+        if (!empty($cookies)) {
+            foreach ($cookies as $cookie) {
+                $this->cookieSubscriber->getCookieJar()->setCookie(new SetCookie($cookie));
+            }
         }
-
-        return $this->getSubscriber('GuzzleHttp\Subscriber\Mock');
     }
 
+    public function clearCookies()
+    {
+        $this->cookieSubscriber->getCookieJar()->clear();
+    }
+
+    public function setBasicHttpAuthorization($username, $password)
+    {
+        if (empty($username) && empty($password)) {
+            return;
+        }
+
+        $this->get()->setDefaultOption(
+            'auth',
+            [$username, $password]
+        );
+    }
+
+    public function clearBasicHttpAuthorization()
+    {
+        $this->get()->setDefaultOption(
+            'auth',
+            null
+        );
+    }
 }

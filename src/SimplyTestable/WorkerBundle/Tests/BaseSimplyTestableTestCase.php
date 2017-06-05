@@ -14,6 +14,7 @@ use GuzzleHttp\Message\MessageFactory as HttpMessageFactory;
 use GuzzleHttp\Message\ResponseInterface as HttpResponse;
 use GuzzleHttp\Message\Request as HttpRequest;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Subscriber\Mock as HttpMockSubscriber;
 
 abstract class BaseSimplyTestableTestCase extends BaseTestCase {
 
@@ -284,7 +285,9 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
 
     protected function setHttpFixtures($fixtures)
     {
-        $this->getHttpClientService()->getMockSubscriber()->addMultiple($fixtures);
+        $this->getHttpClientService()->get()->getEmitter()->attach(
+            new HttpMockSubscriber($fixtures)
+        );
     }
 
 

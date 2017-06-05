@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "8e9bc5b41748f056e0294396dd18db38",
+    "content-hash": "480c4250e3cdd923e9b5e2d80c8a3824",
     "packages": [
         {
             "name": "bcc/resque-bundle",
@@ -3368,23 +3368,22 @@
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "1.0",
+            "version": "1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "64c193d69283a370e7cea0af3a19fb51b0ca519c"
+                "reference": "ed37c8715e60f67870c85216a3a42301df922db3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/64c193d69283a370e7cea0af3a19fb51b0ca519c",
-                "reference": "64c193d69283a370e7cea0af3a19fb51b0ca519c",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/ed37c8715e60f67870c85216a3a42301df922db3",
+                "reference": "ed37c8715e60f67870c85216a3a42301df922db3",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": ">=5.2.0,<5.3",
                 "php": ">=5.4",
                 "webignition/absolute-url-deriver": ">=1.4.1.2",
-                "webignition/cookie-url-matcher": ">=0.1,<1",
                 "webignition/css-validator-output-parser": ">=2.2.2",
                 "webignition/guzzle-curl-exception": ">=0.1.3,<1",
                 "webignition/url": ">=1.9.9",
@@ -3392,13 +3391,16 @@
                 "webignition/web-resource-service": ">=1.1,<2"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
+                "mockery/mockery": "~0.9",
+                "php-mock/php-mock-mockery": "1.1.0",
+                "phpunit/phpunit": "~4.0",
+                "satooshi/php-coveralls": "~1.0",
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\CssValidatorWrapper\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3411,7 +3413,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2015-02-27T09:09:33+00:00"
+            "time": "2017-06-05T14:00:36+00:00"
         },
         {
             "name": "webignition/disallowed-character-terminated-string",
@@ -4357,21 +4359,21 @@
         },
         {
             "name": "webignition/web-resource-service",
-            "version": "1.1",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-service.git",
-                "reference": "5d3e76b105ce4672d07a9bd25153b25087256eed"
+                "reference": "63fff81b0e27d2585aaf37bb969b8b54b7116e50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/5d3e76b105ce4672d07a9bd25153b25087256eed",
-                "reference": "5d3e76b105ce4672d07a9bd25153b25087256eed",
+                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/63fff81b0e27d2585aaf37bb969b8b54b7116e50",
+                "reference": "63fff81b0e27d2585aaf37bb969b8b54b7116e50",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": ">=5.2.0,<5.3",
-                "php": ">=5.4.0",
+                "php": ">=5.5.0",
                 "webignition/internet-media-type": ">=0.4.4,<2.0",
                 "webignition/url": ">=1.9.14,<2.0",
                 "webignition/web-json-model": ">=1.1,<2.0",
@@ -4379,13 +4381,15 @@
                 "webignition/web-resource-model": ">=1.2.1,<2.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
+                "mockery/mockery": "~0.9",
+                "phpunit/phpunit": "~4.0",
+                "satooshi/php-coveralls": "~1.0",
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\WebResource\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -4399,7 +4403,7 @@
                 "service",
                 "web"
             ],
-            "time": "2015-02-23T21:19:26+00:00"
+            "time": "2017-06-05T13:29:23+00:00"
         },
         {
             "name": "winzou/console-bundle",
@@ -4719,121 +4723,6 @@
                 "testing"
             ],
             "time": "2017-02-28T12:52:32+00:00"
-        },
-        {
-            "name": "php-mock/php-mock",
-            "version": "1.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-mock/php-mock.git",
-                "reference": "bfa2d17d64dbf129073a7ba2051a96ce52749570"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-mock/php-mock/zipball/bfa2d17d64dbf129073a7ba2051a96ce52749570",
-                "reference": "bfa2d17d64dbf129073a7ba2051a96ce52749570",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5",
-                "phpunit/php-text-template": "^1"
-            },
-            "replace": {
-                "malkusch/php-mock": "*"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4|^5"
-            },
-            "suggest": {
-                "php-mock/php-mock-mockery": "Allows using PHPMockery for Mockery integration",
-                "php-mock/php-mock-phpunit": "Allows integration into PHPUnit testcase with the trait PHPMock."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "phpmock\\": [
-                        "classes/",
-                        "tests/unit/"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "WTFPL"
-            ],
-            "authors": [
-                {
-                    "name": "Markus Malkusch",
-                    "email": "markus@malkusch.de",
-                    "homepage": "http://markus.malkusch.de",
-                    "role": "Developer"
-                }
-            ],
-            "description": "PHP-Mock can mock built-in PHP functions (e.g. time()). PHP-Mock relies on PHP's namespace fallback policy. No further extension is needed.",
-            "homepage": "https://github.com/php-mock/php-mock",
-            "keywords": [
-                "BDD",
-                "TDD",
-                "function",
-                "mock",
-                "stub",
-                "test",
-                "test double"
-            ],
-            "time": "2015-11-11T22:37:09+00:00"
-        },
-        {
-            "name": "php-mock/php-mock-integration",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-mock/php-mock-integration.git",
-                "reference": "e83fb65dd20cd3cf250d554cbd4682b96b684f4b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-mock/php-mock-integration/zipball/e83fb65dd20cd3cf250d554cbd4682b96b684f4b",
-                "reference": "e83fb65dd20cd3cf250d554cbd4682b96b684f4b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5",
-                "php-mock/php-mock": "^1",
-                "phpunit/php-text-template": "^1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4|^5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "phpmock\\integration\\": "classes/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "WTFPL"
-            ],
-            "authors": [
-                {
-                    "name": "Markus Malkusch",
-                    "email": "markus@malkusch.de",
-                    "homepage": "http://markus.malkusch.de",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Integration package for PHP-Mock",
-            "homepage": "https://github.com/php-mock/php-mock-integration",
-            "keywords": [
-                "BDD",
-                "TDD",
-                "function",
-                "mock",
-                "stub",
-                "test",
-                "test double"
-            ],
-            "time": "2015-10-26T21:21:42+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",

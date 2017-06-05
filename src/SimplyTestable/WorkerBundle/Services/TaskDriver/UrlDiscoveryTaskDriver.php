@@ -20,18 +20,15 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver {
     );
 
     /**
-     * @param TaskTypeService $taskTypeService
      * @param HttpClientService $httpClientService
      * @param WebResourceService $webResourceService
      * @param StateService $stateService
      */
     public function __construct(
-        TaskTypeService $taskTypeService,
         HttpClientService $httpClientService,
         WebResourceService $webResourceService,
         StateService $stateService
     ) {
-        $this->setTaskTypeService($taskTypeService);
         $this->setHttpClientService($httpClientService);
         $this->setWebResourceService($webResourceService);
         $this->setStateService($stateService);
