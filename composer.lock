@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "480c4250e3cdd923e9b5e2d80c8a3824",
+    "content-hash": "bb5e4333a8261702ba5123402ace6a87",
     "packages": [
         {
             "name": "bcc/resque-bundle",
@@ -3368,16 +3368,16 @@
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "1.1",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "ed37c8715e60f67870c85216a3a42301df922db3"
+                "reference": "dc592a4430bba29639034a00204aa1fb2161808a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/ed37c8715e60f67870c85216a3a42301df922db3",
-                "reference": "ed37c8715e60f67870c85216a3a42301df922db3",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/dc592a4430bba29639034a00204aa1fb2161808a",
+                "reference": "dc592a4430bba29639034a00204aa1fb2161808a",
                 "shasum": ""
             },
             "require": {
@@ -3413,7 +3413,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2017-06-05T14:00:36+00:00"
+            "time": "2017-06-06T09:41:33+00:00"
         },
         {
             "name": "webignition/disallowed-character-terminated-string",

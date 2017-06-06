@@ -2,27 +2,35 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 
-use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Message\RequestInterface;
-use GuzzleHttp\Message\ResponseInterface;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
-use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
+use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorOutputFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 use webignition\HtmlValidator\Output\Output as HtmlValidatorOutput;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 
-class HtmlValidationTaskDriverTest extends BaseSimplyTestableTestCase
+/**
+ * Class HtmlValidationTaskDriverTest
+ * @package SimplyTestable\WorkerBundle\Tests\Services\TaskDriver
+ *
+ * @group foo-tests
+ */
+class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
 {
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function getTaskDriver()
     {
-        parent::setUp();
-        $this->removeAllTasks();
-        $this->clearMemcacheHttpCache();
+        return $this->getHtmlValidationTaskDriver();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTaskTypeString()
+    {
+        return strtolower(TaskTypeService::HTML_VALIDATION_NAME);
     }
 
     /**
@@ -82,217 +90,6 @@ class HtmlValidationTaskDriverTest extends BaseSimplyTestableTestCase
                     'type' => 'error',
                 ],
             ]
-        ];
-    }
-
-    public function testPerformNonCurlConnectException()
-    {
-        $this->setHttpFixtures($this->buildHttpFixtureSet([
-            new ConnectException('foo', \Mockery::mock(RequestInterface::class))
-        ]));
-
-        $task = $this->getTaskFactory()->create(
-            TaskFactory::createTaskValuesFromDefaults()
-        );
-
-        $this->setExpectedException(
-            ConnectException::class,
-            'foo',
-            0
-        );
-
-        $this->getHtmlValidationTaskDriver()->perform($task);
-    }
-
-    /**
-     * @dataProvider performBadWebResourceDataProvider
-     *
-     * @param string[] $httpResponseFixtures
-     * @param bool $expectedWebResourceRetrievalHasSucceeded
-     * @param bool $expectedIsRetryable
-     * @param int $expectedErrorCount
-     * @param string $expectedTaskOutput
-     */
-    public function testPerformBadWebResource(
-        $httpResponseFixtures,
-        $expectedWebResourceRetrievalHasSucceeded,
-        $expectedIsRetryable,
-        $expectedErrorCount,
-        $expectedTaskOutput
-    ) {
-        $this->setHttpFixtures($this->buildHttpFixtureSet($httpResponseFixtures));
-
-        $task = $this->getTaskFactory()->create(
-            TaskFactory::createTaskValuesFromDefaults()
-        );
-
-        $htmlValidationTaskDriver = $this->getHtmlValidationTaskDriver();
-
-        $taskDriverResponse = $htmlValidationTaskDriver->perform($task);
-
-        $this->assertEquals($expectedWebResourceRetrievalHasSucceeded, $taskDriverResponse->hasSucceeded());
-        $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
-        $this->assertEquals($expectedErrorCount, $taskDriverResponse->getErrorCount());
-
-        $this->assertEquals(
-            $expectedTaskOutput,
-            json_decode($taskDriverResponse->getTaskOutput()->getOutput(), true)
-        );
-    }
-
-    public function performBadWebResourceDataProvider()
-    {
-        return [
-            'http too many redirects' => [
-                'httpResponseFixtures' => [
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "1",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "2",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "3",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "4",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "5",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "6",
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Redirect limit reached',
-                            'messageId' => 'http-retrieval-redirect-limit-reached',
-                            'type' => 'error',
-                        ],
-                    ],
-                ],
-            ],
-            'http redirect loop' => [
-                'httpResponseFixtures' => [
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "1",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "2",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "3",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL,
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "1",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "2",
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Redirect loop detected',
-                            'messageId' => 'http-retrieval-redirect-loop',
-                            'type' => 'error',
-                        ],
-                    ],
-                ],
-            ],
-            'http 404' => [
-                'httpResponseFixtures' => [
-                    'HTTP/1.1 404 Not Found',
-                    'HTTP/1.1 404 Not Found',
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Not Found',
-                            'messageId' => 'http-retrieval-404',
-                            'type' => 'error',
-                        ],
-                    ],
-                ]
-            ],
-            'curl 3' => [
-                'httpResponseFixtures' => [
-                    'CURL/3: foo',
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Invalid resource URL',
-                            'messageId' => 'http-retrieval-curl-code-3',
-                            'type' => 'error',
-                        ],
-                    ],
-                ]
-            ],
-            'curl 6' => [
-                'httpResponseFixtures' => [
-                    'CURL/6: foo',
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'DNS lookup failure resolving resource domain name',
-                            'messageId' => 'http-retrieval-curl-code-6',
-                            'type' => 'error',
-                        ],
-                    ],
-                ]
-            ],
-            'curl 28' => [
-                'httpResponseFixtures' => [
-                    'CURL/28: foo',
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Timeout reached retrieving resource',
-                            'messageId' => 'http-retrieval-curl-code-28',
-                            'type' => 'error',
-                        ],
-                    ],
-                ]
-            ],
-            'curl unknown' => [
-                'httpResponseFixtures' => [
-                    'CURL/55: foo',
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => '',
-                            'messageId' => 'http-retrieval-curl-code-55',
-                            'type' => 'error',
-                        ],
-                    ],
-                ]
-            ],
-            'incorrect resource type' => [
-                'httpResponseFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/css\n\nfoo",
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
-            ],
-            'empty content' => [
-                'httpResponseFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => true,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
-            ],
         ];
     }
 

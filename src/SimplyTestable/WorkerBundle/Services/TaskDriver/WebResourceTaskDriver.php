@@ -51,7 +51,7 @@ abstract class WebResourceTaskDriver extends TaskDriver
     /**
      * @var WebResourceService
      */
-    private $webResourceService;
+    protected $webResourceService;
 
     /**
      * @param WebResourceService $webResourceService

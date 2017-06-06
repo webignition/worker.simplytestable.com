@@ -187,6 +187,15 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         return $this->container->get('simplytestable.services.memcacheservice');
     }
 
+
+    /**
+     *
+     * @return \webignition\WebResource\Service\Service
+     */
+    protected function getWebResourceService() {
+        return $this->container->get('simplytestable.services.webresourceservice');
+    }
+
     /**
      *
      * @return \Doctrine\ORM\EntityManager

@@ -37,7 +37,7 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase
         );
 
         foreach ($urls as $index => $url) {
-            $task = $this->createTask($this->);
+//            $task = $this->createTask($this->);
 
             $task = $this->getTaskService()->getById($this->createTask($url, 'HTML validation')->id);
 
