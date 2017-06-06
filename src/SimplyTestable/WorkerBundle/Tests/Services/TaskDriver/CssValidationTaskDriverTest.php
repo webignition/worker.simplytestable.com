@@ -24,11 +24,25 @@ use webignition\WebResource\Service\Service as WebResourceService;
 class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
 {
     /**
+     * @var CssValidationTaskDriver
+     */
+    private $taskDriver;
+
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->taskDriver = $this->container->get('simplytestable.services.taskdriver.cssvalidation');
+    }
+
+    /**
      * @inheritdoc
      */
     protected function getTaskDriver()
     {
-        return $this->getCssValidationTaskDriver();
+        return $this->taskDriver;
     }
 
     /**
@@ -52,7 +66,7 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
      * @param int $expectedWarningCount
      * @param array $expectedDecodedOutput
      */
-    public function testPerformFoo(
+    public function testPerform(
         $httpFixtures,
         $taskParameters,
         $expectedAdditionalCreateConfigurationArgs,
@@ -91,10 +105,9 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
             ->shouldReceive('validate')
             ->andReturn($cssValidatorOutput);
 
-        $cssValidationTaskDriver = $this->getCssValidationTaskDriver();
-        $cssValidationTaskDriver->setCssValidatorWrapper($cssValidatorWrapper);
+        $this->taskDriver->setCssValidatorWrapper($cssValidatorWrapper);
 
-        $taskDriverResponse = $cssValidationTaskDriver->perform($task);
+        $taskDriverResponse = $this->taskDriver->perform($task);
 
         $this->assertEquals($expectedHasSucceeded, $taskDriverResponse->hasSucceeded());
         $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
@@ -252,17 +265,6 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
                 ],
             ],
         ];
-    }
-
-    /**
-     * @return CssValidationTaskDriver
-     */
-    private function getCssValidationTaskDriver()
-    {
-        /* @var $cssValidationTaskDriver CssValidationTaskDriver */
-        $cssValidationTaskDriver = $this->container->get('simplytestable.services.taskdriver.cssvalidation');
-
-        return $cssValidationTaskDriver;
     }
 
     /**

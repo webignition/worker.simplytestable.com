@@ -3,13 +3,12 @@ namespace SimplyTestable\WorkerBundle\Services;
 
 use Doctrine\Common\Cache\MemcacheCache;
 use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Message\RequestInterface;
 use GuzzleHttp\Subscriber\Cache\CacheSubscriber;
 use GuzzleHttp\Subscriber\Cache\CacheStorage;
 use GuzzleHttp\Subscriber\Cookie as HttpCookieSubscriber;
-use GuzzleHttp\Subscriber\Retry\RetrySubscriber;
+use GuzzleHttp\Subscriber\Retry\RetrySubscriber as HttpRetrySubscriber;
 use GuzzleHttp\Subscriber\History as HttpHistorySubscriber;
 
 class HttpClientService
@@ -40,19 +39,14 @@ class HttpClientService
     private $historySubscriber;
 
     /**
-     * @var CacheSubscriber
-     */
-    private $cacheSubscriber;
-
-    /**
-     * @var RetrySubscriber
-     */
-    private $retrySubscriber;
-
-    /**
      * @var HttpCookieSubscriber
      */
     private $cookieSubscriber;
+
+    /**
+     * @var HttpRetrySubscriber
+     */
+    private $retrySubscriber;
 
     /**
      * @param MemcacheService $memcacheService
@@ -71,52 +65,37 @@ class HttpClientService
         }
 
         $this->historySubscriber = new HttpHistorySubscriber();
-        $this->cacheSubscriber = $this->createCacheSubscriber();
-        $this->retrySubscriber = $this->createRetrySubscriber();
         $this->cookieSubscriber = new HttpCookieSubscriber();
+        $this->retrySubscriber = $this->createRetrySubscriber();
+
+        $this->httpClient = new HttpClient([
+            'config' => [
+                'curl' => $this->curlOptions
+            ],
+        ]);
+
+        $this->httpClient->getEmitter()->attach($this->createCacheSubscriber());
+        $this->enableRetrySubscriber();
+        $this->httpClient->getEmitter()->attach($this->historySubscriber);
+        $this->httpClient->getEmitter()->attach($this->cookieSubscriber);
+    }
+
+    public function enableRetrySubscriber()
+    {
+        $this->httpClient->getEmitter()->attach($this->retrySubscriber);
+    }
+
+    public function disableRetrySubscriber()
+    {
+        $this->httpClient->getEmitter()->detach($this->retrySubscriber);
     }
 
     /**
-     * @param array $defaultRequestOptions
-     *
      * @return HttpClient
      */
-    public function get($defaultRequestOptions = [])
+    public function get()
     {
-        $defaultRequestOptions = $this->buildHttpClientOptions($defaultRequestOptions);
-
-        if (is_null($this->httpClient)) {
-            $this->httpClient = new HttpClient($defaultRequestOptions);
-            $this->httpClient->getEmitter()->attach($this->cacheSubscriber);
-            $this->httpClient->getEmitter()->attach($this->retrySubscriber);
-            $this->httpClient->getEmitter()->attach($this->historySubscriber);
-            $this->httpClient->getEmitter()->attach($this->cookieSubscriber);
-        }
-
-        if (!empty($defaultRequestOptions)) {
-            foreach ($defaultRequestOptions as $key => $value) {
-                $this->httpClient->setDefaultOption($key, $value);
-            }
-        }
-
         return $this->httpClient;
-    }
-
-    private function buildHttpClientOptions($defaultRequestOptions = [])
-    {
-        if (!isset($defaultRequestOptions['config'])) {
-            $defaultRequestOptions['config'] = [];
-        }
-
-        if (!isset($defaultRequestOptions['config']['curl'])) {
-            $defaultRequestOptions['config']['curl'] = [];
-        }
-
-        foreach ($this->curlOptions as $key => $value) {
-            $defaultRequestOptions['config']['curl'][$key] = $value;
-        }
-
-        return $defaultRequestOptions;
     }
 
     /**
@@ -137,21 +116,21 @@ class HttpClientService
     }
 
     /**
-     * @return RetrySubscriber
+     * @return HttpRetrySubscriber
      */
     protected function createRetrySubscriber()
     {
-        $filter = RetrySubscriber::createChainFilter([
+        $filter = HttpRetrySubscriber::createChainFilter([
             // Does early filter to force non-idempotent methods to NOT be retried.
-            RetrySubscriber::createIdempotentFilter(),
+            HttpRetrySubscriber::createIdempotentFilter(),
             // Retry curl-level errors
-            RetrySubscriber::createCurlFilter(),
+            HttpRetrySubscriber::createCurlFilter(),
             // Performs the last check, returning ``true`` or ``false`` based on
             // if the response received a 500 or 503 status code.
-            RetrySubscriber::createStatusFilter([500, 503])
+            HttpRetrySubscriber::createStatusFilter([500, 503])
         ]);
 
-        return new RetrySubscriber(['filter' => $filter]);
+        return new HttpRetrySubscriber(['filter' => $filter]);
     }
 
     /**

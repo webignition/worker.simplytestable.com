@@ -84,6 +84,9 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
         $this->response->setErrorCount(0);
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function performValidation()
     {
         $doctypeExtractor = new DoctypeExtractor();

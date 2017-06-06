@@ -70,6 +70,7 @@ abstract class FooWebResourceTaskDriverTest extends BaseSimplyTestableTestCase
         $expectedTaskOutput
     ) {
         $this->setHttpFixtures($this->buildHttpFixtureSet($httpResponseFixtures));
+        $this->getWebResourceService()->getConfiguration()->disableRetryWithUrlEncodingDisabled();
 
         $task = $this->getTaskFactory()->create(
             TaskFactory::createTaskValuesFromDefaults()
@@ -139,7 +140,6 @@ abstract class FooWebResourceTaskDriverTest extends BaseSimplyTestableTestCase
             'http 404' => [
                 'httpResponseFixtures' => [
                     'HTTP/1.1 404 Not Found',
-                    'HTTP/1.1 404 Not Found',
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -149,6 +149,28 @@ abstract class FooWebResourceTaskDriverTest extends BaseSimplyTestableTestCase
                         [
                             'message' => 'Not Found',
                             'messageId' => 'http-retrieval-404',
+                            'type' => 'error',
+                        ],
+                    ],
+                ]
+            ],
+            'http 500' => [
+                'httpResponseFixtures' => [
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'Internal Server Error',
+                            'messageId' => 'http-retrieval-500',
                             'type' => 'error',
                         ],
                     ],

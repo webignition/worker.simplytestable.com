@@ -18,11 +18,25 @@ use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
 {
     /**
+     * @var HtmlValidationTaskDriver
+     */
+    private $taskDriver;
+
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->taskDriver = $this->container->get('simplytestable.services.taskdriver.htmlvalidation');
+    }
+
+    /**
      * @inheritdoc
      */
     protected function getTaskDriver()
     {
-        return $this->getHtmlValidationTaskDriver();
+        return $this->taskDriver;
     }
 
     /**
@@ -49,7 +63,7 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
             TaskFactory::createTaskValuesFromDefaults()
         );
 
-        $taskDriverResponse = $this->getHtmlValidationTaskDriver()->perform($task);
+        $taskDriverResponse = $this->taskDriver->perform($task);
 
         $this->assertEquals(1, $taskDriverResponse->getErrorCount());
         $this->assertEquals([
@@ -128,10 +142,9 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
             ->shouldReceive('validate')
             ->andReturn($htmlValidatorOutput);
 
-        $htmlValidationTaskDriver = $this->getHtmlValidationTaskDriver();
-        $htmlValidationTaskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
+        $this->taskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
 
-        $taskDriverResponse = $htmlValidationTaskDriver->perform($task);
+        $taskDriverResponse = $this->taskDriver->perform($task);
 
         $this->assertEquals($expectedHasSucceeded, $taskDriverResponse->hasSucceeded());
         $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
@@ -186,10 +199,9 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
                 HtmlValidatorOutput::STATUS_VALID
             ));
 
-        $htmlValidationTaskDriver = $this->getHtmlValidationTaskDriver();
-        $htmlValidationTaskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
+        $this->taskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
 
-        $htmlValidationTaskDriver->perform($task);
+        $this->taskDriver->perform($task);
 
         $request = $this->getHttpClientService()->getHistory()->getLastRequest();
         $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
@@ -272,10 +284,9 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
                 HtmlValidatorOutput::STATUS_VALID
             ));
 
-        $htmlValidationTaskDriver = $this->getHtmlValidationTaskDriver();
-        $htmlValidationTaskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
+        $this->taskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
 
-        $htmlValidationTaskDriver->perform($task);
+        $this->taskDriver->perform($task);
 
         $request = $this->getHttpClientService()->getHistory()->getLastRequest();
 
@@ -346,10 +357,9 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
             ->shouldReceive('validate')
             ->andReturn($htmlValidatorOutput);
 
-        $htmlValidationTaskDriver = $this->getHtmlValidationTaskDriver();
-        $htmlValidationTaskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
+        $this->taskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
 
-        $htmlValidationTaskDriver->perform($task);
+        $this->taskDriver->perform($task);
     }
 
     /**
@@ -365,16 +375,5 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
                 'fileExists' => true,
             ],
         ];
-    }
-
-    /**
-     * @return HtmlValidationTaskDriver
-     */
-    private function getHtmlValidationTaskDriver()
-    {
-        /* @var $htmlValidationTaskDriver HtmlValidationTaskDriver */
-        $htmlValidationTaskDriver = $this->container->get('simplytestable.services.taskdriver.htmlvalidation');
-
-        return $htmlValidationTaskDriver;
     }
 }
