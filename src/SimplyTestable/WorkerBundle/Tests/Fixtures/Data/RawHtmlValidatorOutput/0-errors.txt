@@ -1,0 +1,16 @@
+Content-Type: application/json; charset=UTF-8
+X-W3C-Validator-Recursion: 1
+X-W3C-Validator-Status: Valid
+X-W3C-Validator-Errors: 0
+X-W3C-Validator-Warnings: 0
+
+{
+    "url": "http://example.com/",
+    "messages": [
+
+        ],
+    "source": {
+        "encoding": "utf-8",
+        "type": ""
+    }
+}

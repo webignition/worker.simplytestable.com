@@ -2,6 +2,7 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 
+use phpmock\mockery\PHPMockery;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorOutputFactory;
@@ -111,15 +112,18 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
      * @dataProvider performDataProvider
      *
      * @param string $content
-     * @param HtmlValidatorOutput $htmlValidatorOutput
+     * @param string $htmlValidatorOutput
      * @param bool $expectedHasSucceeded
      * @param bool $expectedIsRetryable
+     * @param int $expectedErrorCount
      */
     public function testPerform(
         $content,
-        HtmlValidatorOutput $htmlValidatorOutput,
+        $htmlValidatorOutput,
         $expectedHasSucceeded,
-        $expectedIsRetryable
+        $expectedIsRetryable,
+        $expectedErrorCount,
+        $expectedDecodedOutput
     ) {
         $this->setHttpFixtures($this->buildHttpFixtureSet(array(
             "HTTP/1.0 200\nContent-Type:text/html\n\n" . $content
@@ -129,25 +133,15 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
             TaskFactory::createTaskValuesFromDefaults()
         );
 
-        $htmlValidatorWrapper = \Mockery::mock(HtmlValidatorWrapper::class);
-        $htmlValidatorWrapper
-            ->shouldReceive('createConfiguration')
-            ->with(array(
-                'documentUri' => 'file:/tmp/fe364450e1391215f596d043488f989f.html',
-                'validatorPath' => '/usr/local/validator/cgi-bin/check',
-                'documentCharacterSet' => 'UTF-8',
-            ));
-
-        $htmlValidatorWrapper
-            ->shouldReceive('validate')
-            ->andReturn($htmlValidatorOutput);
-
-        $this->taskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
+        $this->setHtmlValidatorFixture($htmlValidatorOutput);
 
         $taskDriverResponse = $this->taskDriver->perform($task);
 
         $this->assertEquals($expectedHasSucceeded, $taskDriverResponse->hasSucceeded());
         $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
+        $this->assertEquals($expectedErrorCount, $taskDriverResponse->getErrorCount());
+
+        $this->assertEquals($expectedDecodedOutput, json_decode($taskDriverResponse->getTaskOutput()->getOutput(), true));
     }
 
     /**
@@ -158,21 +152,100 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
         return [
             'no errors' => [
                 'content' => '<!DOCTYPE html>',
-                'htmlValidatorOutput' => HtmlValidatorOutputFactory::create(
-                    HtmlValidatorOutput::STATUS_VALID
-                ),
+                'htmlValidatorOutput' => $this->loadHtmlValidatorFixture('0-errors'),
                 'expectedHasSucceeded' => true,
                 'expectedIsRetryable' => true,
+                'expectedErrorCount' => 0,
+                'expectedDecodedOutput' => [
+                    'messages' => [],
+                ],
             ],
-            'was aborted' => [
+            'one error' => [
                 'content' => '<!DOCTYPE html>',
-                'htmlValidatorOutput' => HtmlValidatorOutputFactory::create(
-                    HtmlValidatorOutput::STATUS_ABORT
-                ),
-                 'expectedHasSucceeded' => false,
+                'htmlValidatorOutput' => $this->loadHtmlValidatorFixture('1-error'),
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 1,
+                'expectedDecodedOutput' => [
+                    'messages' => [
+                        [
+                            'lastLine' => 188,
+                            'lastColumn' => 79,
+                            'message' => 'An img element must have an alt attribute, except under certain conditions.',
+                            'messageid' => 'html5',
+                            'explanation' => 'explanatory text',
+                            'type' => 'error',
+                        ]
+                    ],
+                ],
+            ],
+            'internal software error' => [
+                'content' => '<!DOCTYPE html>',
+                'htmlValidatorOutput' => $this->loadHtmlValidatorFixture('internal-software-error'),
+                'expectedHasSucceeded' => false,
                 'expectedIsRetryable' => false,
+                'expectedErrorCount' => 0,
+                'expectedDecodedOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'Sorry, this document can\'t be checked',
+                            'messageId' => 'validator-internal-server-error',
+                            'type' => 'error',
+                        ]
+                    ],
+                ],
+            ],
+            'invalid character encoding' => [
+                'content' => '<!DOCTYPE html>',
+                'htmlValidatorOutput' => $this->loadHtmlValidatorFixture('invalid-character-encoding-error'),
+                'expectedHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedDecodedOutput' => [
+                    'messages' => [
+                        [
+                            'message' => '<p>
+        Sorry, I am unable to validate this document because on line
+        <strong>101</strong>
+        it contained one or more bytes that I cannot interpret as
+        <code>utf-8</code>
+        (in other words, the bytes found are not valid values in the specified
+        Character Encoding). Please check both the content of the file and the
+        character encoding indication.
+      </p><p>The error was: 
+        utf8 "\xE1" does not map to Unicode
+
+      </p>',
+                            'messageId' => 'character-encoding',
+                            'type' => 'error',
+                        ]
+                    ],
+                ],
             ],
         ];
+    }
+
+    /**
+     * @param string $name
+     */
+    private function setHtmlValidatorFixture($fixture)
+    {
+        PHPMockery::mock(
+            'webignition\HtmlValidator\Wrapper',
+            'shell_exec'
+        )->andReturn(
+            $fixture
+        );
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    private function loadHtmlValidatorFixture($name)
+    {
+        return file_get_contents(__DIR__ . '/../../Fixtures/Data/RawHtmlValidatorOutput/' . $name . '.txt');
     }
 
     /**
@@ -188,6 +261,8 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
         )));
 
         $task = $this->getTaskFactory()->create($taskValues);
+
+
 
         $htmlValidatorWrapper = \Mockery::mock(HtmlValidatorWrapper::class);
         $htmlValidatorWrapper
@@ -375,5 +450,14 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
                 'fileExists' => true,
             ],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
     }
 }

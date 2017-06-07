@@ -1,0 +1,16 @@
+Connection:close
+Content-Encoding:gzip
+Content-Length:247
+Content-Type:text/html
+Date:Wed, 20 Nov 2013 10:04:26 GMT
+Server:Apache/2.2.22 (Ubuntu)
+Vary:Accept-Encoding
+
+<h1>Software error:</h1>
+<pre>Can't use an undefined value as an ARRAY reference at /usr/lib/cgi-bin/w3c-markup-validator/check line 564.
+</pre>
+<p>
+For help, please send mail to the webmaster (<a href="mailto:webmaster@localhost">webmaster@localhost</a>), giving this error message 
+and the time and date of the error.
+
+</p>

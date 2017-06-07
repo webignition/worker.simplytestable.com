@@ -4,7 +4,6 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
-use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\Service\Service as WebResourceService;
@@ -113,13 +112,16 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
             return json_encode($this->getInvalidDocumentTypeOutput($doctypeExtractor->getDocumentTypeString()));
         }
 
-        $this->htmlValidatorWrapper->createConfiguration(array(
-            'documentUri' => 'file:' . $this->storeTmpFile($this->getWebPage()->getContent()),
-            'validatorPath' => $this->validatorPath,
-            'documentCharacterSet' => (is_null($this->getWebPage()->getCharacterSet()))
+        $this->htmlValidatorWrapper->createConfiguration([
+            HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_URI =>
+                'file:' . $this->storeTmpFile($this->getWebPage()->getContent()),
+            HtmlValidatorWrapper::CONFIG_KEY_VALIDATOR_PATH =>
+                $this->validatorPath,
+            HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_CHARACTER_SET =>
+                (is_null($this->getWebPage()->getCharacterSet()))
                 ? self::DEFAULT_CHARACTER_ENCODING
                 : $this->getWebPage()->getCharacterSet()
-        ));
+        ]);
 
         $output = $this->htmlValidatorWrapper->validate();
 
