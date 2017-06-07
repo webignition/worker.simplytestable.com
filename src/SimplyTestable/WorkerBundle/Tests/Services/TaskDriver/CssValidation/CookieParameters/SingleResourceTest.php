@@ -3,7 +3,7 @@
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\CssValidation\CookieParameters;
 
 class SingleResourceTest extends CookieParametersTest {
-    
+
     protected function getExpectedCookies() {
         return array(
             array(
@@ -15,21 +15,15 @@ class SingleResourceTest extends CookieParametersTest {
                 'domain' => '.example.com',
                 'name' => 'key2',
                 'value' => 'value2'
-            )        
-        );        
-    }    
+            )
+        );
+    }
 
     protected function getExpectedRequestsOnWhichCookiesShouldBeSet() {
-        $requests = array();
-        
-        foreach ($this->getHttpClientService()->getHistory()->getAll() as $httpTransaction) {
-            $requests[] = $httpTransaction['request'];
-        }
-        
-        return $requests;
+        return $this->getHttpClientService()->getHistory()->getRequests(true);
     }
 
     protected function getExpectedRequestsOnWhichCookiesShouldNotBeSet() {
         return array();
-    }    
+    }
 }

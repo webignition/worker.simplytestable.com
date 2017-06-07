@@ -9,14 +9,15 @@ class WarningHasRefTest extends TaskDriverTest {
      */
     private $task;
 
-    
+
     public function setUp() {
         parent::setUp();
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(). '/HttpResponses'));
 
-        $this->container->get('simplytestable.services.cssValidatorWrapperService')->setCssValidatorRawOutput(
+        $this->setCssValidatorFixture(
             file_get_contents($this->getFixturesDataPath() . '/CssValidatorResponse/1')
         );
+
 
         $this->task = $this->getTask('http://www.example.com/', array(
             'vendor-extensions' => 'warn'
