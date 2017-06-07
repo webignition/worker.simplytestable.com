@@ -7,6 +7,7 @@ use GuzzleHttp\Exception\TooManyRedirectsException;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use webignition\GuzzleHttp\Exception\CurlException\Exception as CurlException;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
+use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\WebResource;
 use webignition\WebResource\Exception\Exception as WebResourceException;
 use GuzzleHttp\Message\Request as HttpRequest;
@@ -82,10 +83,10 @@ abstract class WebResourceTaskDriver extends TaskDriver
         $this->getHttpClientService()->clearBasicHttpAuthorization();
 
         if (!$this->response->hasSucceeded()) {
-            return $this->hasNotSucceedHandler();
+            return $this->hasNotSucceededHandler();
         }
 
-        if (!$this->isCorrectWebResourceType()) {
+        if (!$this->webResource instanceof WebPage) {
             return $this->isNotCorrectWebResourceTypeHandler();
         }
 
@@ -99,12 +100,7 @@ abstract class WebResourceTaskDriver extends TaskDriver
     /**
      * @return string
      */
-    abstract protected function hasNotSucceedHandler();
-
-    /**
-     * @return boolean
-     */
-    abstract protected function isCorrectWebResourceType();
+    abstract protected function hasNotSucceededHandler();
 
     abstract protected function isNotCorrectWebResourceTypeHandler();
     abstract protected function isBlankWebResourceHandler();

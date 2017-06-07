@@ -3,7 +3,7 @@
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\CookieParameters;
 
 class MixedDomainResourceTest extends CookieParametersTest {
-    
+
     protected function getExpectedCookies() {
         return array(
             array(
@@ -15,31 +15,31 @@ class MixedDomainResourceTest extends CookieParametersTest {
                 'domain' => '.example.com',
                 'name' => 'key2',
                 'value' => 'value2'
-            )        
-        );        
+            )
+        );
     }
 
     protected function getExpectedRequestsOnWhichCookiesShouldBeSet() {
         $requests = array();
-        
-        foreach ($this->getHttpClientService()->getHistory()->getAll() as $httpTransaction) {
-            if ($httpTransaction['request']->getUrl() != 'http://anotherexample.com/script2.js') {
-                $requests[] = $httpTransaction['request'];
+
+        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+            if ($request->getUrl() != 'http://anotherexample.com/script2.js') {
+                $requests[] = $request;
             }
         }
-        
+
         return $requests;
     }
 
     protected function getExpectedRequestsOnWhichCookiesShouldNotBeSet() {
         $requests = array();
-        
-        foreach ($this->getHttpClientService()->getHistory()->getAll() as $httpTransaction) {
-            if ($httpTransaction['request']->getUrl() == 'http://anotherexample.com/script2.js') {
-                $requests[] = $httpTransaction['request'];
+
+        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+            if ($request->getUrl() == 'http://anotherexample.com/script2.js') {
+                $requests[] = $request;
             }
         }
-        
-        return $requests;        
-    }    
+
+        return $requests;
+    }
 }

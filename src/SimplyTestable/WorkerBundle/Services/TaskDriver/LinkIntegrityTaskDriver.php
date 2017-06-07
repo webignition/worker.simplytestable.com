@@ -6,7 +6,6 @@ use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\Service\Service as WebResourceService;
-use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
 use webignition\HtmlDocument\LinkChecker\Configuration as LinkCheckerConfiguration;
 
@@ -48,9 +47,9 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
-    protected function hasNotSucceedHandler()
+    protected function hasNotSucceededHandler()
     {
         $this->response->setErrorCount(1);
         return json_encode($this->getWebResourceExceptionOutput());
@@ -130,14 +129,6 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver
         $linkChecker->getUrlHealthChecker()->getConfiguration()->setHttpClient($this->getHttpClientService()->get());
 
         return $linkChecker;
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function isCorrectWebResourceType()
-    {
-        return $this->webResource instanceof WebPage;
     }
 
     /**

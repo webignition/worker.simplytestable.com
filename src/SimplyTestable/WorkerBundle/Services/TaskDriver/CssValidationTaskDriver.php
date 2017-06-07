@@ -13,7 +13,6 @@ use webignition\CssValidatorWrapper\Configuration\Configuration as CssValidatorW
 use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\Service\Service as WebResourceService;
-use webignition\WebResource\WebPage\WebPage;
 use webignition\CssValidatorWrapper\Configuration\Flags as CssValidatorWrapperConfigurationFlags;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
 
@@ -67,7 +66,6 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     *
      * @return InternetMediaType
      */
     protected function getOutputContentType()
@@ -80,9 +78,9 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
-    protected function hasNotSucceedHandler()
+    protected function hasNotSucceededHandler()
     {
         $this->response->setErrorCount(1);
 
@@ -96,14 +94,6 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
     {
         $this->response->setHasBeenSkipped();
         $this->response->setErrorCount(0);
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function isCorrectWebResourceType()
-    {
-        return $this->webResource instanceof WebPage;
     }
 
     /**

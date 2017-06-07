@@ -3,7 +3,7 @@
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\JsStaticAnalysis\CookieParameters;
 
 class SecureResourceTest extends CookieParametersTest {
-    
+
     protected function getExpectedCookies() {
         return array(
             array(
@@ -17,17 +17,15 @@ class SecureResourceTest extends CookieParametersTest {
                 'secure' => true,
                 'name' => 'key2',
                 'value' => 'value2'
-            )        
-        );        
-    }    
-
-    protected function getExpectedRequestsOnWhichCookiesShouldBeSet() {
-        $allRequests = $this->getHttpClientService()->getHistory()->getAll();
-        return $allRequests[0]['request'];
+            )
+        );
     }
 
-    protected function getExpectedRequestsOnWhichCookiesShouldNotBeSet() {        
-        $allRequests = $this->getHttpClientService()->getHistory()->getAll();
-        return $allRequests[1]['request'];
-    }    
+    protected function getExpectedRequestsOnWhichCookiesShouldBeSet() {
+        return $this->getHttpClientService()->getHistory()->getRequests(true)[0];
+    }
+
+    protected function getExpectedRequestsOnWhichCookiesShouldNotBeSet() {
+        return $this->getHttpClientService()->getHistory()->getRequests(true)[1];
+    }
 }

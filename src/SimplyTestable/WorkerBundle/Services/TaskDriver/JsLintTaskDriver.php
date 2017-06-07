@@ -2,12 +2,13 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
+use GuzzleHttp\Exception\ConnectException;
 use Psr\Log\LoggerInterface;
-use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
-use SimplyTestable\WorkerBundle\Services\TaskTypeService;
+use webignition\InternetMediaType\InternetMediaType;
 use webignition\NodeJslint\Wrapper\Wrapper as NodeJsLintWrapper;
+use webignition\NodeJslintOutput\NodeJslintOutput;
 use webignition\WebResource\Service\Service as WebResourceService;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\Url\Url;
@@ -16,19 +17,25 @@ use webignition\WebResource\Exception\Exception as WebResourceException;
 use webignition\WebResource\Exception\InvalidContentTypeException;
 use webignition\NodeJslint\Wrapper\Configuration\Flag\JsLint as JsLintFlag;
 use webignition\NodeJslint\Wrapper\Configuration\Option\JsLint as JsLintOption;
+use webignition\NodeJslintOutput\Exception as NodeJslintOutputException;
+use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptionFactory;
+use webignition\NodeJslintOutput\Entry\Entry as NodeJslintOutputEntry;
+use GuzzleHttp\Message\MessageFactory as HttpMessageFactory;
 
-class JsLintTaskDriver extends WebResourceTaskDriver {
-
+class JsLintTaskDriver extends WebResourceTaskDriver
+{
     const JSLINT_PARAMETER_NAME_PREFIX = 'jslint-option-';
     const MAXIMUM_FRAGMENT_LENGTH = 256;
 
+    /**
+     * @var string[]
+     */
     private $disallowedScriptUrlSchemes = [
         'resource',
         'file'
     ];
 
     /**
-     *
      * @var string[]
      */
     private $localResourcePaths = array();
@@ -53,6 +60,15 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
      */
     private $logger;
 
+    /**
+     * @param HttpClientService $httpClientService
+     * @param WebResourceService $webResourceService
+     * @param NodeJsLintWrapper $nodeJsLintWrapper
+     * @param StateService $stateService
+     * @param LoggerInterface $logger
+     * @param string $nodePath
+     * @param string $nodeJsLintPath
+     */
     public function __construct(
         HttpClientService $httpClientService,
         WebResourceService $webResourceService,
@@ -67,67 +83,64 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         $this->setNodeJsLintWrapper($nodeJsLintWrapper);
         $this->setStateService($stateService);
         $this->logger = $logger;
-        $this->setNodePath($nodePath);
-        $this->setNodeJsLintPath($nodeJsLintPath);
+        $this->nodePath = $nodePath;
+        $this->nodeJsLintPath = $nodeJsLintPath;
     }
 
+    /**
+     * @param NodeJsLintWrapper $wrapper
+     */
     public function setNodeJsLintWrapper(NodeJsLintWrapper $wrapper)
     {
         $this->nodeJsLintWrapper = $wrapper;
     }
 
-    private function setNodePath($nodePath)
-    {
-        $this->nodePath = $nodePath;
-    }
-
-    private function setNodeJsLintPath($nodeJsLintPath)
-    {
-        $this->nodeJsLintPath = $nodeJsLintPath;
-    }
-
     /**
-     *
-     * @return boolean
-     */
-    protected function isCorrectWebResourceType() {
-        return $this->webResource instanceof WebPage;
-    }
-
-
-    /**
-     *
-     * @return \webignition\InternetMediaType\InternetMediaType
+     * @return InternetMediaType
      */
     protected function getOutputContentType()
     {
-        $mediaTypeParser = new \webignition\InternetMediaType\Parser\Parser();
-        return $mediaTypeParser->parse('application/json');
+        $contentType = new InternetMediaType();
+        $contentType->setType('application');
+        $contentType->setSubtype('json');
+
+        return $contentType;
     }
 
     /**
-     *
-     * @return string
+     * @inheritdoc
      */
-    protected function hasNotSucceedHandler() {
+    protected function hasNotSucceededHandler()
+    {
         $this->response->setErrorCount(1);
+
         return json_encode($this->getWebResourceExceptionOutput());
     }
 
-    protected function isNotCorrectWebResourceTypeHandler() {
+    /**
+     * @inheritdoc
+     */
+    protected function isNotCorrectWebResourceTypeHandler()
+    {
         $this->response->setHasBeenSkipped();
+        $this->response->setIsRetryable(false);
         $this->response->setErrorCount(0);
-        return true;
     }
 
-
-    protected function isBlankWebResourceHandler() {
+    /**
+     * @inheritdoc
+     */
+    protected function isBlankWebResourceHandler()
+    {
         $this->response->setHasBeenSkipped();
         $this->response->setErrorCount(0);
-        return true;
     }
 
-    protected function performValidation() {
+    /**
+     * @inheritdoc
+     */
+    protected function performValidation()
+    {
         $this->configureNodeJslintWrapper();
 
         $jsLintOutput = array();
@@ -147,6 +160,12 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
 
         $errorCount = 0;
 
+        $this->getHttpClientService()->setCookies($this->task->getParameter('cookies'));
+        $this->getHttpClientService()->setBasicHttpAuthorization(
+            $this->task->getParameter('http-auth-username'),
+            $this->task->getParameter('http-auth-password')
+        );
+
         foreach ($scriptUrls as $scriptUrl) {
             if ($this->isScriptDomainIgnored($scriptUrl)) {
                 continue;
@@ -163,8 +182,16 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
 
                 $jsLintOutput[(string)$scriptUrl] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);
                 $errorCount += $this->getNodeJsErrorCount($nodeJsLintOutput);
-            } catch (\webignition\NodeJslintOutput\Exception $nodeJslintOutputException) {
-                $this->logger->error('JSLintTaskDriver::jslint error: [at '.$scriptUrl.']['.$nodeJslintOutputException->getMessage().']');
+            } catch (NodeJslintOutputException $nodeJslintOutputException) {
+                $this->logger->error(sprintf(
+                    'JSLintTaskDriver::jslint error: [at %s][%s]',
+                    $scriptUrl,
+                    $nodeJslintOutputException->getMessage()
+                ));
+
+                $this->getHttpClientService()->clearCookies();
+                $this->getHttpClientService()->clearBasicHttpAuthorization();
+
                 throw $nodeJslintOutputException;
             } catch (InvalidContentTypeException $invalidContentTypeException) {
                 $jsLintOutput[(string)$scriptUrl] = array(
@@ -186,18 +213,23 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                 );
 
                 $errorCount++;
-            } catch (\Guzzle\Http\Exception\CurlException $curlException) {
+            } catch (ConnectException $connectException) {
+                $curlException = GuzzleCurlExceptionFactory::fromConnectException($connectException);
+
                 $jsLintOutput[(string)$scriptUrl] = array(
                     'statusLine' => 'failed',
                     'errorReport' => array(
                         'reason' => 'curlException',
-                        'statusCode' => $curlException->getErrorNo()
+                        'statusCode' => $curlException->getCurlCode()
                     )
                 );
 
                 $errorCount++;
             }
         }
+
+        $this->getHttpClientService()->clearCookies();
+        $this->getHttpClientService()->clearBasicHttpAuthorization();
 
         foreach ($scriptValues as $scriptValue) {
             @unlink($this->getLocalJavaScriptResourcePathFromContent($scriptValue));
@@ -207,7 +239,11 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
 
         foreach ($jsLintOutput as $sourcePath => $sourcePathOutput) {
             if (preg_match('/^\/tmp\/[a-z0-9]{32}:[0-9]+:[0-9]+\.[0-9]+\.js$/', $sourcePathOutput['statusLine'])) {
-                $jsLintOutput[$sourcePath]['statusLine'] = substr($sourcePathOutput['statusLine'], 0, strpos($sourcePathOutput['statusLine'], ':'));
+                $jsLintOutput[$sourcePath]['statusLine'] = substr(
+                    $sourcePathOutput['statusLine'],
+                    0,
+                    strpos($sourcePathOutput['statusLine'], ':')
+                );
             }
         }
 
@@ -223,13 +259,13 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         return json_encode($jsLintOutput);
     }
 
-
     /**
+     * @param NodeJslintOutput $nodeJsLintOutput
      *
-     * @param \webignition\NodeJslintOutput\NodeJslintOutput $nodeJsLintOutput
      * @return int
      */
-    private function getNodeJsErrorCount(\webignition\NodeJslintOutput\NodeJslintOutput $nodeJsLintOutput) {
+    private function getNodeJsErrorCount(NodeJslintOutput $nodeJsLintOutput)
+    {
         $errorCount = $nodeJsLintOutput->getEntryCount();
         if ($nodeJsLintOutput->wasStopped()) {
             $errorCount--;
@@ -246,23 +282,35 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         return $errorCount;
     }
 
-    private function entryToArray(\webignition\NodeJslintOutput\Entry\Entry $entry) {
-        $output = array(
-            'headerLine' => array(
+    /**
+     * @param NodeJslintOutputEntry $entry
+     *
+     * @return array
+     */
+    private function entryToArray(NodeJslintOutputEntry $entry)
+    {
+        $output = [
+            'headerLine' => [
                 'errorNumber' => 1,
                 'errorMessage' => $entry->getReason()
-            ),
-            'fragmentLine' => array(
+            ],
+            'fragmentLine' => [
                 'fragment' => $entry->getEvidence(),
                 'lineNumber' => $entry->getLineNumber(),
                 'columnNumber' => $entry->getColumnNumber()
-            )
-        );
+            ]
+        ];
 
         return $output;
     }
 
-    private function nodeJsLintOutputToArray(\webignition\NodeJslintOutput\NodeJslintOutput $nodeJsLintOutput) {
+    /**
+     * @param NodeJslintOutput $nodeJsLintOutput
+     *
+     * @return array
+     */
+    private function nodeJsLintOutputToArray(NodeJslintOutput $nodeJsLintOutput)
+    {
         $output = array();
         $output['statusLine'] = $nodeJsLintOutput->getStatusLine();
         $output['entries'] = array();
@@ -275,13 +323,13 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         return $output;
     }
 
-
     /**
+     * @param Url $scriptUrl
      *
-     * @param \webignition\Url\Url $scriptUrl
      * @return boolean
      */
-    private function isScriptDomainIgnored(Url $scriptUrl) {
+    private function isScriptDomainIgnored(Url $scriptUrl)
+    {
         if (!$this->task->hasParameter('domains-to-ignore')) {
             return false;
         }
@@ -294,28 +342,35 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         return in_array($scriptUrl->getHost(), $domainsToIgnore);
     }
 
-
     /**
+     * @param string $url
      *
-     * @param type $url
-     * @return \webignition\NodeJslintOutput\NodeJslintOutput
+     * @return NodeJslintOutput
      */
-    private function validateJsFile($url) {
+    private function validateJsFile($url)
+    {
         $this->nodeJsLintWrapper->getConfiguration()->setUrlToLint($url);
         $response = $this->nodeJsLintWrapper->validate();
 
         return $response;
     }
 
-
-    private function configureNodeJslintWrapper() {
-        $this->getHttpClientService()->get()->setUserAgent('ST Link JS Static Analysis Task Driver (http://bit.ly/RlhKCL)');
-
-        $baseRequest = clone $this->getBaseRequest();
+    private function configureNodeJslintWrapper()
+    {
+        $this->getHttpClientService()->setUserAgent('ST Link JS Static Analysis Task Driver (http://bit.ly/RlhKCL)');
 
         $nodeJslintWrapper = $this->nodeJsLintWrapper;
-        $nodeJslintWrapper->getLocalProxy()->getConfiguration()->setBaseRequest($baseRequest);
-        $nodeJslintWrapper->getLocalProxy()->getWebResourceService()->getConfiguration()->enableRetryWithUrlEncodingDisabled();
+
+        $nodeJslintWrapper
+            ->getLocalProxy()
+            ->getConfiguration()
+            ->setHttpClient($this->getHttpClientService()->get());
+
+        $nodeJslintWrapper
+            ->getLocalProxy()
+            ->getWebResourceService()
+            ->getConfiguration()
+            ->enableRetryWithUrlEncodingDisabled();
 
         $nodeJslintWrapper->getConfiguration()->setNodeJslintPath($this->nodeJsLintPath);
         $nodeJslintWrapper->getConfiguration()->setNodePath($this->nodePath);
@@ -347,41 +402,43 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         }
     }
 
-
     /**
-     *
      * @param string $key
+     *
      * @return boolean
      */
-    private function isJslintParameter($key) {
+    private function isJslintParameter($key)
+    {
         return substr($key, 0, strlen(self::JSLINT_PARAMETER_NAME_PREFIX)) == self::JSLINT_PARAMETER_NAME_PREFIX;
     }
 
-
     /**
-     *
      * @param string $jsLintKey
+     *
      * @return boolean
      */
-    private function isJslintBooleanParameter($jsLintKey) {
+    private function isJslintBooleanParameter($jsLintKey)
+    {
         return in_array($jsLintKey, JsLintFlag::getList());
     }
 
     /**
-     *
      * @param string $jsLintKey
+     *
      * @return boolean
      */
-    private function isJslintOptionParameter($jsLintKey) {
+    private function isJslintOptionParameter($jsLintKey)
+    {
         return in_array($jsLintKey, JsLintOption::getList());
     }
 
     /**
-     *
      * @param string $jsLintKey
+     *
      * @return boolean
      */
-    private function isJsLintSingleOccurrenceOptionParameter($jsLintKey) {
+    private function isJsLintSingleOccurrenceOptionParameter($jsLintKey)
+    {
         $singleOccurrenceOptions = array(
             JsLintOption::INDENT,
             JsLintOption::MAXERR,
@@ -392,11 +449,12 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
     }
 
     /**
-     *
      * @param string $jsLintKey
+     *
      * @return boolean
      */
-    private function isJslintCollectionOptionParameter($jsLintKey) {
+    private function isJslintCollectionOptionParameter($jsLintKey)
+    {
         $singleOccurrenceOptions = array(
             JsLintOption::PREDEF
         );
@@ -404,13 +462,13 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         return $this->isJslintOptionParameter($jsLintKey) && in_array($jsLintKey, $singleOccurrenceOptions);
     }
 
-
     /**
-     *
      * @param string $content
+     *
      * @return string
      */
-    private function getLocalJavaScriptResourcePathFromContent($content) {
+    private function getLocalJavaScriptResourcePathFromContent($content)
+    {
         $key = $this->getLocalJavaScriptResourcePathKey($content);
         if (!isset($this->localResourcePaths[$key])) {
             $this->localResourcePaths[$key] = sys_get_temp_dir() . '/' . $key . ':' . microtime(true) . '.js';
@@ -419,27 +477,32 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         return $this->localResourcePaths[$key];
     }
 
-
     /**
-     *
      * @param string $content
+     *
      * @return string
      */
-    private function getLocalJavaScriptResourcePathKey($content) {
+    private function getLocalJavaScriptResourcePathKey($content)
+    {
         return md5($content) . ':' . $this->task->getId();
     }
 
-
     /**
-     *
      * @return array
      */
-    private function getScriptUrls() {
+    private function getScriptUrls()
+    {
         if ($this->webResource instanceof WebPage) {
             $webPage = clone $this->webResource;
         } else {
+            $httpMessageFactory = new HttpMessageFactory();
+
             $webPage = new WebPage();
-            $webPage->setHttpResponse(\Guzzle\Http\Message\Response::fromMessage("HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $this->webResource->getContent()));
+            $webPage->setHttpResponse(
+                $httpMessageFactory->fromMessage(
+                    "HTTP/1.0 200 OK\nContent-Type:text/html\n\n\" . $this->webResource->getContent()"
+                )
+            );
         }
 
         $scriptUrls = array();
@@ -452,7 +515,9 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
                 $absoluteUrlDeriver = new AbsoluteUrlDeriver($src, $thisUrl);
                 $absoluteScriptUrl = $absoluteUrlDeriver->getAbsoluteUrl();
 
-                if (!in_array($absoluteScriptUrl->getScheme(), $this->disallowedScriptUrlSchemes) && !in_array($absoluteScriptUrl, $scriptUrls)) {
+                $isAllowedUrlScheme = !in_array($absoluteScriptUrl->getScheme(), $this->disallowedScriptUrlSchemes);
+
+                if ($isAllowedUrlScheme && !in_array($absoluteScriptUrl, $scriptUrls)) {
                     $scriptUrls[] = $absoluteScriptUrl;
                 }
             }
@@ -461,14 +526,19 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
         return $scriptUrls;
     }
 
-
     /**
-     *
      * @return array
      */
-    private function getScriptValues() {
+    private function getScriptValues()
+    {
+        $httpMessageFactory = new HttpMessageFactory();
+
         $webPage = new WebPage();
-        $webPage->setHttpResponse(\Guzzle\Http\Message\Response::fromMessage("HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $this->webResource->getContent()));
+        $webPage->setHttpResponse(
+            $httpMessageFactory->fromMessage(
+                "HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $this->webResource->getContent()
+            )
+        );
 
         $scriptValues = array();
 
@@ -481,6 +551,4 @@ class JsLintTaskDriver extends WebResourceTaskDriver {
 
         return $scriptValues;
     }
-
-
 }

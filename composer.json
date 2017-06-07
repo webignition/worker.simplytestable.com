@@ -38,7 +38,7 @@
         "webignition/web-resource-service":">=1.2.1,<2.0",
         "webignition/html-document-type-extractor":">=0.1.1,<1.0",
         "webignition/html-document-type-validator":">=0.1,<1.0",
-        "webignition/node-jslint-wrapper":">=0.4,<1",
+        "webignition/node-jslint-wrapper":">=0.5,<1",
         "webignition/cookie-url-matcher":">=0.1,<1",
         "chrisboulton/php-resque": "dev-master",
         "chrisboulton/php-resque-scheduler": "dev-master",

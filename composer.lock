@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b3b032f0fb144a3d00a96121baa748ec",
+    "content-hash": "490490596a95e70053b496ea1b4e74f1",
     "packages": [
         {
             "name": "bcc/resque-bundle",
@@ -3979,16 +3979,16 @@
         },
         {
             "name": "webignition/node-jslint-wrapper",
-            "version": "0.4",
+            "version": "0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/node-jslint-wrapper.git",
-                "reference": "50bdc4c98440d810093133e27e32994a1bd4fab0"
+                "reference": "60e681ca3eb1598b81d0d05ff1ae2650f780298a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-wrapper/zipball/50bdc4c98440d810093133e27e32994a1bd4fab0",
-                "reference": "50bdc4c98440d810093133e27e32994a1bd4fab0",
+                "url": "https://api.github.com/repos/webignition/node-jslint-wrapper/zipball/60e681ca3eb1598b81d0d05ff1ae2650f780298a",
+                "reference": "60e681ca3eb1598b81d0d05ff1ae2650f780298a",
                 "shasum": ""
             },
             "require": {
@@ -3999,13 +3999,14 @@
             },
             "require-dev": {
                 "icanboogie/inflector": "1.0",
+                "mockery/mockery": "~0.9",
+                "php-mock/php-mock-mockery": "1.1.0",
                 "phpunit/phpunit": "~4.0"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\NodeJslint\\Wrapper\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -4024,7 +4025,7 @@
                 "jslint",
                 "wrapper"
             ],
-            "time": "2015-02-27T09:31:45+00:00"
+            "time": "2017-06-07T17:15:15+00:00"
         },
         {
             "name": "webignition/quoted-string",

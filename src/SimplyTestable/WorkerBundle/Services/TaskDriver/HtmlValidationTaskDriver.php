@@ -57,7 +57,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
     /**
      * @inheritdoc
      */
-    protected function hasNotSucceedHandler()
+    protected function hasNotSucceededHandler()
     {
         $this->response->setErrorCount(1);
 
@@ -223,14 +223,6 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
                 ]
             ]
         ];
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function isCorrectWebResourceType()
-    {
-        return $this->webResource instanceof WebPage;
     }
 
     /**

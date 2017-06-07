@@ -2,13 +2,10 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
-use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
-use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\Service\Service as WebResourceService;
-use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
 class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
@@ -39,9 +36,9 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
-    protected function hasNotSucceedHandler()
+    protected function hasNotSucceededHandler()
     {
         $this->response->setErrorCount(1);
 
@@ -84,14 +81,6 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
         }
 
         return json_encode($finder->getUniqueUrls());
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function isCorrectWebResourceType()
-    {
-        return $this->webResource instanceof WebPage;
     }
 
     /**
