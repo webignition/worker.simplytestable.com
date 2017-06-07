@@ -239,6 +239,10 @@ class HttpClientService
         $this->cookieSubscriber->getCookieJar()->clear();
         if (!empty($cookies)) {
             foreach ($cookies as $cookie) {
+                foreach ($cookie as $key => $value) {
+                    $cookie[ucfirst($key)] = $value;
+                }
+
                 $this->cookieSubscriber->getCookieJar()->setCookie(new SetCookie($cookie));
             }
         }

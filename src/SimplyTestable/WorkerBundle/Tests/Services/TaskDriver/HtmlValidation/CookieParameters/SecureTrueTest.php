@@ -2,24 +2,18 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\HtmlValidation\CookieParameters;
 
-class SecureTrueTest extends CookieParametersTest {   
-    
+class SecureTrueTest extends CookieParametersTest {
+
     protected function getTaskUrl() {
         return 'https://example.com/';
     }
-    
+
 
     protected function getExpectedRequestsOnWhichCookiesShouldBeSet() {
-        $requests = array();
-        
-        foreach ($this->getHttpClientService()->getHistory()->getAll() as $httpTransaction) {
-            $requests[] = $httpTransaction['request'];
-        }
-        
-        return $requests;          
+        return $this->getHttpClientService()->getHistory()->getRequests(true);
     }
 
-    protected function getExpectedRequestsOnWhichCookiesShouldNotBeSet() {        
-        return array();      
-    }    
+    protected function getExpectedRequestsOnWhichCookiesShouldNotBeSet() {
+        return array();
+    }
 }

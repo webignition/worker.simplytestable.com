@@ -1,7 +1,4 @@
 #services:
-#  simplytestable.services.htmlValidatorWrapperService:
-#    class:  webignition\HtmlValidator\Mock\Wrapper\Wrapper
-#
 #  simplytestable.services.cssValidatorWrapperService:
 #    class:  webignition\CssValidatorWrapper\Mock\Wrapper
 #
