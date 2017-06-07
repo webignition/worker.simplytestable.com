@@ -89,6 +89,9 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
         return json_encode($this->getWebResourceExceptionOutput());
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function isBlankWebResourceHandler()
     {
         $this->response->setHasBeenSkipped();
@@ -103,6 +106,9 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
         return $this->webResource instanceof WebPage;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function isNotCorrectWebResourceTypeHandler()
     {
         $this->response->setHasBeenSkipped();
@@ -110,6 +116,9 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
         $this->response->setErrorCount(0);
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function performValidation()
     {
         $vendorExtensionsParameter = $this->task->getParameter('vendor-extensions');

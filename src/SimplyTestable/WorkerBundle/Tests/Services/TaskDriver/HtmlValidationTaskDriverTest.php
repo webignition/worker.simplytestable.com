@@ -235,7 +235,7 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
         $this->setHtmlValidatorFixture($this->loadHtmlValidatorFixture('0-errors'));
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
-            'url' => TaskFactory::DEFAULT_TASK_URL,
+            'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
 
@@ -252,13 +252,13 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
     public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
         $this->setHttpFixtures([
-            "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html>"
+            "HTTP/1.1 200\nContent-Type:text/html\n\n<!doctype html>"
         ]);
 
         $this->setHtmlValidatorFixture($this->loadHtmlValidatorFixture('0-errors'));
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
-                'type' => 'html validation',
+                'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
         ]));
 

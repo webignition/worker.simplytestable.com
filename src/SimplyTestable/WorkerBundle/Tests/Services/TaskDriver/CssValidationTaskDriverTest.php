@@ -259,16 +259,16 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
      */
     public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->setHttpFixtures(array(
+        $this->setHttpFixtures([
             sprintf(
                 "HTTP/1.1 200\nContent-Type:text/html\n\n%s",
                 HtmlDocumentFactory::load('empty-body-single-css-link')
             ),
             "HTTP/1.1 200 OK\nContent-type:text-css\n\n"
-        ));
+        ]);
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
-            'type' => 'css validation',
+            'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
 
@@ -287,16 +287,16 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
      */
     public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->setHttpFixtures(array(
+        $this->setHttpFixtures([
             sprintf(
                 "HTTP/1.1 200\nContent-Type:text/html\n\n%s",
                 HtmlDocumentFactory::load('empty-body-single-css-link')
             ),
             "HTTP/1.1 200 OK\nContent-type:text-css\n\n"
-        ));
+        ]);
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
-            'type' => 'css validation',
+            'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
 

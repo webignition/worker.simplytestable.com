@@ -215,16 +215,16 @@ class LinkIntegrityTaskDriverTest extends FooWebResourceTaskDriverTest
      */
     public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->setHttpFixtures(array(
+        $this->setHttpFixtures([
             $this->createHtmlDocumentHttpFixture(
                 200,
                 '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
             ),
             "HTTP/1.1 200 OK\nContent-type:text-plain\n\n"
-        ));
+        ]);
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
-            'type' => 'link integrity',
+            'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
 
@@ -241,17 +241,17 @@ class LinkIntegrityTaskDriverTest extends FooWebResourceTaskDriverTest
      */
     public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->setHttpFixtures(array(
+        $this->setHttpFixtures([
             $this->createHtmlDocumentHttpFixture(
                 200,
                 '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
             ),
             "HTTP/1.1 200 OK\nContent-type:text-plain\n\n"
-        ));
+        ]);
 
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
-            'type' => 'link integrity',
+            'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
 
@@ -273,6 +273,6 @@ class LinkIntegrityTaskDriverTest extends FooWebResourceTaskDriverTest
      */
     private function createHtmlDocumentHttpFixture($statusCode, $htmlDocument)
     {
-        return sprintf("HTTP/1.0 %s\nContent-Type:text/html\n\n%s", $statusCode, $htmlDocument);
+        return sprintf("HTTP/1.1 %s\nContent-Type:text/html\n\n%s", $statusCode, $htmlDocument);
     }
 }
