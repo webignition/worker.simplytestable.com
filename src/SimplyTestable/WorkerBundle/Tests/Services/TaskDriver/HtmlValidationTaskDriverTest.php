@@ -226,29 +226,6 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
     }
 
     /**
-     * @param string $name
-     */
-    private function setHtmlValidatorFixture($fixture)
-    {
-        PHPMockery::mock(
-            'webignition\HtmlValidator\Wrapper',
-            'shell_exec'
-        )->andReturn(
-            $fixture
-        );
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    private function loadHtmlValidatorFixture($name)
-    {
-        return file_get_contents(__DIR__ . '/../../Fixtures/Data/RawHtmlValidatorOutput/' . $name . '.txt');
-    }
-
-    /**
      * @dataProvider cookiesDataProvider
      *
      * @param $taskValues
@@ -450,6 +427,29 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
                 'fileExists' => true,
             ],
         ];
+    }
+
+    /**
+     * @param string $fixture
+     */
+    private function setHtmlValidatorFixture($fixture)
+    {
+        PHPMockery::mock(
+            'webignition\HtmlValidator\Wrapper',
+            'shell_exec'
+        )->andReturn(
+            $fixture
+        );
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    private function loadHtmlValidatorFixture($name)
+    {
+        return file_get_contents(__DIR__ . '/../../Fixtures/Data/RawHtmlValidatorOutput/' . $name . '.txt');
     }
 
     /**
