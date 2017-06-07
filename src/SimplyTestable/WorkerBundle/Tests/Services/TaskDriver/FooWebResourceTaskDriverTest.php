@@ -7,6 +7,7 @@ use GuzzleHttp\Message\RequestInterface;
 use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
+use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
 abstract class FooWebResourceTaskDriverTest extends BaseSimplyTestableTestCase
@@ -30,6 +31,22 @@ abstract class FooWebResourceTaskDriverTest extends BaseSimplyTestableTestCase
      * @return string
      */
     abstract protected function getTaskTypeString();
+
+    /**
+     * @dataProvider cookiesDataProvider
+     *
+     * @param array $taskParameters
+     * @param string $expectedRequestCookieHeader
+     */
+    abstract public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader);
+
+    /**
+     * @dataProvider httpAuthDataProvider
+     *
+     * @param array $taskParameters
+     * @param string $expectedRequestAuthorizationHeaderValue
+     */
+    abstract public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue);
 
     public function testPerformNonCurlConnectException()
     {
@@ -69,7 +86,7 @@ abstract class FooWebResourceTaskDriverTest extends BaseSimplyTestableTestCase
         $expectedErrorCount,
         $expectedTaskOutput
     ) {
-        $this->setHttpFixtures($this->buildHttpFixtureSet($httpResponseFixtures));
+        $this->setHttpFixtures($httpResponseFixtures);
         $this->getWebResourceService()->getConfiguration()->disableRetryWithUrlEncodingDisabled();
 
         $task = $this->getTaskFactory()->create(
@@ -178,7 +195,7 @@ abstract class FooWebResourceTaskDriverTest extends BaseSimplyTestableTestCase
             ],
             'curl 3' => [
                 'httpResponseFixtures' => [
-                    'CURL/3: foo',
+                    ConnectExceptionFactory::create('CURL/3: foo'),
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -195,7 +212,7 @@ abstract class FooWebResourceTaskDriverTest extends BaseSimplyTestableTestCase
             ],
             'curl 6' => [
                 'httpResponseFixtures' => [
-                    'CURL/6: foo',
+                    ConnectExceptionFactory::create('CURL/6: foo'),
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -212,7 +229,7 @@ abstract class FooWebResourceTaskDriverTest extends BaseSimplyTestableTestCase
             ],
             'curl 28' => [
                 'httpResponseFixtures' => [
-                    'CURL/28: foo',
+                    ConnectExceptionFactory::create('CURL/28: foo'),
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -229,7 +246,7 @@ abstract class FooWebResourceTaskDriverTest extends BaseSimplyTestableTestCase
             ],
             'curl unknown' => [
                 'httpResponseFixtures' => [
-                    'CURL/55: foo',
+                    ConnectExceptionFactory::create('CURL/55: foo'),
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -263,6 +280,73 @@ abstract class FooWebResourceTaskDriverTest extends BaseSimplyTestableTestCase
                 'expectedErrorCount' => 0,
                 'expectedTaskOutput' =>
                     null
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function cookiesDataProvider()
+    {
+        return [
+            'no cookies' => [
+                'taskParameters' => [],
+                'expectedRequestCookieHeader' => '',
+            ],
+            'single cookie' => [
+                'taskParameters' => [
+                    'cookies' => [
+                        [
+                            'Name' => 'foo',
+                            'Value' => 'bar',
+                            'Domain' => '.example.com',
+                        ],
+                    ],
+                ],
+                'expectedRequestCookieHeader' => 'foo=bar',
+            ],
+            'multiple cookies' => [
+                'taskParameters' => [
+                    'cookies' => [
+                        [
+                            'Name' => 'foo1',
+                            'Value' => 'bar1',
+                            'Domain' => '.example.com',
+                        ],
+                        [
+                            'Name' => 'foo2',
+                            'Value' => 'bar2',
+                            'Domain' => 'foo2.example.com',
+                        ],
+                        [
+                            'Name' => 'foo3',
+                            'Value' => 'bar3',
+                            'Domain' => '.example.com',
+                        ],
+                    ],
+                ],
+                'expectedRequestCookieHeader' => 'foo1=bar1; foo3=bar3',
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function httpAuthDataProvider()
+    {
+        return [
+            'no auth' => [
+                'taskParameters' => [],
+                'expectedRequestAuthorizationHeaderValue' => '',
+            ],
+            'has auth' => [
+                'taskParameters' => [
+                    'http-auth-username' => 'foouser',
+                    'http-auth-password' => 'foopassword',
+                ],
+                'expectedRequestAuthorizationHeaderValue' => 'foouser:foopassword',
             ],
         ];
     }

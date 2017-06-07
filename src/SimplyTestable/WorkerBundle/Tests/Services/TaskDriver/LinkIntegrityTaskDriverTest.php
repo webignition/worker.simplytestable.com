@@ -2,9 +2,9 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 
-use GuzzleHttp\Exception\ConnectException;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
+use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
 /**
@@ -65,7 +65,7 @@ class LinkIntegrityTaskDriverTest extends FooWebResourceTaskDriverTest
         $expectedWarningCount,
         $expectedDecodedOutput
     ) {
-        $this->setHttpFixtures($this->buildHttpFixtureSet($httpFixtures));
+        $this->setHttpFixtures($httpFixtures);
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
@@ -154,7 +154,7 @@ class LinkIntegrityTaskDriverTest extends FooWebResourceTaskDriverTest
                         200,
                         '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
                     ),
-                    'CURL/28 Operation timed out.',
+                    ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
                 ],
                 'taskParameters' => [],
                 'expectedHasSucceeded' => true,
@@ -207,6 +207,63 @@ class LinkIntegrityTaskDriverTest extends FooWebResourceTaskDriverTest
                 'expectedDecodedOutput' => [],
             ],
         ];
+    }
+
+    /**
+     * @dataProvider cookiesDataProvider
+     * @inheritdoc
+     */
+    public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
+    {
+        $this->setHttpFixtures(array(
+            $this->createHtmlDocumentHttpFixture(
+                200,
+                '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
+            ),
+            "HTTP/1.1 200 OK\nContent-type:text-plain\n\n"
+        ));
+
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+            'type' => 'link integrity',
+            'parameters' => json_encode($taskParameters)
+        ]));
+
+        $this->taskDriver->perform($task);
+
+        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+            $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
+        }
+    }
+
+    /**
+     * @dataProvider httpAuthDataProvider
+     * @inheritdoc
+     */
+    public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
+    {
+        $this->setHttpFixtures(array(
+            $this->createHtmlDocumentHttpFixture(
+                200,
+                '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
+            ),
+            "HTTP/1.1 200 OK\nContent-type:text-plain\n\n"
+        ));
+
+
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+            'type' => 'link integrity',
+            'parameters' => json_encode($taskParameters)
+        ]));
+
+        $this->taskDriver->perform($task);
+
+        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+            $decodedAuthorizationHeaderValue = base64_decode(
+                str_replace('Basic', '', $request->getHeader('authorization'))
+            );
+
+            $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
+        }
     }
 
     /**

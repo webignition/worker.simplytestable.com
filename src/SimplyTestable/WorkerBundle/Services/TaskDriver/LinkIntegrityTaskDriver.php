@@ -83,7 +83,16 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver
         $linkChecker = $this->createLinkChecker();
 
         $this->getHttpClientService()->disableRetrySubscriber();
+        $this->getHttpClientService()->setCookies($this->task->getParameter('cookies'));
+        $this->getHttpClientService()->setBasicHttpAuthorization(
+            $this->task->getParameter('http-auth-username'),
+            $this->task->getParameter('http-auth-password')
+        );
+
         $linkCheckResults = $linkChecker->getAll();
+
+        $this->getHttpClientService()->clearCookies();
+        $this->getHttpClientService()->clearBasicHttpAuthorization();
         $this->getHttpClientService()->enableRetrySubscriber();
 
         $this->response->setErrorCount(count($linkChecker->getErrored()));

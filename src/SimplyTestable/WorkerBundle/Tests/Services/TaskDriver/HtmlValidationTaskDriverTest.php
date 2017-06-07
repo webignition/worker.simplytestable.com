@@ -5,10 +5,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 use phpmock\mockery\PHPMockery;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
-use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorOutputFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
-use webignition\HtmlValidator\Output\Output as HtmlValidatorOutput;
-use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 
 /**
  * Class HtmlValidationTaskDriverTest
@@ -56,9 +53,9 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
      */
     public function testPerformBadDocumentType($content, $expectedOutputMessage)
     {
-        $this->setHttpFixtures($this->buildHttpFixtureSet(array(
+        $this->setHttpFixtures([
             "HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $content
-        )));
+        ]);
 
         $task = $this->getTaskFactory()->create(
             TaskFactory::createTaskValuesFromDefaults()
@@ -125,9 +122,9 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
         $expectedErrorCount,
         $expectedDecodedOutput
     ) {
-        $this->setHttpFixtures($this->buildHttpFixtureSet(array(
+        $this->setHttpFixtures([
             "HTTP/1.0 200\nContent-Type:text/html\n\n" . $content
-        )));
+        ]);
 
         $task = $this->getTaskFactory()->create(
             TaskFactory::createTaskValuesFromDefaults()
@@ -227,31 +224,20 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
 
     /**
      * @dataProvider cookiesDataProvider
-     *
-     * @param $taskValues
-     * @param $expectedRequestCookieHeader
+     * @inheritdoc
      */
-    public function testSetCookiesOnHttpClient($taskValues, $expectedRequestCookieHeader)
+    public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->setHttpFixtures($this->buildHttpFixtureSet(array(
+        $this->setHttpFixtures([
             "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html>"
-        )));
+        ]);
 
-        $task = $this->getTaskFactory()->create($taskValues);
+        $this->setHtmlValidatorFixture($this->loadHtmlValidatorFixture('0-errors'));
 
-
-
-        $htmlValidatorWrapper = \Mockery::mock(HtmlValidatorWrapper::class);
-        $htmlValidatorWrapper
-            ->shouldReceive('createConfiguration');
-
-        $htmlValidatorWrapper
-            ->shouldReceive('validate')
-            ->andReturn(HtmlValidatorOutputFactory::create(
-                HtmlValidatorOutput::STATUS_VALID
-            ));
-
-        $this->taskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+            'url' => TaskFactory::DEFAULT_TASK_URL,
+            'parameters' => json_encode($taskParameters)
+        ]));
 
         $this->taskDriver->perform($task);
 
@@ -260,83 +246,21 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
     }
 
     /**
-     * @return array
-     */
-    public function cookiesDataProvider()
-    {
-        return [
-            'no cookies' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'parameters' => json_encode([]),
-                ]),
-                'expectedRequestCookieHeader' => '',
-            ],
-            'single cookie' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'parameters' => json_encode([
-                        'cookies' => [
-                            [
-                                'Name' => 'foo',
-                                'Value' => 'bar',
-                                'Domain' => '.example.com',
-                            ],
-                        ],
-                    ]),
-                ]),
-                'expectedRequestCookieHeader' => 'foo=bar',
-            ],
-            'multiple cookies' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'parameters' => json_encode([
-                        'cookies' => [
-                            [
-                                'Name' => 'foo1',
-                                'Value' => 'bar1',
-                                'Domain' => '.example.com',
-                            ],
-                            [
-                                'Name' => 'foo2',
-                                'Value' => 'bar2',
-                                'Domain' => '.example.com',
-                            ],
-                            [
-                                'Name' => 'foo3',
-                                'Value' => 'bar3',
-                                'Domain' => '.example.com',
-                            ],
-                        ],
-                    ]),
-                ]),
-                'expectedRequestCookieHeader' => 'foo1=bar1; foo2=bar2; foo3=bar3',
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider httpAuthDataProvider
-     *
-     * @param array $taskValues
-     * @param string $expectedRequestAuthorizationHeaderValue
+     * @inheritdoc
      */
-    public function testSetHttpAuthOnHttpClient($taskValues, $expectedRequestAuthorizationHeaderValue)
+    public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->setHttpFixtures($this->buildHttpFixtureSet(array(
+        $this->setHttpFixtures([
             "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html>"
-        )));
+        ]);
 
-        $task = $this->getTaskFactory()->create($taskValues);
+        $this->setHtmlValidatorFixture($this->loadHtmlValidatorFixture('0-errors'));
 
-        $htmlValidatorWrapper = \Mockery::mock(HtmlValidatorWrapper::class);
-        $htmlValidatorWrapper
-            ->shouldReceive('createConfiguration');
-
-        $htmlValidatorWrapper
-            ->shouldReceive('validate')
-            ->andReturn(HtmlValidatorOutputFactory::create(
-                HtmlValidatorOutput::STATUS_VALID
-            ));
-
-        $this->taskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+                'type' => 'html validation',
+                'parameters' => json_encode($taskParameters),
+        ]));
 
         $this->taskDriver->perform($task);
 
@@ -347,30 +271,6 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
         );
 
         $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
-    }
-
-    /**
-     * @return array
-     */
-    public function httpAuthDataProvider()
-    {
-        return [
-            'no auth' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'parameters' => json_encode([]),
-                ]),
-                'expectedRequestAuthorizationHeaderValue' => '',
-            ],
-            'has auth' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'parameters' => json_encode([
-                        'http-auth-username' => 'foouser',
-                        'http-auth-password' => 'foopassword',
-                    ]),
-                ]),
-                'expectedRequestAuthorizationHeaderValue' => 'foouser:foopassword',
-            ],
-        ];
     }
 
     /**
@@ -389,27 +289,15 @@ class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
             file_put_contents($tmpFilePath, $content);
         }
 
-        $this->setHttpFixtures($this->buildHttpFixtureSet(array(
+        $this->setHttpFixtures([
             "HTTP/1.0 200\nContent-Type:text/html\n\n" . $content
-        )));
+        ]);
+
+        $this->setHtmlValidatorFixture($this->loadHtmlValidatorFixture('0-errors'));
 
         $task = $this->getTaskFactory()->create(
             TaskFactory::createTaskValuesFromDefaults()
         );
-
-        $htmlValidatorWrapper = \Mockery::mock(HtmlValidatorWrapper::class);
-        $htmlValidatorWrapper
-            ->shouldReceive('createConfiguration');
-
-        $htmlValidatorOutput = HtmlValidatorOutputFactory::create(
-            HtmlValidatorOutput::STATUS_VALID
-        );
-
-        $htmlValidatorWrapper
-            ->shouldReceive('validate')
-            ->andReturn($htmlValidatorOutput);
-
-        $this->taskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
 
         $this->taskDriver->perform($task);
     }

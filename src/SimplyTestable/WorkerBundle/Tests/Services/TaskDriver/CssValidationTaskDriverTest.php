@@ -2,17 +2,12 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 
-use Mockery\MockInterface;
 use phpmock\mockery\PHPMockery;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
+use SimplyTestable\WorkerBundle\Tests\Factory\HtmlDocumentFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
-use webignition\CssValidatorOutput\CssValidatorOutput;
-use webignition\CssValidatorOutput\Message\Error as CssValidatorOutputError;
-use webignition\CssValidatorWrapper\Configuration\Configuration as CssValidatorWrapperConfiguration;
-use webignition\WebResource\Service\Configuration as WebResourceServiceConfiguration;
-use webignition\WebResource\Service\Service as WebResourceService;
 
 /**
  * Class CssValidationTaskDriverTest
@@ -175,7 +170,7 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
                 'httpFixtures' => [
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
-                        $this->loadHtmlDocumentFixture('empty-body-single-css-link')
+                        HtmlDocumentFactory::load('empty-body-single-css-link')
                     ),
                     "HTTP/1.1 404 Not Found",
                     "HTTP/1.1 404 Not Found",
@@ -200,7 +195,7 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
                 'httpFixtures' => [
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
-                        $this->loadHtmlDocumentFixture('empty-body-single-css-link')
+                        HtmlDocumentFactory::load('empty-body-single-css-link')
                     ),
                     "HTTP/1.1 500 Internal Server Error",
                     "HTTP/1.1 500 Internal Server Error",
@@ -235,7 +230,7 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
                 'httpFixtures' => [
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
-                        $this->loadHtmlDocumentFixture('empty-body-single-css-link')
+                        HtmlDocumentFactory::load('empty-body-single-css-link')
                     ),
                     ConnectExceptionFactory::create('CURL/6 foo')
                 ],
@@ -259,68 +254,63 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
     }
 
     /**
-     * @param MockInterface $cssValidatorWrapper
+     * @dataProvider cookiesDataProvider
+     * @inheritdoc
      */
-    private function createEnableRetryWithUrlEncodingDisabledExpectations(MockInterface $cssValidatorWrapper)
+    public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
     {
-        $webResourceServiceConfiguration = \Mockery::mock(WebResourceServiceConfiguration::class);
-        $webResourceServiceConfiguration
-            ->shouldReceive('enableRetryWithUrlEncodingDisabled')
-            ->once()
-            ->withNoArgs();
+        $this->setHttpFixtures(array(
+            sprintf(
+                "HTTP/1.1 200\nContent-Type:text/html\n\n%s",
+                HtmlDocumentFactory::load('empty-body-single-css-link')
+            ),
+            "HTTP/1.1 200 OK\nContent-type:text-css\n\n"
+        ));
 
-        $webResourceService = \Mockery::mock(WebResourceService::class);
-        $webResourceService
-            ->shouldReceive('getConfiguration')
-            ->once()
-            ->withNoArgs()
-            ->andReturn($webResourceServiceConfiguration);
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+            'type' => 'css validation',
+            'parameters' => json_encode($taskParameters)
+        ]));
 
-        $cssValidatorWrapperConfiguration = \Mockery::mock(CssValidatorWrapperConfiguration::class);
-        $cssValidatorWrapperConfiguration
-            ->shouldReceive('getWebResourceService')
-            ->once()
-            ->withNoArgs()
-            ->andReturn($webResourceService);
+        $this->setCssValidatorRawOutput($this->loadCssValidatorFixture('no-messages'));
 
-        $cssValidatorWrapper
-            ->shouldReceive('getConfiguration')
-            ->once()
-            ->withNoArgs()
-            ->andReturn($cssValidatorWrapperConfiguration);
+        $this->taskDriver->perform($task);
+
+        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+            $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
+        }
     }
 
     /**
-     * @return MockInterface|CssValidatorOutput
+     * @dataProvider httpAuthDataProvider
+     * @inheritdoc
      */
-    private function createCssValidatorOutput($hasException, $errorCount, $warningCount, $messages)
+    public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $output = \Mockery::mock(CssValidatorOutput::class);
-        $output
-            ->shouldReceive('hasException')
-            ->once()
-            ->withNoArgs()
-            ->andReturn($hasException);
+        $this->setHttpFixtures(array(
+            sprintf(
+                "HTTP/1.1 200\nContent-Type:text/html\n\n%s",
+                HtmlDocumentFactory::load('empty-body-single-css-link')
+            ),
+            "HTTP/1.1 200 OK\nContent-type:text-css\n\n"
+        ));
 
-        $output
-            ->shouldReceive('getErrorCount')
-            ->once()
-            ->withNoArgs()
-            ->andReturn($errorCount);
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+            'type' => 'css validation',
+            'parameters' => json_encode($taskParameters)
+        ]));
 
-        $output
-            ->shouldReceive('getWarningCount')
-            ->once()
-            ->withNoArgs()
-            ->andReturn($warningCount);
+        $this->setCssValidatorRawOutput($this->loadCssValidatorFixture('no-messages'));
 
-        $output
-            ->shouldReceive('getMessages')
-            ->once()
-            ->withNoArgs()
-            ->andReturn($messages);
+        $this->taskDriver->perform($task);
 
-        return $output;
+        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+            $decodedAuthorizationHeaderValue = base64_decode(
+                str_replace('Basic', '', $request->getHeader('authorization'))
+            );
+
+            $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
+        }
     }
 
     /**
@@ -344,30 +334,6 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
     private function loadCssValidatorFixture($name)
     {
         return file_get_contents(__DIR__ . '/../../Fixtures/Data/RawCssValidatorOutput/' . $name . '.txt');
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    private function loadHtmlDocumentFixture($name)
-    {
-        return file_get_contents(__DIR__ . '/../../Fixtures/Data/HtmlDocuments/' . $name . '.html');
-    }
-
-    /**
-     * @return CssValidatorOutputError
-     */
-    private function createCssValidatorOutputError($message, $context, $ref, $lineNumber)
-    {
-        $error = new CssValidatorOutputError();
-        $error->setMessage($message);
-        $error->setContext($context);
-        $error->setRef($ref);
-        $error->setLineNumber($lineNumber);
-
-        return $error;
     }
 
     /**

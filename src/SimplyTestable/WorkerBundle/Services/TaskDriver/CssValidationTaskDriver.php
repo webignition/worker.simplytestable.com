@@ -136,6 +136,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
             CssValidatorWrapperConfiguration::CONFIG_KEY_VENDOR_EXTENSION_SEVERITY_LEVEL =>
                 $vendorExtensionSeverityLevel,
             CssValidatorWrapperConfiguration::CONFIG_KEY_URL_TO_VALIDATE => $this->webResource->getUrl(),
+            CssValidatorWrapperConfiguration::CONFIG_KEY_CONTENT_TO_VALIDATE => $this->webResource->getContent(),
             CssValidatorWrapperConfiguration::CONFIG_KEY_FLAGS => $cssValidatorFlags,
             CssValidatorWrapperConfiguration::CONFIG_KEY_DOMAINS_TO_IGNORE => $domainsToIgnore,
             CssValidatorWrapperConfiguration::CONFIG_KEY_HTTP_CLIENT => $this->getHttpClientService()->get(),
@@ -149,7 +150,16 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
             ->getConfiguration()
             ->enableRetryWithUrlEncodingDisabled();
 
+        $this->getHttpClientService()->setCookies($this->task->getParameter('cookies'));
+        $this->getHttpClientService()->setBasicHttpAuthorization(
+            $this->task->getParameter('http-auth-username'),
+            $this->task->getParameter('http-auth-password')
+        );
+
         $cssValidatorOutput = $this->cssValidatorWrapper->validate();
+
+        $this->getHttpClientService()->clearCookies();
+        $this->getHttpClientService()->clearBasicHttpAuthorization();
 
         if ($cssValidatorOutput->hasException()) {
             // Will only get unknown CSS validator exceptions here
