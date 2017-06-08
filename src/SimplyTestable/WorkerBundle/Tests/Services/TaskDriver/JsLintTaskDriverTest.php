@@ -5,16 +5,12 @@ namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 use phpmock\mockery\PHPMockery;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
+use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlDocumentFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+use webignition\NodeJslintOutput\Exception as NodeJslintOutputException;
 
-/**
- * Class JsLintTaskDriverTest
- * @package SimplyTestable\WorkerBundle\Tests\Services\TaskDriver
- *
- * @group foo-tests
- */
-class JsLintTaskDriverTest extends FooWebResourceTaskDriverTest
+class JsLintTaskDriverTest extends WebResourceTaskDriverTest
 {
     /**
      * @var JsLintTaskDriver
@@ -46,19 +42,48 @@ class JsLintTaskDriverTest extends FooWebResourceTaskDriverTest
         return strtolower(TaskTypeService::JS_STATIC_ANALYSIS_NAME);
     }
 
+    public function testIncorrectPathToNodeJsLint()
+    {
+        $this->setHttpFixtures([
+            sprintf(
+                "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                HtmlDocumentFactory::load('empty-body-single-js-link')
+            ),
+            "HTTP/1.1 200 OK\nContent-type:application/javascript\n\n",
+        ]);
+
+        $task = $this->getTaskFactory()->create(
+            TaskFactory::createTaskValuesFromDefaults([
+                'type' => $this->getTaskTypeString(),
+            ])
+        );
+
+        $this->setJsLintRawOutput([
+            $this->loadJsLintFixture('incorrect-path-to-node-jslint.txt'),
+        ]);
+
+        $this->setExpectedException(
+            NodeJslintOutputException::class,
+            'node-jslint not found at "/home/example/node_modules/jslint/bin/jslint.js"',
+            3
+        );
+
+        $this->taskDriver->perform($task);
+    }
+
     /**
      * @dataProvider performDataProvider
      *
      * @param array $httpFixtures
      * @param array $taskParameters
-     * @param string $jsLintRawOutput
+     * @param string[] $jsLintRawOutput
      * @param bool $expectedHasSucceeded
      * @param bool $expectedIsRetryable
      * @param int $expectedErrorCount
      * @param int $expectedWarningCount
-     * @param array $expectedDecodedOutput
+     * @param string[] $expectedDecodedOutputKeys
      */
-    public function testPerformFoo(
+    public function testPerform(
         $httpFixtures,
         $taskParameters,
         $jsLintRawOutput,
@@ -66,7 +91,7 @@ class JsLintTaskDriverTest extends FooWebResourceTaskDriverTest
         $expectedIsRetryable,
         $expectedErrorCount,
         $expectedWarningCount,
-        $expectedDecodedOutput
+        $expectedDecodedOutputKeys
     ) {
         $this->setHttpFixtures($httpFixtures);
 
@@ -80,12 +105,13 @@ class JsLintTaskDriverTest extends FooWebResourceTaskDriverTest
         $this->setJsLintRawOutput($jsLintRawOutput);
 
         $taskDriverResponse = $this->taskDriver->perform($task);
+        $decodedTaskOutput = json_decode($taskDriverResponse->getTaskOutput()->getOutput(), true);
 
-//        $this->assertEquals($expectedHasSucceeded, $taskDriverResponse->hasSucceeded());
-//        $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
-//        $this->assertEquals($expectedErrorCount, $taskDriverResponse->getErrorCount());
-//        $this->assertEquals($expectedWarningCount, $taskDriverResponse->getWarningCount());
-//        $this->assertEquals($expectedDecodedOutput, json_decode($taskDriverResponse->getTaskOutput()->getOutput()));
+        $this->assertEquals($expectedHasSucceeded, $taskDriverResponse->hasSucceeded());
+        $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
+        $this->assertEquals($expectedErrorCount, $taskDriverResponse->getErrorCount());
+        $this->assertEquals($expectedWarningCount, $taskDriverResponse->getWarningCount());
+        $this->assertEquals($expectedDecodedOutputKeys, array_keys($decodedTaskOutput));
     }
 
     /**
@@ -94,176 +120,225 @@ class JsLintTaskDriverTest extends FooWebResourceTaskDriverTest
     public function performDataProvider()
     {
         return [
-            'unknown validator exception' => [
+            'no js' => [
                 'httpFixtures' => [
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('minimal')
-                    )
+                    ),
                 ],
                 'taskParameters' => [],
-                'cssValidatorOutput' => $this->loadJsLintFixture('no-errors'),
+                'jsLintRawOutput' => [$this->loadJsLintFixture('no-errors.json')],
                 'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => false,
+                'expectedIsRetryable' => true,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
-//            'unknown validator exception' => [
-//                'httpFixtures' => [
-//                    "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
-//                ],
-//                'taskParameters' => [],
-//                'cssValidatorOutput' => $this->loadCssValidatorFixture('unknown-exception'),
-//                'expectedHasSucceeded' => false,
-//                'expectedIsRetryable' => false,
-//                'expectedErrorCount' => 1,
-//                'expectedWarningCount' => 0,
-//                'expectedDecodedOutput' => [
-//                    (object)[
-//                        'message' => 'Unknown error',
-//                        'class' => 'css-validation-exception-unknown',
-//                        'type' => 'error',
-//                        'context' => '',
-//                        'ref' => 'http://example.com/',
-//                        'line_number' => 0,
-//                    ],
-//                ],
-//            ],
-//            'no errors, ignore warnings' => [
-//                'httpFixtures' => [
-//                    "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
-//                ],
-//                'taskParameters' => [
-//                    'ignore-warnings' => true,
-//                ],
-//                'cssValidatorOutput' => $this->loadCssValidatorFixture('1-vendor-extension-warning'),
-//                'expectedHasSucceeded' => true,
-//                'expectedIsRetryable' => true,
-//                'expectedErrorCount' => 0,
-//                'expectedWarningCount' => 0,
-//                'expectedDecodedOutput' => [],
-//            ],
-//            'three errors' => [
-//                'httpFixtures' => [
-//                    "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
-//                ],
-//                'taskParameters' => [
-//                    'ignore-warnings' => true,
-//                ],
-//                'cssValidatorOutput' => $this->loadCssValidatorFixture('3-errors'),
-//                'expectedHasSucceeded' => true,
-//                'expectedIsRetryable' => true,
-//                'expectedErrorCount' => 3,
-//                'expectedWarningCount' => 0,
-//                'expectedDecodedOutput' => [
-//                    (object)[
-//                        'message' => 'one',
-//                        'context' => 'audio, canvas, video',
-//                        'line_number' => 1,
-//                        'type' => 'error',
-//                        'ref' => 'http://example.com/',
-//                    ],
-//                    (object)[
-//                        'message' => 'two',
-//                        'context' => 'html',
-//                        'line_number' => 2,
-//                        'type' => 'error',
-//                        'ref' => 'http://example.com/',
-//                    ],
-//                    (object)[
-//                        'message' => 'three',
-//                        'context' => '.hide-text',
-//                        'line_number' => 3,
-//                        'type' => 'error',
-//                        'ref' => 'http://example.com/',
-//                    ],
-//                ],
-//            ],
-//            'http 404 getting linked resource' => [
-//                'httpFixtures' => [
-//                    sprintf(
-//                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
-//                        HtmlDocumentFactory::load('empty-body-single-css-link')
-//                    ),
-//                    "HTTP/1.1 404 Not Found",
-//                    "HTTP/1.1 404 Not Found",
-//                ],
-//                'taskParameters' => [],
-//                'cssValidatorOutput' => $this->loadCssValidatorFixture('no-messages'),
-//                'expectedHasSucceeded' => true,
-//                'expectedIsRetryable' => true,
-//                'expectedErrorCount' => 1,
-//                'expectedWarningCount' => 0,
-//                'expectedDecodedOutput' => [
-//                    (object)[
-//                        'message' => 'http-retrieval-404',
-//                        'type' => 'error',
-//                        'context' => '',
-//                        'ref' => 'http://example.com/style.css',
-//                        'line_number' => 0,
-//                    ],
-//                ],
-//            ],
-//            'http 500 getting linked resource' => [
-//                'httpFixtures' => [
-//                    sprintf(
-//                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
-//                        HtmlDocumentFactory::load('empty-body-single-css-link')
-//                    ),
-//                    "HTTP/1.1 500 Internal Server Error",
-//                    "HTTP/1.1 500 Internal Server Error",
-//                    "HTTP/1.1 500 Internal Server Error",
-//                    "HTTP/1.1 500 Internal Server Error",
-//                    "HTTP/1.1 500 Internal Server Error",
-//                    "HTTP/1.1 500 Internal Server Error",
-//                    "HTTP/1.1 500 Internal Server Error",
-//                    "HTTP/1.1 500 Internal Server Error",
-//                    "HTTP/1.1 500 Internal Server Error",
-//                    "HTTP/1.1 500 Internal Server Error",
-//                    "HTTP/1.1 500 Internal Server Error",
-//                    "HTTP/1.1 500 Internal Server Error",
-//                ],
-//                'taskParameters' => [],
-//                'cssValidatorOutput' => $this->loadCssValidatorFixture('no-messages'),
-//                'expectedHasSucceeded' => true,
-//                'expectedIsRetryable' => true,
-//                'expectedErrorCount' => 1,
-//                'expectedWarningCount' => 0,
-//                'expectedDecodedOutput' => [
-//                    (object)[
-//                        'message' => 'http-retrieval-500',
-//                        'type' => 'error',
-//                        'context' => '',
-//                        'ref' => 'http://example.com/style.css',
-//                        'line_number' => 0,
-//                    ],
-//                ],
-//            ],
-//            'curl 6 getting linked resource' => [
-//                'httpFixtures' => [
-//                    sprintf(
-//                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
-//                        HtmlDocumentFactory::load('empty-body-single-css-link')
-//                    ),
-//                    ConnectExceptionFactory::create('CURL/6 foo')
-//                ],
-//                'taskParameters' => [],
-//                'cssValidatorOutput' => $this->loadCssValidatorFixture('no-messages'),
-//                'expectedHasSucceeded' => true,
-//                'expectedIsRetryable' => true,
-//                'expectedErrorCount' => 1,
-//                'expectedWarningCount' => 0,
-//                'expectedDecodedOutput' => [
-//                    (object)[
-//                        'message' => 'http-retrieval-curl-code-6',
-//                        'type' => 'error',
-//                        'context' => '',
-//                        'ref' => 'http://example.com/style.css',
-//                        'line_number' => 0,
-//                    ],
-//                ],
-//            ],
+            'script elements, has errors' => [
+                'httpFixtures' => [
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('js-script-elements')
+                    ),
+                    "HTTP/1.1 200 OK\nContent-type:application/javascript\n\n",
+                ],
+                'taskParameters' => [
+                    'domains-to-ignore' => [
+                        'bar.example.com'
+                    ],
+                    'jslint-option-sloppy' => true,
+                    'jslint-option-debug' => false,
+                    'jslint-option-maxerr' => 50,
+                    'jslint-option-predef' => 'window',
+                ],
+                'jsLintRawOutput' => [
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('too-many-errors-stopped-at-seven-percent.json'),
+                ],
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 1,
+                'expectedWarningCount' => 0,
+                'expectedDecodedOutputKeys' => [
+                    'http://example.com/foo.js',
+                    '7dc508faa82075c1039d38c6522c2124',
+                ],
+            ],
+            'script elements, stopped' => [
+                'httpFixtures' => [
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('js-script-elements')
+                    ),
+                    "HTTP/1.1 200 OK\nContent-type:application/javascript\n\n",
+                ],
+                'taskParameters' => [
+                    'domains-to-ignore' => [
+                        'bar.example.com'
+                    ],
+                    'jslint-option-predef' => ['window'],
+                ],
+                'jsLintRawOutput' => [
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('stopped-no-error.json'),
+                ],
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 0,
+                'expectedWarningCount' => 0,
+                'expectedDecodedOutputKeys' => [
+                    'http://example.com/foo.js',
+                    '7dc508faa82075c1039d38c6522c2124',
+                ],
+            ],
+            'invalid content type exception on linked resource' => [
+                'httpFixtures' => [
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('js-script-elements')
+                    ),
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
+                    "HTTP/1.1 200 OK\nContent-type:text/html"
+                ],
+                'taskParameters' => [
+                    'domains-to-ignore' => 'foo',
+                ],
+                'jsLintRawOutput' => [
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('no-errors.json'),
+                ],
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 2,
+                'expectedWarningCount' => 0,
+                'expectedDecodedOutputKeys' => [
+                    'http://example.com/foo.js',
+                    'http://bar.example.com/bar.js',
+                    '7dc508faa82075c1039d38c6522c2124',
+                ],
+            ],
+            'http 404 getting linked resource' => [
+                'httpFixtures' => [
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('js-script-elements')
+                    ),
+                    "HTTP/1.1 404 Not Found",
+                    "HTTP/1.1 404 Not Found",
+                ],
+                'taskParameters' => [
+                    'domains-to-ignore' => [
+                        'bar.example.com'
+                    ],
+                ],
+                'jsLintRawOutput' => [
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('no-errors.json'),
+                ],
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 1,
+                'expectedWarningCount' => 0,
+                'expectedDecodedOutputKeys' => [
+                    'http://example.com/foo.js',
+                    '7dc508faa82075c1039d38c6522c2124',
+                ],
+            ],
+            'http 500 getting linked resource' => [
+                'httpFixtures' => [
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('js-script-elements')
+                    ),
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                ],
+                'taskParameters' => [
+                    'domains-to-ignore' => [
+                        'bar.example.com'
+                    ],
+                ],
+                'jsLintRawOutput' => [
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('no-errors.json'),
+                ],
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 1,
+                'expectedWarningCount' => 0,
+                'expectedDecodedOutputKeys' => [
+                    'http://example.com/foo.js',
+                    '7dc508faa82075c1039d38c6522c2124',
+                ],
+            ],
+            'curl 6 getting linked resource' => [
+                'httpFixtures' => [
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('js-script-elements')
+                    ),
+                    ConnectExceptionFactory::create('CURL/6 foo'),
+                ],
+                'taskParameters' => [
+                    'domains-to-ignore' => [
+                        'bar.example.com'
+                    ],
+                ],
+                'jsLintRawOutput' => [
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('no-errors.json'),
+                ],
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 1,
+                'expectedWarningCount' => 0,
+                'expectedDecodedOutputKeys' => [
+                    'http://example.com/foo.js',
+                    '7dc508faa82075c1039d38c6522c2124',
+                ],
+            ],
+            'curl 28 getting linked resource' => [
+                'httpFixtures' => [
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('js-script-elements')
+                    ),
+                    ConnectExceptionFactory::create('CURL/28 foo'),
+                ],
+                'taskParameters' => [
+                    'domains-to-ignore' => [
+                        'bar.example.com'
+                    ],
+                ],
+                'jsLintRawOutput' => [
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('no-errors.json'),
+                ],
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 1,
+                'expectedWarningCount' => 0,
+                'expectedDecodedOutputKeys' => [
+                    'http://example.com/foo.js',
+                    '7dc508faa82075c1039d38c6522c2124',
+                ],
+            ],
         ];
     }
 
@@ -286,7 +361,9 @@ class JsLintTaskDriverTest extends FooWebResourceTaskDriverTest
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->setJsLintRawOutput($this->loadJsLintFixture('no-errors'));
+        $this->setJsLintRawOutput([
+            $this->loadJsLintFixture('no-errors.json')
+        ]);
 
         $this->taskDriver->perform($task);
 
@@ -314,7 +391,9 @@ class JsLintTaskDriverTest extends FooWebResourceTaskDriverTest
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->setJsLintRawOutput($this->loadJsLintFixture('no-errors'));
+        $this->setJsLintRawOutput([
+            $this->loadJsLintFixture('no-errors.json')
+        ]);
 
         $this->taskDriver->perform($task);
 
@@ -328,15 +407,15 @@ class JsLintTaskDriverTest extends FooWebResourceTaskDriverTest
     }
 
     /**
-     * @param string $fixture
+     * @param string[] $fixtures
      */
-    protected function setJsLintRawOutput($fixture)
+    protected function setJsLintRawOutput($fixtures)
     {
         PHPMockery::mock(
             'webignition\NodeJslint\Wrapper',
             'shell_exec'
-        )->andReturn(
-            $fixture
+        )->andReturnValues(
+            $fixtures
         );
     }
 
@@ -347,7 +426,7 @@ class JsLintTaskDriverTest extends FooWebResourceTaskDriverTest
      */
     private function loadJsLintFixture($name)
     {
-        return file_get_contents(__DIR__ . '/../../Fixtures/Data/RawJsLintOutput/' . $name . '.txt');
+        return file_get_contents(__DIR__ . '/../../Fixtures/Data/RawJsLintOutput/' . $name);
     }
 
     /**

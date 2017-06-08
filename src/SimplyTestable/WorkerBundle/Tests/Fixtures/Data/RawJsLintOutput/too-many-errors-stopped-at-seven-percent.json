@@ -1,0 +1,19 @@
+[
+  "/tmp/2be27b536970c6988a1f387359237529:1:1379085668.7688.js",
+  [
+    {
+      "id": "(error)",
+      "raw": "Missing 'use strict' statement.",
+      "evidence": "var excessivelyLongName = 'bar';var excessivelyLongName = 'bar';var excessivelyLongName = 'bar';var excessivelyLongName = 'bar';var excessivelyLongName = 'bar';var excessivelyLongName = 'bar';var excessivelyLongName = 'bar';var excessivelyLongName = 'bar';var excessivelyLongName = 'bar';",
+      "line": 6,
+      "character": 5,
+      "a": "var",
+      "reason": "Missing 'use strict' statement."
+    },
+    {
+      "reason": "Too many errors. (7% scanned).",
+      "line": 113,
+      "character": 1
+    }
+  ]
+]

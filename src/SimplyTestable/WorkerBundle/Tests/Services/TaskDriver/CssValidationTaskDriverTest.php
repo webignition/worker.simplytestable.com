@@ -9,13 +9,7 @@ use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlDocumentFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
-/**
- * Class CssValidationTaskDriverTest
- * @package SimplyTestable\WorkerBundle\Tests\Services\TaskDriver
- *
- * @group foo-tests
- */
-class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
+class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
 {
     /**
      * @var CssValidationTaskDriver
@@ -59,7 +53,7 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
      * @param int $expectedWarningCount
      * @param array $expectedDecodedOutput
      */
-    public function testPerformFoo(
+    public function testPerform(
         $httpFixtures,
         $taskParameters,
         $cssValidatorOutput,

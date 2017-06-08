@@ -20,7 +20,6 @@ use webignition\NodeJslint\Wrapper\Configuration\Option\JsLint as JsLintOption;
 use webignition\NodeJslintOutput\Exception as NodeJslintOutputException;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptionFactory;
 use webignition\NodeJslintOutput\Entry\Entry as NodeJslintOutputEntry;
-use GuzzleHttp\Message\MessageFactory as HttpMessageFactory;
 
 class JsLintTaskDriver extends WebResourceTaskDriver
 {
@@ -238,16 +237,6 @@ class JsLintTaskDriver extends WebResourceTaskDriver
         $this->response->setErrorCount($errorCount);
 
         foreach ($jsLintOutput as $sourcePath => $sourcePathOutput) {
-            if (preg_match('/^\/tmp\/[a-z0-9]{32}:[0-9]+:[0-9]+\.[0-9]+\.js$/', $sourcePathOutput['statusLine'])) {
-                $jsLintOutput[$sourcePath]['statusLine'] = substr(
-                    $sourcePathOutput['statusLine'],
-                    0,
-                    strpos($sourcePathOutput['statusLine'], ':')
-                );
-            }
-        }
-
-        foreach ($jsLintOutput as $sourcePath => $sourcePathOutput) {
             if (preg_match('/^file:\/tmp\/[a-z0-9]{32}:[0-9]+:[0-9]+\.[0-9]+\.js$/', $sourcePath)) {
                 $newSourcePath = preg_replace('/^file:\/tmp\//', '', $sourcePath);
                 $firstColonPosition = strpos($newSourcePath, ':');
@@ -275,11 +264,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver
             $errorCount--;
         }
 
-        if ($errorCount < 0) {
-            $errorCount = 0;
-        }
-
-        return $errorCount;
+        return max(0, $errorCount);
     }
 
     /**
@@ -335,11 +320,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver
         }
 
         $domainsToIgnore = $this->task->getParameter('domains-to-ignore');
-        if (!is_array($domainsToIgnore)) {
-            return false;
-        }
 
-        return in_array($scriptUrl->getHost(), $domainsToIgnore);
+        return is_array($domainsToIgnore) && in_array($scriptUrl->getHost(), $domainsToIgnore);
     }
 
     /**
@@ -492,21 +474,10 @@ class JsLintTaskDriver extends WebResourceTaskDriver
      */
     private function getScriptUrls()
     {
-        if ($this->webResource instanceof WebPage) {
-            $webPage = clone $this->webResource;
-        } else {
-            $httpMessageFactory = new HttpMessageFactory();
-
-            $webPage = new WebPage();
-            $webPage->setHttpResponse(
-                $httpMessageFactory->fromMessage(
-                    "HTTP/1.0 200 OK\nContent-Type:text/html\n\n\" . $this->webResource->getContent()"
-                )
-            );
-        }
+        /* @var WebPage $webPage */
+        $webPage = $this->webResource;
 
         $scriptUrls = array();
-
         $thisUrl = new Url($webPage->getUrl());
 
         $webPage->find('script')->each(function ($index, \DOMElement $domElement) use (&$scriptUrls, $thisUrl) {
@@ -531,14 +502,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver
      */
     private function getScriptValues()
     {
-        $httpMessageFactory = new HttpMessageFactory();
-
-        $webPage = new WebPage();
-        $webPage->setHttpResponse(
-            $httpMessageFactory->fromMessage(
-                "HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $this->webResource->getContent()
-            )
-        );
+        /* @var WebPage $webPage */
+        $webPage = $this->webResource;
 
         $scriptValues = array();
 

@@ -7,13 +7,7 @@ use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
-/**
- * Class LinkIntegrityTaskDriverTest
- * @package SimplyTestable\WorkerBundle\Tests\Services\TaskDriver
- *
- * @group foo-tests
- */
-class LinkIntegrityTaskDriverTest extends FooWebResourceTaskDriverTest
+class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
 {
     /**
      * @var LinkIntegrityTaskDriver

@@ -7,13 +7,7 @@ use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlDocumentFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
-/**
- * Class UrlDiscoveryTaskDriverTest
- * @package SimplyTestable\WorkerBundle\Tests\Services\TaskDriver
- *
- * @group foo-tests
- */
-class UrlDiscoveryTaskDriverTest extends FooWebResourceTaskDriverTest
+class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
 {
     /**
      * @var UrlDiscoveryTaskDriver
@@ -54,7 +48,7 @@ class UrlDiscoveryTaskDriverTest extends FooWebResourceTaskDriverTest
      * @param $expectedIsRetryable
      * @param $expectedDecodedOutput
      */
-    public function testPerformFoo(
+    public function testPerform(
         $httpFixture,
         $taskParameters,
         $expectedHasSucceeded,

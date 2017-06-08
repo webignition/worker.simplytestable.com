@@ -7,13 +7,7 @@ use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
-/**
- * Class HtmlValidationTaskDriverTest
- * @package SimplyTestable\WorkerBundle\Tests\Services\TaskDriver
- *
- * @group foo-tests
- */
-class HtmlValidationTaskDriverTest extends FooWebResourceTaskDriverTest
+class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 {
     /**
      * @var HtmlValidationTaskDriver
