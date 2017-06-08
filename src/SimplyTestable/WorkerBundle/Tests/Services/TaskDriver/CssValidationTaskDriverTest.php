@@ -129,6 +129,20 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
+            'no errors, ignore vendor extension warnings' => [
+                'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
+                ],
+                'taskParameters' => [
+                    'vendor-extensions' => VendorExtensionSeverityLevel::LEVEL_IGNORE,
+                ],
+                'cssValidatorOutput' => $this->loadCssValidatorFixture('1-vendor-extension-warning'),
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 0,
+                'expectedWarningCount' => 0,
+                'expectedDecodedOutput' => [],
+            ],
             'three errors' => [
                 'httpFixtures' => [
                     "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
