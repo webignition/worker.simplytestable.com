@@ -5,6 +5,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
+use SimplyTestable\WorkerBundle\Tests\Factory\HtmlDocumentFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
 class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
@@ -194,6 +195,20 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
                         'example.com'
                     ],
                 ],
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 0,
+                'expectedWarningCount' => 0,
+                'expectedDecodedOutput' => [],
+            ],
+            'ignored schemes' => [
+                'httpFixtures' => [
+                    $this->createHtmlDocumentHttpFixture(
+                        200,
+                        HtmlDocumentFactory::load('ignored-link-integrity-schemes')
+                    ),
+                ],
+                'taskParameters' => [],
                 'expectedHasSucceeded' => true,
                 'expectedIsRetryable' => true,
                 'expectedErrorCount' => 0,
