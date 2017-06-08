@@ -16,23 +16,9 @@ abstract class IgnoreSchemeTest extends TaskDriverTest {
     }
 
     public function testAllRequestAreForHttpResources() {
-        foreach ($this->getAllRequests() as $request) {
+        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
             $requestUrl = new Url($request->getUrl());
             $this->assertEquals('http', $requestUrl->getScheme());
         }
     }
-
-    /**
-     * @return \Guzzle\Http\Message\Request[]
-     */
-    private function getAllRequests() {
-        $requests = array();
-
-        foreach ($this->getHttpClientService()->getHistory()->getAll() as $httpTransaction) {
-            $requests[] = $httpTransaction['request'];
-        }
-
-        return $requests;
-    }
-    
 }

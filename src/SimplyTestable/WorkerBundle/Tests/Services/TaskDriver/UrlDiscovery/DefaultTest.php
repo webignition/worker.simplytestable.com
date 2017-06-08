@@ -5,7 +5,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\UrlDiscovery;
 use SimplyTestable\WorkerBundle\Tests\Services\TaskDriver\UrlDiscovery\TaskDriverTest;
 
 class DefaultTest extends TaskDriverTest {
-    
+
     /**
      * @group standard
      */
@@ -25,45 +25,24 @@ class DefaultTest extends TaskDriverTest {
             "http://example.com/articles/getting-to-building-simpytestable-dot-com/"
         ), json_decode($task->getOutput()->getOutput()));
     }
-    
-    
+
+
     /**
      * @group standard
-     */    
+     */
     public function testTreatWwwAndNonWwwAsEquivalent() {
         $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-        
+
         $task = $this->getTask('http://example.com/', array(
             'scope' => array(
                 'http://example.com/',
                 'http://www.example.com/'
             )
-        ));        
+        ));
 
         $this->assertEquals(0, $this->getTaskService()->perform($task));
         $this->assertEquals(23, count(json_decode($task->getOutput()->getOutput())));
     }
-    
-
-    /**
-     * @group standard
-     */
-    public function testWithHttpAuthProtectedPage() {
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-
-        $task = $this->getTask('http://http-auth-04.simplytestable.com/', array(
-            'scope' => 'http://http-auth-04.simplytestable.com/',
-            'http-auth-username' => 'example',
-            'http-auth-password' => 'password'
-        ));
-
-        $this->assertEquals(0, $this->getTaskService()->perform($task));
-        $this->assertEquals(array(
-            'http://http-auth-04.simplytestable.com/two.html',
-            'http://http-auth-04.simplytestable.com/three.html'
-        ), json_decode($task->getOutput()->getOutput()));
-    }
-
 
     /**
      * @group standard
@@ -146,5 +125,5 @@ class DefaultTest extends TaskDriverTest {
             'https://example.com/contact/'
         ), json_decode($task->getOutput()->getOutput()));
     }
-    
+
 }

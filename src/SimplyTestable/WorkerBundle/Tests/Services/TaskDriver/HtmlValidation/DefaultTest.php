@@ -68,43 +68,6 @@ class DefaultTest extends TaskDriverTest {
         $this->assertEquals($this->getTaskService()->getSkippedState(), $task->getState());
     }
 
-
-    /**
-     * @group standard
-     */
-    public function testOnHttpAuthenticationProtectedUrl() {
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath($this->getName() . '/HttpResponses')));
-
-        $this->setHtmlValidatorFixture(
-            file_get_contents($this->getFixturesDataPath(__FUNCTION__ . '/HtmlValidatorResponses/1'))
-        );
-
-        $task = $this->getTask('http://unreliable.simplytestable.com/http-auth/index.html', array(
-            'http-auth-username' => 'example',
-            'http-auth-password' => 'password'
-        ));
-
-        $this->assertEquals(0, $this->getTaskService()->perform($task));
-        $this->assertEquals('{"messages":[]}', $task->getOutput()->getOutput());
-    }
-
-
-    /**
-     * @group standard
-     */
-    public function testOnHttpAuthenticationWithInvalidCredentials() {
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath($this->getName() . '/HttpResponses')));
-
-        $task = $this->getTask('http://unreliable.simplytestable.com/http-auth/index.html', array(
-            'http-auth-username' => 'wrong-username',
-            'http-auth-password' => 'wrong-password'
-        ));
-
-        $this->assertEquals(0, $this->getTaskService()->perform($task));
-        $this->assertEquals('{"messages":[{"message":"Unauthorized","messageId":"http-retrieval-401","type":"error"}]}', $task->getOutput()->getOutput());
-    }
-
-
     /**
      * @group standard
      */
