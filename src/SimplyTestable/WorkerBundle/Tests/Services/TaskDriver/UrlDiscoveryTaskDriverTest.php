@@ -96,8 +96,10 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
                 'expectedHasSucceeded' => true,
                 'expectedIsRetryable' => true,
                 'expectedDecodedOutput' => [
-                    'http://example.com/foo/anchor',
-                    'http://bar.example.com/bar/anchor'
+                    'http://example.com/foo/anchor1',
+                    'http://www.example.com/foo/anchor2',
+                    'http://bar.example.com/bar/anchor',
+                    'https://www.example.com/foo/anchor1',
                 ],
             ],
             'has scope' => [
@@ -106,12 +108,17 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
                     HtmlDocumentFactory::load('css-link-js-link-image-anchors')
                 ),
                 'taskParameters' => [
-                    'scope' => 'http://example.com'
+                    'scope' => [
+                        'http://example.com',
+                        'http://www.example.com',
+                    ]
                 ],
                 'expectedHasSucceeded' => true,
                 'expectedIsRetryable' => true,
                 'expectedDecodedOutput' => [
-                    'http://example.com/foo/anchor',
+                    'http://example.com/foo/anchor1',
+                    'http://www.example.com/foo/anchor2',
+                    'https://www.example.com/foo/anchor1',
                 ],
             ],
         ];

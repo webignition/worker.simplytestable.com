@@ -5,10 +5,14 @@
         <title>title</title>
         <link rel="stylesheet" href="/style.css">
         <script src="/foo.js"></script>
+        <base href="/">
     </head>
     <body>
-        <a href="/foo/anchor">Foo</a>
+        <a href="/foo/anchor1">Foo</a>
+        <a href="foo/anchor1">Foo</a>
+        <a href="http://www.example.com/foo/anchor2">Foo</a>
         <a href="http://bar.example.com/bar/anchor">Foo</a>
+        <a href="https://www.example.com/foo/anchor1">Foo</a>
         <img src="/foo/image.png">
     </body>
 </html>
