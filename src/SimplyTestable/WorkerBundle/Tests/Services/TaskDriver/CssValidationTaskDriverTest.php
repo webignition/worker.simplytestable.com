@@ -2,12 +2,17 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 
+use Mockery\MockInterface;
 use phpmock\mockery\PHPMockery;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlDocumentFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
+use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
+use webignition\CssValidatorWrapper\Configuration\Configuration as CssValidatorWrapperConfiguration;
+use webignition\CssValidatorWrapper\Configuration\Flags as CssValidatorWrapperConfigurationFlags;
 
 class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
 {
@@ -265,6 +270,99 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
                         'context' => '',
                         'ref' => 'http://example.com/style.css',
                         'line_number' => 0,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider performsSetCssValidatorConfigurationDataProvider
+     *
+     * @param array $taskParameters
+     * @param array $expectedConfigurationValues
+     */
+    public function testPerformSetCssValidatorConfiguration(
+        $taskParameters,
+        $expectedConfigurationValues
+    ) {
+        $content = 'foo';
+
+        $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html\n\n" . $content,
+        ]);
+
+        $task = $this->getTaskFactory()->create(
+            TaskFactory::createTaskValuesFromDefaults([
+                'type' => $this->getTaskTypeString(),
+                'parameters' => json_encode($taskParameters),
+            ])
+        );
+
+        $this->setCssValidatorRawOutput($this->loadCssValidatorFixture('no-messages'));
+
+        /* @var CssValidatorWrapper|MockInterface $cssValidatorWrapper */
+        $cssValidatorWrapper = \Mockery::spy(
+            $this->container->get('simplytestable.services.cssvalidatorwrapperservice')
+        );
+
+        $this->getTaskDriver()->setCssValidatorWrapper($cssValidatorWrapper);
+
+        $this->taskDriver->perform($task);
+
+        $standardConfigurationValues = [
+            CssValidatorWrapperConfiguration::CONFIG_KEY_CSS_VALIDATOR_JAR_PATH =>
+                $this->container->getParameter('css-validator-jar-path'),
+            CssValidatorWrapperConfiguration::CONFIG_KEY_URL_TO_VALIDATE =>
+                'http://example.com/',
+            CssValidatorWrapperConfiguration::CONFIG_KEY_CONTENT_TO_VALIDATE =>
+                $content,
+            CssValidatorWrapperConfiguration::CONFIG_KEY_HTTP_CLIENT =>
+                $this->getHttpClientService()->get(),
+        ];
+
+        $cssValidatorWrapper
+            ->shouldHaveReceived('createConfiguration')
+            ->once()
+            ->with(array_merge($expectedConfigurationValues, $standardConfigurationValues));
+    }
+
+    /**
+     * @return array
+     */
+    public function performsSetCssValidatorConfigurationDataProvider()
+    {
+        return [
+            'default' => [
+                'taskParameters' => [],
+                'expectedConfigurationValues' => [
+                    CssValidatorWrapperConfiguration::CONFIG_KEY_VENDOR_EXTENSION_SEVERITY_LEVEL =>
+                        VendorExtensionSeverityLevel::LEVEL_WARN,
+                    CssValidatorWrapperConfiguration::CONFIG_KEY_DOMAINS_TO_IGNORE => [],
+                    CssValidatorWrapperConfiguration::CONFIG_KEY_FLAGS => [
+                        CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_FALSE_IMAGE_DATA_URL_MESSAGES,
+                    ],
+                ],
+            ],
+            'non-default' => [
+                'taskParameters' => [
+                    'vendor-extensions' => VendorExtensionSeverityLevel::LEVEL_ERROR,
+                    'domains-to-ignore' => [
+                        'foo',
+                        'bar',
+                    ],
+                    'ignore-warnings' => true,
+                ],
+                'expectedConfigurationValues' => [
+                    CssValidatorWrapperConfiguration::CONFIG_KEY_FLAGS => [
+                        CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_FALSE_IMAGE_DATA_URL_MESSAGES,
+                        CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_WARNINGS,
+                    ],
+                    CssValidatorWrapperConfiguration::CONFIG_KEY_VENDOR_EXTENSION_SEVERITY_LEVEL =>
+                        VendorExtensionSeverityLevel::LEVEL_ERROR,
+                    CssValidatorWrapperConfiguration::CONFIG_KEY_DOMAINS_TO_IGNORE => [
+                        'foo',
+                        'bar',
                     ],
                 ],
             ],
