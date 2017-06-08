@@ -264,7 +264,7 @@ class CssValidationTaskDriverTest extends FooWebResourceTaskDriverTest
                 "HTTP/1.1 200\nContent-Type:text/html\n\n%s",
                 HtmlDocumentFactory::load('empty-body-single-css-link')
             ),
-            "HTTP/1.1 200 OK\nContent-type:text-css\n\n"
+            "HTTP/1.1 200 OK\nContent-type:text/css\n\n"
         ]);
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
