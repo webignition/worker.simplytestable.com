@@ -83,7 +83,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
      * @param int $expectedWarningCount
      * @param string[] $expectedDecodedOutputKeys
      */
-    public function testPerform(
+    public function testPerformFoo(
         $httpFixtures,
         $taskParameters,
         $jsLintRawOutput,
@@ -162,6 +162,37 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutputKeys' => [
                     'http://example.com/foo.js',
+                    '7dc508faa82075c1039d38c6522c2124',
+                ],
+            ],
+            'redirect impacts script url' => [
+                'httpFixtures' => [
+                    "HTTP/1.1 301 Moved Permanently\nLocation: http://sub.example.com",
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('js-script-elements')
+                    ),
+                    "HTTP/1.1 200 OK\nContent-type:application/javascript\n\n",
+                ],
+                'taskParameters' => [
+                    'domains-to-ignore' => [
+                        'bar.example.com'
+                    ],
+                    'jslint-option-sloppy' => true,
+                    'jslint-option-debug' => false,
+                    'jslint-option-maxerr' => 50,
+                    'jslint-option-predef' => 'window',
+                ],
+                'jsLintRawOutput' => [
+                    $this->loadJsLintFixture('no-errors.json'),
+                    $this->loadJsLintFixture('too-many-errors-stopped-at-seven-percent.json'),
+                ],
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 1,
+                'expectedWarningCount' => 0,
+                'expectedDecodedOutputKeys' => [
+                    'http://sub.example.com/foo.js',
                     '7dc508faa82075c1039d38c6522c2124',
                 ],
             ],
