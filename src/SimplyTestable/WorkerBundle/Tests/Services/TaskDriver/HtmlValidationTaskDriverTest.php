@@ -132,7 +132,10 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
         $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
         $this->assertEquals($expectedErrorCount, $taskDriverResponse->getErrorCount());
 
-        $this->assertEquals($expectedDecodedOutput, json_decode($taskDriverResponse->getTaskOutput()->getOutput(), true));
+        $this->assertEquals(
+            $expectedDecodedOutput,
+            json_decode($taskDriverResponse->getTaskOutput()->getOutput(), true)
+        );
     }
 
     /**
@@ -167,6 +170,41 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
                             'explanation' => 'explanatory text',
                             'type' => 'error',
                         ]
+                    ],
+                ],
+            ],
+            'three errors' => [
+                'content' => '<!DOCTYPE html>',
+                'htmlValidatorOutput' => $this->loadHtmlValidatorFixture('3-errors'),
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 3,
+                'expectedDecodedOutput' => [
+                    'messages' => [
+                        [
+                            'lastLine' => 188,
+                            'lastColumn' => 79,
+                            'message' => 'An img element must have an alt attribute, except under certain conditions.',
+                            'messageid' => 'html5',
+                            'explanation' => 'explanatory text',
+                            'type' => 'error',
+                        ],
+                        [
+                            'lastLine' => 188,
+                            'lastColumn' => 79,
+                            'message' => 'An img element must have an alt attribute, except under certain conditions.',
+                            'messageid' => 'html5',
+                            'explanation' => 'explanatory text',
+                            'type' => 'error',
+                        ],
+                        [
+                            'lastLine' => 188,
+                            'lastColumn' => 79,
+                            'message' => 'An img element must have an alt attribute, except under certain conditions.',
+                            'messageid' => 'html5',
+                            'explanation' => 'explanatory text',
+                            'type' => 'error',
+                        ],
                     ],
                 ],
             ],
