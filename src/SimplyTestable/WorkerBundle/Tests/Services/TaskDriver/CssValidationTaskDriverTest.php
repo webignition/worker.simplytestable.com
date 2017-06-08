@@ -244,6 +244,30 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
                     ],
                 ],
             ],
+            'invalid content type getting linked resource' => [
+                'httpFixtures' => [
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('empty-body-single-css-link')
+                    ),
+                    "HTTP/1.1 200 OK\nContent-type:application/pdf"
+                ],
+                'taskParameters' => [],
+                'cssValidatorOutput' => $this->loadCssValidatorFixture('no-messages'),
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 1,
+                'expectedWarningCount' => 0,
+                'expectedDecodedOutput' => [
+                    (object)[
+                        'message' => 'invalid-content-type:application/pdf',
+                        'type' => 'error',
+                        'context' => '',
+                        'ref' => 'http://example.com/style.css',
+                        'line_number' => 0,
+                    ],
+                ],
+            ],
         ];
     }
 
