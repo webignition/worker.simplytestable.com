@@ -27,7 +27,6 @@
         "webignition/web-page-model":">=1.1,<2",
         "webignition/web-json-model":">=1.1,<2",
         "webignition/absolute-url-deriver":">=1.4",
-        "winzou/console-bundle":"1.0.0",
         "guzzlehttp/guzzle":">=5.2.0,<5.3",
         "doctrine/doctrine-fixtures-bundle": "~2.3",
         "webignition/html-document-link-finder":">=1.2,<2.0",

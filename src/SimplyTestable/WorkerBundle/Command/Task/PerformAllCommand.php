@@ -1,8 +1,8 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
+use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\CommandService;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -33,7 +33,7 @@ class PerformAllCommand extends Command
         foreach ($queuedTaskIds as $taskId) {
             $output->writeln('Issuing perform command for task '.$taskId);
 
-            $outputBuffer = new \CoreSphere\ConsoleBundle\Output\StringOutput();
+            $outputBuffer = new StringOutput();
 
             if ($this->isDryRun($input)) {
                 $commandResponse = 'dry run';
