@@ -10,7 +10,7 @@ use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 class TasksServiceTest extends BaseSimplyTestableTestCase
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected static function getServicesToMock()
     {

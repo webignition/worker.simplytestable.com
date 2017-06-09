@@ -55,7 +55,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function hasNotSucceededHandler()
     {
@@ -65,7 +65,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isNotCorrectWebResourceTypeHandler()
     {
@@ -75,7 +75,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isBlankWebResourceHandler()
     {
@@ -84,7 +84,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function performValidation()
     {

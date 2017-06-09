@@ -16,7 +16,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
     private $taskDriver;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -25,7 +25,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getTaskDriver()
     {
@@ -33,7 +33,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getTaskTypeString()
     {
@@ -257,7 +257,8 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
     /**
      * @dataProvider cookiesDataProvider
-     * @inheritdoc
+     *
+     * {@inheritdoc}
      */
     public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
     {
@@ -280,7 +281,8 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
     /**
      * @dataProvider httpAuthDataProvider
-     * @inheritdoc
+     *
+     * {@inheritdoc}
      */
     public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
@@ -351,7 +353,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown()
     {

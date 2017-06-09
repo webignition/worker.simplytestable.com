@@ -12,7 +12,7 @@ class StringOutput extends Output
     private $buffer = '';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function doWrite($message, $newline)
     {

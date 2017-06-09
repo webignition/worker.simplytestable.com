@@ -57,7 +57,7 @@ abstract class BaseTestCase extends WebTestCase {
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected static function createClient(array $options = array(), array $server = array())
     {

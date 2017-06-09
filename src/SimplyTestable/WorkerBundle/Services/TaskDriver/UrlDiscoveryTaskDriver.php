@@ -36,7 +36,7 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function hasNotSucceededHandler()
     {
@@ -46,7 +46,7 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isNotCorrectWebResourceTypeHandler()
     {
@@ -56,7 +56,7 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isBlankWebResourceHandler()
     {
@@ -65,7 +65,7 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function performValidation()
     {

@@ -11,7 +11,7 @@ use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 class PerformCommandTest extends ConsoleCommandBaseTestCase
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -20,7 +20,7 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getAdditionalCommands()
     {
@@ -30,7 +30,7 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected static function getServicesToMock()
     {
@@ -182,7 +182,7 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown()
     {

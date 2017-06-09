@@ -23,7 +23,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
     private $taskDriver;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -32,7 +32,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getTaskDriver()
     {
@@ -40,7 +40,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getTaskTypeString()
     {
@@ -478,7 +478,8 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
 
     /**
      * @dataProvider cookiesDataProvider
-     * @inheritdoc
+     *
+     * {@inheritdoc}
      */
     public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
     {
@@ -508,7 +509,8 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
 
     /**
      * @dataProvider httpAuthDataProvider
-     * @inheritdoc
+     *
+     * {@inheritdoc}
      */
     public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
@@ -564,7 +566,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown()
     {

@@ -22,7 +22,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
     private $taskDriver;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -31,7 +31,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getTaskDriver()
     {
@@ -39,7 +39,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getTaskTypeString()
     {
@@ -385,7 +385,8 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
 
     /**
      * @dataProvider cookiesDataProvider
-     * @inheritdoc
+     *
+     * {@inheritdoc}
      */
     public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
     {
@@ -413,7 +414,8 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
 
     /**
      * @dataProvider httpAuthDataProvider
-     * @inheritdoc
+     *
+     * {@inheritdoc}
      */
     public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
@@ -467,7 +469,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown()
     {

@@ -108,7 +108,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function hasNotSucceededHandler()
     {
@@ -118,7 +118,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isNotCorrectWebResourceTypeHandler()
     {
@@ -128,7 +128,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isBlankWebResourceHandler()
     {
@@ -137,7 +137,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function performValidation()
     {

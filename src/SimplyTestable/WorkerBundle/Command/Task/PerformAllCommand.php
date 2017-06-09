@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class PerformAllCommand extends Command
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -21,7 +21,7 @@ class PerformAllCommand extends Command
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {

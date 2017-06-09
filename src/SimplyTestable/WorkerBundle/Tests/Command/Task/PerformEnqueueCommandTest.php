@@ -9,7 +9,7 @@ use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getAdditionalCommands()
     {
@@ -19,7 +19,7 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -28,7 +28,7 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown()
     {

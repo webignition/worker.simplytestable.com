@@ -78,7 +78,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function hasNotSucceededHandler()
     {
@@ -88,7 +88,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isBlankWebResourceHandler()
     {
@@ -97,7 +97,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isNotCorrectWebResourceTypeHandler()
     {
@@ -107,7 +107,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function performValidation()
     {

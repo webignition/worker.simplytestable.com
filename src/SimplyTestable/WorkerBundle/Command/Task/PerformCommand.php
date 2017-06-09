@@ -14,7 +14,7 @@ class PerformCommand extends Command
     const RETURN_CODE_TASK_SERVICE_RAISED_EXCEPTION = -6;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -27,7 +27,7 @@ class PerformCommand extends Command
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {

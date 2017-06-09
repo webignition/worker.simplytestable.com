@@ -20,7 +20,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     const DEFAULT_TASK_STATE = TaskService::TASK_STARTING_STATE;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected static function getServicesToMock()
     {
@@ -417,7 +417,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function tearDown()
     {

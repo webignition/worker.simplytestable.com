@@ -16,7 +16,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
     private $taskDriver;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -25,7 +25,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getTaskDriver()
     {
@@ -33,7 +33,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getTaskTypeString()
     {
@@ -220,7 +220,8 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
 
     /**
      * @dataProvider cookiesDataProvider
-     * @inheritdoc
+     *
+     * {@inheritdoc}
      */
     public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
     {
@@ -246,7 +247,8 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
 
     /**
      * @dataProvider httpAuthDataProvider
-     * @inheritdoc
+     *
+     * {@inheritdoc}
      */
     public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {

@@ -63,7 +63,7 @@ abstract class WebResourceTaskDriver extends TaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function execute(Task $task)
     {

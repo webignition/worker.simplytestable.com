@@ -47,7 +47,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function hasNotSucceededHandler()
     {
@@ -56,7 +56,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isNotCorrectWebResourceTypeHandler()
     {
@@ -66,7 +66,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isBlankWebResourceHandler()
     {
@@ -75,7 +75,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function performValidation()
     {

@@ -13,7 +13,7 @@ use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {
