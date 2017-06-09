@@ -4,20 +4,13 @@ namespace SimplyTestable\WorkerBundle\Tests\Services;
 
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
-use SimplyTestable\WorkerBundle\Entity\Task\Output as TaskOutput;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass;
-use SimplyTestable\WorkerBundle\Entity\TimePeriod;
-use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
-use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
-use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorFixtureFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
-use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 
 class TaskServiceTest extends BaseSimplyTestableTestCase
 {

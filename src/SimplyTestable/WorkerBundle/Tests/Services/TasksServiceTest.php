@@ -3,9 +3,7 @@
 namespace SimplyTestable\WorkerBundle\Tests\Services;
 
 use GuzzleHttp\Post\PostBodyInterface;
-use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
-use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 
