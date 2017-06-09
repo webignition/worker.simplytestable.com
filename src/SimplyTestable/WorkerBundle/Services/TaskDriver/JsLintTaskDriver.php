@@ -366,8 +366,12 @@ class JsLintTaskDriver extends WebResourceTaskDriver
      *
      * @return array
      */
-    private function getNodeJsLintConfigurationFlagsAndOptionsFromParameters(array $parameters)
+    private function getNodeJsLintConfigurationFlagsAndOptionsFromParameters($parameters = [])
     {
+        if (empty($parameters)) {
+            $parameters = [];
+        }
+
         $flags = [];
         $options = [];
 
