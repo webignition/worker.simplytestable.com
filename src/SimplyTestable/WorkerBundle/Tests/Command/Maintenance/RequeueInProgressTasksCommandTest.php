@@ -5,6 +5,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Command\Maintenance;
 use SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand;
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
+use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
 class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase
 {
@@ -37,31 +38,45 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase
         );
 
         foreach ($urls as $index => $url) {
-//            $task = $this->createTask($this->);
+            $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+                'url' => $url,
+                'type' => 'html validation',
+            ]));
 
-            $task = $this->getTaskService()->getById($this->createTask($url, 'HTML validation')->id);
+            if ($index > 0) {
+                $task->setState($this->getTaskService()->getInProgressState());
 
-//            if ($index > 0) {
-//                $task->setState($this->getTaskService()->getInProgressState());
-//
-//                $timePeriod = new TimePeriod();
-//                $timePeriod->setStartDateTime(new \DateTime('-25 hour'));
-//
-//                $task->setTimePeriod($timePeriod);
-//
-//                $this->getTaskService()->getEntityManager()->persist($task);
-//            }
+                $timePeriod = new TimePeriod();
+                $timePeriod->setStartDateTime(new \DateTime('-25 hour'));
+
+                $task->setTimePeriod($timePeriod);
+
+                $this->getTaskService()->getEntityManager()->persist($task);
+            }
         }
-//
-//        $this->getTaskService()->getEntityManager()->flush();
-//
-//        $this->assertEquals(1, count($this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState())));
-//        $this->assertEquals(2, count($this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getInProgressState())));
-//
-//        $this->clearRedis();
-//
-//        $this->assertEquals(0, $this->executeCommand('simplytestable:maintenance:requeue-in-progress-tasks'));
-//        $this->assertEquals(3, count($this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState())));
+
+        $this->getTaskService()->getEntityManager()->flush();
+
+        $this->assertCount(
+            1,
+            $this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState())
+        );
+
+        $this->assertCount(
+            2,
+            $this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getInProgressState())
+        );
+
+        $this->clearRedis();
+
+        $this->assertEquals(
+            0,
+            $this->executeCommand('simplytestable:maintenance:requeue-in-progress-tasks')
+        );
+
+        $this->assertCount(
+            3,
+            $this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState())
+        );
     }
 }
-
