@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
+use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 
 class TasksServiceTest extends BaseSimplyTestableTestCase
 {
@@ -59,9 +60,9 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
             ->shouldReceive('getInCompleteCount')
             ->andReturn($this->getTasksService()->getWorkerProcessCount());
 
-        $this->setHttpFixtures($this->buildHttpFixtureSet([
+        $this->setHttpFixtures([
             $httpResponseFixture
-        ]));
+        ]);
 
         $this->container->get('logger')
             ->shouldReceive('error')
@@ -101,7 +102,7 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
                 ],
             ],
             'curl-28' => [
-                'httpResponseFixture' => 'CURL/28 Operation timed out.',
+                'httpResponseFixture' => ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
                 'expectedLogErrorMessage' => 'TasksService:request:GuzzleHttp\Exception\ConnectException [28]',
                 'expectedException' => [
                     'class' => RequestException::class,
@@ -123,9 +124,9 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
             ->shouldReceive('getInCompleteCount')
             ->andReturn($this->getTasksService()->getWorkerProcessCount());
 
-        $this->setHttpFixtures($this->buildHttpFixtureSet([
+        $this->setHttpFixtures([
             'HTTP/1.1 200 OK'
-        ]));
+        ]);
 
         $this->assertTrue(
             $this->getTasksService()->request($requestedLimit)
