@@ -17,8 +17,8 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
     protected static function getServicesToMock()
     {
         return [
-            'logger' => LoggerInterface::class,
-            'simplytestable.services.taskservice' => TaskService::class,
+            'logger',
+            'simplytestable.services.taskservice',
         ];
     }
 

@@ -49,7 +49,7 @@ abstract class BaseTestCase extends WebTestCase {
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     protected static function getServicesToMock()
     {
@@ -63,12 +63,12 @@ abstract class BaseTestCase extends WebTestCase {
     {
         $client = parent::createClient($options, $server);
 
-        foreach (static::getServicesToMock() as $serviceId => $serviceClass) {
-            $spiedService = \Mockery::spy(
+        foreach (static::getServicesToMock() as $serviceId) {
+            $mockedService = \Mockery::mock(
                 $client->getContainer()->get($serviceId)
             );
 
-            $client->getContainer()->set($serviceId, $spiedService);
+            $client->getContainer()->set($serviceId, $mockedService);
         }
 
         return $client;
