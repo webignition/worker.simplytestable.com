@@ -35,7 +35,6 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
     protected static function getServicesToMock()
     {
         return [
-            'logger',
             'simplytestable.services.taskservice',
         ];
     }
