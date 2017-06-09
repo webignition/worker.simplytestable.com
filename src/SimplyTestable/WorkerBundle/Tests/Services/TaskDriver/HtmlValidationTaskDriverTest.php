@@ -147,7 +147,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
         return [
             'no errors' => [
                 'content' => '<!DOCTYPE html>',
-                'htmlValidatorOutput' => $this->loadHtmlValidatorFixture('0-errors'),
+                'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('0-errors'),
                 'expectedHasSucceeded' => true,
                 'expectedIsRetryable' => true,
                 'expectedErrorCount' => 0,
@@ -157,7 +157,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'one error' => [
                 'content' => '<!DOCTYPE html>',
-                'htmlValidatorOutput' => $this->loadHtmlValidatorFixture('1-error'),
+                'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('1-error'),
                 'expectedHasSucceeded' => true,
                 'expectedIsRetryable' => true,
                 'expectedErrorCount' => 1,
@@ -176,7 +176,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'three errors' => [
                 'content' => '<!DOCTYPE html>',
-                'htmlValidatorOutput' => $this->loadHtmlValidatorFixture('3-errors'),
+                'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('3-errors'),
                 'expectedHasSucceeded' => true,
                 'expectedIsRetryable' => true,
                 'expectedErrorCount' => 3,
@@ -211,7 +211,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'internal software error' => [
                 'content' => '<!DOCTYPE html>',
-                'htmlValidatorOutput' => $this->loadHtmlValidatorFixture('internal-software-error'),
+                'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('internal-software-error'),
                 'expectedHasSucceeded' => false,
                 'expectedIsRetryable' => false,
                 'expectedErrorCount' => 0,
@@ -227,7 +227,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'invalid character encoding' => [
                 'content' => '<!DOCTYPE html>',
-                'htmlValidatorOutput' => $this->loadHtmlValidatorFixture('invalid-character-encoding-error'),
+                'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('invalid-character-encoding-error'),
                 'expectedHasSucceeded' => false,
                 'expectedIsRetryable' => false,
                 'expectedErrorCount' => 1,
@@ -265,7 +265,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html>"
         ]);
 
-        HtmlValidatorFixtureFactory::set($this->loadHtmlValidatorFixture('0-errors'));
+        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
@@ -288,7 +288,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200\nContent-Type:text/html\n\n<!doctype html>"
         ]);
 
-        HtmlValidatorFixtureFactory::set($this->loadHtmlValidatorFixture('0-errors'));
+        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
@@ -326,7 +326,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.0 200\nContent-Type:text/html\n\n" . $content
         ]);
 
-        HtmlValidatorFixtureFactory::set($this->loadHtmlValidatorFixture('0-errors'));
+        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->getTaskFactory()->create(
             TaskFactory::createTaskValuesFromDefaults()
@@ -348,16 +348,6 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
                 'fileExists' => true,
             ],
         ];
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    private function loadHtmlValidatorFixture($name)
-    {
-        return file_get_contents(__DIR__ . '/../../Fixtures/Data/RawHtmlValidatorOutput/' . $name . '.txt');
     }
 
     /**
