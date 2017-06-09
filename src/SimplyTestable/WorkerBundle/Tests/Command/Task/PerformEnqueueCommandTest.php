@@ -8,6 +8,9 @@ use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
 class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase
 {
+    /**
+     * @inheritdoc
+     */
     protected function getAdditionalCommands()
     {
         return array(
@@ -15,12 +18,18 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function setUp()
     {
         parent::setUp();
         $this->clearRedis();
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function tearDown()
     {
         $this->clearRedis();
