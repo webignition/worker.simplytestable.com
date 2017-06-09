@@ -1,1 +1,0 @@
-["/tmp/066419ed35839dafb8c2d810dea2078c:715:1390912030.9796.js",[{"id":"(error)","raw":"Expected '{a}' at column {b}, not column {c}.","code":"expected_a_at_b_c","evidence":"  bar = 3;","line":6,"character":3,"a":"bar","b":5,"c":3,"reason":"Expected 'bar' at column 5, not column 3."}]]

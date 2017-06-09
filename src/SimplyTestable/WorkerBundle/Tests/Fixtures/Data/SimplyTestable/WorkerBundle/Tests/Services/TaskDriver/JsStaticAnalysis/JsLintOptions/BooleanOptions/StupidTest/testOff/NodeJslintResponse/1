@@ -1,1 +1,0 @@
-["/tmp/2d290f800ba2d09203e956f5e71aa0f9:493:1390911511.1362.js",[{"id":"(error)","raw":"Unexpected sync method: '{a}'.","code":"sync_a","evidence":"var fs = require(\"fs\"), files = fs.readdirSync(\"myDirectory\");","line":1,"character":36,"a":"readdirSync","reason":"Unexpected sync method: 'readdirSync'."}]]
