@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "490490596a95e70053b496ea1b4e74f1",
+    "content-hash": "4694a7724cd13ca842faf1ea57bab25b",
     "packages": [
         {
             "name": "bcc/resque-bundle",
@@ -3979,16 +3979,16 @@
         },
         {
             "name": "webignition/node-jslint-wrapper",
-            "version": "0.5",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/node-jslint-wrapper.git",
-                "reference": "60e681ca3eb1598b81d0d05ff1ae2650f780298a"
+                "reference": "d39f05e907c1205046cc2c5115eb536528b13373"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-wrapper/zipball/60e681ca3eb1598b81d0d05ff1ae2650f780298a",
-                "reference": "60e681ca3eb1598b81d0d05ff1ae2650f780298a",
+                "url": "https://api.github.com/repos/webignition/node-jslint-wrapper/zipball/d39f05e907c1205046cc2c5115eb536528b13373",
+                "reference": "d39f05e907c1205046cc2c5115eb536528b13373",
                 "shasum": ""
             },
             "require": {
@@ -3998,10 +3998,10 @@
                 "webignition/web-resource-service": ">=1.1,<2.0"
             },
             "require-dev": {
-                "icanboogie/inflector": "1.0",
                 "mockery/mockery": "~0.9",
                 "php-mock/php-mock-mockery": "1.1.0",
-                "phpunit/phpunit": "~4.0"
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
@@ -4025,7 +4025,7 @@
                 "jslint",
                 "wrapper"
             ],
-            "time": "2017-06-07T17:15:15+00:00"
+            "time": "2017-06-08 18:29:04"
         },
         {
             "name": "webignition/quoted-string",
@@ -5957,6 +5957,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "webignition/node-jslint-wrapper": 20,
         "chrisboulton/php-resque": 20,
         "chrisboulton/php-resque-scheduler": 20,
         "bcc/resque-bundle": 20,

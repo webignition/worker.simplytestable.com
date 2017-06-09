@@ -2,13 +2,18 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 
+use Mockery\MockInterface;
 use phpmock\mockery\PHPMockery;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlDocumentFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+use webignition\NodeJslint\Wrapper\Wrapper as NodeJslintWrapper;
 use webignition\NodeJslintOutput\Exception as NodeJslintOutputException;
+use webignition\NodeJslint\Wrapper\Configuration\Configuration as NodeJslintWrapperConfiguration;
+use webignition\NodeJslint\Wrapper\Configuration\Flag\JsLint as JsLintFlag;
+use webignition\NodeJslint\Wrapper\Configuration\Option\JsLint as JsLintOption;
 
 class JsLintTaskDriverTest extends WebResourceTaskDriverTest
 {
@@ -368,6 +373,104 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
                 'expectedDecodedOutputKeys' => [
                     'http://example.com/foo.js',
                     '7dc508faa82075c1039d38c6522c2124',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider performsSetJslintConfigurationDataProvider
+     *
+     * @param array $taskParameters
+     * @param array $expectedConfigurationValues
+     */
+    public function testPerformSetJslintConfiguration(
+        $taskParameters,
+        $expectedConfigurationValues
+    ) {
+        $content = 'foo';
+
+        $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html\n\n" . $content,
+        ]);
+
+        $task = $this->getTaskFactory()->create(
+            TaskFactory::createTaskValuesFromDefaults([
+                'type' => $this->getTaskTypeString(),
+                'parameters' => json_encode($taskParameters),
+            ])
+        );
+
+        $this->setJsLintRawOutput([$this->loadJsLintFixture('no-errors.json')]);
+
+
+        /* @var NodeJslintWrapper|MockInterface $nodeJslintWrapper */
+        $nodeJslintWrapper = \Mockery::spy(
+            $this->container->get('simplytestable.services.nodejslintwrapperservice')
+        );
+
+        $this->getTaskDriver()->setNodeJsLintWrapper($nodeJslintWrapper);
+
+        $this->taskDriver->perform($task);
+
+        $standardConfigurationValues = [
+            NodeJslintWrapperConfiguration::CONFIG_KEY_NODE_JSLINT_PATH =>
+                $this->container->getParameter('node-jslint-path'),
+            NodeJslintWrapperConfiguration::CONFIG_KEY_NODE_PATH =>
+                $this->container->getParameter('node-path'),
+        ];
+
+        $nodeJslintWrapper
+            ->shouldHaveReceived('createConfiguration')
+            ->once()
+            ->with(array_merge($expectedConfigurationValues, $standardConfigurationValues));
+    }
+
+    /**
+     * @return array
+     */
+    public function performsSetJslintConfigurationDataProvider()
+    {
+        $allFlags = JsLintFlag::getList();
+        $allConfigurationFlagsEnabled = [];
+        $allConfigurationFlagsDisabled = [];
+        $allParameterFlagsEnabled = [];
+        $allParameterFlagsDisabled = [];
+
+        $allConfigurationOptionsSet = [
+            JSLintOPtion::INDENT => 12,
+            JSLintOPtion::MAXERR => 99,
+            JSLintOPtion::MAXLEN => 15,
+            JSLintOPtion::PREDEF => ['window'],
+        ];
+
+        $allParameterOptionsSet = [
+            'jslint-option-' . JSLintOPtion::INDENT => 12,
+            'jslint-option-' . JSLintOPtion::MAXERR => 99,
+            'jslint-option-' . JSLintOPtion::MAXLEN => 15,
+            'jslint-option-' . JSLintOPtion::PREDEF => 'window',
+        ];
+
+        foreach ($allFlags as $name) {
+            $allConfigurationFlagsEnabled[$name] = true;
+            $allConfigurationFlagsDisabled[$name] = false;
+            $allParameterFlagsEnabled['jslint-option-' . $name] = true;
+            $allParameterFlagsDisabled['jslint-option-' . $name] = false;
+        }
+
+        return [
+            'default' => [
+                'taskParameters' => [],
+                'expectedConfigurationValues' => [
+                    NodeJslintWrapperConfiguration::CONFIG_KEY_FLAGS => [],
+                    NodeJslintWrapperConfiguration::CONFIG_KEY_OPTIONS => [],
+                ],
+            ],
+            'enable all boolean parameters' => [
+                'taskParameters' => array_merge($allParameterFlagsEnabled, $allParameterOptionsSet),
+                'expectedConfigurationValues' => [
+                    NodeJslintWrapperConfiguration::CONFIG_KEY_FLAGS => $allConfigurationFlagsEnabled,
+                    NodeJslintWrapperConfiguration::CONFIG_KEY_OPTIONS => $allConfigurationOptionsSet,
                 ],
             ],
         ];

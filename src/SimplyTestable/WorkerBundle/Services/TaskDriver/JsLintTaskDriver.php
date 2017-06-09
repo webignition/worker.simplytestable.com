@@ -20,6 +20,7 @@ use webignition\NodeJslint\Wrapper\Configuration\Option\JsLint as JsLintOption;
 use webignition\NodeJslintOutput\Exception as NodeJslintOutputException;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptionFactory;
 use webignition\NodeJslintOutput\Entry\Entry as NodeJslintOutputEntry;
+use webignition\NodeJslint\Wrapper\Configuration\Configuration as NodeJslintWrapperConfiguration;
 
 class JsLintTaskDriver extends WebResourceTaskDriver
 {
@@ -159,6 +160,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver
 
         $errorCount = 0;
 
+        $this->getHttpClientService()->setUserAgent('ST Link JS Static Analysis Task Driver (http://bit.ly/RlhKCL)');
         $this->getHttpClientService()->setCookies($this->task->getParameter('cookies'));
         $this->getHttpClientService()->setBasicHttpAuthorization(
             $this->task->getParameter('http-auth-username'),
@@ -227,6 +229,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver
             }
         }
 
+        $this->getHttpClientService()->resetUserAgent();
         $this->getHttpClientService()->clearCookies();
         $this->getHttpClientService()->clearBasicHttpAuthorization();
 
@@ -339,49 +342,59 @@ class JsLintTaskDriver extends WebResourceTaskDriver
 
     private function configureNodeJslintWrapper()
     {
-        $this->getHttpClientService()->setUserAgent('ST Link JS Static Analysis Task Driver (http://bit.ly/RlhKCL)');
-
-        $nodeJslintWrapper = $this->nodeJsLintWrapper;
-
-        $nodeJslintWrapper
+        $this->nodeJsLintWrapper
             ->getLocalProxy()
             ->getConfiguration()
             ->setHttpClient($this->getHttpClientService()->get());
 
-        $nodeJslintWrapper
+        $this->nodeJsLintWrapper
             ->getLocalProxy()
             ->getWebResourceService()
             ->getConfiguration()
             ->enableRetryWithUrlEncodingDisabled();
 
-        $nodeJslintWrapper->getConfiguration()->setNodeJslintPath($this->nodeJsLintPath);
-        $nodeJslintWrapper->getConfiguration()->setNodePath($this->nodePath);
+        $configurationValues = array_merge([
+            NodeJslintWrapperConfiguration::CONFIG_KEY_NODE_JSLINT_PATH => $this->nodeJsLintPath,
+            NodeJslintWrapperConfiguration::CONFIG_KEY_NODE_PATH => $this->nodePath,
+        ], $this->getNodeJsLintConfigurationFlagsAndOptionsFromParameters($this->task->getParametersArray()));
 
-        if ($this->task->hasParameters()) {
-            foreach ($this->task->getParametersArray() as $key => $value) {
-                if (!$this->isJslintParameter($key)) {
-                    continue;
+        $this->nodeJsLintWrapper->createConfiguration($configurationValues);
+    }
+
+    /**
+     * @param array $parameters
+     *
+     * @return array
+     */
+    private function getNodeJsLintConfigurationFlagsAndOptionsFromParameters(array $parameters)
+    {
+        $flags = [];
+        $options = [];
+
+        foreach ($parameters as $key => $value) {
+            if (!$this->isJslintParameter($key)) {
+                continue;
+            }
+
+            $jsLintKey = str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key);
+
+            if ($this->isJslintBooleanParameter($jsLintKey)) {
+                $flags[$jsLintKey] = (bool)$value;
+            } elseif ($this->isJsLintSingleOccurrenceOptionParameter($jsLintKey)) {
+                $options[$jsLintKey] = $value;
+            } elseif ($this->isJslintCollectionOptionParameter($jsLintKey)) {
+                if (is_array($value)) {
+                    $value = $value[0];
                 }
 
-                $jsLintKey = str_replace(self::JSLINT_PARAMETER_NAME_PREFIX, '', $key);
-
-                if ($this->isJslintBooleanParameter($jsLintKey)) {
-                    if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
-                        $nodeJslintWrapper->getConfiguration()->enableFlag($jsLintKey);
-                    } else {
-                        $nodeJslintWrapper->getConfiguration()->disableFlag($jsLintKey);
-                    }
-                } elseif ($this->isJsLintSingleOccurrenceOptionParameter($jsLintKey)) {
-                    $nodeJslintWrapper->getConfiguration()->setOption($jsLintKey, $value);
-                } elseif ($this->isJslintCollectionOptionParameter($jsLintKey)) {
-                    if (is_array($value)) {
-                        $value = $value[0];
-                    }
-
-                    $nodeJslintWrapper->getConfiguration()->setOption($jsLintKey, explode(' ', $value));
-                }
+                $options[$jsLintKey] = explode(' ', $value);
             }
         }
+
+        return [
+            NodeJslintWrapperConfiguration::CONFIG_KEY_FLAGS => $flags,
+            NodeJslintWrapperConfiguration::CONFIG_KEY_OPTIONS => $options,
+        ];
     }
 
     /**

@@ -301,7 +301,7 @@ class Task
 
     /**
      *
-     * @return \stdClass
+     * @return array
      */
     public function getParametersArray() {
         return json_decode($this->getParameters(), true);
