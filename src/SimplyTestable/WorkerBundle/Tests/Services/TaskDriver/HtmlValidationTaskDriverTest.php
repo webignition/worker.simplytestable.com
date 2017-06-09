@@ -5,6 +5,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 use phpmock\mockery\PHPMockery;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
+use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorFixtureFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
 class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
@@ -124,7 +125,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             TaskFactory::createTaskValuesFromDefaults()
         );
 
-        $this->setHtmlValidatorFixture($htmlValidatorOutput);
+        HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
 
         $taskDriverResponse = $this->taskDriver->perform($task);
 
@@ -264,7 +265,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html>"
         ]);
 
-        $this->setHtmlValidatorFixture($this->loadHtmlValidatorFixture('0-errors'));
+        HtmlValidatorFixtureFactory::set($this->loadHtmlValidatorFixture('0-errors'));
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
@@ -287,7 +288,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200\nContent-Type:text/html\n\n<!doctype html>"
         ]);
 
-        $this->setHtmlValidatorFixture($this->loadHtmlValidatorFixture('0-errors'));
+        HtmlValidatorFixtureFactory::set($this->loadHtmlValidatorFixture('0-errors'));
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
@@ -325,7 +326,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.0 200\nContent-Type:text/html\n\n" . $content
         ]);
 
-        $this->setHtmlValidatorFixture($this->loadHtmlValidatorFixture('0-errors'));
+        HtmlValidatorFixtureFactory::set($this->loadHtmlValidatorFixture('0-errors'));
 
         $task = $this->getTaskFactory()->create(
             TaskFactory::createTaskValuesFromDefaults()
@@ -347,19 +348,6 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
                 'fileExists' => true,
             ],
         ];
-    }
-
-    /**
-     * @param string $fixture
-     */
-    private function setHtmlValidatorFixture($fixture)
-    {
-        PHPMockery::mock(
-            'webignition\HtmlValidator\Wrapper',
-            'shell_exec'
-        )->andReturn(
-            $fixture
-        );
     }
 
     /**
