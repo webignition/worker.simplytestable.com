@@ -4,21 +4,14 @@ namespace SimplyTestable\WorkerBundle\Services;
 use Doctrine\ORM\EntityManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\State;
-use SimplyTestable\WorkerBundle\Entity\Task\Output as TaskOutput;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use SimplyTestable\WorkerBundle\Repository\TaskRepository;
-use SimplyTestable\WorkerBundle\Services\CoreApplicationService;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
-use SimplyTestable\WorkerBundle\Services\StateService;
-use SimplyTestable\WorkerBundle\Services\TaskDriver\FactoryService as TaskDriverFactoryService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use GuzzleHttp\Exception\BadResponseException as HttpBadResponseException;
 use GuzzleHttp\Exception\ConnectException as HttpConnectException;
-use SimplyTestable\WorkerBundle\Services\UrlService;
-use SimplyTestable\WorkerBundle\Services\WorkerService;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
 class TaskService extends EntityService
@@ -32,7 +25,6 @@ class TaskService extends EntityService
     const TASK_FAILED_RETRY_AVAILABLE_STATE = 'task-failed-retry-available';
     const TASK_FAILED_RETRY_LIMIT_REACHED_STATE = 'task-failed-retry-limit-reached';
     const TASK_SKIPPED_STATE = 'task-skipped';
-
 
     /**
      * @var LoggerInterface
@@ -259,14 +251,14 @@ class TaskService extends EntityService
     public function perform(Task $task)
     {
         $this->logger->info(sprintf(
-            'TaskService::perform: [%i] [%s] Initialising',
+            'TaskService::perform: [%d] [%s] Initialising',
             $task->getId(),
-            $task->getState())
-        );
+            $task->getState()
+        ));
 
         if (!$this->isQueued($task)) {
             $this->logger->info(sprintf(
-                'TaskService::perform: [%i] Task state is [%s] and cannot be performed',
+                'TaskService::perform: [%d] Task state is [%s] and cannot be performed',
                 $task->getId(),
                 $task->getState()
             ));
@@ -274,41 +266,24 @@ class TaskService extends EntityService
             return 1;
         }
 
-        $taskDriver = $this->getTaskDriver($task);
-
-        if ($taskDriver === false) {
-            $this->logger->info(sprintf(
-                'TaskService::perform: [%i] No driver found for task type "%s"',
-                $task->getId(),
-                $task->getType()
-            ));
-
-            return 2;
-        }
+        $taskDriver = $this->taskDrivers[strtolower($task->getType())];
 
         $this->start($task);
 
         $taskDriverResponse = $taskDriver->perform($task);
 
-        $this->complete($task, $taskDriverResponse);
-
-        return 0;
-    }
-
-    /**
-     * @param Task $task
-     *
-     * @return bool|TaskDriver
-     */
-    public function getTaskDriver(Task $task)
-    {
-        $taskTypeName = strtolower($task->getType());
-
-        if (isset($this->taskDrivers[$taskTypeName])) {
-            return $this->taskDrivers[$taskTypeName];
+        if (!$task->getTimePeriod()->hasEndDateTime()) {
+            $task->getTimePeriod()->setEndDateTime(new \DateTime());
         }
 
-        return false;
+        $task->setOutput($taskDriverResponse->getTaskOutput());
+
+        $this->finish(
+            $task,
+            $this->getCompletionStateFromTaskDriverResponse($taskDriverResponse)
+        );
+
+        return 0;
     }
 
     /**
@@ -336,26 +311,6 @@ class TaskService extends EntityService
     }
 
     /**
-     * @param Task $task
-     * @param TaskDriverResponse $taskDriverResponse
-     *
-     * @return Task
-     */
-    public function complete(Task $task, TaskDriverResponse $taskDriverResponse)
-    {
-        if (!$task->getTimePeriod()->hasEndDateTime()) {
-            $task->getTimePeriod()->setEndDateTime(new \DateTime());
-        }
-
-        $task->setOutput($taskDriverResponse->getTaskOutput());
-
-        return $this->finish(
-            $task,
-            $this->getCompletionStateFromTaskDriverResponse($taskDriverResponse)
-        );
-    }
-
-    /**
      * @param TaskDriverResponse $taskDriverResponse
      *
      * @return State
@@ -368,14 +323,6 @@ class TaskService extends EntityService
 
         if ($taskDriverResponse->hasSucceeded()) {
             return $this->getCompletedState();
-        }
-
-        if ($taskDriverResponse->isRetryLimitReached()) {
-            return $this->getFailedRetryLimitReachedState();
-        }
-
-        if ($taskDriverResponse->isRetryable()) {
-            return $this->getFailedRetryAvailableState();
         }
 
         return $this->getFailedNoRetryAvailableState();
@@ -443,12 +390,13 @@ class TaskService extends EntityService
 
     /**
      * @param Task $task
-     * @return boolean
+     *
+     * @return boolean|int
      */
     public function reportCompletion(Task $task)
     {
         $this->logger->info(sprintf(
-            'TaskService::reportCompletion: Initialising [%i]',
+            'TaskService::reportCompletion: Initialising [%d]',
             $task->getId()
         ));
 
@@ -460,8 +408,6 @@ class TaskService extends EntityService
             return true;
         }
 
-        $this->removeTemporaryParameters($task);
-
         $requestUrl = $this->urlService->prepare(
             $this->coreApplicationService->get()->getUrl()
             . '/task/'
@@ -472,19 +418,20 @@ class TaskService extends EntityService
             . '/complete/'
         );
 
-        $httpRequest = $this->httpClientService->postRequest($requestUrl, null, array(
-            'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
-            'output' => $task->getOutput()->getOutput(),
-            'contentType' => (string)$task->getOutput()->getContentType(),
-            'state' => $task->getState()->getName(),
-            'errorCount' => $task->getOutput()->getErrorCount(),
-            'warningCount' => $task->getOutput()->getWarningCount()
-        ));
+        $httpRequest = $this->httpClientService->postRequest($requestUrl, [
+            'body' => [
+                'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
+                'output' => $task->getOutput()->getOutput(),
+                'contentType' => (string)$task->getOutput()->getContentType(),
+                'state' => $task->getState()->getName(),
+                'errorCount' => $task->getOutput()->getErrorCount(),
+                'warningCount' => $task->getOutput()->getWarningCount()
+            ],
+        ]);
 
         $this->logger->info("TaskService::reportCompletion: Reporting completion state to " . $requestUrl);
 
         try {
-            /* @var $response \GuzzleHttp\Message\Response */
             $response = $this->httpClientService->get()->send($httpRequest);
 
             $this->logger->notice(sprintf(
@@ -496,8 +443,6 @@ class TaskService extends EntityService
 
             $task->setNextState();
             $this->persistAndFlush($task);
-
-            return true;
         } catch (HttpBadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
 
@@ -525,6 +470,8 @@ class TaskService extends EntityService
                 return $curlExceptionFactory::fromConnectException($connectException)->getCurlCode();
             }
         }
+
+        return true;
     }
 
     /**
@@ -539,45 +486,13 @@ class TaskService extends EntityService
     }
 
     /**
-     * @param Task $task
-     */
-    private function removeTemporaryParameters(Task $task)
-    {
-        if (!$task->hasParameters()) {
-            return;
-        }
-
-        $hasRemovedTemporaryParameters = false;
-        $decodedParameters = json_decode($task->getParameters());
-
-        foreach ($decodedParameters as $key => $value) {
-            if (substr($key, 0, strlen('x-')) == 'x-') {
-                unset($decodedParameters->$key);
-                $hasRemovedTemporaryParameters = true;
-            }
-        }
-
-        if ($hasRemovedTemporaryParameters) {
-            $task->setParameters(json_encode($decodedParameters));
-        }
-    }
-
-    /**
-     * @return State[]
-     */
-    public function getIncompleteStates()
-    {
-        return [
-            $this->getQueuedState(),
-            $this->getInProgressState()
-        ];
-    }
-
-    /**
      * @return int
      */
     public function getInCompleteCount()
     {
-        return $this->getEntityRepository()->getCountByStates($this->getIncompleteStates());
+        return $this->getEntityRepository()->getCountByStates([
+            $this->getQueuedState(),
+            $this->getInProgressState()
+        ]);
     }
 }

@@ -2,8 +2,11 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services;
 
+use Mockery\MockInterface;
+use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Output as TaskOutput;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
@@ -11,10 +14,10 @@ use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
-use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorOutputFactory;
+use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
+use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorFixtureFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
-use webignition\HtmlValidator\Output\Output as HtmlValidatorOutput;
-use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
+use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 
 class TaskServiceTest extends BaseSimplyTestableTestCase
 {
@@ -26,10 +29,10 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     /**
      * @inheritdoc
      */
-    protected static function getMockServices()
+    protected static function getServicesToMock()
     {
         return [
-            'foo' => HtmlValidationTaskDriver::class,
+            'logger',
         ];
     }
 
@@ -75,95 +78,6 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
                     'state' => TaskService::TASK_IN_PROGRESS_STATE,
                 ]),
                 'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider completeDataProvider
-     *
-     * @param array $taskValues
-     * @param array $taskDriverResponseValues
-     * @param string $expectedEndState
-     */
-    public function testComplete(
-        array $taskValues,
-        array $taskDriverResponseValues,
-        $expectedEndState,
-        $expectedTaskOutput
-    ) {
-        $taskDriverResponse = $this->createTaskDriverResponse($taskDriverResponseValues);
-
-        $task = $this->getTaskFactory()->create($taskValues);
-        $this->startTask($task);
-        $this->assertEquals(TaskService::TASK_IN_PROGRESS_STATE, $task->getState());
-        $this->assertNull($task->getOutput());
-
-        $this->getTaskService()->complete($task, $taskDriverResponse);
-        $this->assertEquals($expectedEndState, $task->getState());
-        $this->assertTrue($task->getTimePeriod()->hasEndDateTime());
-        $this->assertInstanceOf(TaskOutput::class, $task->getOutput());
-        $this->assertEquals($expectedTaskOutput, $task->getOutput()->getOutput());
-    }
-
-    /**
-     * @return array
-     */
-    public function completeDataProvider()
-    {
-        return [
-            'completed' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
-                'taskDriverResponse' => [],
-                'expectedEndState' => TaskService::TASK_COMPLETED_STATE,
-                'expectedTaskOutput' => '',
-            ],
-            'completed with non-empty output' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
-                'taskDriverResponse' => [
-                    'taskOutputValues' => [
-                        'output' => 'foo'
-                    ],
-                ],
-                'expectedEndState' => TaskService::TASK_COMPLETED_STATE,
-                'expectedTaskOutput' => 'foo',
-            ],
-            'skipped' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
-                'taskDriverResponse' => [
-                    'hasBeenSkipped' => true,
-                ],
-                'expectedEndState' => TaskService::TASK_SKIPPED_STATE,
-                'expectedTaskOutput' => '',
-            ],
-            'failed, retry limit reached' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
-                'taskDriverResponse' => [
-                    'hasSucceeded' => false,
-                    'retryLimitReached' => true,
-                ],
-                'expectedEndState' => TaskService::TASK_FAILED_RETRY_LIMIT_REACHED_STATE,
-                'expectedTaskOutput' => '',
-            ],
-            'failed, retry available' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
-                'taskDriverResponse' => [
-                    'hasSucceeded' => false,
-                    'retryLimitReached' => false,
-                    'retryable' => true,
-                ],
-                'expectedEndState' => TaskService::TASK_FAILED_RETRY_AVAILABLE_STATE,
-                'expectedTaskOutput' => '',
-            ],
-            'failed, no retry available' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults(),
-                'taskDriverResponse' => [
-                    'hasSucceeded' => false,
-                    'retryLimitReached' => false,
-                    'retryable' => false,
-                ],
-                'expectedEndState' => TaskService::TASK_FAILED_NO_RETRY_AVAILABLE_STATE,
-                'expectedTaskOutput' => '',
             ],
         ];
     }
@@ -296,43 +210,78 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     }
 
     /**
+     * @dataProvider performTaskInIncorrectStateDataProvider
+     *
+     * @param array $taskValues
+     */
+    public function testPerformTaskInIncorrectState($taskValues)
+    {
+        $task = $this->getTaskFactory()->create($taskValues);
+        $this->assertEquals(1, $this->getTaskService()->perform($task));
+    }
+
+    /**
+     * @return array
+     */
+    public function performTaskInIncorrectStateDataProvider()
+    {
+        return [
+            'in-progress' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                ]),
+            ],
+            'completed' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'state' => TaskService::TASK_COMPLETED_STATE,
+                ]),
+            ],
+            'cancelled' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'state' => TaskService::TASK_CANCELLED_STATE,
+                ]),
+            ],
+            'failed-no-retry-available' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'state' => TaskService::TASK_FAILED_NO_RETRY_AVAILABLE_STATE,
+                ]),
+            ],
+            'failed-retry-available' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'state' => TaskService::TASK_FAILED_RETRY_AVAILABLE_STATE,
+                ]),
+            ],
+            'failed-retry-limit-reached' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'state' => TaskService::TASK_FAILED_RETRY_LIMIT_REACHED_STATE,
+                ]),
+            ],
+            'skipped' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                    'state' => TaskService::TASK_SKIPPED_STATE,
+                ]),
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider performDataProvider
      *
-     * @param $taskValues
+     * @param array $taskValues
+     * @param array $httpFixtures
+     * @param string $expectedFinishedStateName
      */
-    public function testPerform($taskValues)
+    public function testPerform($taskValues, $httpFixtures, $expectedFinishedStateName)
     {
         $this->clearMemcacheHttpCache();
-        $this->setHttpFixtures([
-            "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html><head></head><body></body>"
-        ]);
+        $this->setHttpFixtures($httpFixtures);
+        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->getTaskFactory()->create($taskValues);
 
-        $htmlValidatorWrapper = \Mockery::mock(HtmlValidatorWrapper::class);
-        $htmlValidatorWrapper
-            ->shouldReceive('createConfiguration')
-            ->with(array(
-                'documentUri' => 'file:/tmp/e64c6d8aa780860f5adf9e82d25f8313.html',
-                'validatorPath' => '/usr/local/validator/cgi-bin/check',
-                'documentCharacterSet' => 'UTF-8',
-            ));
-
-        $htmlValidatorOutputFactory = new HtmlValidatorOutputFactory();
-        $htmlValidatorOutput = $htmlValidatorOutputFactory->create(
-            HtmlValidatorOutput::STATUS_VALID
-        );
-        $htmlValidatorWrapper
-            ->shouldReceive('validate')
-            ->andReturn($htmlValidatorOutput);
-
-        /* @var $htmlValidationTaskDriver HtmlValidationTaskDriver */
-        $htmlValidationTaskDriver = $this->getTaskService()->getTaskDriver($task);
-        $htmlValidationTaskDriver->setHtmlValidatorWrapper($htmlValidatorWrapper);
-
         $this->getTaskService()->perform($task);
 
-        $this->assertEquals(TaskService::TASK_COMPLETED_STATE, $task->getState());
+        $this->assertEquals($expectedFinishedStateName, $task->getState());
     }
 
     /**
@@ -341,77 +290,145 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     public function performDataProvider()
     {
         return [
-            'foo' => [
+            'default' => [
                 'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html><head></head><body></body>"
+                ],
+                'expectedFinishedStateName' => TaskService::TASK_COMPLETED_STATE,
+            ],
+            'skipped' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:application/pdf"
+                ],
+                'expectedFinishedStateName' => TaskService::TASK_SKIPPED_STATE,
+            ],
+            'failed, no retry available' => [
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'httpFixtures' => [
+                    "HTTP/1.1 404",
+                    "HTTP/1.1 404",
+                ],
+                'expectedFinishedStateName' => TaskService::TASK_FAILED_NO_RETRY_AVAILABLE_STATE,
             ],
         ];
     }
 
-    /**
-     * @param array $taskDriverResponseValues
-     * @return TaskDriverResponse
-     */
-    private function createTaskDriverResponse($taskDriverResponseValues)
+    public function testGetById()
     {
-        $taskOutputValues = isset($taskDriverResponseValues['taskOutputValues'])
-            ? $taskDriverResponseValues['taskOutputValues']
-            : [
-                'output' => '',
-            ];
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults());
+        $id = $task->getId();
 
-        if (!isset($taskDriverResponseValues['hasSucceeded'])) {
-            $taskDriverResponseValues['hasSucceeded'] = true;
-        }
+        $this->getEntityManager()->detach($task);
 
-        if (!isset($taskDriverResponseValues['hasBeenSkipped'])) {
-            $taskDriverResponseValues['hasBeenSkipped'] = false;
-        }
+        $this->assertEquals($id, $this->getTaskService()->getById($id)->getId());
+    }
 
-        if (!isset($taskDriverResponseValues['retryLimitReached'])) {
-            $taskDriverResponseValues['retryLimitReached'] = false;
-        }
+    public function testReportCompletionNoOutput()
+    {
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
 
-        if (!isset($taskDriverResponseValues['retryable'])) {
-            $taskDriverResponseValues['retryable'] = true;
-        }
+        /* @var LoggerInterface|MockInterface $logger */
+        $logger = $this->container->get('logger');
 
-        $taskOutput = new TaskOutput();
-        $taskOutput->setOutput($taskOutputValues['output']);
-        $taskOutput->setState(
-            $this->getStateService()->fetch(TaskDriver::OUTPUT_STARTING_STATE)
-        );
+        $logger
+            ->shouldReceive('info')
+            ->with(sprintf(
+                'TaskService::reportCompletion: Initialising [%d]',
+                $task->getId()
+            ));
 
-        $taskDriverResponse = new TaskDriverResponse();
-        $taskDriverResponse->setTaskOutput($taskOutput);
+        $logger
+            ->shouldReceive('info')
+            ->with(sprintf(
+                'TaskService::reportCompletion: Task state is [%s], we can\'t report back just yet',
+                $task->getState()
+            ));
 
-        if ($taskDriverResponseValues['hasBeenSkipped']) {
-            $taskDriverResponse->setHasBeenSkipped();
-        }
-
-        if ($taskDriverResponseValues['hasSucceeded']) {
-            $taskDriverResponse->setHasSucceeded();
-        } else {
-            $taskDriverResponse->setHasFailed();
-        }
-
-        $taskDriverResponse->setIsRetryLimitReached($taskDriverResponseValues['retryLimitReached']);
-        $taskDriverResponse->setIsRetryable($taskDriverResponseValues['retryable']);
-
-        return $taskDriverResponse;
+        $this->getTaskService()->reportCompletion($task);
     }
 
     /**
-     * @param Task $task
+     * @dataProvider reportCompletionFailureDataProvider
      *
-     * @return Task
+     * @param $responseFixture
+     * @param $expectedReturnValue
      */
-    private function startTask(Task $task)
+    public function testReportCompletionFailure($responseFixture, $expectedReturnValue)
     {
-        $timePeriod = new TimePeriod();
-        $timePeriod->setStartDateTime(new \DateTime());
-        $task->setTimePeriod($timePeriod);
-        $task->setState($this->getTaskService()->getInProgressState());
+        $this->clearMemcacheHttpCache();
+        $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html>",
+            $responseFixture,
+        ]);
+        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $this->getTaskService()->persistAndFlush($task);
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $this->getTaskService()->perform($task);
+        $initialTaskState = (string)$task->getState();
+
+        $this->assertEquals($expectedReturnValue, $this->getTaskService()->reportCompletion($task));
+        $this->assertEquals($initialTaskState, (string)$task->getState());
+    }
+
+    /**
+     * @return array
+     */
+    public function reportCompletionFailureDataProvider()
+    {
+        return [
+            'http 404' => [
+                'responseFixture' => "HTTP/1.1 404",
+                'expectedReturnValue' => 404,
+            ],
+            'http 500' => [
+                'responseFixture' => "HTTP/1.1 500",
+                'expectedReturnValue' => 500,
+            ],
+            'curl 28' => [
+                'responseFixture' => ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
+                'expectedReturnValue' => 28,
+            ],
+        ];
+    }
+
+    public function testReportCompletion()
+    {
+        $this->clearMemcacheHttpCache();
+        $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html>",
+            "HTTP/1.1 200 OK",
+        ]);
+        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
+
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+
+        ]));
+        $this->getTaskService()->perform($task);
+
+        $this->assertTrue($this->getTaskService()->reportCompletion($task));
+        $this->assertEquals(TaskService::TASK_COMPLETED_STATE, (string)$task->getState());
+    }
+
+    public function testGetIncompleteCount()
+    {
+        $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+            'state' => TaskService::TASK_STARTING_STATE,
+        ]));
+        $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+            'state' => TaskService::TASK_IN_PROGRESS_STATE,
+        ]));
+
+        $this->assertEquals(2, $this->getTaskService()->getInCompleteCount());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
     }
 }
