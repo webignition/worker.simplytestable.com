@@ -14,7 +14,7 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
     /**
      * @inheritdoc
      */
-    protected static function getMockServices()
+    protected static function getServicesToMock()
     {
         return [
             'logger' => LoggerInterface::class,
@@ -64,10 +64,6 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
             $httpResponseFixture
         ]);
 
-        $this->container->get('logger')
-            ->shouldReceive('error')
-            ->with($expectedLogErrorMessage);
-
         $this->setExpectedException(
             $expectedException['class'],
             $expectedException['message'],
@@ -75,6 +71,10 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
         );
 
         $this->getTasksService()->request();
+
+        $this->container->get('logger')
+            ->shouldHaveReceived('error')
+            ->with($expectedLogErrorMessage);
     }
 
     /**
