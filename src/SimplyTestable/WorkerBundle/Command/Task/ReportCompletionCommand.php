@@ -10,6 +10,9 @@ class ReportCompletionCommand extends Command
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -22,6 +25,9 @@ EOF
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if ($this->getWorkerService()->isMaintenanceReadOnly()) {
