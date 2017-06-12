@@ -14,10 +14,7 @@ class ReportCompletionEnqueueCommand extends Command
         $this
             ->setName('simplytestable:task:reportcompletion:enqueue')
             ->setDescription('Enqueue task report completion jobs for tasks waiting to be report back completion state')
-            ->setHelp(<<<EOF
-Enqueue task report completion jobs for tasks waiting to be report back completion state
-EOF
-        );
+            ->setHelp('Enqueue task report completion jobs for tasks waiting to be report back completion state');
     }
 
     /**

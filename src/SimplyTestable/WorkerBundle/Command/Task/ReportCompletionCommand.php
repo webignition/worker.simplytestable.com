@@ -19,10 +19,7 @@ class ReportCompletionCommand extends Command
             ->setName('simplytestable:task:reportcompletion')
             ->setDescription('Report back to the core application the completed status of a task')
             ->addArgument('id', InputArgument::REQUIRED, 'id of task to report')
-            ->setHelp(<<<EOF
-Report back to the core application the completed status of a task
-EOF
-        );
+            ->setHelp('Report back to the core application the completed status of a task');
     }
 
     /**

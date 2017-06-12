@@ -2,38 +2,33 @@
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\BaseCommand;
-
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
+use SimplyTestable\WorkerBundle\Services\TaskService;
 
 abstract class Command extends BaseCommand
-{    
+{
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\TaskService
+     * @return TaskService
      */
-    protected function getTaskService() {
+    protected function getTaskService()
+    {
         return $this->getContainer()->get('simplytestable.services.taskservice');
     }
 
-
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\Resque\QueueService
+     * @return QueueService
      */
-    protected function getResqueQueueService() {
+    protected function getResqueQueueService()
+    {
         return $this->getContainer()->get('simplytestable.services.resque.queueservice');
     }
 
-
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService
+     * @return JobFactoryService
      */
-    protected function getResqueJobFactoryService() {
+    protected function getResqueJobFactoryService()
+    {
         return $this->getContainer()->get('simplytestable.services.resque.jobFactoryService');
-    }     
+    }
 }
