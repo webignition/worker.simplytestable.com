@@ -25,13 +25,7 @@ class EnableReadOnlyCommand extends BaseCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->getWorkerService()->setReadOnly();
-        if ($this->getWorkerService()->isMaintenanceReadOnly()) {
-            $output->writeln('Set state to maintenance-read-only');
-
-            return 0;
-        }
-
-        $output->writeln('Failed to set state to maintenance-read-only');
+        $output->writeln('Set state to maintenance-read-only');
 
         return 0;
     }
