@@ -2,151 +2,114 @@
 namespace SimplyTestable\WorkerBundle\Services;
 
 use Doctrine\ORM\EntityManager;
-use SimplyTestable\WorkerBundle\Services\CoreApplicationService;
-use SimplyTestable\WorkerBundle\Services\StateService;
-use SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\ConnectException;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
-use SimplyTestable\WorkerBundle\Model\RemoteEndpoint;
-use webignition\Http\Client\Client as HttpClient;
 use Psr\Log\LoggerInterface;
-use webignition\Http\Client\CurlException;
+use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptionFactory;
 
-class WorkerService extends EntityService {
-
+class WorkerService extends EntityService
+{
     const WORKER_NEW_STATE = 'worker-new';
-    const WORKER_ACTIVATE_STATE = 'worker-active';
+    const WORKER_ACTIVE_STATE = 'worker-active';
     const WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE = 'worker-awaiting-activation-verification';
     const WORKER_ACTIVATE_REMOTE_ENDPOINT_IDENTIFIER = 'worker-activate';
     const WORKER_MAINTENANCE_READ_ONLY_STATE = 'worker-maintenance-read-only';
     const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\ThisWorker';
 
-
     /**
-     *
      * @var LoggerInterface
      */
     private $logger;
 
-
     /**
-     *
      * @var string
      */
     private $salt;
 
-
     /**
-     *
      * @var string
      */
     private $hostname;
 
-
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\CoreApplicationService
+     * @var string
      */
-    private $coreApplicationService;
-
+    private $coreApplicationBaseUrl;
 
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\StateService
+     * @var StateService
      */
     private $stateService;
 
-
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\HttpClientService
+     * @var HttpClientService
      */
     private $httpClientService;
 
-
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Service\UrlService $urlService
+     * @var UrlService $urlService
      */
     private $urlService;
 
-
     /**
-     *
-     * @param \Doctrine\ORM\EntityManager $entityManager
+     * @param EntityManager $entityManager
      * @param LoggerInterface $logger
      * @param string $salt
      * @param string $hostname
-     * @param \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService
-     * @param \SimplyTestable\WorkerBundle\Services\StateService $stateService
-     * @param \SimplyTestable\WorkerBundle\Services $httpClientService
-     * @param \SimplyTestable\WorkerBundle\Services\UrlService $urlService
+     * @param string $coreApplicationBaseUrl
+     * @param StateService $stateService
+     * @param HttpClientService $httpClientService
+     * @param UrlService $urlService
      */
     public function __construct(
-            EntityManager $entityManager,
-            LoggerInterface $logger,
-            $salt,
-            $hostname,
-            \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService,
-            \SimplyTestable\WorkerBundle\Services\StateService $stateService,
-            \SimplyTestable\WorkerBundle\Services\HttpClientService $httpClientService,
-            \SimplyTestable\WorkerBundle\Services\UrlService $urlService)
-    {
+        EntityManager $entityManager,
+        LoggerInterface $logger,
+        $salt,
+        $hostname,
+        $coreApplicationBaseUrl,
+        StateService $stateService,
+        HttpClientService $httpClientService,
+        UrlService $urlService
+    ) {
         parent::__construct($entityManager);
 
         $this->logger = $logger;
         $this->salt = $salt;
         $this->hostname = $hostname;
-        $this->coreApplicationService = $coreApplicationService;
+        $this->coreApplicationBaseUrl = $coreApplicationBaseUrl;
         $this->stateService = $stateService;
         $this->httpClientService = $httpClientService;
-        //$this->httpClient->redirectHandler()->enable();
         $this->urlService = $urlService;
     }
 
-
     /**
-     *
      * @return string
      */
-    protected function getEntityName() {
+    protected function getEntityName()
+    {
         return self::ENTITY_NAME;
     }
 
-
     /**
-     *
      * @return ThisWorker
      */
-    public function get() {
-        if (!$this->has()) {
+    public function get()
+    {
+        $workers = $this->getEntityRepository()->findAll();
+        if (empty($workers)) {
             $this->create();
+            $workers = $this->getEntityRepository()->findAll();
         }
 
-        return $this->fetch();
+        return $workers[0];
     }
 
     /**
-     *
-     * @return boolean
-     */
-    private function has() {
-        return !is_null($this->fetch());
-    }
-
-    /**
-     *
      * @return ThisWorker
      */
-    private function fetch() {
-        return $this->getEntityRepository()->find(1);
-    }
-
-
-    /**
-     *
-     * @return ThisWorker
-     */
-    private function create() {
+    private function create()
+    {
         $thisWorker = new ThisWorker();
         $thisWorker->setHostname($this->hostname);
         $thisWorker->setState($this->stateService->fetch('worker-new'));
@@ -155,18 +118,18 @@ class WorkerService extends EntityService {
         return $this->persistAndFlush($thisWorker);
     }
 
-
     /**
+     * @param ThisWorker $thisWorker
      *
-     * @param ThisWorker $job
      * @return ThisWorker
      */
-    public function persistAndFlush(ThisWorker $thisWorker) {
+    private function persistAndFlush(ThisWorker $thisWorker)
+    {
         $this->getEntityManager()->persist($thisWorker);
         $this->getEntityManager()->flush();
+
         return $thisWorker;
     }
-
 
     /**
      * Issue activation request to core application
@@ -174,71 +137,93 @@ class WorkerService extends EntityService {
      *
      * @return int
      */
-    public function activate() {
+    public function activate()
+    {
         $this->logger->info("WorkerService::activate: Initialising");
 
         if (!$this->isNew()) {
             $this->logger->info("WorkerService::activate: This worker is not new and cannot be activated");
+
             return 0;
         }
 
-        /* @var $coreApplication \SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication */
-        $coreApplication = $this->coreApplicationService->get();
-        $this->coreApplicationService->populateRemoteEndpoints($coreApplication);
-
         $thisWorker = $this->get();
+        $requestUrl = $this->urlService->prepare($this->coreApplicationBaseUrl . 'worker/activate/');
 
-        $remoteEndpoint = $this->getWorkerActivateRemoteEndpoint($coreApplication);
-
-        $requestUrl = $this->urlService->prepare($remoteEndpoint->getUrl());
-
-        $httpRequest = $this->httpClientService->postRequest($requestUrl, null, array(
-            'hostname' => $thisWorker->getHostname(),
-            'token' => $thisWorker->getActivationToken()
-        ));
+        $httpRequest = $this->httpClientService->postRequest($requestUrl, [
+            'body' => [
+                'hostname' => $thisWorker->getHostname(),
+                'token' => $thisWorker->getActivationToken()
+            ],
+        ]);
 
         $this->logger->info("WorkerService::activate: Requesting activation with " . $requestUrl);
 
+        $response = null;
+        $responseCode = null;
+        $responsePhrase = null;
+        $hasHttpError = false;
+        $hasCurlError = false;
+
         try {
-            $response = $httpRequest->send();
-        } catch (\Guzzle\Http\Exception\ServerErrorResponseException $serverErrorResponseException) {
-            $response = $serverErrorResponseException->getResponse();
-        } catch (\Guzzle\Http\Exception\ClientErrorResponseException $clientErrorResponseException) {
-            $response = $clientErrorResponseException->getResponse();
-        } catch (\Guzzle\Http\Exception\CurlException $curlException) {
-            $this->logger->error("WorkerService::activate: " . $requestUrl . ": " . $curlException->getErrorNo());
-            return $curlException->getErrorNo();
+            $response = $this->httpClientService->get()->send($httpRequest);
+            $responseCode = 200;
+            $responsePhrase = $response->getReasonPhrase();
+        } catch (BadResponseException $badResponseException) {
+            $hasHttpError = true;
+            $response = $badResponseException->getResponse();
+            $responseCode = $response->getStatusCode();
+            $responsePhrase = $response->getReasonPhrase();
+        } catch (ConnectException $connectException) {
+            $hasCurlError = true;
+            $curlException = GuzzleCurlExceptionFactory::fromConnectException($connectException);
+            $responseCode = $curlException->getCurlCode();
+            $responsePhrase = $curlException->getMessage();
         }
 
-        $this->logger->info("WorkerService::activate: " . $requestUrl . ": " . $response->getStatusCode()." ".$response->getReasonPhrase());
+        $this->logger->info(sprintf(
+            "WorkerService::activate: %s: %s %s",
+            $requestUrl,
+            $responseCode,
+            $responsePhrase
+        ));
 
-        if ($response->getStatusCode() === 503) {
-            $this->logger->error("WorkerService::activate: Activation request failed (core application is in read-only mode)");
-            return $response->getStatusCode();
-        }
+        if ($hasHttpError || $hasCurlError) {
+            $this->logger->error("WorkerService::activate: Activation request failed: " . $responseCode);
 
-        if ($response->getStatusCode() !== 200) {
-            $this->logger->error("WorkerService::activate: Activation request failed");
-            return $response->getStatusCode();
+            return $responseCode;
         }
 
         $thisWorker->setNextState();
         $this->persistAndFlush($thisWorker);
 
-        return 0;;
+        return 0;
     }
 
+    public function setActive()
+    {
+        $this->setState(self::WORKER_ACTIVE_STATE);
+    }
 
-    public function setActive() {
-        $activeState = $this->getActiveState();
-        $thisWorker = $this->get()->setState($activeState);
+    public function setReadOnly()
+    {
+        $this->setState(self::WORKER_MAINTENANCE_READ_ONLY_STATE);
+    }
+
+    private function setState($stateName)
+    {
+        $thisWorker = $this->get();
+        $thisWorker->setState(
+            $this->stateService->fetch($stateName)
+        );
         $this->persistAndFlush($thisWorker);
     }
 
-
-    public function verify() {
+    public function verify()
+    {
         if (!$this->isAwaitingActivationVerification()) {
             $this->logger->info("WorkerService::verify: This worker is not awaiting activation verification");
+
             return true;
         }
 
@@ -249,101 +234,44 @@ class WorkerService extends EntityService {
         return true;
     }
 
-
     /**
-     *
-     * @param CoreApplication $coreApplication
-     * @return RemoteEndpoint
-     */
-    private function getWorkerActivateRemoteEndpoint(CoreApplication $coreApplication) {
-        $remoteEndpoint = new RemoteEndpoint();
-        $remoteEndpoint->setIdentifier(self::WORKER_ACTIVATE_REMOTE_ENDPOINT_IDENTIFIER);
-
-        return $coreApplication->getRemoteEndpoint($remoteEndpoint);
-    }
-
-
-    /**
-     *
      * @return boolean
      */
-    private function isNew() {
-        return $this->get()->getState()->equals($this->getStartingState());
+    private function isNew()
+    {
+        return $this->get()->getState()->equals(
+            $this->stateService->fetch(self::WORKER_NEW_STATE)
+        );
     }
 
     /**
-     *
      * @return boolean
      */
-    private function isAwaitingActivationVerification() {
-        return $this->get()->getState()->equals($this->getAwaitingActivationVerificationState());
+    private function isAwaitingActivationVerification()
+    {
+        return $this->get()->getState()->equals(
+            $this->stateService->fetch(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE)
+        );
     }
 
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
-     */
-    public function getStartingState() {
-        return $this->stateService->fetch(self::WORKER_NEW_STATE);
-    }
-
-    /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
-     */
-    public function getAwaitingActivationVerificationState() {
-        return $this->stateService->fetch(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE);
-    }
-
-    /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
-     */
-    public function getActiveState() {
-        return $this->stateService->fetch(self::WORKER_ACTIVATE_STATE);
-    }
-
-    /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
-     */
-    public function getMaintenanceReadOnlyState() {
-        return $this->stateService->fetch(self::WORKER_MAINTENANCE_READ_ONLY_STATE);
-    }
-
-
-    /**
-     *
      * @return boolean
      */
-    public function isActive() {
-        return $this->get()->getState()->equals($this->getActiveState());
+    public function isActive()
+    {
+        return $this->get()->getState()->equals(
+            $this->stateService->fetch(self::WORKER_ACTIVE_STATE)
+        );
     }
 
 
     /**
-     *
      * @return boolean
      */
-    public function isMaintenanceReadOnly() {
-        return $this->get()->getState()->equals($this->getMaintenanceReadOnlyState());
-    }
-
-
-    /**
-     *
-     */
-    public function setReadOnly() {
-        $thisWorker = $this->get();
-        $thisWorker->setState($this->getMaintenanceReadOnlyState());
-        $this->persistAndFlush($thisWorker);
-    }
-
-
-    /**
-     *
-     */
-    public function clearReadOnly() {
-        $this->setActive();
+    public function isMaintenanceReadOnly()
+    {
+        return $this->get()->getState()->equals(
+            $this->stateService->fetch(self::WORKER_MAINTENANCE_READ_ONLY_STATE)
+        );
     }
 }

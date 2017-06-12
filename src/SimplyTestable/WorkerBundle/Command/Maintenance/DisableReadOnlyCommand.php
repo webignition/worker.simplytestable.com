@@ -24,7 +24,7 @@ class DisableReadOnlyCommand extends BaseCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->getWorkerService()->clearReadOnly();
+        $this->getWorkerService()->setActive();
         $output->writeln('Set state to active');
 
         return 0;

@@ -44,7 +44,7 @@ services:
         logger: "@logger"
         salt: %secret%
         hostname: %hostname%
-        coreApplicationService: "@simplytestable.services.coreApplicationService"
+        coreApplicationBaseUrl: "%core_url%"
         stateService: "@simplytestable.services.stateservice"
         httpClientService: "@simplytestable.services.httpClientService"
         urlService: "@simplytestable.services.urlService"
