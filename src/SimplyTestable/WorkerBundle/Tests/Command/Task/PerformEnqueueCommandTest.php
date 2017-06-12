@@ -73,7 +73,7 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase
         $this->assertEquals(0, $this->executeCommand('simplytestable:task:perform:enqueue'));
 
         foreach ($tasks as $task) {
-            $this->assertTrue($this->getRequeQueueService()->contains('task-perform', array(
+            $this->assertTrue($this->getResqueQueueService()->contains('task-perform', array(
                 'id' => $task->getId()
             )));
         }

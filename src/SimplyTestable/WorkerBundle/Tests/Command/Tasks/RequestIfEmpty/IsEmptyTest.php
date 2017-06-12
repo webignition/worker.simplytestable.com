@@ -6,12 +6,12 @@ class IsEmptyTest extends RequestIfEmptyCommandTest {
 
     public function testResqueJobIsCreated() {
         $this->executeCommand('simplytestable:tasks:requestifempty');
-        $this->assertTrue($this->getRequeQueueService()->contains('tasks-request'));
+        $this->assertTrue($this->getResqueQueueService()->contains('tasks-request'));
     }
 
 
     public function testResqueQueueLength() {
         $this->executeCommand('simplytestable:tasks:requestifempty');
-        $this->assertEquals(1, $this->getRequeQueueService()->getQueueLength('tasks-request'));
+        $this->assertEquals(1, $this->getResqueQueueService()->getQueueLength('tasks-request'));
     }
 }

@@ -121,7 +121,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      *
      * @return \SimplyTestable\WorkerBundle\Services\Resque\QueueService
      */
-    protected function getRequeQueueService() {
+    protected function getResqueQueueService() {
         return $this->container->get('simplytestable.services.resque.queueservice');
     }
 

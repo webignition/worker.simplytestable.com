@@ -60,7 +60,7 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
         ));
 
         $this->assertEquals(PerformCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE, $returnCode);
-        $this->assertTrue($this->getRequeQueueService()->contains(
+        $this->assertTrue($this->getResqueQueueService()->contains(
             'task-perform',
             [
                 'id' => $task->getId()
@@ -123,12 +123,12 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
                 }
             }
 
-            $this->assertFalse($this->getRequeQueueService()->isEmpty($queueName));
-            $this->assertTrue($this->getRequeQueueService()->contains($queueName, $data));
+            $this->assertFalse($this->getResqueQueueService()->isEmpty($queueName));
+            $this->assertTrue($this->getResqueQueueService()->contains($queueName, $data));
         }
 
         foreach ($expectedEmptyResqueQueues as $queueName) {
-            $this->assertTrue($this->getRequeQueueService()->isEmpty($queueName));
+            $this->assertTrue($this->getResqueQueueService()->isEmpty($queueName));
         }
     }
 

@@ -35,7 +35,7 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase
 
         $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion:enqueue'));
 
-        $this->assertTrue($this->getRequeQueueService()->contains(
+        $this->assertTrue($this->getResqueQueueService()->contains(
             'task-report-completion',
             [
                 'id' => $task->getId()
@@ -57,7 +57,7 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase
 
         $this->assertTrue($this->clearRedis());
 
-        $this->getRequeQueueService()->enqueue(
+        $this->getResqueQueueService()->enqueue(
             $this->getResqueJobFactoryService()->create(
                 'task-report-completion',
                 ['id' => $task->getId()]
@@ -66,7 +66,7 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase
 
         $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion:enqueue'));
 
-        $this->assertTrue($this->getRequeQueueService()->contains(
+        $this->assertTrue($this->getResqueQueueService()->contains(
             'task-report-completion',
             [
                 'id' => $task->getId()

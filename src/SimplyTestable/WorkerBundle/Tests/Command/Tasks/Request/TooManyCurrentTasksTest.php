@@ -25,6 +25,6 @@ class TooManyCurrentTasksTest extends RequestCommandTest {
     }
 
     public function testReturnsResqueJobToQueue() {
-        $this->assertTrue($this->getRequeQueueService()->contains('tasks-request'));
+        $this->assertTrue($this->getResqueQueueService()->contains('tasks-request'));
     }
 }

@@ -26,7 +26,7 @@ class ControllerTest extends BaseControllerTest {
 
 
     public function testResqueJobIsCreated() {
-        $this->assertFalse($this->getRequeQueueService()->isEmpty('tasks-request'));
+        $this->assertFalse($this->getResqueQueueService()->isEmpty('tasks-request'));
     }
 
 

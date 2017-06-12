@@ -5,7 +5,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Command\Tasks\RequestIfEmpty;
 class IsNotEmptyTest extends RequestIfEmptyCommandTest {
 
     public function testResqueJobIsNotCreated() {
-        $this->getRequeQueueService()->enqueue(
+        $this->getResqueQueueService()->enqueue(
             $this->getResqueJobFactoryService()->create(
                 'tasks-request'
             )
@@ -23,6 +23,6 @@ class IsNotEmptyTest extends RequestIfEmptyCommandTest {
 
 //
         $this->executeCommand('simplytestable:tasks:requestifempty');
-        $this->assertEquals(1, $this->getRequeQueueService()->getQueueLength('tasks-request'));
+        $this->assertEquals(1, $this->getResqueQueueService()->getQueueLength('tasks-request'));
     }
 }

@@ -59,6 +59,6 @@ abstract class SuccessTest extends RequestCommandTest {
     }
 
     public function testResqueJobToQueueIsEmpty() {
-        $this->assertEquals($this->getExpectedResqueQueueIsEmpty(), $this->getRequeQueueService()->isEmpty('tasks-request'));
+        $this->assertEquals($this->getExpectedResqueQueueIsEmpty(), $this->getResqueQueueService()->isEmpty('tasks-request'));
     }
 }
