@@ -80,17 +80,6 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
 
     /**
      *
-     * @param string $methodName
-     * @param array $postData
-     * @return \SimplyTestable\WorkerBundle\Controller\MaintenanceController
-     */
-    protected function getMaintenanceController($methodName, $postData = array()) {
-        return $this->getController(self::MAINTENANCE_CONTROLLER_NAME, $methodName, $postData);
-    }
-
-
-    /**
-     *
      * @param string $controllerName
      * @param string $methodName
      * @return \Symfony\Bundle\FrameworkBundle\Controller\Controller

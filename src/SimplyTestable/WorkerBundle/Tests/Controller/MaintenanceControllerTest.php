@@ -2,6 +2,8 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Controller;
 
+use SimplyTestable\WorkerBundle\Controller\MaintenanceController;
+
 class MaintenanceControllerTest extends BaseControllerJsonTestCase
 {
     public function setUp() {
@@ -43,5 +45,18 @@ class MaintenanceControllerTest extends BaseControllerJsonTestCase
         );
         $this->assertFalse($this->getWorkerService()->isMaintenanceReadOnly());
         $this->assertTrue($this->getWorkerService()->isActive());
+    }
+
+    /**
+     * @param string $methodName
+     *
+     * @return MaintenanceController
+     */
+    private function getMaintenanceController($methodName)
+    {
+        /* @var MaintenanceController $maintenanceController */
+        $maintenanceController = $this->getController(self::MAINTENANCE_CONTROLLER_NAME, $methodName);
+
+        return $maintenanceController;
     }
 }
