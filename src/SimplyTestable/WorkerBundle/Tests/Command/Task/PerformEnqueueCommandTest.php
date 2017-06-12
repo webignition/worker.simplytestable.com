@@ -38,28 +38,20 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase
 
     public function testEnqueueTaskPerformJobs()
     {
-        $taskPropertyCollection = array(
-            array(
+        $taskPropertyCollection = [
+            [
                 'url' => 'http://example.com/1/',
                 'type' => 'HTML validation'
-            ),
-            array(
-                'url' => 'http://example.com/1/',
-                'type' => 'CSS validation'
-            ),
-            array(
-                'url' => 'http://example.com/1/',
-                'type' => 'JS static analysis'
-            ),
-            array(
+            ],
+            [
                 'url' => 'http://example.com/2/',
                 'type' => 'HTML validation'
-            ),
-            array(
+            ],
+            [
                 'url' => 'http://example.com/3/',
                 'type' => 'HTML validation'
-            ),
-        );
+            ],
+        ];
 
         $tasks = array();
         foreach ($taskPropertyCollection as $taskProperties) {
@@ -69,6 +61,13 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase
         }
 
         $this->clearRedis();
+
+        $this->getResqueQueueService()->enqueue(
+            $this->getResqueJobFactoryService()->create(
+                'task-perform',
+                ['id' => $tasks[0]->getId()]
+            )
+        );
 
         $this->assertEquals(0, $this->executeCommand('simplytestable:task:perform:enqueue'));
 
