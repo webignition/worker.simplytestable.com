@@ -3,8 +3,9 @@
 namespace SimplyTestable\WorkerBundle\Tests\Command\Maintenance;
 
 use SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand;
+use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
-use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
 class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase
@@ -29,54 +30,182 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase
         );
     }
 
-    public function testRequeueInProgressTasksCommand()
-    {
-        $urls = array(
-            'http://example.com/zero/',
-            'http://example.com/one/',
-            'http://example.com/two/',
-        );
+    /**
+     * @dataProvider executeDataProvider
+     *
+     * @param array $taskValuesCollection
+     * @param int $expectedInitialQueuedTaskCount
+     * @param int $expectedInitialInProgressTaskCount
+     * @param int $expectedQueuedTaskCount
+     */
+    public function testExecute(
+        $taskValuesCollection,
+        $commandArguments,
+        $expectedInitialQueuedTaskCount,
+        $expectedInitialInProgressTaskCount,
+        $expectedQueuedTaskCount
+    ) {
+        /* @var Task[] $tasks */
+        $tasks = [];
 
-        foreach ($urls as $index => $url) {
-            $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
-                'url' => $url,
-                'type' => 'html validation',
-            ]));
+        $queuedState = $this->getTaskService()->getQueuedState();
+        $inProgressState = $this->getTaskService()->getInProgressState();
 
-            if ($index > 0) {
-                $task->setState($this->getTaskService()->getInProgressState());
-
-                $timePeriod = new TimePeriod();
-                $timePeriod->setStartDateTime(new \DateTime('-25 hour'));
-
-                $task->setTimePeriod($timePeriod);
-
-                $this->getTaskService()->getEntityManager()->persist($task);
-            }
+        foreach ($taskValuesCollection as $taskValues) {
+            $tasks[] = $this->getTaskFactory()->create($taskValues);
         }
 
-        $this->getTaskService()->getEntityManager()->flush();
-
         $this->assertCount(
-            1,
-            $this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState())
+            $expectedInitialQueuedTaskCount,
+            $this->getTaskService()->getEntityRepository()->getIdsByState($queuedState)
         );
 
         $this->assertCount(
-            2,
-            $this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getInProgressState())
+            $expectedInitialInProgressTaskCount,
+            $this->getTaskService()->getEntityRepository()->getIdsByState($inProgressState)
         );
 
         $this->clearRedis();
 
         $this->assertEquals(
             0,
-            $this->executeCommand('simplytestable:maintenance:requeue-in-progress-tasks')
+            $this->executeCommand('simplytestable:maintenance:requeue-in-progress-tasks', $commandArguments)
         );
 
         $this->assertCount(
-            3,
-            $this->getTaskService()->getEntityRepository()->getIdsByState($this->getTaskService()->getQueuedState())
+            $expectedQueuedTaskCount,
+            $this->getTaskService()->getEntityRepository()->getIdsByState($queuedState)
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function executeDataProvider()
+    {
+        return [
+            'no in-progress tasks' => [
+                'taskValuesCollection' => [
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2/',
+                        'state' => TaskService::TASK_STARTING_STATE,
+                    ]),
+                ],
+                'commandArguments' => [],
+                'expectedInitialQueuedTaskCount' => 1,
+                'expectedInitialInProgressTaskCount' => 0,
+                'expectedQueuedTaskCount' => 1,
+            ],
+            'one in-progress task not of suitable default age' => [
+                'taskValuesCollection' => [
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1/',
+                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'age' => '10 minute',
+                    ]),
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2/',
+                        'state' => TaskService::TASK_STARTING_STATE,
+                    ]),
+                ],
+                'commandArguments' => [],
+                'expectedInitialQueuedTaskCount' => 1,
+                'expectedInitialInProgressTaskCount' => 1,
+                'expectedQueuedTaskCount' => 1,
+            ],
+            'one in-progress task of suitable default age' => [
+                'taskValuesCollection' => [
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1/',
+                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'age' => '1 hour',
+                    ]),
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2/',
+                        'state' => TaskService::TASK_STARTING_STATE,
+                    ]),
+                ],
+                'commandArguments' => [],
+                'expectedInitialQueuedTaskCount' => 1,
+                'expectedInitialInProgressTaskCount' => 1,
+                'expectedQueuedTaskCount' => 2,
+            ],
+            'one in-progress task of suitable default age, dry run' => [
+                'taskValuesCollection' => [
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1/',
+                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'age' => '1 hour',
+                    ]),
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2/',
+                        'state' => TaskService::TASK_STARTING_STATE,
+                    ]),
+                ],
+                'commandArguments' => [
+                    '--dry-run' => true,
+                ],
+                'expectedInitialQueuedTaskCount' => 1,
+                'expectedInitialInProgressTaskCount' => 1,
+                'expectedQueuedTaskCount' => 1,
+            ],
+            'one in-progress task of suitable non-default age' => [
+                'taskValuesCollection' => [
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1/',
+                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'age' => '12 hour',
+                    ]),
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2/',
+                        'state' => TaskService::TASK_STARTING_STATE,
+                    ]),
+                ],
+                'commandArguments' => [
+                    '--age-in-hours' => 11,
+                ],
+                'expectedInitialQueuedTaskCount' => 1,
+                'expectedInitialInProgressTaskCount' => 1,
+                'expectedQueuedTaskCount' => 2,
+            ],
+            'one in-progress task of suitable default age, invalid bool age-in-hours' => [
+                'taskValuesCollection' => [
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1/',
+                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'age' => '12 hour',
+                    ]),
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2/',
+                        'state' => TaskService::TASK_STARTING_STATE,
+                    ]),
+                ],
+                'commandArguments' => [
+                    '--age-in-hours' => true,
+                ],
+                'expectedInitialQueuedTaskCount' => 1,
+                'expectedInitialInProgressTaskCount' => 1,
+                'expectedQueuedTaskCount' => 2,
+            ],
+            'one in-progress task of suitable default age, invalid zero age-in-hours' => [
+                'taskValuesCollection' => [
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1/',
+                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'age' => '12 hour',
+                    ]),
+                    TaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2/',
+                        'state' => TaskService::TASK_STARTING_STATE,
+                    ]),
+                ],
+                'commandArguments' => [
+                    '--age-in-hours' => 0,
+                ],
+                'expectedInitialQueuedTaskCount' => 1,
+                'expectedInitialInProgressTaskCount' => 1,
+                'expectedQueuedTaskCount' => 2,
+            ],
+        ];
     }
 }

@@ -4,6 +4,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Factory;
 
 use Doctrine\ORM\EntityManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
@@ -90,6 +91,13 @@ class TaskFactory
 
         if ($taskValues['state'] != self::DEFAULT_TASK_STATE) {
             $task->setState($this->stateService->fetch($taskValues['state']));
+        }
+
+        if (isset($taskValues['age'])) {
+            $timePeriod = new TimePeriod();
+            $timePeriod->setStartDateTime(new \DateTime('-' . $taskValues['age']));
+
+            $task->setTimePeriod($timePeriod);
         }
 
         $this->entityManager->persist($task);
