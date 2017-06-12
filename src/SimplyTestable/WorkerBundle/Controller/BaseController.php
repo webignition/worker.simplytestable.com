@@ -113,11 +113,11 @@ abstract class BaseController extends Controller
      */
     private function getRequestType($methodName) {
         if (!is_array($this->requestTypes)) {
-            return \Guzzle\Http\Message\RequestInterface::GET;
+            return 'GET';
         }
 
         if (!isset($this->requestTypes[$methodName])) {
-            return \Guzzle\Http\Message\RequestInterface::GET;
+            return 'GET';
         }
 
         return $this->requestTypes[$methodName];
