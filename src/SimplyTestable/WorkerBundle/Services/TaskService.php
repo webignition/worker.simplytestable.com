@@ -9,9 +9,14 @@ use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use SimplyTestable\WorkerBundle\Repository\TaskRepository;
+use SimplyTestable\WorkerBundle\Services\CoreApplicationService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use GuzzleHttp\Exception\BadResponseException as HttpBadResponseException;
 use GuzzleHttp\Exception\ConnectException as HttpConnectException;
+use SimplyTestable\WorkerBundle\Services\UrlService;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
 class TaskService extends EntityService
@@ -72,21 +77,21 @@ class TaskService extends EntityService
     /**
      * @param EntityManager $entityManager
      * @param LoggerInterface $logger
-     * @param \SimplyTestable\WorkerBundle\Services\StateService $stateService
-     * @param \SimplyTestable\WorkerBundle\Services\UrlService $urlService
-     * @param \SimplyTestable\WorkerBundle\Services\CoreApplicationService $coreApplicationService
-     * @param \SimplyTestable\WorkerBundle\Services\WorkerService $workerService
-     * @param \SimplyTestable\WorkerBundle\Services\HttpClientService $httpClientService
+     * @param StateService $stateService
+     * @param UrlService $urlService
+     * @param CoreApplicationService $coreApplicationService
+     * @param WorkerService $workerService
+     * @param HttpClientService $httpClientService
      */
     public function __construct(
-            EntityManager $entityManager,
-            LoggerInterface $logger,
-            \SimplyTestable\WorkerBundle\Services\StateService $stateService,
-            \SimplyTestable\WorkerBundle\Services\UrlService $urlService,
-            \SimplyTestable\WorkerBundle\Services\CoreApplicationService$coreApplicationService,
-            \SimplyTestable\WorkerBundle\Services\WorkerService $workerService,
-            \SimplyTestable\WorkerBundle\Services\HttpClientService $httpClientService)
-    {
+        EntityManager $entityManager,
+        LoggerInterface $logger,
+        StateService $stateService,
+        UrlService $urlService,
+        CoreApplicationService$coreApplicationService,
+        WorkerService $workerService,
+        HttpClientService $httpClientService
+    ) {
         parent::__construct($entityManager);
 
         $this->logger = $logger;
