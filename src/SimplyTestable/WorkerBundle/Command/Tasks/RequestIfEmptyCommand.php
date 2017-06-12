@@ -4,26 +4,31 @@ namespace SimplyTestable\WorkerBundle\Command\Tasks;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RequestIfEmptyCommand extends Command {
-
+class RequestIfEmptyCommand extends Command
+{
     const RETURN_CODE_OK = 0;
+    const QUEUE_NAME = 'tasks-request';
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
             ->setName('simplytestable:tasks:requestifempty')
             ->setDescription('Pop a resque tasks-request job in the queue if the queue is empty')
-            ->setHelp(<<<EOF
-Request tasks to be assigned by the core application
-EOF
-        );
+            ->setHelp('Request tasks to be assigned by the core application');
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) {
-        if ($this->getResqueQueueService()->isEmpty('tasks-request')) {
+    /**
+     * {@inheritdoc}
+     */
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->getResqueQueueService()->isEmpty(self::QUEUE_NAME)) {
             $this->getResqueQueueService()->enqueue(
                 $this->getResqueJobFactoryService()->create(
-                    'tasks-request'
+                    self::QUEUE_NAME
                 )
             );
         }
