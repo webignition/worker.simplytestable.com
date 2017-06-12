@@ -3,14 +3,12 @@ namespace SimplyTestable\WorkerBundle\Command\Task;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ReportCompletionCommand extends Command
 {
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;
-    const RETURN_CODE_UNKNOWN_ERROR = -3;
 
     protected function configure()
     {
@@ -28,13 +26,17 @@ EOF
     {
         if ($this->getWorkerService()->isMaintenanceReadOnly()) {
             $output->writeln('Unable to report completion, worker application is in maintenance read-only mode');
+
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }
 
         $task = $this->getTaskService()->getById($input->getArgument('id'));
         if (is_null($task)) {
-            $this->getContainer()->get('logger')->error("TaskReportCompletionCommand::execute: [".$input->getArgument('id')."] does not exist");
+            $this->getContainer()->get('logger')->error(
+                "TaskReportCompletionCommand::execute: [".$input->getArgument('id')."] does not exist"
+            );
             $output->writeln("[" . $input->getArgument('id')."] does not exist");
+
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
         }
 
@@ -43,7 +45,6 @@ EOF
         if ($reportCompletionResult === true) {
             $output->writeln('Reported task completion ['.$task->getId().']');
 
-            /* @var $entityManager \Doctrine\ORM\EntityManager */
             $entityManager = $this->getContainer()->get('doctrine')->getManager();
             $entityManager->remove($task);
             $entityManager->remove($task->getOutput());
@@ -51,11 +52,6 @@ EOF
             $entityManager->flush();
 
             return 0;
-        }
-
-        if ($reportCompletionResult === false) {
-            $output->writeln('Report completion failed, unknown error');
-            return self::RETURN_CODE_UNKNOWN_ERROR;
         }
 
         if ($this->isHttpStatusCode($reportCompletionResult)) {

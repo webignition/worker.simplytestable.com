@@ -294,6 +294,8 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
 
     protected function setHttpFixtures($fixtures)
     {
+        $this->clearMemcacheHttpCache();
+
         $this->getHttpClientService()->get()->getEmitter()->attach(
             new HttpMockSubscriber($fixtures)
         );

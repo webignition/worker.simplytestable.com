@@ -2,210 +2,149 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Command\Task;
 
+use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand;
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
-use SimplyTestable\WorkerBundle\Entity\TimePeriod;
+use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
+use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorFixtureFactory;
+use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
-class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase {
-
-    protected function getAdditionalCommands() {
+class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAdditionalCommands()
+    {
         return array(
-            new \SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand()
+            new ReportCompletionCommand()
         );
-    }     
-    
-    
-    /**
-     * @group standard
-     */    
-    public function testReportCompletionSuccessfullyReturnsStatusCode0() {
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-        $taskObject = $createdTask = $this->createTask('http://example.com/', 'HTML validation');                
-        
-        $task = $this->getTaskService()->getById($taskObject->id);
-        $taskTimePeriod = new TimePeriod();
-        $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
-        $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-02'));
-        
-        $task->setTimePeriod($taskTimePeriod);
-
-        $this->createCompletedTaskOutputForTask($task);
-
-        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion', array(
-            'id' => $task->getId()
-        )));     
-        
-        $this->assertNull($this->getTaskService()->getById($createdTask->id));
     }
-    
 
-    
     /**
-     * @group standard
-     */    
-    public function testReportCompletionForInvalidTaskReturnsStatusCodeMinus2() {        
-        $this->assertEquals(-2, $this->executeCommand('simplytestable:task:reportcompletion', array(
-            'id' => -1
-        )));        
-    }    
-    
-    /**
-     * @group standard
-     */    
-    public function testReportCompletionWhenNoCoreApplicationReturnsStatusCode404() {        
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-        
-        $createdTask = $this->createTask('http://example.com/', 'HTML validation');
-        
-        $task = $this->getTaskService()->getById($createdTask->id);
-        $taskTimePeriod = new TimePeriod();
-        $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
-        $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-03'));
-        
-        $task->setTimePeriod($taskTimePeriod);
-
-        $this->createCompletedTaskOutputForTask($task);
-        
-        $this->assertEquals(404, $this->executeCommand('simplytestable:task:reportcompletion', array(
-            'id' => $task->getId()          
-        )));      
+     * {@inheritdoc}
+     */
+    protected static function getServicesToMock()
+    {
+        return [
+            'simplytestable.services.workerservice',
+            'simplytestable.services.taskservice',
+        ];
     }
-    
-    
-    /**
-     * @group standard
-     */    
-    public function testReportCompletionWhenInvalidCoreApplicationHostReturnsCurlCode6() {                
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-        $coreApplication = $this->getCoreApplicationService()->get();
-        
-        $coreApplication->setUrl('http://example.com/');
-        $this->getCoreApplicationService()->getEntityManager()->persist($coreApplication);
-        $this->getCoreApplicationService()->getEntityManager()->flush();        
-        
-        $createdTask = $this->createTask('http://example.com/', 'HTML validation');
-        
-        $task = $this->getTaskService()->getById($createdTask->id);
-        $taskTimePeriod = new TimePeriod();
-        $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
-        $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-03'));
-        
-        $task->setTimePeriod($taskTimePeriod);
 
-        $this->createCompletedTaskOutputForTask($task);      
-        
-        $this->assertEquals(6, $this->executeCommand('simplytestable:task:reportcompletion', array(
-            'id' => $task->getId()          
-        )));        
-    }
-    
-    
-    /**
-     * @group standard
-     */    
-    public function testReportCompletionInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {        
+    public function testExecuteInMaintenanceReadOnlyMode()
+    {
         $this->getWorkerService()->setReadOnly();
-        
-        $this->assertEquals(-1, $this->executeCommand('simplytestable:task:reportcompletion', array(
-            'id' => 1          
-        )));        
-    }
-    
-    
-    /**
-     * @group standard
-     */    
-    public function testReportCompletionWhenCoreApplicationInMaintenanceReadOnlyModeReturnsStatusCode503() {        
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
 
-        $createdTask = $this->createTask('http://example.com/', 'HTML validation');
-        
-        $task = $this->getTaskService()->getById($createdTask->id);
-        $taskTimePeriod = new TimePeriod();
-        $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
-        $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-02'));
-        
-        $task->setTimePeriod($taskTimePeriod);
-
-        $this->createCompletedTaskOutputForTask($task);
-        
-        $this->assertEquals(503, $this->executeCommand('simplytestable:task:reportcompletion', array(
-            'id' => $task->getId()          
-        )));        
-    }  
-    
-    /**
-     * @group standard
-     */    
-    public function testReportCompletionSuccessfullyDeletesTask() {
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-        $taskObject = $createdTask = $this->createTask('http://example.com/', 'HTML validation');                
-        
-        $task = $this->getTaskService()->getById($taskObject->id);
-        $taskTimePeriod = new TimePeriod();
-        $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
-        $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-02'));
-        
-        $task->setTimePeriod($taskTimePeriod);
-
-        $this->createCompletedTaskOutputForTask($task);
-        
-        $this->assertNotNull($task->getId());
-        $this->assertNotNull($task->getOutput()->getId());
-        $this->assertNotNull($task->getTimePeriod()->getId());        
-
-        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion', array(
-            'id' => $task->getId()          
-        )));        
-             
-        $this->assertNull($this->getTaskService()->getById($createdTask->id));
-        
-        $this->assertNull($task->getId());
-        $this->assertNull($task->getOutput()->getId());
-        $this->assertNull($task->getTimePeriod()->getId());
-    } 
-    
-    
-    /**
-     * @group standard
-     */      
-    public function testReportCompletionRemovesTemporaryTaskParameters() {
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-
-        $taskObject = $this->createTask('http://unreliable.simplytestable.com/http-auth/index.html', 'HTML validation', json_encode(array(
-            'http-auth-username' => 'example',
-            'http-auth-password' => 'password'
-        )));              
-        
-        $task = $this->getTaskService()->getById($taskObject->id);
-        $taskTimePeriod = new TimePeriod();
-        $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
-        $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-02'));
-        
-        $task->setTimePeriod($taskTimePeriod);
-
-        $this->createCompletedTaskOutputForTask($task);
-        
-        $this->assertNotNull($task->getId());
-        $this->assertNotNull($task->getOutput()->getId());
-        $this->assertNotNull($task->getTimePeriod()->getId());        
-        
-        $taskParameters = $task->getParametersArray();
-        $taskParameters['x-http-auth-tried'] = true;
-
-        $task->setParameters(json_encode($taskParameters));           
-        $this->getTaskService()->persistAndFlush($task);
-        
-        $this->assertTrue($task->hasParameter('http-auth-username'));
-        $this->assertTrue($task->hasParameter('http-auth-password'));
-        $this->assertTrue($task->hasParameter('x-http-auth-tried'));
-        
-        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion', array(
-            'id' => $task->getId()          
-        )));        
-        
-        $this->assertTrue($task->hasParameter('http-auth-username'));
-        $this->assertTrue($task->hasParameter('http-auth-password'));
-        $this->assertFalse($task->hasParameter('x-http-auth-tried'));        
+        $this->assertEquals(
+            ReportCompletionCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
+            $this->executeCommand(
+                'simplytestable:task:reportcompletion',
+                [
+                    'id' => 1
+                ]
+            )
+        );
     }
 
+    public function testExecuteForInvalidTask()
+    {
+        $this->assertEquals(
+            ReportCompletionCommand::RETURN_CODE_TASK_DOES_NOT_EXIST,
+            $this->executeCommand(
+                'simplytestable:task:reportcompletion',
+                [
+                    'id' => -1
+                ]
+            )
+        );
+    }
+
+    /**
+     * @dataProvider executeDataProvider
+     *
+     * @param array $responseFixtures
+     * @param int $expectedCommandReturnCode
+     * @param bool $expectedTaskIsDeleted
+     */
+    public function testExecute($responseFixtures, $expectedCommandReturnCode, $expectedTaskIsDeleted)
+    {
+        $this->setHttpFixtures(array_merge([
+            "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
+        ], $responseFixtures));
+
+        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
+
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+            'url' => 'http://example.com/',
+            'type' => 'html validation',
+        ]));
+        $this->assertNotNull($task->getId());
+
+        $this->getTaskService()->perform($task);
+        $this->assertNotNull($task->getOutput()->getId());
+
+        $this->assertEquals(
+            $expectedCommandReturnCode,
+            $this->executeCommand(
+                'simplytestable:task:reportcompletion',
+                [
+                    'id' => $task->getId()
+                ]
+            )
+        );
+
+        if ($expectedTaskIsDeleted) {
+            $this->assertNull($task->getOutput()->getId());
+            $this->assertNull($task->getId());
+        } else {
+            $this->assertNotNull($task->getOutput()->getId());
+            $this->assertNotNull($task->getId());
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function executeDataProvider()
+    {
+        return [
+            'http 200' => [
+                'responseFixtures' => [
+                    'HTTP/1.1 200',
+                ],
+                'expectedCommandReturnCode' => 0,
+                'expectedTaskIsDeleted' => true,
+            ],
+            'http 404' => [
+                'responseFixtures' => [
+                    'HTTP/1.1 404',
+                ],
+                'expectedCommandReturnCode' => 404,
+                'expectedTaskIsDeleted' => false,
+            ],
+            'http 500' => [
+                'responseFixtures' => [
+                    'HTTP/1.1 500',
+                ],
+                'expectedCommandReturnCode' => 500,
+                'expectedTaskIsDeleted' => false,
+            ],
+            'curl 28' => [
+                'responseFixtures' => [
+                    ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
+                ],
+                'expectedCommandReturnCode' => 28,
+                'expectedTaskIsDeleted' => false,
+            ],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
+    }
 }
