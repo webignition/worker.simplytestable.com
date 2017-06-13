@@ -89,6 +89,15 @@ class FooTaskControllerTest extends BaseControllerJsonTestCase
             $this->assertTrue(isset($decodedResponseContent[$key]));
             $this->assertEquals($expectedResponseTaskData[$key], $decodedResponseContent[$key]);
         }
+
+        $this->assertTrue(
+            $this->getResqueQueueService()->contains(
+                'task-perform',
+                [
+                    'id' => $decodedResponseContent['id']
+                ]
+            )
+        );
     }
 
     /**
