@@ -60,6 +60,7 @@ abstract class BaseController extends Controller
 
         $response = new Response($this->container->get('jms_serializer')->serialize($object, 'json'));
         $response->setStatusCode($statusCode);
+        $response->headers->set('content-type', 'application/json');
 
         return $response;
     }
