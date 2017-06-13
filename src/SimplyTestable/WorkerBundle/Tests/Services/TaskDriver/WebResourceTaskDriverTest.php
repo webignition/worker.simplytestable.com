@@ -19,7 +19,6 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
     {
         parent::setUp();
         $this->removeAllTasks();
-        $this->clearMemcacheHttpCache();
     }
 
     /**
@@ -53,9 +52,9 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
         /* @var $request MockInterface|RequestInterface */
         $request = \Mockery::mock(RequestInterface::class);
 
-        $this->setHttpFixtures($this->buildHttpFixtureSet([
+        $this->setHttpFixtures([
             new ConnectException('foo', $request)
-        ]));
+        ]);
 
         $task = $this->getTaskFactory()->create(
             TaskFactory::createTaskValuesFromDefaults()

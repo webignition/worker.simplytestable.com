@@ -6,14 +6,9 @@ use SimplyTestable\WorkerBundle\Controller\MaintenanceController;
 
 class MaintenanceControllerTest extends BaseControllerJsonTestCase
 {
-    public function setUp() {
-        parent::setUp();
-        $this->removeAllTasks();
-    }
-
     public function testEnableReadOnlyAction()
     {
-        $response = $this->getMaintenanceController('enableReadOnlyAction')->enableReadOnlyAction();
+        $response = $this->createMaintenanceController()->enableReadOnlyAction();
 
         $this->assertEquals(
             '["Set state to maintenance-read-only"]',
@@ -25,7 +20,7 @@ class MaintenanceControllerTest extends BaseControllerJsonTestCase
 
     public function testDisableReadOnlyAction()
     {
-        $response = $this->getMaintenanceController('disableReadOnlyAction')->disableReadOnlyAction();
+        $response = $this->createMaintenanceController()->disableReadOnlyAction();
 
         $this->assertEquals(
             '["Set state to active"]',
@@ -37,7 +32,9 @@ class MaintenanceControllerTest extends BaseControllerJsonTestCase
 
     public function testLeaveReadOnlyAction()
     {
-        $response = $this->getMaintenanceController('leaveReadOnlyAction')->leaveReadOnlyAction();
+        $this->removeAllTasks();
+
+        $response = $this->createMaintenanceController()->leaveReadOnlyAction();
 
         $this->assertEquals(
             '["Set state to active","0 completed tasks ready to be enqueued","0 queued tasks ready to be enqueued"]',
@@ -48,15 +45,13 @@ class MaintenanceControllerTest extends BaseControllerJsonTestCase
     }
 
     /**
-     * @param string $methodName
-     *
      * @return MaintenanceController
      */
-    private function getMaintenanceController($methodName)
+    private function createMaintenanceController()
     {
-        /* @var MaintenanceController $maintenanceController */
-        $maintenanceController = $this->getController(self::MAINTENANCE_CONTROLLER_NAME, $methodName);
+        $controller = new MaintenanceController();
+        $controller->setContainer($this->container);
 
-        return $maintenanceController;
+        return $controller;
     }
 }

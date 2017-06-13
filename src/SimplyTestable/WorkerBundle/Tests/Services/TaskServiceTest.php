@@ -266,7 +266,6 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
      */
     public function testPerform($taskValues, $httpFixtures, $expectedFinishedStateName)
     {
-        $this->clearMemcacheHttpCache();
         $this->setHttpFixtures($httpFixtures);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
@@ -350,7 +349,6 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
      */
     public function testReportCompletionFailure($responseFixture, $expectedReturnValue)
     {
-        $this->clearMemcacheHttpCache();
         $this->setHttpFixtures([
             "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html>",
             $responseFixture,
@@ -388,7 +386,6 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
 
     public function testReportCompletion()
     {
-        $this->clearMemcacheHttpCache();
         $this->setHttpFixtures([
             "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html>",
             "HTTP/1.1 200 OK",

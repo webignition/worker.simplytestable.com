@@ -19,7 +19,7 @@ class StatusControllerTest extends BaseControllerJsonTestCase
 
     public function testIndexAction()
     {
-        $response = $this->getStatusController('indexAction')->indexAction();
+        $response = $this->createStatusController()->indexAction();
         $this->assertEquals(200, $response->getStatusCode());
     }
 
@@ -37,22 +37,18 @@ class StatusControllerTest extends BaseControllerJsonTestCase
             ->shouldReceive('getMemcacheCache')
             ->andReturn($memcacheCache);
 
-        $response = $this->getStatusController('indexAction')->indexAction();
+        $response = $this->createStatusController()->indexAction();
         $this->assertEquals(200, $response->getStatusCode());
     }
 
     /**
-     *
-     * @param string $methodName
-     * @param array $postData
-     *
      * @return StatusController
      */
-    private function getStatusController($methodName, $postData = [])
+    private function createStatusController()
     {
-        /* @var StatusController $statusController */
-        $statusController = $this->getController(StatusController::class, $methodName, $postData);
+        $controller = new StatusController();
+        $controller->setContainer($this->container);
 
-        return $statusController;
+        return $controller;
     }
 }
