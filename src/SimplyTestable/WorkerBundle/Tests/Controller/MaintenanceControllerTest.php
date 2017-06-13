@@ -3,8 +3,9 @@
 namespace SimplyTestable\WorkerBundle\Tests\Controller;
 
 use SimplyTestable\WorkerBundle\Controller\MaintenanceController;
+use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
 
-class MaintenanceControllerTest extends BaseControllerJsonTestCase
+class MaintenanceControllerTest extends BaseSimplyTestableTestCase
 {
     public function testEnableReadOnlyAction()
     {

@@ -6,12 +6,13 @@ use SimplyTestable\WorkerBundle\Controller\TaskController;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFactory;
+use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class TaskControllerTest extends BaseControllerJsonTestCase
+class TaskControllerTest extends BaseSimplyTestableTestCase
 {
     public function testCreateActionInMaintenanceReadOnlyMode()
     {

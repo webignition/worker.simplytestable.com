@@ -3,8 +3,9 @@
 namespace SimplyTestable\WorkerBundle\Tests\Controller;
 
 use SimplyTestable\WorkerBundle\Controller\TasksController;
+use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
 
-class TasksControllerTest extends BaseControllerJsonTestCase
+class TasksControllerTest extends BaseSimplyTestableTestCase
 {
     public function testNotifyActionWithResqueQueueEmpty()
     {

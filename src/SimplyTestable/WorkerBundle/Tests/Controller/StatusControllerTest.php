@@ -4,8 +4,9 @@ namespace SimplyTestable\WorkerBundle\Tests\Controller;
 
 use Doctrine\Common\Cache\MemcacheCache;
 use SimplyTestable\WorkerBundle\Controller\StatusController;
+use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
 
-class StatusControllerTest extends BaseControllerJsonTestCase
+class StatusControllerTest extends BaseSimplyTestableTestCase
 {
     /**
      * {@inheritdoc}

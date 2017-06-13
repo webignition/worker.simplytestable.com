@@ -108,69 +108,6 @@ abstract class BaseTestCase extends WebTestCase
     }
 
     /**
-     *
-     * Builds a Controller object and the request to satisfy it. Attaches the request
-     * to the object and to the container.
-     *
-     * @param string $controllerClass The full path to the controller class
-     * @param string $controllerMethod Name of the controller method to be called
-     * @param array $postData Array of post values
-     * @param array $queryData Array of query string values
-     * @return \Symfony\Bundle\FrameworkBundle\Controller\Controller
-     */
-    protected function createController(
-        $controllerClass,
-        $controllerMethod,
-        array $postData = [],
-        array $queryData = []
-    ) {
-        $request = $this->createWebRequest();
-        $request->attributes->set('_controller', $controllerClass.'::'.$controllerMethod);
-        $request->request->add($postData);
-        $request->query->add($queryData);
-        $this->container->set('request', $request);
-
-        $controllerCallable = $this->getControllerCallable($request);
-        $controllerCallable[0]->setContainer($this->container);
-
-        $dispatcher = $this->container->get('event_dispatcher');
-        $dispatcher->dispatch('kernel.controller', new FilterControllerEvent(
-                self::$kernel,
-                $controllerCallable,
-                $request,
-                HttpKernelInterface::MASTER_REQUEST
-        ));
-
-        return $controllerCallable[0];
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return bool|mixed
-     */
-    private function getControllerCallable(Request $request)
-    {
-        $controllerResolver = new ControllerResolver();
-
-        return $controllerResolver->getController($request);
-    }
-
-    /**
-     * Creates a new Request object and hydrates it with the proper values to make
-     * a valid web request.
-     *
-     * @return \Symfony\Component\HttpFoundation\Request The hydrated Request object.
-     */
-    protected function createWebRequest()
-    {
-        $request = Request::createFromGlobals();
-        $request->server->set('REMOTE_ADDR', '127.0.0.1');
-
-        return $request;
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function tearDown()

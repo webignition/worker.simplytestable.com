@@ -5,11 +5,12 @@ namespace SimplyTestable\WorkerBundle\Tests\Controller;
 use SimplyTestable\WorkerBundle\Controller\VerifyController;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
+use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class VerifyControllerTest extends BaseControllerJsonTestCase
+class VerifyControllerTest extends BaseSimplyTestableTestCase
 {
     /**
      * {@inheritdoc}
