@@ -4,6 +4,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Services;
 
 use GuzzleHttp\Post\PostBodyInterface;
 use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
+use SimplyTestable\WorkerBundle\Services\TasksService;
 use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 
@@ -161,5 +162,13 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
                 'expectedLimit' => 5,
             ],
         ];
+    }
+
+    /**
+     * @return TasksService
+     */
+    private function getTasksService()
+    {
+        return $this->container->get('simplytestable.services.tasksservice');
     }
 }

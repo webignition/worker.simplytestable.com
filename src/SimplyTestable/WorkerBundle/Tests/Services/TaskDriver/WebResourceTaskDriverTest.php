@@ -86,7 +86,8 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
         $expectedTaskOutput
     ) {
         $this->setHttpFixtures($httpResponseFixtures);
-        $this->getWebResourceService()->getConfiguration()->disableRetryWithUrlEncodingDisabled();
+        $webResourceService = $this->container->get('simplytestable.services.webresourceservice');
+        $webResourceService->getConfiguration()->disableRetryWithUrlEncodingDisabled();
 
         $task = $this->getTaskFactory()->create(
             TaskFactory::createTaskValuesFromDefaults()

@@ -262,7 +262,9 @@ class WorkerServiceTest extends BaseSimplyTestableTestCase
      */
     private function setWorkerState(ThisWorker $worker, $stateName)
     {
-        $worker->setState($this->getStateService()->fetch($stateName));
+        $stateService = $this->container->get('simplytestable.services.stateservice');
+
+        $worker->setState($stateService->fetch($stateName));
         $this->getEntityManager()->persist($worker);
         $this->getEntityManager()->flush();
     }

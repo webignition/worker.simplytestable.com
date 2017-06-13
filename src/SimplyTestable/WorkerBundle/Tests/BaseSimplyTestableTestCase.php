@@ -4,20 +4,16 @@ namespace SimplyTestable\WorkerBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Services\CoreApplicationService;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\MemcacheService;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
-use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
-use SimplyTestable\WorkerBundle\Services\TasksService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 use Doctrine\Common\Cache\MemcacheCache;
 use GuzzleHttp\Subscriber\Mock as HttpMockSubscriber;
-use webignition\WebResource\Service\Service as WebResourceService;
 
 abstract class BaseSimplyTestableTestCase extends BaseTestCase
 {
@@ -35,26 +31,23 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
      */
     private $taskFactory;
 
+    /**
+     * @return TaskFactory
+     */
     protected function getTaskFactory()
     {
+        $stateService = $this->container->get('simplytestable.services.stateservice');
+
         if (is_null($this->taskFactory)) {
             $this->taskFactory = new TaskFactory(
                 $this->getTaskService(),
                 $this->getTaskTypeService(),
-                $this->getStateService(),
+                $stateService,
                 $this->getEntityManager()
             );
         }
 
         return $this->taskFactory;
-    }
-
-    /**
-     * @return StateService
-     */
-    protected function getStateService()
-    {
-        return $this->container->get('simplytestable.services.stateservice');
     }
 
     /**
@@ -106,35 +99,11 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
     }
 
     /**
-     * @return TasksService
-     */
-    protected function getTasksService()
-    {
-        return $this->container->get('simplytestable.services.tasksservice');
-    }
-
-    /**
-     * @return CoreApplicationService
-     */
-    protected function getCoreApplicationService()
-    {
-        return $this->container->get('simplytestable.services.coreapplicationservice');
-    }
-
-    /**
      * @return MemcacheService
      */
     protected function getMemcacheService()
     {
         return $this->container->get('simplytestable.services.memcacheservice');
-    }
-
-    /**
-     * @return WebResourceService
-     */
-    protected function getWebResourceService()
-    {
-        return $this->container->get('simplytestable.services.webresourceservice');
     }
 
     /**
