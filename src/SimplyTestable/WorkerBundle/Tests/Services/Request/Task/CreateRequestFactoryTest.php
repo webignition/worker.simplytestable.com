@@ -77,6 +77,8 @@ class CreateRequestFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $taskTypeName
+     * @param TaskType|null $fetchReturnValue
      * @return MockInterface|TaskTypeService
      */
     private function createTaskTypeService($taskTypeName, $fetchReturnValue)
