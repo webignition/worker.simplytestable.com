@@ -49,8 +49,8 @@ class CreateRequestFactory
     {
         return new CreateRequest(
             $this->getTaskTypeFromRequestParameters(),
-            $this->getUrlFromRequestParameters(),
-            $this->getParametersFromRequestParameters()
+            $this->getStringValueFromRequestParameters(self::PARAMETER_URL),
+            $this->getStringValueFromRequestParameters(self::PARAMETER_PARAMETERS)
         );
     }
 
@@ -65,22 +65,6 @@ class CreateRequestFactory
         }
 
         return $this->taskTypeService->fetch($requestTaskType);
-    }
-
-    /**
-     * @return string
-     */
-    private function getUrlFromRequestParameters()
-    {
-        return $this->getStringValueFromRequestParameters(self::PARAMETER_URL);
-    }
-
-    /**
-     * @return string
-     */
-    private function getParametersFromRequestParameters()
-    {
-        return $this->getStringValueFromRequestParameters(self::PARAMETER_PARAMETERS);
     }
 
     /**

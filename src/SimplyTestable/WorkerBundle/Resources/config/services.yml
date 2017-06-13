@@ -192,3 +192,9 @@ services:
     arguments:
         request: "@request"
         createRequestFactory: "@simplytestable.services.request.factory.task.cancel"
+
+  simplytestable.services.request.factory.verify:
+    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory
+    scope: request
+    arguments:
+        request: "@request"
