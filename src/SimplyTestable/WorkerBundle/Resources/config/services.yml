@@ -185,3 +185,10 @@ services:
     arguments:
         request: "@request"
         taskService: "@simplytestable.services.taskservice"
+
+  simplytestable.services.request.factory.task.cancelcollection:
+    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory
+    scope: request
+    arguments:
+        request: "@request"
+        createRequestFactory: "@simplytestable.services.request.factory.task.cancel"

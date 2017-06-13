@@ -9,32 +9,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class TaskController extends BaseController
 {
-    public function __construct() {
-//        $this->setInputDefinitions(array(
-//            'createAction' => new InputDefinition(array(
-//                new InputArgument('type', InputArgument::REQUIRED, 'Name of task type, case insensitive'),
-//                new InputArgument('url', InputArgument::REQUIRED, 'URL of web page against which the task is to be performed')
-//            )),
-//            'createCollectionAction' => new InputDefinition(array(
-//                new InputArgument('tasks', InputArgument::REQUIRED, 'Collection of task urls and test types')
-//            )),
-//            'cancelAction' => new InputDefinition(array(
-//                new InputArgument('id', InputArgument::REQUIRED, 'ID of task to be cancelled')
-//            )),
-//            'cancelCollectionAction' => new InputDefinition(array(
-//                new InputArgument('ids', InputArgument::REQUIRED, 'IDs of tasks to be cancelled')
-//            ))
-//
-//        ));
-//
-//        $this->setRequestTypes(array(
-//            'createAction' => 'POST',
-//            'createCollectionAction' => 'POST',
-//            'cancelAction' => 'POST',
-//            'cancelCollectionAction' => 'POST'
-//        ));
-    }
-
     public function createAction()
     {
         if ($this->isInMaintenanceReadOnlyMode()) {
@@ -96,7 +70,6 @@ class TaskController extends BaseController
         }
 
         $this->getTaskService()->cancel($cancelRequest->getTask());
-
         $this->getTaskService()->getEntityManager()->remove($cancelRequest->getTask());
         $this->getTaskService()->getEntityManager()->flush();
 
@@ -109,16 +82,14 @@ class TaskController extends BaseController
             return $this->sendServiceUnavailableResponse();
         }
 
-        $taskIds = explode(',', $this->getArguments('cancelCollectionAction')->get('ids'));
+        $cancelCollectionRequest =
+            $this->container->get('simplytestable.services.request.factory.task.cancelcollection')->create();
 
         $cancelledTaskCount = 0;
-        foreach ($taskIds as $taskId) {
-            $task = $this->getTaskService()->getById($taskId);
-            if (!is_null($task)) {
-                $this->getTaskService()->cancel($task);
-                $this->getTaskService()->getEntityManager()->remove($task);
-                $cancelledTaskCount++;
-            }
+        foreach ($cancelCollectionRequest->getCancelRequests() as $cancelRequest) {
+            $this->getTaskService()->cancel($cancelRequest->getTask());
+            $this->getTaskService()->getEntityManager()->remove($cancelRequest->getTask());
+            $cancelledTaskCount++;
         }
 
         if ($cancelledTaskCount > 0) {

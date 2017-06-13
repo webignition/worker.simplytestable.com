@@ -33,6 +33,14 @@ class CancelRequestFactory
     }
 
     /**
+     * @param ParameterBag $parameters
+     */
+    public function setRequestParameters(ParameterBag $parameters)
+    {
+        $this->requestParameters = $parameters;
+    }
+
+    /**
      * @return CancelRequest
      */
     public function create()
