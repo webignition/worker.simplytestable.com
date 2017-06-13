@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
+namespace SimplyTestable\WorkerBundle\Tests\Request\Task;
 
 use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
