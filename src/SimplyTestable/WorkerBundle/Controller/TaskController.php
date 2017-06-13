@@ -3,6 +3,8 @@
 namespace SimplyTestable\WorkerBundle\Controller;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Request\Task\CreateRequest;
+use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class TaskController extends BaseController
@@ -45,64 +47,41 @@ class TaskController extends BaseController
             throw new BadRequestHttpException();
         }
 
-        $task = $this->getTaskService()->create(
-            $createRequest->getUrl(),
-            $createRequest->getTaskType(),
-            $createRequest->getParameters()
-        );
-
+        $task = $this->createTaskFromCreateRequest($createRequest);
         $this->getTaskService()->getEntityManager()->persist($task);
         $this->getTaskService()->getEntityManager()->flush();
 
-        $this->get('simplytestable.services.resque.queueService')->enqueue(
-            $this->get('simplytestable.services.resque.jobFactoryService')->create(
-                'task-perform',
-                ['id' => $task->getId()]
-            )
-        );
+        $this->enqueueTaskPerformJob($task);
 
         return $this->sendResponse($task);
     }
 
-
-    public function createCollectionAction() {
+    public function createCollectionAction()
+    {
         if ($this->isInMaintenanceReadOnlyMode()) {
             return $this->sendServiceUnavailableResponse();
         }
 
-        $rawRequestTasks = $this->getArguments('createCollectionAction')->get('tasks');
-        $tasks = array();
+        $createCollectionRequest =
+            $this->container->get('simplytestable.services.request.factory.task.createcollection')->create();
 
-        foreach ($rawRequestTasks as $taskDetails) {
-            if ($this->getTaskTypeService()->has($taskDetails['type'])) {
-                $parameters = (!isset($taskDetails['parameters'])) ? '' : $taskDetails['parameters'];
+        $tasks = [];
 
-                $task = $this->getTaskService()->create(
-                    $taskDetails['url'],
-                    $this->getTaskTypeService()->fetch($taskDetails['type']),
-                    $parameters
-                );
+        foreach ($createCollectionRequest->getCreateRequests() as $createRequest) {
+            $task = $this->createTaskFromCreateRequest($createRequest);
+            $tasks[] = $task;
 
-                $tasks[] = $task;
-
-                $this->getTaskService()->getEntityManager()->persist($task);
-            }
+            $this->getTaskService()->getEntityManager()->persist($task);
         }
 
         $this->getTaskService()->getEntityManager()->flush();
 
         foreach ($tasks as $task) {
-            $this->get('simplytestable.services.resque.queueService')->enqueue(
-                $this->get('simplytestable.services.resque.jobFactoryService')->create(
-                    'task-perform',
-                    ['id' => $task->getId()]
-                )
-            );
+            $this->enqueueTaskPerformJob($task);
         }
 
         return $this->sendResponse($tasks);
     }
-
 
     public function cancelAction()
     {
@@ -148,22 +127,41 @@ class TaskController extends BaseController
         return $this->sendSuccessResponse();
     }
 
-
-
-
     /**
+     * @param CreateRequest $createRequest
      *
-     * @return \SimplyTestable\WorkerBundle\Services\TaskService
+     * @return Task
      */
-    private function getTaskService() {
-        return $this->container->get('simplytestable.services.taskservice');
+    private function createTaskFromCreateRequest(CreateRequest $createRequest)
+    {
+        return $this->getTaskService()->create(
+            $createRequest->getUrl(),
+            $createRequest->getTaskType(),
+            $createRequest->getParameters()
+        );
     }
 
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\TaskTypeService
+     * @param Task $task
      */
-    private function getTaskTypeService() {
-        return $this->container->get('simplytestable.services.tasktypeservice');
+    private function enqueueTaskPerformJob(Task $task)
+    {
+        $resqueQueueService = $this->get('simplytestable.services.resque.queueService');
+        $jobFactoryService = $this->get('simplytestable.services.resque.jobFactoryService');
+
+        $resqueQueueService->enqueue(
+            $jobFactoryService->create(
+                'task-perform',
+                ['id' => $task->getId()]
+            )
+        );
+    }
+
+    /**
+     * @return TaskService
+     */
+    private function getTaskService()
+    {
+        return $this->container->get('simplytestable.services.taskservice');
     }
 }

@@ -35,6 +35,14 @@ class CreateRequestFactory
     }
 
     /**
+     * @param ParameterBag $parameters
+     */
+    public function setRequestParameters(ParameterBag $parameters)
+    {
+        $this->requestParameters = $parameters;
+    }
+
+    /**
      * @return CreateRequest
      */
     public function create()

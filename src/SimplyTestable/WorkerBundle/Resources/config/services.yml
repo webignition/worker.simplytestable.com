@@ -171,3 +171,10 @@ services:
     arguments:
         request: "@request"
         taskTypeService: "@simplytestable.services.tasktypeservice"
+
+  simplytestable.services.request.factory.task.createcollection:
+    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory
+    scope: request
+    arguments:
+        request: "@request"
+        createRequestFactory: "@simplytestable.services.request.factory.task.create"

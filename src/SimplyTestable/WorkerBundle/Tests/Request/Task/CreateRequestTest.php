@@ -8,7 +8,7 @@ use SimplyTestable\WorkerBundle\Request\Task\CreateRequest;
 class CreateRequestTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider createRequestDataProvider
+     * @dataProvider createDataProvider
      *
      * @param TaskType|null $taskType
      * @param string|null $url
@@ -18,7 +18,7 @@ class CreateRequestTest extends \PHPUnit_Framework_TestCase
      * @param string|null $expectedUrl
      * @param string $expectedParameters
      */
-    public function testCreateRequest(
+    public function testCreate(
         $taskType,
         $url,
         $parameters,
@@ -38,7 +38,7 @@ class CreateRequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function createRequestDataProvider()
+    public function createDataProvider()
     {
         $taskType = new TaskType();
 
@@ -81,5 +81,4 @@ class CreateRequestTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
-
 }

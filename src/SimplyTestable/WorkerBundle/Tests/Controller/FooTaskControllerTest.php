@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class FooTaskControllerTest extends BaseControllerJsonTestCase
 {
-    public function testCreateInMaintenanceReadOnlyMode()
+    public function testCreateActionInMaintenanceReadOnlyMode()
     {
         $this->getWorkerService()->setReadOnly();
         $response = $this->createTaskController()->createAction();
@@ -166,6 +166,83 @@ class FooTaskControllerTest extends BaseControllerJsonTestCase
                     'type' => 'Link integrity',
                     'parameters' => '',
                 ],
+            ],
+        ];
+    }
+
+    public function testCreateCollectionActionInMaintenanceReadOnlyMode()
+    {
+        $this->getWorkerService()->setReadOnly();
+        $response = $this->createTaskController()->createCollectionAction();
+
+        $this->assertEquals(503, $response->getStatusCode());
+    }
+
+    /**
+     * @dataProvider createCollectionActionDataProvider
+     *
+     * @param array $postData
+     * @param int $expectedResponseTaskCollectionCount
+     */
+    public function testCreateCollectionAction($postData, $expectedResponseTaskCollectionCount)
+    {
+        $this->removeAllTasks();
+
+        $request = new Request();
+        $request->request = $postData;
+        $this->addRequestToContainer($request);
+
+        $response = $this->createTaskController()->createCollectionAction();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('application/json', $response->headers->get('content-type'));
+
+        $decodedResponseContent = json_decode($response->getContent(), true);
+
+        $this->assertCount($expectedResponseTaskCollectionCount, $decodedResponseContent);
+    }
+
+    /**
+     * @return array
+     */
+    public function createCollectionActionDataProvider()
+    {
+        return [
+            'no tasks data' => [
+                'postData' => new ParameterBag([]),
+                'expectedResponseTaskCollectionCount' => 0,
+            ],
+            'empty tasks data' => [
+                'postData' => new ParameterBag([
+                    'tasks' => [],
+                ]),
+                'expectedResponseTaskCollectionCount' => 0,
+            ],
+            'single invalid task' => [
+                'postData' => new ParameterBag([
+                    'tasks' => [
+                        [
+                            CreateRequestFactory::PARAMETER_TYPE => 'foo',
+                            CreateRequestFactory::PARAMETER_URL => 'http://example.com/',
+                        ],
+                    ],
+                ]),
+                'expectedResponseTaskCollectionCount' => 0,
+            ],
+            'valid tasks' => [
+                'postData' => new ParameterBag([
+                    'tasks' => [
+                        [
+                            CreateRequestFactory::PARAMETER_TYPE => 'html validation',
+                            CreateRequestFactory::PARAMETER_URL => 'http://example.com/',
+                        ],
+                        [
+                            CreateRequestFactory::PARAMETER_TYPE => 'css validation',
+                            CreateRequestFactory::PARAMETER_URL => 'http://example.com/',
+                        ],
+                    ],
+                ]),
+                'expectedResponseTaskCollectionCount' => 2,
             ],
         ];
     }
