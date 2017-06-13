@@ -11,6 +11,7 @@ class CreateRequestCollectionTest extends \PHPUnit_Framework_TestCase
      * @dataProvider createDataProvider
      *
      * @param CreateRequest[] $createRequests
+     * @param int $expectedCollectionCount
      */
     public function testCreate($createRequests, $expectedCollectionCount)
     {
