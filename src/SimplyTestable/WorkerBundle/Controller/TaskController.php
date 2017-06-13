@@ -89,14 +89,15 @@ class TaskController extends BaseController
             return $this->sendServiceUnavailableResponse();
         }
 
-        $task = $this->getTaskService()->getById($this->getArguments('cancelAction')->get('id'));
-        if (is_null($task)) {
-            throw new \Symfony\Component\HttpKernel\Exception\HttpException(400);
+        $cancelRequest = $this->container->get('simplytestable.services.request.factory.task.cancel')->create();
+
+        if (!$cancelRequest->isValid()) {
+            throw new BadRequestHttpException();
         }
 
-        $this->getTaskService()->cancel($task);
+        $this->getTaskService()->cancel($cancelRequest->getTask());
 
-        $this->getTaskService()->getEntityManager()->remove($task);
+        $this->getTaskService()->getEntityManager()->remove($cancelRequest->getTask());
         $this->getTaskService()->getEntityManager()->flush();
 
         return $this->sendSuccessResponse();

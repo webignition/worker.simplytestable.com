@@ -2,8 +2,11 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Controller;
 
+use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use SimplyTestable\WorkerBundle\Controller\TaskController;
+use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFactory;
+use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -245,6 +248,67 @@ class FooTaskControllerTest extends BaseControllerJsonTestCase
                 'expectedResponseTaskCollectionCount' => 2,
             ],
         ];
+    }
+
+    public function testCancelActionInMaintenanceReadOnlyMode()
+    {
+        $this->getWorkerService()->setReadOnly();
+        $response = $this->createTaskController()->cancelAction();
+
+        $this->assertEquals(503, $response->getStatusCode());
+    }
+
+    /**
+     * @dataProvider cancelActionInvalidRequestDataProvider
+     *
+     * @param ParameterBag $postData
+     */
+    public function testCancelActionInvalidRequest(ParameterBag $postData)
+    {
+        $request = new Request();
+        $request->request = $postData;
+        $this->addRequestToContainer($request);
+
+        $this->setExpectedException(
+            BadRequestHttpException::class
+        );
+
+        $this->createTaskController()->cancelAction();
+    }
+
+    /**
+     * @return array
+     */
+    public function cancelActionInvalidRequestDataProvider()
+    {
+        return [
+            'no request parameters' => [
+                'postData' => new ParameterBag([]),
+            ],
+            'invalid id' => [
+                'postData' => new ParameterBag([
+                    CancelRequestFactory::PARAMETER_ID => 'foo',
+                ]),
+            ],
+        ];
+    }
+
+    public function testCancelAction()
+    {
+        $this->removeAllTasks();
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults());
+        $this->assertEquals('task-queued', $task->getState());
+
+        $request = new Request();
+        $request->request = new ParameterBag([
+            CancelRequestFactory::PARAMETER_ID => $task->getId(),
+        ]);
+        $this->addRequestToContainer($request);
+
+        $response = $this->createTaskController()->cancelAction();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('task-cancelled', $task->getState());
     }
 
     /**
