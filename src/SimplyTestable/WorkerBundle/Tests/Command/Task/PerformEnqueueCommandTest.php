@@ -18,24 +18,6 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->clearRedis();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        $this->clearRedis();
-        parent::tearDown();
-    }
-
     public function testEnqueueTaskPerformJobs()
     {
         $taskPropertyCollection = [

@@ -14,8 +14,6 @@ class ControllerTest extends BaseControllerTest {
     public function setUp() {
         parent::setUp();
 
-        $this->clearRedis();
-
         $this->response = $this->getTasksController('notifyAction')->notifyAction();
     }
 

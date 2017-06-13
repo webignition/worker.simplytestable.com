@@ -16,12 +16,21 @@ use GuzzleHttp\Message\Request as HttpRequest;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Subscriber\Mock as HttpMockSubscriber;
 
-abstract class BaseSimplyTestableTestCase extends BaseTestCase {
-
+abstract class BaseSimplyTestableTestCase extends BaseTestCase
+{
     const TASK_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TaskController';
     const TASKS_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\TasksController';
     const VERIFY_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\VerifyController';
     const MAINTENANCE_CONTROLLER_NAME = 'SimplyTestable\WorkerBundle\Controller\MaintenanceController';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->getWorkerService()->setActive();
+    }
 
     /**
      * @var TaskFactory
@@ -42,21 +51,6 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
         return $this->taskFactory;
     }
 
-    protected function setActiveState() {
-        $this->getWorkerService()->activate();
-    }
-
-    /**
-     *
-     * @param string $methodName
-     * @param array $postData
-     * @return \SimplyTestable\WorkerBundle\Controller\TaskController
-     */
-    protected function getTaskController($methodName, $postData = array()) {
-        return $this->getController(self::TASK_CONTROLLER_NAME, $methodName, $postData);
-    }
-
-
     /**
      *
      * @param string $methodName
@@ -65,17 +59,6 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase {
      */
     protected function getTasksController($methodName, $postData = array()) {
         return $this->getController(self::TASKS_CONTROLLER_NAME, $methodName, $postData);
-    }
-
-
-    /**
-     *
-     * @param string $methodName
-     * @param array $postData
-     * @return \SimplyTestable\WorkerBundle\Controller\VerifyController
-     */
-    protected function getVerifyController($methodName, $postData = array()) {
-        return $this->getController(self::VERIFY_CONTROLLER_NAME, $methodName, $postData);
     }
 
     /**

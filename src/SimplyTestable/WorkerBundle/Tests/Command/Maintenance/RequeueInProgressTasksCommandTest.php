@@ -10,19 +10,9 @@ use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
 class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->removeAllTasks();
-        $this->clearRedis();
-    }
-
-    public function tearDown()
-    {
-        $this->clearRedis();
-        parent::tearDown();
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     protected function getAdditionalCommands()
     {
         return array(
@@ -45,6 +35,8 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase
         $expectedInitialInProgressTaskCount,
         $expectedQueuedTaskCount
     ) {
+        $this->removeAllTasks();
+
         /* @var Task[] $tasks */
         $tasks = [];
 

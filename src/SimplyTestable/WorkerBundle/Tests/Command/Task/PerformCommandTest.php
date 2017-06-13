@@ -13,15 +13,6 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->clearRedis();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getAdditionalCommands()
     {
         return array(
@@ -187,7 +178,6 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
     protected function tearDown()
     {
         parent::tearDown();
-        $this->clearRedis();
         \Mockery::close();
     }
 }
