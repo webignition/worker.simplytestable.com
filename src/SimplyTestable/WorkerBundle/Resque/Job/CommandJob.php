@@ -2,17 +2,16 @@
 
 namespace SimplyTestable\WorkerBundle\Resque\Job;
 
+use SimplyTestable\WorkerBundle\Output\StringOutput;
 use Symfony\Component\Console\Input\ArrayInput;
-use CoreSphere\ConsoleBundle\Output\StringOutput;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-abstract class CommandJob extends Job {
-
+abstract class CommandJob extends Job
+{
     /**
      * @return ContainerAwareCommand
      */
     abstract protected function getCommand();
-
 
     /**
      * Get the arguments required by the to-be-run command.
@@ -24,14 +23,18 @@ abstract class CommandJob extends Job {
      */
     abstract protected function getCommandArgs();
 
-
     /**
      * @return string
      */
     abstract protected function getIdentifier();
 
-
-    public function run($args) {
+    /**
+     * @param array $args
+     *
+     * @return bool
+     */
+    public function run($args)
+    {
         $command = $this->getCommand();
         $command->setContainer($this->getContainer());
 
@@ -47,18 +50,39 @@ abstract class CommandJob extends Job {
         return $this->handleNonZeroReturnCode($returnCode, $output);
     }
 
-    protected function handleNonZeroReturnCode($returnCode, $output) {
-        $this->getContainer()->get('logger')->error(get_class($this) . ': task [' . $this->getIdentifier() . '] returned ' . $returnCode);
-        $this->getContainer()->get('logger')->error(get_class($this) . ': task [' . $this->getIdentifier() . '] output ' . trim($output->getBuffer()));
+    /**
+     * @param int $returnCode
+     * @param string $output
+     *
+     * @return int
+     */
+    protected function handleNonZeroReturnCode($returnCode, $output)
+    {
+        $logger = $this->getContainer()->get('logger');
+
+        $logger->error(sprintf(
+            '%s: task [%s] returned %s',
+            get_class($this),
+            $this->getIdentifier(),
+            $returnCode
+        ));
+
+
+        $logger->error(sprintf(
+            '%s: task [%s] output %s',
+            get_class($this),
+            $this->getIdentifier(),
+            trim($output->getBuffer())
+        ));
 
         return $returnCode;
     }
 
-
     /**
      * @return bool
      */
-    private function isTestEnvironment() {
+    private function isTestEnvironment()
+    {
         if (!isset($this->args['kernel.environment'])) {
             return false;
         }

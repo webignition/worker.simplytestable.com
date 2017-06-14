@@ -8,7 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 
 class LoadTaskTypes extends AbstractFixture implements OrderedFixtureInterface
-{    
+{
     private $taskTypes = array(
         'HTML validation' => array(
             'description' => 'Validates the HTML markup for a given URL',
@@ -36,36 +36,36 @@ class LoadTaskTypes extends AbstractFixture implements OrderedFixtureInterface
             'selectable' => true
         ),
     );
-    
+
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
     {
         $taskTypeClassRepository = $manager->getRepository('SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass');
         $taskTypeRepository = $manager->getRepository('SimplyTestable\WorkerBundle\Entity\Task\Type\Type');
-        
+
         foreach ($this->taskTypes as $name => $properties) {
             $taskType = $taskTypeRepository->findOneByName($name);
-            
+
             if (is_null($taskType)) {
                 $taskType = new TaskType();
             }
-            
+
             $taskTypeClass = $taskTypeClassRepository->findOneByName($properties['class']);
-            
+
             $taskType->setClass($taskTypeClass);
             $taskType->setDescription($properties['description']);
             $taskType->setName($name);
             $taskType->setSelectable($properties['selectable']);
-            
+
             $manager->persist($taskType);
-            $manager->flush();            
+            $manager->flush();
         }
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getOrder()
     {

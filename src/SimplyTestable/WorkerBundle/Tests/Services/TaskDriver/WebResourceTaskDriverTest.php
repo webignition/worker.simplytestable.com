@@ -2,131 +2,352 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Services\TaskDriver;
 
-class WebResourceTaskDriverTest extends BaseTest {
-    
-    private $taskTypeName = null;
-    private $taskTypeNames = array(
-        'HTML Validation',
-        'CSS Validation',
-        'JS Static Analysis',
-        'URL Discovery',
-        'Link Integrity'
-    );
-    
-    public static function setUpBeforeClass() {
-        self::setupDatabaseIfNotExists();        
-    }
-    
-    public function setUp() {
-        parent::setUp();        
-        $this->clearMemcacheHttpCache();
-    }
-    
-    protected function getTaskTypeName() {
-        return $this->taskTypeName;
-    }
-    
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Message\RequestInterface;
+use Mockery\MockInterface;
+use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
+use SimplyTestable\WorkerBundle\Tests\BaseSimplyTestableTestCase;
+use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
+use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+
+abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
+{
     /**
-     * @group standard
-     */     
-    public function testInvalidContentType() {
-
-        foreach ($this->taskTypeNames as $taskTypeName) {
-            $this->setHttpFixtures($this->buildHttpFixtureSet(array(
-                'HTTP/1.0 200'."\n".'Content-Type:invalid/made-it-up'
-            )));
-
-            $this->taskTypeName = $taskTypeName;
-
-            $task = $this->getDefaultTask();
-
-            $this->assertEquals(0, $this->getTaskService()->perform($task));
-
-            $this->assertEquals(0, $task->getOutput()->getErrorCount());
-            $this->assertEquals(0, $task->getOutput()->getWarningCount());
-
-            $this->assertEquals($this->getTaskService()->getSkippedState(), $task->getState());            
-        }
-    }    
-    
-    
-    /**
-     * @group standard
+     * {@inheritdoc}
      */
-    public function testHttp401() {
-        $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->removeAllTasks();
     }
 
     /**
-     * @group standard
+     * @return TaskDriver
      */
-    public function testHttp404() {
-        $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
+    abstract protected function getTaskDriver();
+
+    /**
+     * @return string
+     */
+    abstract protected function getTaskTypeString();
+
+    /**
+     * @dataProvider cookiesDataProvider
+     *
+     * @param array $taskParameters
+     * @param string $expectedRequestCookieHeader
+     */
+    abstract public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader);
+
+    /**
+     * @dataProvider httpAuthDataProvider
+     *
+     * @param array $taskParameters
+     * @param string $expectedRequestAuthorizationHeaderValue
+     */
+    abstract public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue);
+
+    public function testPerformNonCurlConnectException()
+    {
+        /* @var $request MockInterface|RequestInterface */
+        $request = \Mockery::mock(RequestInterface::class);
+
+        $this->setHttpFixtures([
+            new ConnectException('foo', $request)
+        ]);
+
+        $task = $this->getTaskFactory()->create(
+            TaskFactory::createTaskValuesFromDefaults()
+        );
+
+        $this->setExpectedException(
+            ConnectException::class,
+            'foo',
+            0
+        );
+
+        $this->getTaskDriver()->perform($task);
     }
 
     /**
-     * @group standard
+     * @dataProvider performBadWebResourceDataProvider
+     *
+     * @param string[] $httpResponseFixtures
+     * @param bool $expectedWebResourceRetrievalHasSucceeded
+     * @param bool $expectedIsRetryable
+     * @param int $expectedErrorCount
+     * @param string $expectedTaskOutput
      */
-    public function testHttp500() {
-        $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
+    public function testPerformBadWebResource(
+        $httpResponseFixtures,
+        $expectedWebResourceRetrievalHasSucceeded,
+        $expectedIsRetryable,
+        $expectedErrorCount,
+        $expectedTaskOutput
+    ) {
+        $this->setHttpFixtures($httpResponseFixtures);
+        $webResourceService = $this->container->get('simplytestable.services.webresourceservice');
+        $webResourceService->getConfiguration()->disableRetryWithUrlEncodingDisabled();
+
+        $task = $this->getTaskFactory()->create(
+            TaskFactory::createTaskValuesFromDefaults()
+        );
+
+        $taskDriver = $this->getTaskDriver();
+
+        $taskDriverResponse = $taskDriver->perform($task);
+
+        $this->assertEquals($expectedWebResourceRetrievalHasSucceeded, $taskDriverResponse->hasSucceeded());
+        $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
+        $this->assertEquals($expectedErrorCount, $taskDriverResponse->getErrorCount());
+
+        $this->assertEquals(
+            $expectedTaskOutput,
+            json_decode($taskDriverResponse->getTaskOutput()->getOutput(), true)
+        );
+    }
+
+    public function performBadWebResourceDataProvider()
+    {
+        return [
+            'http too many redirects' => [
+                'httpResponseFixtures' => [
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "1",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "2",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "3",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "4",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "5",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "6",
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'Redirect limit reached',
+                            'messageId' => 'http-retrieval-redirect-limit-reached',
+                            'type' => 'error',
+                        ],
+                    ],
+                ],
+            ],
+            'http redirect loop' => [
+                'httpResponseFixtures' => [
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "1",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "2",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "3",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL,
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "1",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "2",
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'Redirect loop detected',
+                            'messageId' => 'http-retrieval-redirect-loop',
+                            'type' => 'error',
+                        ],
+                    ],
+                ],
+            ],
+            'http 404' => [
+                'httpResponseFixtures' => [
+                    'HTTP/1.1 404 Not Found',
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'Not Found',
+                            'messageId' => 'http-retrieval-404',
+                            'type' => 'error',
+                        ],
+                    ],
+                ]
+            ],
+            'http 500' => [
+                'httpResponseFixtures' => [
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'Internal Server Error',
+                            'messageId' => 'http-retrieval-500',
+                            'type' => 'error',
+                        ],
+                    ],
+                ]
+            ],
+            'curl 3' => [
+                'httpResponseFixtures' => [
+                    ConnectExceptionFactory::create('CURL/3: foo'),
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'Invalid resource URL',
+                            'messageId' => 'http-retrieval-curl-code-3',
+                            'type' => 'error',
+                        ],
+                    ],
+                ]
+            ],
+            'curl 6' => [
+                'httpResponseFixtures' => [
+                    ConnectExceptionFactory::create('CURL/6: foo'),
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'DNS lookup failure resolving resource domain name',
+                            'messageId' => 'http-retrieval-curl-code-6',
+                            'type' => 'error',
+                        ],
+                    ],
+                ]
+            ],
+            'curl 28' => [
+                'httpResponseFixtures' => [
+                    ConnectExceptionFactory::create('CURL/28: foo'),
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'Timeout reached retrieving resource',
+                            'messageId' => 'http-retrieval-curl-code-28',
+                            'type' => 'error',
+                        ],
+                    ],
+                ]
+            ],
+            'curl unknown' => [
+                'httpResponseFixtures' => [
+                    ConnectExceptionFactory::create('CURL/55: foo'),
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => false,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 1,
+                'expectedTaskOutput' => [
+                    'messages' => [
+                        [
+                            'message' => '',
+                            'messageId' => 'http-retrieval-curl-code-55',
+                            'type' => 'error',
+                        ],
+                    ],
+                ]
+            ],
+            'incorrect resource type' => [
+                'httpResponseFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:application/pdf\n\nfoo",
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => true,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 0,
+                'expectedTaskOutput' =>
+                    null
+            ],
+            'empty content' => [
+                'httpResponseFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 0,
+                'expectedTaskOutput' =>
+                    null
+            ],
+        ];
     }
 
     /**
-     * @group standard
+     * @return array
      */
-    public function testHttp503() {
-        $this->assertCorrectFailureForGivenHttpStatusCode(str_replace('testHttp', '', $this->getName()));
+    public function cookiesDataProvider()
+    {
+        return [
+            'no cookies' => [
+                'taskParameters' => [],
+                'expectedRequestCookieHeader' => '',
+            ],
+            'single cookie' => [
+                'taskParameters' => [
+                    'cookies' => [
+                        [
+                            'Name' => 'foo',
+                            'Value' => 'bar',
+                            'Domain' => '.example.com',
+                        ],
+                    ],
+                ],
+                'expectedRequestCookieHeader' => 'foo=bar',
+            ],
+            'multiple cookies' => [
+                'taskParameters' => [
+                    'cookies' => [
+                        [
+                            'Name' => 'foo1',
+                            'Value' => 'bar1',
+                            'Domain' => '.example.com',
+                        ],
+                        [
+                            'Name' => 'foo2',
+                            'Value' => 'bar2',
+                            'Domain' => 'foo2.example.com',
+                        ],
+                        [
+                            'Name' => 'foo3',
+                            'Value' => 'bar3',
+                            'Domain' => '.example.com',
+                        ],
+                    ],
+                ],
+                'expectedRequestCookieHeader' => 'foo1=bar1; foo3=bar3',
+            ],
+        ];
     }
-
 
     /**
-     * @group standard
+     * @return array
      */
-    public function testCurl6() {
-        $this->assertCorrectFailureForGivenCurlCode(str_replace('testCurl', '', $this->getName()));
+    public function httpAuthDataProvider()
+    {
+        return [
+            'no auth' => [
+                'taskParameters' => [],
+                'expectedRequestAuthorizationHeaderValue' => '',
+            ],
+            'has auth' => [
+                'taskParameters' => [
+                    'http-auth-username' => 'foouser',
+                    'http-auth-password' => 'foopassword',
+                ],
+                'expectedRequestAuthorizationHeaderValue' => 'foouser:foopassword',
+            ],
+        ];
     }
-
-    /**
-     * @group standard
-     */
-    public function testCurl28() {
-        $this->assertCorrectFailureForGivenCurlCode(str_replace('testCurl', '', $this->getName()));
-    }
-    
-    private function assertCorrectFailureForGivenHttpStatusCode($statusCode) {        
-        $this->assertCorrectFailureForGivenModeAndCode('http', $statusCode);       
-    } 
-    
-    
-    private function assertCorrectFailureForGivenCurlCode($curlCode) {        
-        $this->assertCorrectFailureForGivenModeAndCode('curl', $curlCode);       
-    }    
-    
-    private function assertCorrectFailureForGivenModeAndCode($mode, $errorCode) {        
-        foreach ($this->taskTypeNames as $taskTypeName) {
-            $this->taskTypeName = $taskTypeName;
-            
-            $responseFixtureContent = ($mode === 'http')
-                ? 'HTTP/1.0 ' . $errorCode
-                : 'CURL/' . $errorCode .' Non-relevant worded error';
-
-            $this->setHttpFixtures($this->buildHttpFixtureSet(array(
-                $responseFixtureContent,
-                $responseFixtureContent
-            )));
-            $this->getHttpClientService()->disablePlugin('Guzzle\Plugin\Backoff\BackoffPlugin');
-
-            $task = $this->getDefaultTask();
-            $this->assertEquals(0, $this->getTaskService()->perform($task));
-
-            $decodedTaskOutput = json_decode($task->getOutput()->getOutput());
-
-            $expectedMessageId = ($mode === 'http')
-                ? 'http-retrieval-' . $errorCode
-                : 'http-retrieval-curl-code-' . $errorCode;
-
-            $this->assertEquals($expectedMessageId, $decodedTaskOutput->messages[0]->messageId);              
-        }
-    }
-
 }

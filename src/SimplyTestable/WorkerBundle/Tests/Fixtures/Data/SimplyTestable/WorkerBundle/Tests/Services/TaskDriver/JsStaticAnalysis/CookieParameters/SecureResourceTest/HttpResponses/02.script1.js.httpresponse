@@ -1,4 +1,0 @@
-HTTP/1.0 200 OK
-Content-type: application/javascript
-
-var foo = 'bar';

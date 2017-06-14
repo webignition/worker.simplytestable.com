@@ -8,20 +8,20 @@ use Doctrine\Common\Persistence\ObjectManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass;
 
 class LoadTaskTypeClasses extends AbstractFixture implements OrderedFixtureInterface
-{    
+{
     private $taskTypeClasses = array(
         'verification' => 'For the verification of quality aspects such as the presence of a robots.txt file',
         'discovery' => 'For the discovery of information, such as collecting all unique URLs within a given page',
         'validation' => 'For the validation of syntactial correctness, such as HTML or CSS validation'
-    ); 
-    
+    );
+
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
     {
         $repository = $manager->getRepository('SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass');
-        
+
         foreach ($this->taskTypeClasses as $name => $description) {
             if (is_null($repository->findOneByName($name))) {
                 $taskTypeClass = new TaskTypeClass();
@@ -29,13 +29,13 @@ class LoadTaskTypeClasses extends AbstractFixture implements OrderedFixtureInter
                 $taskTypeClass->setDescription($description);
 
                 $manager->persist($taskTypeClass);
-                $manager->flush();                 
-            }            
+                $manager->flush();
+            }
         }
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getOrder()
     {

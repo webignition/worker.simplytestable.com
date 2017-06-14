@@ -6,51 +6,45 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as SerializerAnnotation;
 
 /**
- * 
  * @ORM\Entity
  * @SerializerAnnotation\ExclusionPolicy("all")
  */
 class ThisWorker
-{    
+{
     /**
-     * 
      * @var integer
-     * 
+     *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
-    
-    
+
+
     /**
-     *
      * @var string
-     * 
+     *
      * @ORM\Column(type="string", unique=true, nullable=false)
      * @SerializerAnnotation\Expose
      */
     protected $hostname;
-    
-    
+
+
     /**
+     * @var State
      *
-     * @var SimplyTestable\WorkerBundle\Entity\State
-     * 
      * @ORM\ManyToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\State")
      * @ORM\JoinColumn(name="state_id", referencedColumnName="id", nullable=false)
-     * 
+     *
      * @SerializerAnnotation\Expose
      * @SerializerAnnotation\Accessor(getter="getPublicSerializedState")
      * @SerializerAnnotation\Type("string")
-     */    
+     */
     protected $state;
-    
-    
+
     /**
-     *
      * @var string
-     * 
+     *
      * @ORM\Column(type="string", nullable=true)
      */
     protected $activationToken;
@@ -58,7 +52,7 @@ class ThisWorker
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -74,14 +68,14 @@ class ThisWorker
     public function setHostname($hostname)
     {
         $this->hostname = $hostname;
-    
+
         return $this;
     }
 
     /**
      * Get url
      *
-     * @return string 
+     * @return string
      */
     public function getHostname()
     {
@@ -91,20 +85,21 @@ class ThisWorker
     /**
      * Set state
      *
-     * @param SimplyTestable\WorkerBundle\Entity\State $state
+     * @param State $state
+     *
      * @return ThisWorker
      */
-    public function setState(\SimplyTestable\WorkerBundle\Entity\State $state)
+    public function setState(State $state)
     {
         $this->state = $state;
-    
+
         return $this;
     }
 
     /**
      * Get state
      *
-     * @return SimplyTestable\WorkerBundle\Entity\State 
+     * @return State
      */
     public function getState()
     {
@@ -115,40 +110,41 @@ class ThisWorker
      * Set activationToken
      *
      * @param string $activationToken
+     *
      * @return ThisWorker
      */
     public function setActivationToken($activationToken)
     {
         $this->activationToken = $activationToken;
-    
+
         return $this;
     }
 
     /**
      * Get activationToken
      *
-     * @return string 
+     * @return string
      */
     public function getActivationToken()
     {
         return $this->activationToken;
     }
-    
-    
+
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\ThisWorker
+     * @return ThisWorker
      */
-    public function setNextState() {
+    public function setNextState()
+    {
         $this->state = $this->getState()->getNextState();
+
         return $this;
-    }    
-    
+    }
+
     /**
-     *
      * @return string
      */
-    public function getPublicSerializedState() {
+    public function getPublicSerializedState()
+    {
         return str_replace('worker-', '', (string)$this->getState());
-    }     
+    }
 }

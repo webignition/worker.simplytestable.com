@@ -1,1 +1,0 @@
-["/tmp/5965d46668ef0533716afba518564fc2:412:1390910655.9249.js",[{"id":"(error)","raw":"Unexpected '{a}'.","code":"unexpected_a","evidence":"foo = -9 << 2;","line":2,"character":10,"a":"<<","reason":"Unexpected '<<'."}]]

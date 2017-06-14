@@ -5,10 +5,18 @@ services:
         memcacheService: "@simplytestable.services.memcacheService"
         curlOptions: %curl_options%
 
+  simplytestable.services.webResourceServiceConfiguration:
+    class:  webignition\WebResource\Service\Configuration
+    arguments:
+        configurationValues:
+          allow-uknown-resource-types: true
+          retry-with-url-encoding-disabled: true
+          content-type-web-resource-map: %content_type_web_resource_map%
+
   simplytestable.services.webResourceService:
     class:  webignition\WebResource\Service\Service
     calls:
-      - [createConfiguration, [{allow-uknown-resource-types: "true", retry-with-url-encoding-disabled: "true", content-type-web-resource-map: %content_type_web_resource_map% }]]
+      - [setConfiguration, [@simplytestable.services.webResourceServiceConfiguration]]
 
   simplytestable.services.htmlValidatorWrapperService:
     class:  webignition\HtmlValidator\Wrapper\Wrapper
@@ -36,7 +44,7 @@ services:
         logger: "@logger"
         salt: %secret%
         hostname: %hostname%
-        coreApplicationService: "@simplytestable.services.coreApplicationService"
+        coreApplicationBaseUrl: "%core_url%"
         stateService: "@simplytestable.services.stateservice"
         httpClientService: "@simplytestable.services.httpClientService"
         urlService: "@simplytestable.services.urlService"
@@ -76,7 +84,6 @@ services:
   simplytestable.services.taskdriver.htmlvalidation:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver
     arguments:
-        taskTypeService: "@simplytestable.services.tasktypeservice"
         httpClientService: "@simplytestable.services.httpclientservice"
         webResourceService: "@simplytestable.services.webResourceService"
         htmlValidatorWrapper: "@simplytestable.services.htmlValidatorWrapperService"
@@ -86,7 +93,6 @@ services:
   simplytestable.services.taskdriver.cssvalidation:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
     arguments:
-        taskTypeService: "@simplytestable.services.tasktypeservice"
         httpClientService: "@simplytestable.services.httpclientservice"
         webResourceService: "@simplytestable.services.webResourceService"
         cssValidatorWrapper: "@simplytestable.services.cssValidatorWrapperService"
@@ -97,7 +103,6 @@ services:
   simplytestable.services.taskdriver.jslint:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver
     arguments:
-        taskTypeService: "@simplytestable.services.tasktypeservice"
         httpClientService: "@simplytestable.services.httpclientservice"
         webResourceService: "@simplytestable.services.webResourceService"
         nodeJsLintWrapper: "@simplytestable.services.nodeJslintWrapperService"
@@ -109,7 +114,6 @@ services:
   simplytestable.services.taskdriver.linkintegrity:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver
     arguments:
-        taskTypeService: "@simplytestable.services.tasktypeservice"
         httpClientService: "@simplytestable.services.httpclientservice"
         webResourceService: "@simplytestable.services.webResourceService"
         stateService: "@simplytestable.services.stateService"
@@ -118,7 +122,6 @@ services:
   simplytestable.services.taskdriver.urldiscovery:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver
     arguments:
-        taskTypeService: "@simplytestable.services.tasktypeservice"
         httpClientService: "@simplytestable.services.httpclientservice"
         webResourceService: "@simplytestable.services.webResourceService"
         stateService: "@simplytestable.services.stateService"
@@ -161,3 +164,37 @@ services:
     calls:
       - [setWorkerProcessCount, [%worker_process_count%]]
       - [setMaxTasksRequestFactor, [%max_tasks_request_factor%]]
+
+  simplytestable.services.request.factory.task.create:
+    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFactory
+    scope: request
+    arguments:
+        request: "@request"
+        taskTypeService: "@simplytestable.services.tasktypeservice"
+
+  simplytestable.services.request.factory.task.createcollection:
+    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory
+    scope: request
+    arguments:
+        request: "@request"
+        createRequestFactory: "@simplytestable.services.request.factory.task.create"
+
+  simplytestable.services.request.factory.task.cancel:
+    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory
+    scope: request
+    arguments:
+        request: "@request"
+        taskService: "@simplytestable.services.taskservice"
+
+  simplytestable.services.request.factory.task.cancelcollection:
+    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory
+    scope: request
+    arguments:
+        request: "@request"
+        createRequestFactory: "@simplytestable.services.request.factory.task.cancel"
+
+  simplytestable.services.request.factory.verify:
+    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory
+    scope: request
+    arguments:
+        request: "@request"

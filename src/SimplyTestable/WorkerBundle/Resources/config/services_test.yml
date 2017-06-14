@@ -1,15 +1,6 @@
-services:    
-  simplytestable.services.httpClientService:
-    class:  SimplyTestable\WorkerBundle\Services\TestHttpClientService
-    arguments:
-        memcacheService: "@simplytestable.services.memcacheService"        
-        curlOptions: %curl_options%
-        
-  simplytestable.services.htmlValidatorWrapperService:
-    class:  webignition\HtmlValidator\Mock\Wrapper\Wrapper
-
-  simplytestable.services.cssValidatorWrapperService:
-    class:  webignition\CssValidatorWrapper\Mock\Wrapper
-    
-  simplytestable.services.nodeJslintWrapperService:
-    class:  webignition\NodeJslint\Wrapper\Mock\Wrapper
+#services:
+#  simplytestable.services.cssValidatorWrapperService:
+#    class:  webignition\CssValidatorWrapper\Mock\Wrapper
+#
+#  simplytestable.services.nodeJslintWrapperService:
+#    class:  webignition\NodeJslint\Wrapper\Mock\Wrapper

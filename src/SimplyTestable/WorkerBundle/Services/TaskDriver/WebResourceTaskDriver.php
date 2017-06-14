@@ -2,304 +2,246 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\TooManyRedirectsException;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use webignition\GuzzleHttp\Exception\CurlException\Exception as CurlException;
+use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
+use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\WebResource;
 use webignition\WebResource\Exception\Exception as WebResourceException;
-use Guzzle\Plugin\Cookie\CookiePlugin;
-use Guzzle\Plugin\Cookie\CookieJar\ArrayCookieJar;
-use Guzzle\Plugin\Cookie\Cookie;
+use GuzzleHttp\Message\Request as HttpRequest;
+use webignition\WebResource\Service\Service as WebResourceService;
 
-abstract class WebResourceTaskDriver extends TaskDriver {        
-    
+abstract class WebResourceTaskDriver extends TaskDriver
+{
+    const CURL_CODE_INVALID_URL = 3;
+    const CURL_CODE_TIMEOUT = 28;
+    const CURL_CODE_DNS_LOOKUP_FAILURE = 6;
+
     /**
-     *
      * @var WebResourceException
      */
-    protected $webResourceException;
-    
+    private $webResourceException = null;
+
     /**
-     *
-     * @var \webignition\Http\Client\CurlException  
+     * @var CurlException
      */
-    protected $curlException;
-    
-    
+    private $curlException = null;
+
     /**
-     *
-     * @var \webignition\WebResource\WebResource 
+     * @var WebResource
      */
     protected $webResource;
-    
-    
+
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Entity\Task\Task  
+     * @var Task
      */
     protected $task;
-    
-    
+
     /**
-     *
-     * @var \Guzzle\Http\Exception\TooManyRedirectsException
+     * @var TooManyRedirectsException
      */
     private $tooManyRedirectsException = null;
-    
-    
+
     /**
-     *
-     * @var \Guzzle\Http\Message\Request
+     * @var HttpRequest
      */
     private $baseRequest = null;
-    
-    
-    public function execute(Task $task) {                        
-        if (!$this->isCorrectTaskType($task)) {
-            return false;
-        }
-        
-        $this->task = $task;
-        
-        $this->getHttpClientService()->get()->setUserAgent('ST Web Resource Task Driver (http://bit.ly/RlhKCL)');
-        $this->webResource = $this->getWebResource();        
-        $this->getHttpClientService()->get()->setUserAgent(null);        
 
-        if (!$this->response->hasSucceeded()) {            
-            return $this->hasNotSucceedHandler();
+    /**
+     * @var WebResourceService
+     */
+    protected $webResourceService;
+
+    /**
+     * @param WebResourceService $webResourceService
+     */
+    protected function setWebResourceService(WebResourceService $webResourceService)
+    {
+        $this->webResourceService = $webResourceService;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function execute(Task $task)
+    {
+        $this->task = $task;
+
+        $this->getHttpClientService()->setUserAgent('ST Web Resource Task Driver (http://bit.ly/RlhKCL)');
+        $this->getHttpClientService()->setCookies($this->task->getParameter('cookies'));
+        $this->getHttpClientService()->setBasicHttpAuthorization(
+            $this->task->getParameter('http-auth-username'),
+            $this->task->getParameter('http-auth-password')
+        );
+
+        $this->webResource = $this->getWebResource();
+
+        $this->getHttpClientService()->resetUserAgent();
+        $this->getHttpClientService()->clearCookies();
+        $this->getHttpClientService()->clearBasicHttpAuthorization();
+
+        if (!$this->response->hasSucceeded()) {
+            return $this->hasNotSucceededHandler();
         }
-        
-        if (!$this->isCorrectWebResourceType()) {            
+
+        if (!$this->webResource instanceof WebPage) {
             return $this->isNotCorrectWebResourceTypeHandler();
         }
-        
-        if ($this->webResource->getContent() == '') {
+
+        if (empty($this->webResource->getContent())) {
             return $this->isBlankWebResourceHandler();
         }
-        
+
         return $this->performValidation();
     }
 
-    
     /**
      * @return string
      */
-    abstract protected function hasNotSucceedHandler();
-    
-    
-    /**
-     * @return boolean
-     */
-    abstract protected function isCorrectWebResourceType();
-    
-    
-    /**
-     * @return mixed
-     */
-    abstract protected function isNotCorrectWebResourceTypeHandler();
-    
-    
-    abstract protected function isBlankWebResourceHandler();
-    
-    
-    abstract protected function performValidation();
-    
-    
-    /**
-     * @return \Guzzle\Http\Message\Request
-     */
-    protected function getBaseRequest() {
-        if (is_null($this->baseRequest)) {
-            $cookiePlugin = new CookiePlugin(new ArrayCookieJar());
-            $this->getHttpClientService()->get()->addSubscriber($cookiePlugin);
+    abstract protected function hasNotSucceededHandler();
 
-            $baseRequest = $this->getHttpClientService()->getRequest($this->task->getUrl());
-            
-            if ($this->task->hasParameter('http-auth-username') || $this->task->hasParameter('http-auth-password')) {
-                $baseRequest->setAuth(
-                    $this->task->hasParameter('http-auth-username') ? $this->task->getParameter('http-auth-username') : '',
-                    $this->task->hasParameter('http-auth-password') ? $this->task->getParameter('http-auth-password') : '',
-                    'any'
-                );
-            }
-            
-            if ($this->task->hasParameter('cookies')) {
-                foreach ($this->task->getParameter('cookies') as $cookie) {
-                    $cookiePlugin->getCookieJar()->add(new Cookie($cookie));
-                }
-            }
-            
-            $this->baseRequest = $baseRequest;
+    abstract protected function isNotCorrectWebResourceTypeHandler();
+    abstract protected function isBlankWebResourceHandler();
+    abstract protected function performValidation();
+
+    /**
+     * @return HttpRequest
+     */
+    protected function getBaseRequest()
+    {
+        if (is_null($this->baseRequest)) {
+            $this->baseRequest = $this->getHttpClientService()->get()->createRequest(
+                'GET',
+                $this->task->getUrl()
+            );
         }
-        
+
         return $this->baseRequest;
     }
-    
-    
+
     /**
-     *
-     * @return WebResource 
+     * @return WebResource
      */
-    protected function getWebResource() {
-        try {   
-            $request = clone $this->getBaseRequest();            
-            return $this->getWebResourceService()->get($request);            
+    protected function getWebResource()
+    {
+        try {
+            return $this->webResourceService->get(clone $this->getBaseRequest());
         } catch (WebResourceException $webResourceException) {
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
-            
-            $this->webResourceException = $webResourceException;           
-        } catch (\Guzzle\Http\Exception\CurlException $curlException) {
-            $this->response->setHasFailed();
-            
-            if ($this->isTimeoutException($curlException)) {
-                $this->response->setIsRetryable(false);
+
+            $this->webResourceException = $webResourceException;
+        } catch (ConnectException $connectException) {
+            $curlExceptionFactory = new CurlExceptionFactory();
+
+            if (!$curlExceptionFactory->isCurlException($connectException)) {
+                throw $connectException;
             }
-            
-            if ($this->isDnsLookupFailureException($curlException)) {
-                $this->response->setIsRetryable(false);
-            }            
-            
-            if ($this->isInvalidUrlException($curlException)) {
-                $this->response->setIsRetryable(false);
-            }              
-            
-            $this->curlException = $curlException;
-        } catch (\Guzzle\Http\Exception\TooManyRedirectsException $tooManyRedirectsException) {            
+
+            $curlException = $curlExceptionFactory->fromConnectException($connectException);
+
             $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);            
-            
+            $this->response->setIsRetryable(false);
+
+            $this->curlException = $curlException;
+        } catch (TooManyRedirectsException $tooManyRedirectsException) {
+            $this->response->setHasFailed();
+            $this->response->setIsRetryable(false);
+
             $this->tooManyRedirectsException = $tooManyRedirectsException;
         }
     }
-    
-    
+
     /**
-     *
-     * @return \stdClass 
+     * @return \stdClass
      */
-    protected function getWebResourceExceptionOutput() {
-        $outputObjectMessage = new \stdClass();
-        $outputObjectMessage->message = $this->getOutputMessage();
-        $outputObjectMessage->messageId = 'http-retrieval-' . $this->getOutputMessageId();
-        $outputObjectMessage->type = 'error';
-        
-        $outputObject = new \stdClass();
-        $outputObject->messages = array($outputObjectMessage);        
-        
-        return $outputObject;
+    protected function getWebResourceExceptionOutput()
+    {
+        return (object)[
+            'messages' => [
+                [
+                    'message' => $this->getOutputMessage(),
+                    'messageId' => 'http-retrieval-' . $this->getOutputMessageId(),
+                    'type' => 'error',
+                ]
+            ],
+        ];
     }
-    
-    
+
     /**
-     *
-     * @return string 
+     * @return string
      */
-    private function getOutputMessage() {         
-        if ($this->tooManyRedirectsException instanceof \Guzzle\Http\Exception\TooManyRedirectsException) {            
+    private function getOutputMessage()
+    {
+        if (!empty($this->tooManyRedirectsException)) {
             if ($this->isRedirectLoopException()) {
                 return 'Redirect loop detected';
             }
-            
+
             return 'Redirect limit reached';
         }
-        
-        if ($this->curlException instanceof \Guzzle\Http\Exception\CurlException) {            
-            if ($this->isTimeoutException($this->curlException)) {
+
+        if (!empty($this->curlException)) {
+            if (self::CURL_CODE_TIMEOUT == $this->curlException->getCurlCode()) {
                 return 'Timeout reached retrieving resource';
             }
-            
-            if ($this->isDnsLookupFailureException($this->curlException)) {
+
+            if (self::CURL_CODE_DNS_LOOKUP_FAILURE == $this->curlException->getCurlCode()) {
                 return 'DNS lookup failure resolving resource domain name';
-            }            
-            
-            if ($this->isInvalidUrlException($this->curlException)) {
+            }
+
+            if (self::CURL_CODE_INVALID_URL == $this->curlException->getCurlCode()) {
                 return 'Invalid resource URL';
-            }                        
+            }
+
+            return '';
         }
-        
-        if ($this->webResourceException instanceof WebResourceException) {
-            return $this->webResourceException->getResponse()->getReasonPhrase();
-        }
-        
-        return '';
+
+        return $this->webResourceException->getResponse()->getReasonPhrase();
     }
-    
-    
+
     /**
-     * 
+     * @return string
+     */
+    private function getOutputMessageId()
+    {
+        if (!empty($this->tooManyRedirectsException)) {
+            if ($this->isRedirectLoopException()) {
+                return 'redirect-loop';
+            }
+
+            return 'redirect-limit-reached';
+        }
+
+        if (!empty($this->curlException)) {
+            return 'curl-code-' . $this->curlException->getCurlCode();
+        }
+
+        return $this->webResourceException->getResponse()->getStatusCode();
+    }
+
+    /**
      * @return boolean
      */
-    private function isRedirectLoopException() {
+    private function isRedirectLoopException()
+    {
         $history = $this->getHttpClientService()->getHistory();
-        if (is_null($history)) {
-            return false;
-        }
-        
         $urlHistory = array();
-    
-        foreach ($history->getAll() as $transaction) {
-            $urlHistory[] = $transaction['request']->getUrl();
+
+        $history->getRequests();
+
+        foreach ($history->getRequests(true) as $request) {
+            $urlHistory[] = $request->getUrl();
         }
-        
-        foreach ($urlHistory as $urlIndex => $url) {            
+
+        foreach ($urlHistory as $urlIndex => $url) {
             if (in_array($url, array_slice($urlHistory, $urlIndex + 1))) {
                 return true;
             }
         }
-        
+
         return false;
     }
-
-    
-    /**
-     *
-     * @return string 
-     */
-    private function getOutputMessageId() {        
-        if ($this->tooManyRedirectsException instanceof \Guzzle\Http\Exception\TooManyRedirectsException) {
-            if ($this->isRedirectLoopException()) {
-                return 'redirect-loop';
-            }
-            
-            return 'redirect-limit-reached';
-        }
-        
-        if ($this->curlException instanceof \Guzzle\Http\Exception\CurlException) {
-            return 'curl-code-' . $this->curlException->getErrorNo();                     
-        }        
-        
-        if ($this->webResourceException instanceof WebResourceException) {
-            return $this->webResourceException->getResponse()->getStatusCode();
-        }        
-        
-        return '';        
-    }
-    
-    
-    /**
-     *
-     * @param \Guzzle\Http\Exception\CurlException $curlException
-     * @return boolean 
-     */
-    public function isInvalidUrlException(\Guzzle\Http\Exception\CurlException $curlException) {        
-        return $curlException->getErrorNo() === 3;
-    }
-    
-    
-    /**
-     *
-     * @param \Guzzle\Http\Exception\CurlException $curlException
-     */
-    public function isTimeoutException(\Guzzle\Http\Exception\CurlException $curlException) {
-        return $curlException->getErrorNo() === 28;
-    }
-    
-    
-    /**
-     *
-     * @param \Guzzle\Http\Exception\CurlException $curlException
-     */
-    public function isDnsLookupFailureException(\Guzzle\Http\Exception\CurlException $curlException) {
-        return $curlException->getErrorNo() === 6;
-    }      
-    
 }

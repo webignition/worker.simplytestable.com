@@ -1,236 +1,275 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Services;
 
-use Guzzle\Http\Client as HttpClient;
-use Guzzle\Plugin\Backoff\BackoffPlugin;
 use Doctrine\Common\Cache\MemcacheCache;
-use Guzzle\Cache\DoctrineCacheAdapter;
-use Guzzle\Plugin\Cache\CachePlugin;
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Cookie\SetCookie;
+use GuzzleHttp\Message\RequestInterface;
+use GuzzleHttp\Subscriber\Cache\CacheSubscriber;
+use GuzzleHttp\Subscriber\Cache\CacheStorage;
+use GuzzleHttp\Subscriber\Cookie as HttpCookieSubscriber;
+use GuzzleHttp\Subscriber\Retry\RetrySubscriber as HttpRetrySubscriber;
+use GuzzleHttp\Subscriber\History as HttpHistorySubscriber;
 
-class HttpClientService { 
-    
-    
+class HttpClientService
+{
     /**
-     *
-     * @var \Guzzle\Http\Client
+     * @var HttpClient
      */
-    protected $httpClient = null;   
-    
-    
+    protected $httpClient = null;
+
     /**
-     *
-     * @var (\SimplyTestable\WorkerBundle\Services\MemcacheService 
+     * @var MemcacheService
      */
     private $memcacheService = null;
-    
-    
+
     /**
-     *
-     * @var \Doctrine\Common\Cache\MemcacheCache 
+     * @var MemcacheCache
      */
     private $memcacheCache = null;
-    
-    
+
     /**
-     *
      * @var array
      */
-    private $curlOptions = array();    
-    
-    
+    private $curlOptions = array();
+
     /**
-     * 
-     * @param \SimplyTestable\WorkerBundle\Services\MemcacheService $memcacheService
+     * @var HttpHistorySubscriber
+     */
+    private $historySubscriber;
+
+    /**
+     * @var HttpCookieSubscriber
+     */
+    private $cookieSubscriber;
+
+    /**
+     * @var HttpRetrySubscriber
+     */
+    private $retrySubscriber;
+
+    /**
+     * @param MemcacheService $memcacheService
      * @param array $curlOptions
      */
     public function __construct(
-            \SimplyTestable\WorkerBundle\Services\MemcacheService $memcacheService,
-            $curlOptions) {
-        $this->memcacheService = $memcacheService;   
-        
+        MemcacheService $memcacheService,
+        $curlOptions
+    ) {
+        $this->memcacheService = $memcacheService;
+
         foreach ($curlOptions as $curlOption) {
             if (defined($curlOption['name'])) {
                 $this->curlOptions[constant($curlOption['name'])] = $curlOption['value'];
             }
-        }        
-    }      
-    
-    
-    public function get($baseUrl = '', $config = null) {
-        if (is_null($this->httpClient)) {
-            $this->httpClient = new HttpClient($baseUrl, $config);            
-            $this->enablePlugins();         
         }
-        
+
+        $this->historySubscriber = new HttpHistorySubscriber();
+        $this->cookieSubscriber = new HttpCookieSubscriber();
+        $this->retrySubscriber = $this->createRetrySubscriber();
+
+        $this->httpClient = new HttpClient([
+            'config' => [
+                'curl' => $this->curlOptions
+            ],
+        ]);
+
+        $this->httpClient->getEmitter()->attach($this->createCacheSubscriber());
+        $this->enableRetrySubscriber();
+        $this->httpClient->getEmitter()->attach($this->historySubscriber);
+        $this->httpClient->getEmitter()->attach($this->cookieSubscriber);
+    }
+
+    public function enableRetrySubscriber()
+    {
+        $this->httpClient->getEmitter()->attach($this->retrySubscriber);
+    }
+
+    public function disableRetrySubscriber()
+    {
+        $this->httpClient->getEmitter()->detach($this->retrySubscriber);
+    }
+
+    /**
+     * @return HttpClient
+     */
+    public function get()
+    {
         return $this->httpClient;
     }
-    
-    public function enablePlugins() {        
-        foreach ($this->getPlugins() as $plugin) {
-            if (!$this->hasPlugin(get_class($plugin))) {
-                $this->httpClient->addSubscriber($plugin);
-            }            
-        }        
-    }    
-    
-    
-    public function disablePlugin($pluginClassName) {
-        if (!$this->hasPlugin($pluginClassName)) {
-            return true;
-        }
-        
-        $this->get()->getEventDispatcher()->removeSubscriber($this->getPluginListener($pluginClassName));
-    }  
-    
-    
-    private function getPluginListener($pluginClassName) {
-        foreach ($this->httpClient->getEventDispatcher()->getListeners() as $eventName => $eventListeners) {
-            foreach ($eventListeners as $eventListener) {
-                if (get_class($eventListener[0]) == $pluginClassName) {
-                    return $eventListener[0];
-                }
-            }
-        }       
-    }
-    
-    
+
     /**
-     * 
-     * @param string $pluginClassName
-     * @return boolean
+     * @param string $userAgent
      */
-    public function hasPlugin($pluginClassName) {        
-        foreach ($this->httpClient->getEventDispatcher()->getListeners() as $eventName => $eventListeners) {
-            foreach ($eventListeners as $eventListener) {
-                if (get_class($eventListener[0]) == $pluginClassName) {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
+    public function setUserAgent($userAgent)
+    {
+        $defaultHeaders = $this->get()->getDefaultOption('headers');
+        $defaultHeaders['User-Agent'] = $userAgent;
+
+        $this->get()->setDefaultOption('headers', $defaultHeaders);
     }
-    
-    
-    protected function getPlugins() {        
-        return array(
-            BackoffPlugin::getExponentialBackoff(
-                3,
-                array(500, 503, 504)
-            ),
-            $this->getCachePlugin(),
-            new \Guzzle\Plugin\History\HistoryPlugin()
-        );
+
+    public function resetUserAgent()
+    {
+        $client = $this->get();
+        $this->setUserAgent($client::getDefaultUserAgent());
     }
-    
-    protected function getCachePlugin() {
+
+    /**
+     * @return HttpRetrySubscriber
+     */
+    protected function createRetrySubscriber()
+    {
+        $filter = HttpRetrySubscriber::createChainFilter([
+            // Does early filter to force non-idempotent methods to NOT be retried.
+            HttpRetrySubscriber::createIdempotentFilter(),
+            // Retry curl-level errors
+            HttpRetrySubscriber::createCurlFilter(),
+            // Performs the last check, returning ``true`` or ``false`` based on
+            // if the response received a 500 or 503 status code.
+            HttpRetrySubscriber::createStatusFilter([500, 503])
+        ]);
+
+        return new HttpRetrySubscriber(['filter' => $filter]);
+    }
+
+    /**
+     * @return CacheSubscriber|null
+     */
+    private function createCacheSubscriber()
+    {
         $memcacheCache = $this->getMemcacheCache();
         if (is_null($memcacheCache)) {
             return null;
         }
 
-        $adapter = new DoctrineCacheAdapter($memcacheCache);            
-        return new CachePlugin($adapter, true);
+        $cacheSubscriber = new CacheSubscriber(
+            new CacheStorage($memcacheCache),
+            [
+                'GuzzleHttp\Subscriber\Cache\Utils',
+                'canCacheRequest'
+            ]
+        );
+
+        return $cacheSubscriber;
     }
-    
-    
+
     /**
-     * 
-     * @param string $uri
-     * @param array $headers
-     * @param string $body
-     * @return \Guzzle\Http\Message\Request
+     * @param string $url
+     * @param array $options
+     *
+     * @return RequestInterface
      */
-    public function getRequest($uri = null, $headers = null, $body = null) {        
-        $request = $this->get()->get($uri, $headers, $body);        
-        $request->setHeader('Accept-Encoding', 'gzip,deflate');
-        
-        foreach ($this->curlOptions as $key => $value) {
-            $request->getCurlOptions()->set($key, $value);
-        }        
-        
-        return $request;
+    public function getRequest($url, array $options = [])
+    {
+        return $this->createRequest('GET', $url, $options);
     }
-    
-    
+
+
     /**
-     * 
-     * @param string $uri
-     * @param array $headers
-     * @param array $postBody
-     * @return \Guzzle\Http\Message\Request
+     * @param string $url
+     * @param array $options
+     *
+     * @return RequestInterface
      */
-    public function postRequest($uri = null, $headers = null, $postBody = null) {
-        $request = $this->get()->post($uri, $headers, $postBody);        
-        
-        foreach ($this->curlOptions as $key => $value) {
-            $request->getCurlOptions()->set($key, $value);
-        }
-        
-        return $request;        
+    public function postRequest($url, array $options = [])
+    {
+        return $this->createRequest('POST', $url, $options);
     }
-    
-    
+
     /**
-     * 
-     * @return \Doctrine\Common\Cache\MemcacheCache 
+     * @param string $method
+     * @param string $url
+     * @param array $options
+     *
+     * @return RequestInterface
      */
-    public function getMemcacheCache() {
+    private function createRequest($method, $url, $options)
+    {
+        $options['config'] = [
+            'curl' => $this->curlOptions
+        ];
+
+        return $this->get()->createRequest(
+            $method,
+            $url,
+            $options
+        );
+    }
+
+    /**
+     * @return MemcacheCache
+     */
+    public function getMemcacheCache()
+    {
         if (is_null($this->memcacheCache)) {
             $memcache = $this->memcacheService->get();
-            if (!is_null($memcache)) {                
-                $this->memcacheCache = new MemcacheCache();                
-                $this->memcacheCache->setMemcache($memcache);                                    
-            }            
+            if (!is_null($memcache)) {
+                $this->memcacheCache = new MemcacheCache();
+                $this->memcacheCache->setMemcache($memcache);
+            }
         }
-        
+
         return $this->memcacheCache;
     }
-    
-    
+
     /**
-     * 
      * @return boolean
      */
-    public function hasMemcacheCache() {
+    public function hasMemcacheCache()
+    {
         return !is_null($this->getMemcacheCache());
     }
-    
-    
-    
+
     /**
-     * 
-     * @return \Guzzle\Plugin\History\HistoryPlugin|null
+     * @return HttpHistorySubscriber
      */
-    public function getHistory() {
-        $listenerCollections = $this->get()->getEventDispatcher()->getListeners('request.sent');
-        
-        foreach ($listenerCollections as $listener) {
-            if ($listener[0] instanceof \Guzzle\Plugin\History\HistoryPlugin) {
-                return $listener[0];
-            }
-        }
-        
-        return null;     
+    public function getHistory()
+    {
+        return $this->historySubscriber;
     }
 
-
     /**
+     * Set cookies to be sent on all requests (dependent on cookie domain/secure matching rules)
      *
-     * @return \Guzzle\Plugin\Mock\MockPlugin
+     * @param array $cookies
      */
-    public function getMockPlugin() {
-        $listenerCollections = $this->get()->getEventDispatcher()->getListeners('request.before_send');
+    public function setCookies($cookies = [])
+    {
+        $this->cookieSubscriber->getCookieJar()->clear();
+        if (!empty($cookies)) {
+            foreach ($cookies as $cookie) {
+                foreach ($cookie as $key => $value) {
+                    $cookie[ucfirst($key)] = $value;
+                }
 
-        foreach ($listenerCollections as $listener) {
-            if ($listener[0] instanceof \Guzzle\Plugin\Mock\MockPlugin) {
-                return $listener[0];
+                $this->cookieSubscriber->getCookieJar()->setCookie(new SetCookie($cookie));
             }
         }
-
-        $plugin = new \Guzzle\Plugin\Mock\MockPlugin();
-        $this->get()->addSubscriber($plugin);
-        return $plugin;
     }
-    
+
+    public function clearCookies()
+    {
+        $this->cookieSubscriber->getCookieJar()->clear();
+    }
+
+    public function setBasicHttpAuthorization($username, $password)
+    {
+        if (empty($username) && empty($password)) {
+            return;
+        }
+
+        $this->get()->setDefaultOption(
+            'auth',
+            [$username, $password]
+        );
+    }
+
+    public function clearBasicHttpAuthorization()
+    {
+        $this->get()->setDefaultOption(
+            'auth',
+            null
+        );
+    }
 }

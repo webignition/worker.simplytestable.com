@@ -10,40 +10,40 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication;
 
 class LoadCoreApplication extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
-{  
+{
     /**
      * @var ContainerInterface
      */
     private $container;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
-    }     
-    
+    }
+
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
-    {        
+    {
         $coreApplicationUrl = $this->container->getParameter('core_url');
         $repository = $manager->getRepository('SimplyTestable\WorkerBundle\Entity\CoreApplication\CoreApplication');
-        
+
         $coreApplicationList = $repository->findAll();
-        $coreApplication = (count($coreApplicationList)) ? $coreApplicationList[0] : new CoreApplication(); 
-        
+        $coreApplication = (count($coreApplicationList)) ? $coreApplicationList[0] : new CoreApplication();
+
         if ($coreApplication->getUrl() != $coreApplicationUrl) {
             $coreApplication->setUrl($coreApplicationUrl);
             $manager->persist($coreApplication);
-            $manager->flush();            
+            $manager->flush();
         }
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getOrder()
     {

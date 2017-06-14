@@ -5,7 +5,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as SerializerAnnotation;
 
 /**
- * 
+ *
  * @ORM\Entity
  * @ORM\Table(name="TaskType")
  * @SerializerAnnotation\ExclusionPolicy("all")
@@ -13,16 +13,16 @@ use JMS\Serializer\Annotation as SerializerAnnotation;
 class Type
 {
     /**
-     * 
+     *
      * @var integer
-     * 
+     *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
-    
-    
+
+
     /**
      *
      * @var string
@@ -30,37 +30,37 @@ class Type
      * @SerializerAnnotation\Expose
      */
     protected $name;
-    
-    
+
+
     /**
      *
      * @var string
      * @ORM\Column(type="text", nullable=false)
      */
     protected $description;
-    
-    
+
+
     /**
      *
-     * @var SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass
-     * 
+     * @var \SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass
+     *
      * @ORM\ManyToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass")
      * @ORM\JoinColumn(name="tasktypeclass_id", referencedColumnName="id", nullable=false)
      */
-    protected $class;   
-    
+    protected $class;
+
     /**
      *
      * @var boolean
      * @ORM\Column(type="boolean", name="selectable", nullable=false)
      */
-    protected $selectable = false;    
-    
+    protected $selectable = false;
+
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -82,7 +82,7 @@ class Type
     /**
      * Get name
      *
-     * @return string 
+     * @return string
      */
     public function getName()
     {
@@ -92,7 +92,7 @@ class Type
     /**
      * Set description
      *
-     * @param text $description
+     * @param string $description
      * @return Type
      */
     public function setDescription($description)
@@ -104,7 +104,7 @@ class Type
     /**
      * Get description
      *
-     * @return text 
+     * @return string
      */
     public function getDescription()
     {
@@ -132,13 +132,13 @@ class Type
     {
         return $this->class;
     }
-    
-    
+
+
     public function __construct()
     {
         $this->selectable = false;
     }
-    
+
     /**
      * Set selectable
      *
@@ -154,14 +154,14 @@ class Type
     /**
      * Get selectable
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getSelectable()
     {
         return $this->selectable;
     }
-    
-    
+
+
     /**
      *
      * @param Type $taskType
@@ -170,8 +170,8 @@ class Type
     public function equals(Type $taskType) {
         return $this->getName() == $taskType->getName();
     }
-    
-    
+
+
     /**
      *
      * @return string

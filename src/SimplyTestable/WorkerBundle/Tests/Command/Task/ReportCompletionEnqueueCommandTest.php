@@ -2,70 +2,84 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Command\Task;
 
+use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
 use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
-use SimplyTestable\WorkerBundle\Entity\TimePeriod;
+use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorFixtureFactory;
+use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 
-class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase {
-    
-    public function setUp() {
-        parent::setUp();
-        $this->removeAllTasks();
-    }
-    
-    protected function getAdditionalCommands() {
-        return array(
-            new \SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand()
-        );
-    }
-    
-    
+class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase
+{
     /**
-     * @group standard
-     */    
-    public function testEnqueueTaskReportCompletionJobs() {
-        $taskPropertyCollection = array(
-            array(
-                'url' => 'http://example.com/1/',
-                'type' => 'HTML validation'
-            ),
-            array(
-                'url' => 'http://example.com/1/',
-                'type' => 'JS static analysis'
-            ),
-            array(
-                'url' => 'http://example.com/2/',
-                'type' => 'HTML validation'
-            ),            
-            array(
-                'url' => 'http://example.com/3/',
-                'type' => 'HTML validation'
-            ),             
+     * {@inheritdoc}
+     */
+    protected function getAdditionalCommands()
+    {
+        return array(
+            new ReportCompletionEnqueueCommand()
         );
-        
-        $tasks = array();        
-        foreach ($taskPropertyCollection as $taskIndex => $taskProperties) {
-            $taskObject = $this->createTask($taskProperties['url'], $taskProperties['type']);               
+    }
 
-            $task = $this->getTaskService()->getById($taskObject->id);
-            $taskTimePeriod = new TimePeriod();
-            $taskTimePeriod->setStartDateTime(new \DateTime('1970-01-01'));
-            $taskTimePeriod->setEndDateTime(new \DateTime('1970-01-02'));
+    public function testExecuteWithEmptyQueue()
+    {
+        $this->removeAllTasks();
+        $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
+        ]);
 
-            $task->setTimePeriod($taskTimePeriod);
+        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-            $this->createCompletedTaskOutputForTask($task);
-            
-            $tasks[] = $task;
-        }
-        
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $this->getTaskService()->perform($task);
+
         $this->assertTrue($this->clearRedis());
-        
-        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion:enqueue'));            
-        
-        foreach ($tasks as $task) {
-            $this->assertTrue($this->getRequeQueueService()->contains('task-report-completion', array(
+
+        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion:enqueue'));
+
+        $this->assertTrue($this->getResqueQueueService()->contains(
+            'task-report-completion',
+            [
                 'id' => $task->getId()
-            )));             
-        }
+            ]
+        ));
+    }
+
+    public function testExecuteWithNonEmptyQueue()
+    {
+        $this->removeAllTasks();
+        $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
+        ]);
+
+        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
+
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $this->getTaskService()->perform($task);
+
+        $this->assertTrue($this->clearRedis());
+
+        $this->getResqueQueueService()->enqueue(
+            $this->getResqueJobFactoryService()->create(
+                'task-report-completion',
+                ['id' => $task->getId()]
+            )
+        );
+
+        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion:enqueue'));
+
+        $this->assertTrue($this->getResqueQueueService()->contains(
+            'task-report-completion',
+            [
+                'id' => $task->getId()
+            ]
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
     }
 }

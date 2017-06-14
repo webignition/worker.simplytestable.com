@@ -2,15 +2,16 @@
 
 namespace SimplyTestable\WorkerBundle\Controller;
 
-use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService as ResqueJobFactoryService;
+class TasksController extends BaseController
+{
+    public function notifyAction()
+    {
+        $resqueQueueService = $this->container->get('simplytestable.services.resque.queueservice');
+        $jobFactoryService = $this->container->get('simplytestable.services.resque.jobFactoryService');
 
-class TasksController extends BaseController {
-    
-    public function notifyAction() {
-        if ($this->getResqueQueueService()->isEmpty('tasks-request')) {
-            $this->getResqueQueueService()->enqueue(
-                $this->getResqueJobFactoryService()->create(
+        if ($resqueQueueService->isEmpty('tasks-request')) {
+            $resqueQueueService->enqueue(
+                $jobFactoryService->create(
                     'tasks-request',
                     ['limit' => $this->container->getParameter('worker_process_count')]
                 )
@@ -18,23 +19,5 @@ class TasksController extends BaseController {
         }
 
         return $this->sendResponse();
-    }
-
-
-    /**
-     *
-     * @return ResqueQueueService
-     */
-    protected function getResqueQueueService() {
-        return $this->container->get('simplytestable.services.resque.queueservice');
-    }
-
-
-    /**
-     *
-     * @return ResqueJobFactoryService
-     */
-    protected function getResqueJobFactoryService() {
-        return $this->container->get('simplytestable.services.resque.jobFactoryService');
     }
 }

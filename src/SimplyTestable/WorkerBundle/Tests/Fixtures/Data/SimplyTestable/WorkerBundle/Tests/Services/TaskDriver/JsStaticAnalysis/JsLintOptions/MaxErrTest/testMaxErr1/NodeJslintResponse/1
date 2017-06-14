@@ -1,1 +1,0 @@
-["/tmp/844ba378fe5ad0b66e97a91d630a26b2:763:1390912472.5537.js",[{"id":"(error)","raw":"Expected '{a}' at column {b}, not column {c}.","code":"expected_a_at_b_c","evidence":"foobar,","line":2,"character":1,"a":"foobar","b":5,"c":1,"reason":"Expected 'foobar' at column 5, not column 1."},{"reason":"Too many errors. (28% scanned).","line":2,"character":1},null]]

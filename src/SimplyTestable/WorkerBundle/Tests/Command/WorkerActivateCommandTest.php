@@ -2,65 +2,78 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Command;
 
-use SimplyTestable\WorkerBundle\Tests\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Command\WorkerActivateCommand;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 
-class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase {
-    
-    protected function getAdditionalCommands() {
-        return array(
-            new \SimplyTestable\WorkerBundle\Command\WorkerActivateCommand()
-        );
-    }   
-
+class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase
+{
     /**
-     * @group standard
-     */    
-    public function testSuccessfulActivateWorker() {        
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
-        
-        $thisWorker = $this->getWorkerService()->get();
-        $thisWorker->setState($this->getWorkerService()->getStartingState());
-        $this->getWorkerService()->getEntityManager()->persist($thisWorker);
-        $this->getWorkerService()->getEntityManager()->flush();
-        
-        $this->assertEquals(self::CONSOLE_COMMAND_SUCCESS, $this->executeCommand('simplytestable:worker:activate'));
-    }
-    
-    /**
-     * @group standard
+     * {@inheritdoc}
      */
-    public function test404FailureActivateWorker() {        
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses'))); 
-        
-        $thisWorker = $this->getWorkerService()->get();
-        $thisWorker->setState($this->getWorkerService()->getStartingState());
-        $this->getWorkerService()->getEntityManager()->persist($thisWorker);
-        $this->getWorkerService()->getEntityManager()->flush();        
-        
-        $this->assertEquals(404, $this->executeCommand('simplytestable:worker:activate'));
+    protected function getAdditionalCommands()
+    {
+        return array(
+            new WorkerActivateCommand()
+        );
     }
-    
+
     /**
-     * @group standard
-     */    
-    public function testActivationInMaintenanceReadOnlyModeReturnsStatusCodeMinus1() {
+     * {@inheritdoc}
+     */
+    protected static function getServicesToMock()
+    {
+        return [
+            'simplytestable.services.workerservice',
+        ];
+    }
+
+    public function testExecuteInMaintenanceReadOnlyMode()
+    {
         $this->getWorkerService()->setReadOnly();
 
-        $this->assertEquals(-1, $this->executeCommand('simplytestable:worker:activate'));
+        $this->assertEquals(
+            WorkerActivateCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
+            $this->executeCommand('simplytestable:worker:activate')
+        );
     }
-    
+
     /**
-     * @group standard
-     */    
-    public function testActivationWithCoreApplicationInMaintenanceReadOnlyModeReturnsStatusCode503() {
-        $this->setHttpFixtures($this->getHttpFixtures($this->getFixturesDataPath(__FUNCTION__ . '/HttpResponses')));
-        
-        $thisWorker = $this->getWorkerService()->get();
-        $thisWorker->setState($this->getWorkerService()->getStartingState());
-        $this->getWorkerService()->getEntityManager()->persist($thisWorker);
-        $this->getWorkerService()->getEntityManager()->flush(); 
+     * @dataProvider executeDataProvider
+     *
+     * @param int $activationResult
+     * @param int $expectedReturnCode
+     */
+    public function testExecute($activationResult, $expectedReturnCode)
+    {
+        $this->container->get('simplytestable.services.workerservice')
+            ->shouldReceive('activate')
+            ->andReturn($activationResult);
 
-        $this->assertEquals(503, $this->executeCommand('simplytestable:worker:activate'));
-    }    
+        $this->assertEquals($expectedReturnCode, $this->executeCommand('simplytestable:worker:activate'));
+    }
 
+    /**
+     * @return array
+     */
+    public function executeDataProvider()
+    {
+        return [
+            'success' => [
+                'activationResult' => 0,
+                'expectedReturnCode' => 0,
+            ],
+            'unknown error' => [
+                'activationResult' => 1,
+                'expectedReturnCode' => WorkerActivateCommand::RETURN_CODE_UNKNOWN_ERROR,
+            ],
+            'http 404' => [
+                'activationResult' => 404,
+                'expectedReturnCode' => 404,
+            ],
+            'curl 28' => [
+                'activationResult' => 28,
+                'expectedReturnCode' => 28,
+            ],
+        ];
+    }
 }

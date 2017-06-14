@@ -1,1 +1,0 @@
-["/tmp/41ce43a0e2a1c6530cda88fe7ee06d48:797:1390912769.2474.js",[{"id":"(error)","raw":"Expected '{a}' and instead saw '{b}'.","code":"expected_a_b","evidence":"bar = 8","line":3,"character":8,"a":";","b":"foobar","reason":"Expected ';' and instead saw 'foobar'."},{"reason":"Stopping. (75% scanned).","line":3,"character":8},null]]
