@@ -45,11 +45,6 @@ abstract class WebResourceTaskDriver extends TaskDriver
     private $tooManyRedirectsException = null;
 
     /**
-     * @var HttpRequest
-     */
-    private $baseRequest = null;
-
-    /**
      * @var WebResourceService
      */
     protected $webResourceService;
@@ -107,27 +102,17 @@ abstract class WebResourceTaskDriver extends TaskDriver
     abstract protected function performValidation();
 
     /**
-     * @return HttpRequest
-     */
-    protected function getBaseRequest()
-    {
-        if (is_null($this->baseRequest)) {
-            $this->baseRequest = $this->getHttpClientService()->get()->createRequest(
-                'GET',
-                $this->task->getUrl()
-            );
-        }
-
-        return $this->baseRequest;
-    }
-
-    /**
      * @return WebResource
      */
     protected function getWebResource()
     {
         try {
-            return $this->webResourceService->get(clone $this->getBaseRequest());
+            $request = $this->getHttpClientService()->get()->createRequest(
+                'GET',
+                $this->task->getUrl()
+            );
+
+            return $this->webResourceService->get($request);
         } catch (WebResourceException $webResourceException) {
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
