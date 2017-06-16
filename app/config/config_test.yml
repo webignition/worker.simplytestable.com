@@ -1,7 +1,7 @@
 imports:
-    - { resource: config_dev.yml }    
-    - { resource: "@SimplyTestableWorkerBundle/Resources/config/parameters_test.yml" }    
-    - { resource: "@SimplyTestableWorkerBundle/Resources/config/services_test.yml" }    
+    - { resource: config_dev.yml }
+    - { resource: "@SimplyTestableWorkerBundle/Resources/config/parameters_test.yml" }
+    - { resource: "@SimplyTestableWorkerBundle/Resources/config/services_test.yml" }
 
 framework:
     test: ~
@@ -12,17 +12,17 @@ web_profiler:
     toolbar: false
     intercept_redirects: false
 
-#parameters:    
-#    database_driver: pdo_mysql
-#    database_host: localhost
-#    database_port: null
-#    database_name: test_app_simplytestable_com
-#    database_user: st_app_test
-#    database_password: st_app_test_password 
-    
-doctrine:
-  dbal:
-    connections:
-      default:
-        driver: pdo_sqlite
-        path: /run/shm/worker.simplytestable.com.db
+parameters:
+    database_driver: pdo_mysql
+    database_host: localhost
+    database_port: null
+    database_name: test_worker_simplytestable_com
+    database_user: root
+    database_password: root
+
+#doctrine:
+#  dbal:
+#    connections:
+#      default:
+#        driver: pdo_sqlite
+#        path: /run/shm/worker.simplytestable.com.db
