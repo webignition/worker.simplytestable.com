@@ -20,9 +20,9 @@ class TasksService
     private $urlService;
 
     /**
-     * @var CoreApplicationService $coreApplicationService
+     * @var string
      */
-    private $coreApplicationService;
+    private $coreApplicationBaseUrl;
 
     /**
      * @var WorkerService $workerService
@@ -52,7 +52,7 @@ class TasksService
     /**
      * @param LoggerInterface $logger
      * @param UrlService $urlService
-     * @param CoreApplicationService $coreApplicationService
+     * @param string $coreApplicationBaseUrl
      * @param WorkerService $workerService
      * @param HttpClientService $httpClientService
      * @param TaskService $taskService
@@ -60,14 +60,14 @@ class TasksService
     public function __construct(
         LoggerInterface $logger,
         UrlService $urlService,
-        CoreApplicationService $coreApplicationService,
+        $coreApplicationBaseUrl,
         WorkerService $workerService,
         HttpClientService $httpClientService,
         TaskService $taskService
     ) {
         $this->logger = $logger;
         $this->urlService = $urlService;
-        $this->coreApplicationService = $coreApplicationService;
+        $this->coreApplicationBaseUrl = $coreApplicationBaseUrl;
         $this->workerService = $workerService;
         $this->httpClientService = $httpClientService;
         $this->taskService = $taskService;
@@ -119,7 +119,7 @@ class TasksService
         }
 
         $requestUrl = $this->urlService->prepare(
-            $this->coreApplicationService->get()->getUrl() . '/worker/tasks/request/'
+            $this->coreApplicationBaseUrl . '/worker/tasks/request/'
         );
 
         $request = $this->httpClientService->postRequest($requestUrl, [

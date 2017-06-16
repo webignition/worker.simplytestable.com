@@ -31,11 +31,6 @@ services:
   simplytestable.services.nodeJslintWrapperService:
     class:  webignition\NodeJslint\Wrapper\Wrapper
 
-  simplytestable.services.coreApplicationService:
-    class:  SimplyTestable\WorkerBundle\Services\CoreApplicationService
-    arguments:
-        entityManager: "@doctrine.orm.entity_manager"
-
   simplytestable.services.stateservice:
     class:  SimplyTestable\WorkerBundle\Services\StateService
     arguments:
@@ -70,7 +65,7 @@ services:
         logger: "@logger"
         stateService: "@simplytestable.services.stateservice"
         urlService: "@simplytestable.services.urlservice"
-        coreApplicationService: "@simplytestable.services.coreapplicationservice"
+        coreApplicationBaseUrl: "%core_url%"
         workerService: "@simplytestable.services.workerservice"
         httpClientService: "@simplytestable.services.httpClientService"
     calls:
@@ -116,7 +111,7 @@ services:
     arguments:
         logger: "@logger"
         urlService: "@simplytestable.services.urlservice"
-        coreApplicationService: "@simplytestable.services.coreapplicationservice"
+        coreApplicationBaseUrl: "%core_url%"
         workerService: "@simplytestable.services.workerservice"
         httpClientService: "@simplytestable.services.httpClientService"
         taskService: "@simplytestable.services.taskservice"
