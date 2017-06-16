@@ -1,3 +1,7 @@
+imports:
+    - { resource: services/task-drivers.yml }
+    - { resource: services/request-factories.yml }
+
 services:
   simplytestable.services.httpClientService:
     class:  SimplyTestable\WorkerBundle\Services\HttpClientService
@@ -26,11 +30,6 @@ services:
 
   simplytestable.services.nodeJslintWrapperService:
     class:  webignition\NodeJslint\Wrapper\Wrapper
-
-  simplytestable.services.coreApplicationService:
-    class:  SimplyTestable\WorkerBundle\Services\CoreApplicationService
-    arguments:
-        entityManager: "@doctrine.orm.entity_manager"
 
   simplytestable.services.stateservice:
     class:  SimplyTestable\WorkerBundle\Services\StateService
@@ -66,7 +65,7 @@ services:
         logger: "@logger"
         stateService: "@simplytestable.services.stateservice"
         urlService: "@simplytestable.services.urlservice"
-        coreApplicationService: "@simplytestable.services.coreapplicationservice"
+        coreApplicationBaseUrl: "%core_url%"
         workerService: "@simplytestable.services.workerservice"
         httpClientService: "@simplytestable.services.httpClientService"
     calls:
@@ -80,51 +79,6 @@ services:
     class:   SimplyTestable\WorkerBundle\Services\TaskTypeService
     arguments:
         entityManager: "@doctrine.orm.entity_manager"
-
-  simplytestable.services.taskdriver.htmlvalidation:
-    class:   SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver
-    arguments:
-        httpClientService: "@simplytestable.services.httpclientservice"
-        webResourceService: "@simplytestable.services.webResourceService"
-        htmlValidatorWrapper: "@simplytestable.services.htmlValidatorWrapperService"
-        stateService: "@simplytestable.services.stateService"
-        validatorPath: %html-validator-path%
-
-  simplytestable.services.taskdriver.cssvalidation:
-    class:   SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
-    arguments:
-        httpClientService: "@simplytestable.services.httpclientservice"
-        webResourceService: "@simplytestable.services.webResourceService"
-        cssValidatorWrapper: "@simplytestable.services.cssValidatorWrapperService"
-        serializer: "@jms_serializer"
-        stateService: "@simplytestable.services.stateService"
-        cssValidatorJarPath: %css-validator-jar-path%
-
-  simplytestable.services.taskdriver.jslint:
-    class:   SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver
-    arguments:
-        httpClientService: "@simplytestable.services.httpclientservice"
-        webResourceService: "@simplytestable.services.webResourceService"
-        nodeJsLintWrapper: "@simplytestable.services.nodeJslintWrapperService"
-        stateService: "@simplytestable.services.stateService"
-        logger: "@logger"
-        nodePath: %node-path%
-        nodeJsLintPath: %node-jslint-path%
-
-  simplytestable.services.taskdriver.linkintegrity:
-    class:   SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver
-    arguments:
-        httpClientService: "@simplytestable.services.httpclientservice"
-        webResourceService: "@simplytestable.services.webResourceService"
-        stateService: "@simplytestable.services.stateService"
-        userAgents: %link-integrity-user-agents%
-
-  simplytestable.services.taskdriver.urldiscovery:
-    class:   SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver
-    arguments:
-        httpClientService: "@simplytestable.services.httpclientservice"
-        webResourceService: "@simplytestable.services.webResourceService"
-        stateService: "@simplytestable.services.stateService"
 
   simplytestable.services.resque.queueService:
     class:   SimplyTestable\WorkerBundle\Services\Resque\QueueService
@@ -157,44 +111,10 @@ services:
     arguments:
         logger: "@logger"
         urlService: "@simplytestable.services.urlservice"
-        coreApplicationService: "@simplytestable.services.coreapplicationservice"
+        coreApplicationBaseUrl: "%core_url%"
         workerService: "@simplytestable.services.workerservice"
         httpClientService: "@simplytestable.services.httpClientService"
         taskService: "@simplytestable.services.taskservice"
     calls:
       - [setWorkerProcessCount, [%worker_process_count%]]
       - [setMaxTasksRequestFactor, [%max_tasks_request_factor%]]
-
-  simplytestable.services.request.factory.task.create:
-    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFactory
-    scope: request
-    arguments:
-        request: "@request"
-        taskTypeService: "@simplytestable.services.tasktypeservice"
-
-  simplytestable.services.request.factory.task.createcollection:
-    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory
-    scope: request
-    arguments:
-        request: "@request"
-        createRequestFactory: "@simplytestable.services.request.factory.task.create"
-
-  simplytestable.services.request.factory.task.cancel:
-    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory
-    scope: request
-    arguments:
-        request: "@request"
-        taskService: "@simplytestable.services.taskservice"
-
-  simplytestable.services.request.factory.task.cancelcollection:
-    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory
-    scope: request
-    arguments:
-        request: "@request"
-        createRequestFactory: "@simplytestable.services.request.factory.task.cancel"
-
-  simplytestable.services.request.factory.verify:
-    class:   SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory
-    scope: request
-    arguments:
-        request: "@request"
