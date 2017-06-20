@@ -11,6 +11,7 @@ class CoreApplicationRouterTest extends BaseSimplyTestableTestCase
      *
      * @param string $name
      * @param array $parameters
+     * @param string $expectedUrl
      */
     public function testGenerate($name, $parameters, $expectedUrl)
     {
