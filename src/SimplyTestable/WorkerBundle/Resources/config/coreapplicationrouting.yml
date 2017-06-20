@@ -1,0 +1,10 @@
+worker_activate:
+    path:  /worker/activate/
+
+task_complete:
+    path:  /task/{url}/{type}/{parameter_hash}/complete/
+    requirements:
+      url: ".+"
+
+tasks_request:
+    path:  /worker/tasks/request/

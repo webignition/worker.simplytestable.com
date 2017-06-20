@@ -9,14 +9,9 @@ use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use SimplyTestable\WorkerBundle\Repository\TaskRepository;
-use SimplyTestable\WorkerBundle\Services\CoreApplicationService;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
-use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use GuzzleHttp\Exception\BadResponseException as HttpBadResponseException;
 use GuzzleHttp\Exception\ConnectException as HttpConnectException;
-use SimplyTestable\WorkerBundle\Services\UrlService;
-use SimplyTestable\WorkerBundle\Services\WorkerService;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
 class TaskService extends EntityService
@@ -47,9 +42,9 @@ class TaskService extends EntityService
     private $urlService;
 
     /**
-     * @var CoreApplicationService
+     * @var CoreApplicationRouter
      */
-    private $coreApplicationService;
+    private $coreApplicationRouter;
 
     /**
      * @var WorkerService
@@ -79,7 +74,7 @@ class TaskService extends EntityService
      * @param LoggerInterface $logger
      * @param StateService $stateService
      * @param UrlService $urlService
-     * @param CoreApplicationService $coreApplicationService
+     * @param CoreApplicationRouter $coreApplicationRouter
      * @param WorkerService $workerService
      * @param HttpClientService $httpClientService
      */
@@ -88,7 +83,7 @@ class TaskService extends EntityService
         LoggerInterface $logger,
         StateService $stateService,
         UrlService $urlService,
-        CoreApplicationService$coreApplicationService,
+        CoreApplicationRouter $coreApplicationRouter,
         WorkerService $workerService,
         HttpClientService $httpClientService
     ) {
@@ -97,7 +92,7 @@ class TaskService extends EntityService
         $this->logger = $logger;
         $this->stateService = $stateService;
         $this->urlService = $urlService;
-        $this->coreApplicationService = $coreApplicationService;
+        $this->coreApplicationRouter = $coreApplicationRouter;
         $this->workerService = $workerService;
         $this->httpClientService = $httpClientService;
     }
@@ -414,13 +409,14 @@ class TaskService extends EntityService
         }
 
         $requestUrl = $this->urlService->prepare(
-            $this->coreApplicationService->get()->getUrl()
-            . '/task/'
-            . urlencode($task->getUrl())
-            . '/'
-            . rawurlencode($task->getType()->getName())
-            . '/' . $task->getParametersHash()
-            . '/complete/'
+            $this->coreApplicationRouter->generate(
+                'task_complete',
+                [
+                    'url' => $task->getUrl(),
+                    'type' => $task->getType()->getName(),
+                    'parameter_hash' => $task->getParametersHash(),
+                ]
+            )
         );
 
         $httpRequest = $this->httpClientService->postRequest($requestUrl, [
