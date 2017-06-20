@@ -42,9 +42,9 @@ class TaskService extends EntityService
     private $urlService;
 
     /**
-     * @var string
+     * @var CoreApplicationRouter
      */
-    private $coreApplicationBaseUrl;
+    private $coreApplicationRouter;
 
     /**
      * @var WorkerService
@@ -74,7 +74,7 @@ class TaskService extends EntityService
      * @param LoggerInterface $logger
      * @param StateService $stateService
      * @param UrlService $urlService
-     * @param string $coreApplicationBaseUrl
+     * @param CoreApplicationRouter $coreApplicationRouter
      * @param WorkerService $workerService
      * @param HttpClientService $httpClientService
      */
@@ -83,7 +83,7 @@ class TaskService extends EntityService
         LoggerInterface $logger,
         StateService $stateService,
         UrlService $urlService,
-        $coreApplicationBaseUrl,
+        CoreApplicationRouter $coreApplicationRouter,
         WorkerService $workerService,
         HttpClientService $httpClientService
     ) {
@@ -92,7 +92,7 @@ class TaskService extends EntityService
         $this->logger = $logger;
         $this->stateService = $stateService;
         $this->urlService = $urlService;
-        $this->coreApplicationBaseUrl = $coreApplicationBaseUrl;
+        $this->coreApplicationRouter = $coreApplicationRouter;
         $this->workerService = $workerService;
         $this->httpClientService = $httpClientService;
     }
@@ -409,13 +409,14 @@ class TaskService extends EntityService
         }
 
         $requestUrl = $this->urlService->prepare(
-            $this->coreApplicationBaseUrl
-            . '/task/'
-            . urlencode($task->getUrl())
-            . '/'
-            . rawurlencode($task->getType()->getName())
-            . '/' . $task->getParametersHash()
-            . '/complete/'
+            $this->coreApplicationRouter->generate(
+                'task_complete',
+                [
+                    'url' => $task->getUrl(),
+                    'type' => $task->getType()->getName(),
+                    'parameter_hash' => $task->getParametersHash(),
+                ]
+            )
         );
 
         $httpRequest = $this->httpClientService->postRequest($requestUrl, [

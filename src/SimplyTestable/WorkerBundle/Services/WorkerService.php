@@ -33,9 +33,9 @@ class WorkerService extends EntityService
     private $hostname;
 
     /**
-     * @var string
+     * @var CoreApplicationRouter
      */
-    private $coreApplicationBaseUrl;
+    private $coreApplicationRouter;
 
     /**
      * @var StateService
@@ -57,7 +57,7 @@ class WorkerService extends EntityService
      * @param LoggerInterface $logger
      * @param string $salt
      * @param string $hostname
-     * @param string $coreApplicationBaseUrl
+     * @param CoreApplicationRouter $coreApplicationRouter
      * @param StateService $stateService
      * @param HttpClientService $httpClientService
      * @param UrlService $urlService
@@ -67,7 +67,7 @@ class WorkerService extends EntityService
         LoggerInterface $logger,
         $salt,
         $hostname,
-        $coreApplicationBaseUrl,
+        CoreApplicationRouter $coreApplicationRouter,
         StateService $stateService,
         HttpClientService $httpClientService,
         UrlService $urlService
@@ -77,7 +77,7 @@ class WorkerService extends EntityService
         $this->logger = $logger;
         $this->salt = $salt;
         $this->hostname = $hostname;
-        $this->coreApplicationBaseUrl = $coreApplicationBaseUrl;
+        $this->coreApplicationRouter = $coreApplicationRouter;
         $this->stateService = $stateService;
         $this->httpClientService = $httpClientService;
         $this->urlService = $urlService;
@@ -148,7 +148,11 @@ class WorkerService extends EntityService
         }
 
         $thisWorker = $this->get();
-        $requestUrl = $this->urlService->prepare($this->coreApplicationBaseUrl . 'worker/activate/');
+        $requestUrl = $this->urlService->prepare(
+            $this->coreApplicationRouter->generate(
+                'worker_activate'
+            )
+        );
 
         $httpRequest = $this->httpClientService->postRequest($requestUrl, [
             'body' => [

@@ -43,7 +43,7 @@ services:
         logger: "@logger"
         salt: %secret%
         hostname: %hostname%
-        coreApplicationBaseUrl: "%core_url%"
+        coreApplicationRouter: "@simplytestable.services.coreapplicationrouter"
         stateService: "@simplytestable.services.stateservice"
         httpClientService: "@simplytestable.services.httpClientService"
         urlService: "@simplytestable.services.urlService"
@@ -65,7 +65,7 @@ services:
         logger: "@logger"
         stateService: "@simplytestable.services.stateservice"
         urlService: "@simplytestable.services.urlservice"
-        coreApplicationBaseUrl: "%core_url%"
+        coreApplicationRouter: "@simplytestable.services.coreapplicationrouter"
         workerService: "@simplytestable.services.workerservice"
         httpClientService: "@simplytestable.services.httpClientService"
     calls:
@@ -111,10 +111,17 @@ services:
     arguments:
         logger: "@logger"
         urlService: "@simplytestable.services.urlservice"
-        coreApplicationBaseUrl: "%core_url%"
+        coreApplicationRouter: "@simplytestable.services.coreapplicationrouter"
         workerService: "@simplytestable.services.workerservice"
         httpClientService: "@simplytestable.services.httpClientService"
         taskService: "@simplytestable.services.taskservice"
     calls:
       - [setWorkerProcessCount, [%worker_process_count%]]
       - [setMaxTasksRequestFactor, [%max_tasks_request_factor%]]
+
+  simplytestable.services.coreapplicationrouter:
+    class:   SimplyTestable\WorkerBundle\Services\CoreApplicationRouter
+    arguments:
+        baseUrl: "%core_url%"
+        kernel: "@kernel"
+        cachePath: "%kernel.cache_dir%"
