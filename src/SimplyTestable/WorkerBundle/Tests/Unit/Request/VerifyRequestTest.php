@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Functional\Request;
+namespace SimplyTestable\WorkerBundle\Tests\Unit\Request;
 
 use SimplyTestable\WorkerBundle\Request\VerifyRequest;
 

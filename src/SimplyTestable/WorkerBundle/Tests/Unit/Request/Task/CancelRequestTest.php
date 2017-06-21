@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Functional\Request\Task;
+namespace SimplyTestable\WorkerBundle\Tests\Unit\Request\Task;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Request\Task\CancelRequest;
