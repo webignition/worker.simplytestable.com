@@ -2,13 +2,28 @@
 namespace SimplyTestable\WorkerBundle\Command\Memcache\HttpCache;
 
 use SimplyTestable\WorkerBundle\Services\MemcacheService;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Doctrine\Common\Cache\MemcacheCache;
 
-class ClearCommand extends ContainerAwareCommand
+class ClearCommand extends Command
 {
+    /**
+     * @var MemcacheService
+     */
+    private $memcacheService;
+
+    /**
+     * @param MemcacheService $memcacheService
+     * @param string|null $name
+     */
+    public function __construct(MemcacheService $memcacheService, $name = null)
+    {
+        parent::__construct($name);
+        $this->memcacheService = $memcacheService;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -26,17 +41,8 @@ class ClearCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $memcacheCache = new MemcacheCache();
-        $memcacheCache->setMemcache($this->getMemcacheService()->get());
+        $memcacheCache->setMemcache($this->memcacheService->get());
 
         return ($memcacheCache->deleteAll()) ? 0 : 1;
-    }
-
-    /**
-     *
-     * @return MemcacheService
-     */
-    private function getMemcacheService()
-    {
-        return $this->getContainer()->get('simplytestable.services.memcacheservice');
     }
 }

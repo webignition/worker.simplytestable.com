@@ -13,6 +13,13 @@ services:
     tags:
       - { name: console.command }
 
+  simplytestable.command.memcache.httpcache.clear:
+    class: SimplyTestable\WorkerBundle\Command\Memcache\HttpCache\ClearCommand
+    arguments:
+        memcacheService: "@simplytestable.services.memcacheservice"
+    tags:
+      - { name: console.command }
+
   simplytestable.command.maintenance.requeinprogresstasks:
     class: SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand
     arguments:
