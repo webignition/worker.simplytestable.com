@@ -88,3 +88,11 @@ services:
         resqueJobFactoryService: "@simplytestable.services.resque.jobfactoryservice"
     tags:
       - { name: console.command }
+
+  simplytestable.command.tasks.requestifempty:
+    class:   SimplyTestable\WorkerBundle\Command\Tasks\RequestIfEmptyCommand
+    arguments:
+        resqueQueueService: "@simplytestable.services.resque.queueservice"
+        resqueJobFactoryService: "@simplytestable.services.resque.jobfactoryservice"
+    tags:
+      - { name: console.command }
