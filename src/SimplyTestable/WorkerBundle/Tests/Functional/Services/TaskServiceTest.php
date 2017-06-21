@@ -50,18 +50,6 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     public function cancelDataProvider()
     {
         return [
-            'state: cancelled' => [
-                'task' => TaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_CANCELLED_STATE,
-                ]),
-                'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
-            ],
-            'state: completed' => [
-                'task' => TaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_COMPLETED_STATE,
-                ]),
-                'expectedEndState' => TaskService::TASK_COMPLETED_STATE,
-            ],
             'state: queued' => [
                 'task' => TaskFactory::createTaskValuesFromDefaults(),
                 'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
@@ -198,61 +186,6 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
             'skipped' => [
                 'method' => 'getSkippedState',
                 'expectedStateName' => TaskService::TASK_SKIPPED_STATE,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider performTaskInIncorrectStateDataProvider
-     *
-     * @param array $taskValues
-     */
-    public function testPerformTaskInIncorrectState($taskValues)
-    {
-        $task = $this->getTaskFactory()->create($taskValues);
-        $this->assertEquals(1, $this->getTaskService()->perform($task));
-    }
-
-    /**
-     * @return array
-     */
-    public function performTaskInIncorrectStateDataProvider()
-    {
-        return [
-            'in-progress' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_IN_PROGRESS_STATE,
-                ]),
-            ],
-            'completed' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_COMPLETED_STATE,
-                ]),
-            ],
-            'cancelled' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_CANCELLED_STATE,
-                ]),
-            ],
-            'failed-no-retry-available' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_FAILED_NO_RETRY_AVAILABLE_STATE,
-                ]),
-            ],
-            'failed-retry-available' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_FAILED_RETRY_AVAILABLE_STATE,
-                ]),
-            ],
-            'failed-retry-limit-reached' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_FAILED_RETRY_LIMIT_REACHED_STATE,
-                ]),
-            ],
-            'skipped' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_SKIPPED_STATE,
-                ]),
             ],
         ];
     }
@@ -403,11 +336,16 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
 
     public function testGetIncompleteCount()
     {
+        $this->removeAllTasks();
+
         $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
             'state' => TaskService::TASK_STARTING_STATE,
+            'type' => TaskTypeService::HTML_VALIDATION_NAME,
         ]));
+
         $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
             'state' => TaskService::TASK_IN_PROGRESS_STATE,
+            'type' => TaskTypeService::CSS_VALIDATION_NAME,
         ]));
 
         $this->assertEquals(2, $this->getTaskService()->getInCompleteCount());
