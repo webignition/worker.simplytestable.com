@@ -4,22 +4,15 @@ namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Task;
 
 use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Command\Task\PerformCommand;
+use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\TaskService;
-use SimplyTestable\WorkerBundle\Tests\Functional\Command\ConsoleCommandBaseTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
+use Symfony\Component\Console\Input\ArrayInput;
 
-class PerformCommandTest extends ConsoleCommandBaseTestCase
+class PerformCommandTest extends BaseSimplyTestableTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAdditionalCommands()
-    {
-        return array(
-            new PerformCommand()
-        );
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -30,25 +23,34 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
         ];
     }
 
-    public function testInvalidTask()
+    public function testRunWithInvalidTask()
     {
-        $returnCode = $this->executeCommand('simplytestable:task:perform', [
-            'id' => 0,
-        ]);
+        $command = $this->createPerformCommand();
 
-        $this->assertEquals(PerformCommand::RETURN_CODE_TASK_DOES_NOT_EXIST, $returnCode);
+        $this->assertEquals(
+            PerformCommand::RETURN_CODE_TASK_DOES_NOT_EXIST,
+            $command->run(
+                new ArrayInput([
+                    'id' => 0,
+                ]),
+                new StringOutput()
+            )
+        );
     }
 
-    public function testMaintenanceMode()
+    public function testRunInMaintenanceReadOnlyMode()
     {
         $this->getWorkerService()->setReadOnly();
-
+        $this->clearRedis();
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
 
-        $this->clearRedis();
-        $returnCode = $this->executeCommand('simplytestable:task:perform', array(
-            'id' => $task->getId()
-        ));
+        $command = $this->createPerformCommand();
+        $returnCode = $command->run(
+            new ArrayInput([
+                'id' => $task->getId(),
+            ]),
+            new StringOutput()
+        );
 
         $this->assertEquals(PerformCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE, $returnCode);
         $this->assertTrue($this->getResqueQueueService()->contains(
@@ -62,17 +64,15 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
     public function testTaskServiceRaisesException()
     {
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $this->createTaskServiceMock($task, new \Exception());
 
-        /* @var TaskService|MockInterface $taskService */
-        $taskService = $this->container->get('simplytestable.services.taskservice');
-        $taskService
-            ->shouldReceive('perform')
-            ->with($task)
-            ->andThrow(\Exception::class, 'message', 0);
-
-        $returnCode = $this->executeCommand('simplytestable:task:perform', array(
-            'id' => $task->getId()
-        ));
+        $command = $this->createPerformCommand();
+        $returnCode = $command->run(
+            new ArrayInput([
+                'id' => $task->getId(),
+            ]),
+            new StringOutput()
+        );
 
         $this->assertEquals(PerformCommand::RETURN_CODE_TASK_SERVICE_RAISED_EXCEPTION, $returnCode);
     }
@@ -80,9 +80,11 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
     /**
      * @dataProvider performDataProvider
      *
-     * @param $taskValues
-     * @param $taskServiceReturnValue
-     * @param $expectedReturnCode
+     * @param array $taskValues
+     * @param int $taskServiceReturnValue
+     * @param int $expectedReturnCode
+     * @param array $expectedResqueJobs
+     * @param array $expectedEmptyResqueQueues
      */
     public function testPerform(
         $taskValues,
@@ -92,18 +94,16 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
         $expectedEmptyResqueQueues
     ) {
         $task = $this->getTaskFactory()->create($taskValues);
-
-        /* @var TaskService|MockInterface $taskService */
-        $taskService = $this->container->get('simplytestable.services.taskservice');
-        $taskService
-            ->shouldReceive('perform')
-            ->with($task)
-            ->andReturn($taskServiceReturnValue);
-
         $this->clearRedis();
-        $returnCode = $this->executeCommand('simplytestable:task:perform', array(
-            'id' => $task->getId()
-        ));
+        $this->createTaskServiceMock($task, $taskServiceReturnValue);
+
+        $command = $this->createPerformCommand();
+        $returnCode = $command->run(
+            new ArrayInput([
+                'id' => $task->getId(),
+            ]),
+            new StringOutput()
+        );
 
         $this->assertEquals($expectedReturnCode, $returnCode);
 
@@ -170,6 +170,42 @@ class PerformCommandTest extends ConsoleCommandBaseTestCase
                 'expectedEmptyResqueQueues' => [],
             ],
         ];
+    }
+
+    /**
+     * @param Task $task
+     * @param mixed $performResult
+     */
+    private function createTaskServiceMock(Task $task, $performResult)
+    {
+        /* @var TaskService|MockInterface $taskService */
+        $taskService = $this->container->get('simplytestable.services.taskservice');
+
+        if ($performResult instanceof \Exception) {
+            $taskService
+                ->shouldReceive('perform')
+                ->with($task)
+                ->andThrow(\Exception::class);
+        } else {
+            $taskService
+                ->shouldReceive('perform')
+                ->with($task)
+                ->andReturn($performResult);
+        }
+    }
+
+    /**
+     * @return PerformCommand
+     */
+    private function createPerformCommand()
+    {
+        return new PerformCommand(
+            $this->container->get('logger'),
+            $this->container->get('simplytestable.services.taskservice'),
+            $this->container->get('simplytestable.services.workerservice'),
+            $this->container->get('simplytestable.services.resque.queueservice'),
+            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+        );
     }
 
     /**

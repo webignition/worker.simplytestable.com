@@ -1,6 +1,7 @@
 imports:
     - { resource: services/task-drivers.yml }
     - { resource: services/request-factories.yml }
+    - { resource: services/commands.yml }
 
 services:
   simplytestable.services.httpClientService:

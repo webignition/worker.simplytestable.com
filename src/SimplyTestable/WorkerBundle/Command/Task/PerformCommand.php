@@ -1,17 +1,65 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
+use Psr\Log\LoggerInterface;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService as ResqueJobFactoryService;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
+use SimplyTestable\WorkerBundle\Services\TaskService;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Command\Command as BaseCommand;
 
-class PerformCommand extends Command
+class PerformCommand extends BaseCommand
 {
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;
     const RETURN_CODE_FAILED_DUE_TO_WRONG_STATE = -3;
     const RETURN_CODE_UNKNOWN_ERROR = -5;
     const RETURN_CODE_TASK_SERVICE_RAISED_EXCEPTION = -6;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var TaskService
+     */
+    private $taskService;
+
+    /**
+     * @var WorkerService
+     */
+    private $workerService;
+
+    /**
+     * @var ResqueQueueService
+     */
+    private $resqueQueueService;
+
+    /**
+     * @var ResqueJobFactoryService
+     */
+    private $resqueJobFactoryService;
+
+    public function __construct(
+        LoggerInterface $logger,
+        TaskService $taskService,
+        WorkerService $workerService,
+        ResqueQueueService $resqueQueueService,
+        ResqueJobFactoryService $resqueJobFactoryService,
+        $name = null
+    ) {
+        parent::__construct($name);
+
+        $this->logger = $logger;
+        $this->taskService = $taskService;
+        $this->workerService = $workerService;
+        $this->resqueQueueService = $resqueQueueService;
+        $this->resqueJobFactoryService = $resqueJobFactoryService;
+    }
 
     /**
      * {@inheritdoc}
@@ -31,22 +79,21 @@ class PerformCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $logger = $this->getContainer()->get('logger');
-        $task = $this->getTaskService()->getById($input->getArgument('id'));
+        $task = $this->taskService->getById($input->getArgument('id'));
 
         if (is_null($task)) {
-            $logger->error("TaskPerformCommand::execute: [".$input->getArgument('id')."] does not exist");
+            $this->logger->error("TaskPerformCommand::execute: [".$input->getArgument('id')."] does not exist");
             $output->writeln('Unable to execute, task '.$input->getArgument('id').' does not exist');
 
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
         }
 
-        $logger->info("TaskPerformCommand::execute: [".$task->getId()."] [".$task->getState()->getName()."]");
+        $this->logger->info("TaskPerformCommand::execute: [".$task->getId()."] [".$task->getState()->getName()."]");
 
-        if ($this->getWorkerService()->isMaintenanceReadOnly()) {
-            if (!$this->getResqueQueueService()->contains('task-perform', ['id' => $task->getId()])) {
-                $this->getResqueQueueService()->enqueue(
-                    $this->getResqueJobFactoryService()->create('task-perform', ['id' => $task->getId()])
+        if ($this->workerService->isMaintenanceReadOnly()) {
+            if (!$this->resqueQueueService->contains('task-perform', ['id' => $task->getId()])) {
+                $this->resqueQueueService->enqueue(
+                    $this->resqueJobFactoryService->create('task-perform', ['id' => $task->getId()])
                 );
             }
 
@@ -56,34 +103,34 @@ class PerformCommand extends Command
         }
 
         try {
-            $performResult = $this->getTaskService()->perform($task);
+            $performResult = $this->taskService->perform($task);
         } catch (\Exception $e) {
-            $logger->error('TaskPerformCommand: Exception: taskId: [' . $task->getId() . ']');
-            $logger->error('TaskPerformCommand: Exception: exception class: [' . get_class($e) . ']');
-            $logger->error('TaskPerformCommand: Exception: exception code: [' . $e->getCode() . ']');
-            $logger->error('TaskPerformCommand: Exception: exception msg: [' . $e->getMessage() . ']');
+            $this->logger->error('TaskPerformCommand: Exception: taskId: [' . $task->getId() . ']');
+            $this->logger->error('TaskPerformCommand: Exception: exception class: [' . get_class($e) . ']');
+            $this->logger->error('TaskPerformCommand: Exception: exception code: [' . $e->getCode() . ']');
+            $this->logger->error('TaskPerformCommand: Exception: exception msg: [' . $e->getMessage() . ']');
 
             return self::RETURN_CODE_TASK_SERVICE_RAISED_EXCEPTION;
         }
 
-        if ($this->getResqueQueueService()->isEmpty('tasks-request')) {
-            $this->getResqueQueueService()->enqueue(
-                $this->getResqueJobFactoryService()->create(
+        if ($this->resqueQueueService->isEmpty('tasks-request')) {
+            $this->resqueQueueService->enqueue(
+                $this->resqueJobFactoryService->create(
                     'tasks-request'
                 )
             );
         }
 
         if ($performResult === 0) {
-            $this->getResqueQueueService()->enqueue(
-                $this->getResqueJobFactoryService()->create(
+            $this->resqueQueueService->enqueue(
+                $this->resqueJobFactoryService->create(
                     'task-report-completion',
                     ['id' => $task->getId()]
                 )
             );
 
             $output->writeln('Performed ['.$task->getId().']');
-            $logger->info(sprintf(
+            $this->logger->info(sprintf(
                 'TaskPerformCommand::Performed [%d] [%s] [%s]',
                 $task->getId(),
                 $task->getState(),
