@@ -8,11 +8,6 @@ use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 
 class MemcacheServiceTest extends BaseSimplyTestableTestCase
 {
-    public function testHasMemcache()
-    {
-        $this->assertTrue(class_exists(Memcache::class));
-    }
-
     public function testGetMemcacheService()
     {
         $this->assertTrue($this->getMemcacheService() instanceof MemcacheService);
