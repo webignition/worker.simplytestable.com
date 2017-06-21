@@ -14,60 +14,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class TaskControllerTest extends BaseSimplyTestableTestCase
 {
-    public function testCreateActionInMaintenanceReadOnlyMode()
-    {
-        $this->getWorkerService()->setReadOnly();
-        $response = $this->createTaskController()->createAction();
-
-        $this->assertEquals(503, $response->getStatusCode());
-    }
-
-    /**
-     * @dataProvider createActionInvalidRequestDataProvider
-     *
-     * @param ParameterBag $postData
-     */
-    public function testCreateActionInvalidRequest(ParameterBag $postData)
-    {
-        $request = new Request();
-        $request->request = $postData;
-        $this->addRequestToContainer($request);
-
-        $this->setExpectedException(
-            BadRequestHttpException::class
-        );
-
-        $this->createTaskController()->createAction();
-    }
-
-    /**
-     * @return array
-     */
-    public function createActionInvalidRequestDataProvider()
-    {
-        return [
-            'no request parameters' => [
-                'postData' => new ParameterBag([]),
-            ],
-            'type missing' => [
-                'postData' => new ParameterBag([
-                    CreateRequestFactory::PARAMETER_URL => 'http://example.com/',
-                ]),
-            ],
-            'url missing' => [
-                'postData' => new ParameterBag([
-                    CreateRequestFactory::PARAMETER_TYPE => 'html validation',
-                ]),
-            ],
-            'invalid type' => [
-                'postData' => new ParameterBag([
-                    CreateRequestFactory::PARAMETER_TYPE => 'foo',
-                    CreateRequestFactory::PARAMETER_URL => 'http://example.com/',
-                ]),
-            ],
-        ];
-    }
-
     /**
      * @dataProvider createActionDataProvider
      *
@@ -174,14 +120,6 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         ];
     }
 
-    public function testCreateCollectionActionInMaintenanceReadOnlyMode()
-    {
-        $this->getWorkerService()->setReadOnly();
-        $response = $this->createTaskController()->createCollectionAction();
-
-        $this->assertEquals(503, $response->getStatusCode());
-    }
-
     /**
      * @dataProvider createCollectionActionDataProvider
      *
@@ -251,49 +189,6 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         ];
     }
 
-    public function testCancelActionInMaintenanceReadOnlyMode()
-    {
-        $this->getWorkerService()->setReadOnly();
-        $response = $this->createTaskController()->cancelAction();
-
-        $this->assertEquals(503, $response->getStatusCode());
-    }
-
-    /**
-     * @dataProvider cancelActionInvalidRequestDataProvider
-     *
-     * @param ParameterBag $postData
-     */
-    public function testCancelActionInvalidRequest(ParameterBag $postData)
-    {
-        $request = new Request();
-        $request->request = $postData;
-        $this->addRequestToContainer($request);
-
-        $this->setExpectedException(
-            BadRequestHttpException::class
-        );
-
-        $this->createTaskController()->cancelAction();
-    }
-
-    /**
-     * @return array
-     */
-    public function cancelActionInvalidRequestDataProvider()
-    {
-        return [
-            'no request parameters' => [
-                'postData' => new ParameterBag([]),
-            ],
-            'invalid id' => [
-                'postData' => new ParameterBag([
-                    CancelRequestFactory::PARAMETER_ID => 'foo',
-                ]),
-            ],
-        ];
-    }
-
     public function testCancelAction()
     {
         $this->removeAllTasks();
@@ -310,14 +205,6 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('task-cancelled', $task->getState());
-    }
-
-    public function testCancelCollectionActionInMaintenanceReadOnlyMode()
-    {
-        $this->getWorkerService()->setReadOnly();
-        $response = $this->createTaskController()->cancelCollectionAction();
-
-        $this->assertEquals(503, $response->getStatusCode());
     }
 
     public function testCancelCollectionAction()
