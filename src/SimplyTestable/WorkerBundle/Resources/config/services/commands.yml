@@ -6,6 +6,13 @@ services:
     tags:
       - { name: console.command }
 
+  simplytestable.command.maintenance.enablereadonly:
+    class: SimplyTestable\WorkerBundle\Command\Maintenance\EnableReadOnlyCommand
+    arguments:
+        workerService: "@simplytestable.services.workerservice"
+    tags:
+      - { name: console.command }
+
   simplytestable.command.task.perform:
     class:   SimplyTestable\WorkerBundle\Command\Task\PerformCommand
     arguments:

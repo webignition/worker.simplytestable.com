@@ -4,6 +4,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Maintenance;
 
 use SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -21,6 +22,9 @@ class DisableReadOnlyCommandTest extends BaseSimplyTestableTestCase
         );
 
         $this->assertEquals(0, $returnCode);
-        $this->assertEquals('worker-active', $this->getWorkerService()->get()->getState()->getName());
+        $this->assertEquals(
+            WorkerService::WORKER_ACTIVE_STATE,
+            $this->getWorkerService()->get()->getState()->getName()
+        );
     }
 }
