@@ -13,6 +13,16 @@ services:
     tags:
       - { name: console.command }
 
+  simplytestable.command.maintenance.requeinprogresstasks:
+    class: SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand
+    arguments:
+        taskService: "@simplytestable.services.taskservice"
+        resqueQueueService: "@simplytestable.services.resque.queueservice"
+        resqueJobFactoryService: "@simplytestable.services.resque.jobfactoryservice"
+    tags:
+      - { name: console.command }
+
+
   simplytestable.command.task.perform:
     class:   SimplyTestable\WorkerBundle\Command\Task\PerformCommand
     arguments:

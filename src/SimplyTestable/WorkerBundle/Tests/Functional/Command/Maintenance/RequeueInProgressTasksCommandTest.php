@@ -4,26 +4,19 @@ namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Maintenance;
 
 use SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\TaskService;
-use SimplyTestable\WorkerBundle\Tests\Functional\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+use Symfony\Component\Console\Input\ArrayInput;
 
-class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase
+class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAdditionalCommands()
-    {
-        return array(
-            new RequeueInProgressTasksCommand(),
-        );
-    }
-
     /**
      * @dataProvider executeDataProvider
      *
      * @param array $taskValuesCollection
+     * @param array $commandArguments
      * @param int $expectedInitialQueuedTaskCount
      * @param int $expectedInitialInProgressTaskCount
      * @param int $expectedQueuedTaskCount
@@ -36,6 +29,7 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase
         $expectedQueuedTaskCount
     ) {
         $this->removeAllTasks();
+        $this->clearRedis();
 
         /* @var Task[] $tasks */
         $tasks = [];
@@ -57,12 +51,13 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase
             $this->getTaskService()->getEntityRepository()->getIdsByState($inProgressState)
         );
 
-        $this->clearRedis();
-
-        $this->assertEquals(
-            0,
-            $this->executeCommand('simplytestable:maintenance:requeue-in-progress-tasks', $commandArguments)
+        $command = $this->createRequeueInProgressTasksCommand();
+        $returnCode = $command->run(
+            new ArrayInput($commandArguments),
+            new StringOutput()
         );
+
+        $this->assertEquals(0, $returnCode);
 
         $this->assertCount(
             $expectedQueuedTaskCount,
@@ -199,5 +194,17 @@ class RequeueInProgressTasksCommandTest extends ConsoleCommandBaseTestCase
                 'expectedQueuedTaskCount' => 2,
             ],
         ];
+    }
+
+    /**
+     * @return RequeueInProgressTasksCommand
+     */
+    private function createRequeueInProgressTasksCommand()
+    {
+        return new RequeueInProgressTasksCommand(
+            $this->container->get('simplytestable.services.taskservice'),
+            $this->container->get('simplytestable.services.resque.queueservice'),
+            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+        );
     }
 }

@@ -13,6 +13,10 @@ class EnableReadOnlyCommand extends Command
      */
     private $workerService;
 
+    /**
+     * @param WorkerService $workerService
+     * @param string|null $name
+     */
     public function __construct(WorkerService $workerService, $name = null)
     {
         parent::__construct($name);
