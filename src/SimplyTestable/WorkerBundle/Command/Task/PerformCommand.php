@@ -44,6 +44,14 @@ class PerformCommand extends BaseCommand
      */
     private $resqueJobFactoryService;
 
+    /**
+     * @param LoggerInterface $logger
+     * @param TaskService $taskService
+     * @param WorkerService $workerService
+     * @param ResqueQueueService $resqueQueueService
+     * @param ResqueJobFactoryService $resqueJobFactoryService
+     * @param string|null $name
+     */
     public function __construct(
         LoggerInterface $logger,
         TaskService $taskService,
