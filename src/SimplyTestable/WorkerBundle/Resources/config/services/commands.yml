@@ -78,3 +78,13 @@ services:
         resqueJobFactoryService: "@simplytestable.services.resque.jobfactoryservice"
     tags:
       - { name: console.command }
+
+  simplytestable.command.tasks.request:
+    class:   SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand
+    arguments:
+        tasksService: "@simplytestable.services.tasksservice"
+        workerService: "@simplytestable.services.workerservice"
+        resqueQueueService: "@simplytestable.services.resque.queueservice"
+        resqueJobFactoryService: "@simplytestable.services.resque.jobfactoryservice"
+    tags:
+      - { name: console.command }
