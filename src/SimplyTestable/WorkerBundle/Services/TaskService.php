@@ -250,13 +250,7 @@ class TaskService extends EntityService
      */
     public function perform(Task $task)
     {
-        $this->logger->info(sprintf(
-            'TaskService::perform: [%d] [%s] Initialising',
-            $task->getId(),
-            $task->getState()
-        ));
-
-        if (!$this->isQueued($task)) {
+        if (TaskService::TASK_STARTING_STATE != $task->getState()) {
             $this->logger->info(sprintf(
                 'TaskService::perform: [%d] Task state is [%s] and cannot be performed',
                 $task->getId(),
@@ -265,6 +259,12 @@ class TaskService extends EntityService
 
             return 1;
         }
+
+        $this->logger->info(sprintf(
+            'TaskService::perform: [%d] [%s] Initialising',
+            $task->getId(),
+            $task->getState()
+        ));
 
         $taskDriver = $this->taskDrivers[strtolower($task->getType())];
 
@@ -335,35 +335,14 @@ class TaskService extends EntityService
      */
     public function cancel(Task $task)
     {
-        if ($this->isCancelled($task)) {
-            return $task;
-        }
+        $isCancelled = TaskService::TASK_CANCELLED_STATE == $task->getState();
+        $isCompleted = TaskService::TASK_COMPLETED_STATE == $task->getState();
 
-        if ($this->isCompleted($task)) {
+        if ($isCancelled || $isCompleted) {
             return $task;
         }
 
         return $this->finish($task, $this->getCancelledState());
-    }
-
-    /**
-     * @param Task $task
-     *
-     * @return boolean
-     */
-    private function isCancelled(Task $task)
-    {
-        return $task->getState()->equals($this->getCancelledState());
-    }
-
-    /**
-     * @param Task $task
-     *
-     * @return boolean
-     */
-    private function isCompleted(Task $task)
-    {
-        return $task->getState()->equals($this->getCompletedState());
     }
 
     /**
