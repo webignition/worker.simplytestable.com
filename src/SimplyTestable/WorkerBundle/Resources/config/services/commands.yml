@@ -68,3 +68,13 @@ services:
         entityManager: "@doctrine.orm.entity_manager"
     tags:
       - { name: console.command }
+
+  simplytestable.command.task.reportcompletionenqueue:
+    class:   SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand
+    arguments:
+        logger: "@logger"
+        taskService: "@simplytestable.services.taskservice"
+        resqueQueueService: "@simplytestable.services.resque.queueservice"
+        resqueJobFactoryService: "@simplytestable.services.resque.jobfactoryservice"
+    tags:
+      - { name: console.command }
