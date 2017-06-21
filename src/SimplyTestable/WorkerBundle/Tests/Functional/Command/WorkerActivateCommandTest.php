@@ -3,20 +3,12 @@
 namespace SimplyTestable\WorkerBundle\Tests\Functional\Command;
 
 use SimplyTestable\WorkerBundle\Command\WorkerActivateCommand;
-use SimplyTestable\WorkerBundle\Services\WorkerService;
+use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
+use Symfony\Component\Console\Input\ArrayInput;
 
-class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase
+class WorkerActivateCommandTest extends BaseSimplyTestableTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAdditionalCommands()
-    {
-        return array(
-            new WorkerActivateCommand()
-        );
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -27,35 +19,47 @@ class WorkerActivateCommandTest extends ConsoleCommandBaseTestCase
         ];
     }
 
-    public function testExecuteInMaintenanceReadOnlyMode()
+    public function testRunInMaintenanceReadOnlyMode()
     {
         $this->getWorkerService()->setReadOnly();
 
+        $command = new WorkerActivateCommand(
+            $this->container->get('simplytestable.services.workerservice')
+        );
+
+        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+
         $this->assertEquals(
             WorkerActivateCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
-            $this->executeCommand('simplytestable:worker:activate')
+            $returnCode
         );
     }
 
     /**
-     * @dataProvider executeDataProvider
+     * @dataProvider runDataProvider
      *
      * @param int $activationResult
      * @param int $expectedReturnCode
      */
-    public function testExecute($activationResult, $expectedReturnCode)
+    public function testRun($activationResult, $expectedReturnCode)
     {
         $this->container->get('simplytestable.services.workerservice')
             ->shouldReceive('activate')
             ->andReturn($activationResult);
 
-        $this->assertEquals($expectedReturnCode, $this->executeCommand('simplytestable:worker:activate'));
+        $command = new WorkerActivateCommand(
+            $this->container->get('simplytestable.services.workerservice')
+        );
+
+        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+
+        $this->assertEquals($expectedReturnCode, $returnCode);
     }
 
     /**
      * @return array
      */
-    public function executeDataProvider()
+    public function runDataProvider()
     {
         return [
             'success' => [

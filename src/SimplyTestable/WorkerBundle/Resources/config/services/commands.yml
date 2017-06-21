@@ -96,3 +96,11 @@ services:
         resqueJobFactoryService: "@simplytestable.services.resque.jobfactoryservice"
     tags:
       - { name: console.command }
+
+
+  simplytestable.command.worker.activate:
+    class:   SimplyTestable\WorkerBundle\Command\WorkerActivateCommand
+    arguments:
+        workerService: "@simplytestable.services.workerservice"
+    tags:
+      - { name: console.command }

@@ -1,14 +1,33 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command;
 
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Command\Command as BaseCommand;
 
 class WorkerActivateCommand extends BaseCommand
 {
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_UNKNOWN_ERROR = -2;
     const RETURN_CODE_FAILED_DUE_TO_WRONG_STATE = -3;
+
+    /**
+     * @var WorkerService
+     */
+    private $workerService;
+
+    /**
+     * @param WorkerService $workerService
+     * @param string|null $name
+     */
+    public function __construct(
+        WorkerService $workerService,
+        $name = null
+    ) {
+        parent::__construct($name);
+        $this->workerService = $workerService;
+    }
 
     /**
      * {@inheritdoc}
@@ -28,12 +47,12 @@ class WorkerActivateCommand extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($this->getWorkerService()->isMaintenanceReadOnly()) {
+        if ($this->workerService->isMaintenanceReadOnly()) {
             $output->writeln('Unable to activate, worker application is in maintenance read-only mode');
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }
 
-        $activationResult = $this->getWorkerService()->activate();
+        $activationResult = $this->workerService->activate();
         if ($activationResult === 0) {
             return 0;
         }
@@ -43,7 +62,7 @@ class WorkerActivateCommand extends BaseCommand
             return self::RETURN_CODE_UNKNOWN_ERROR;
         }
 
-        if ($this->isHttpStatusCode($activationResult)) {
+        if (strlen($activationResult) == 3) {
             $output->writeln('Activation failed, HTTP response '.$activationResult);
         } else {
             $output->writeln('Activation failed, CURL error '.$activationResult);
