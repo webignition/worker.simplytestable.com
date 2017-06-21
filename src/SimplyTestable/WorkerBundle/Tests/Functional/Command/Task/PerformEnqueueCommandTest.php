@@ -3,21 +3,13 @@
 namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand;
-use SimplyTestable\WorkerBundle\Tests\Functional\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+use Symfony\Component\Console\Input\ArrayInput;
 
-class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase
+class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAdditionalCommands()
-    {
-        return array(
-            new PerformEnqueueCommand()
-        );
-    }
-
     public function testEnqueueTaskPerformJobs()
     {
         $taskPropertyCollection = [
@@ -51,12 +43,31 @@ class PerformEnqueueCommandTest extends ConsoleCommandBaseTestCase
             )
         );
 
-        $this->assertEquals(0, $this->executeCommand('simplytestable:task:perform:enqueue'));
+        $command = $this->createPerformEnqueueCommand();
+
+        $returnCode = $command->execute(
+            new ArrayInput([]),
+            new StringOutput()
+        );
+
+        $this->assertEquals(0, $returnCode);
 
         foreach ($tasks as $task) {
             $this->assertTrue($this->getResqueQueueService()->contains('task-perform', array(
                 'id' => $task->getId()
             )));
         }
+    }
+
+    /**
+     * @return PerformEnqueueCommand
+     */
+    private function createPerformEnqueueCommand()
+    {
+        return new PerformEnqueueCommand(
+            $this->container->get('simplytestable.services.taskservice'),
+            $this->container->get('simplytestable.services.resque.queueservice'),
+            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+        );
     }
 }
