@@ -1,13 +1,12 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Maintenance;
 
-use SimplyTestable\WorkerBundle\Command\BaseCommand;
-
 use SimplyTestable\WorkerBundle\Services\WorkerService;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class EnableReadOnlyCommand extends BaseCommand
+class EnableReadOnlyCommand extends Command
 {
     /**
      * @var WorkerService
