@@ -1,17 +1,13 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Functional\Entity\Task;
+namespace SimplyTestable\WorkerBundle\Tests\Unit\Entity\Task;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Tests\Functional\BaseTestCase;
 
-class TaskTest extends BaseTestCase {
-
-
-    /**
-     * @group standard
-     */
-    public function testCheckIfParameterIsTrue() {
+class TaskTest extends \PHPUnit_Framework_TestCase
+{
+    public function testIsTrue()
+    {
         $parameters = array(
             'one' => true,
             'two' => false,
@@ -26,5 +22,4 @@ class TaskTest extends BaseTestCase {
         $this->assertFalse($task->isTrue('three'));
         $this->assertFalse($task->isTrue('unset-key'));
     }
-
 }
