@@ -23,11 +23,11 @@ class PerformAllCommandTest extends BaseSimplyTestableTestCase
     }
 
     /**
-     * @dataProvider executeDataProvider
+     * @dataProvider runDataProvider
      *
      * @param array $arguments
      */
-    public function testExecute($arguments)
+    public function testRun($arguments)
     {
         $this->removeAllTasks();
 
@@ -53,7 +53,7 @@ class PerformAllCommandTest extends BaseSimplyTestableTestCase
     /**
      * @return array
      */
-    public function executeDataProvider()
+    public function runDataProvider()
     {
         return [
             'default' => [

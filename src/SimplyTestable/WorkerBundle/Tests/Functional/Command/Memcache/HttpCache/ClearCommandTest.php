@@ -12,12 +12,12 @@ use Symfony\Component\Console\Input\ArrayInput;
 class ClearCommandTest extends BaseSimplyTestableTestCase
 {
     /**
-     * @dataProvider executeDataProvider
+     * @dataProvider runDataProvider
      *
      * @param bool $deleteAllReturnValue
      * @param int $expectedReturnCode
      */
-    public function testExecute($deleteAllReturnValue, $expectedReturnCode)
+    public function testRun($deleteAllReturnValue, $expectedReturnCode)
     {
         $memcache = \Mockery::mock(Memcache::class);
         $memcache
@@ -46,7 +46,7 @@ class ClearCommandTest extends BaseSimplyTestableTestCase
     /**
      * @return array
      */
-    public function executeDataProvider()
+    public function runDataProvider()
     {
         return [
             'fail' => [

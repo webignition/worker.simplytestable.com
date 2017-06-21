@@ -78,7 +78,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
     }
 
     /**
-     * @dataProvider performDataProvider
+     * @dataProvider runDataProvider
      *
      * @param array $taskValues
      * @param int $taskServiceReturnValue
@@ -86,7 +86,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
      * @param array $expectedResqueJobs
      * @param array $expectedEmptyResqueQueues
      */
-    public function testPerform(
+    public function testRun(
         $taskValues,
         $taskServiceReturnValue,
         $expectedReturnCode,
@@ -126,7 +126,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
     /**
      * @return array
      */
-    public function performDataProvider()
+    public function runDataProvider()
     {
         return [
             'task in wrong state' => [

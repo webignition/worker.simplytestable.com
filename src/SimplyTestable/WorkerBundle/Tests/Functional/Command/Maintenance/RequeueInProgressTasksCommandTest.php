@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
 {
     /**
-     * @dataProvider executeDataProvider
+     * @dataProvider runDataProvider
      *
      * @param array $taskValuesCollection
      * @param array $commandArguments
@@ -21,7 +21,7 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
      * @param int $expectedInitialInProgressTaskCount
      * @param int $expectedQueuedTaskCount
      */
-    public function testExecute(
+    public function testRun(
         $taskValuesCollection,
         $commandArguments,
         $expectedInitialQueuedTaskCount,
@@ -68,7 +68,7 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
     /**
      * @return array
      */
-    public function executeDataProvider()
+    public function runDataProvider()
     {
         return [
             'no in-progress tasks' => [

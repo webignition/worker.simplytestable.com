@@ -3,23 +3,15 @@
 namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand;
-use SimplyTestable\WorkerBundle\Tests\Functional\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorFixtureFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
+use Symfony\Component\Console\Input\ArrayInput;
 
-class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase
+class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAdditionalCommands()
-    {
-        return array(
-            new ReportCompletionCommand()
-        );
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -31,42 +23,42 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase
         ];
     }
 
-    public function testExecuteInMaintenanceReadOnlyMode()
+    public function testRunInMaintenanceReadOnlyMode()
     {
         $this->getWorkerService()->setReadOnly();
 
+        $command = $this->createReportCompletionCommand();
+
+        $returnCode = $command->execute(new ArrayInput([]), new StringOutput());
+
         $this->assertEquals(
             ReportCompletionCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
-            $this->executeCommand(
-                'simplytestable:task:reportcompletion',
-                [
-                    'id' => 1
-                ]
-            )
+            $returnCode
         );
     }
 
-    public function testExecuteForInvalidTask()
+    public function testRunForInvalidTask()
     {
+        $command = $this->createReportCompletionCommand();
+
+        $returnCode = $command->run(new ArrayInput([
+            'id' => -1
+        ]), new StringOutput());
+
         $this->assertEquals(
             ReportCompletionCommand::RETURN_CODE_TASK_DOES_NOT_EXIST,
-            $this->executeCommand(
-                'simplytestable:task:reportcompletion',
-                [
-                    'id' => -1
-                ]
-            )
+            $returnCode
         );
     }
 
     /**
-     * @dataProvider executeDataProvider
+     * @dataProvider runDataProvider
      *
      * @param array $responseFixtures
      * @param int $expectedCommandReturnCode
      * @param bool $expectedTaskIsDeleted
      */
-    public function testExecute($responseFixtures, $expectedCommandReturnCode, $expectedTaskIsDeleted)
+    public function testRun($responseFixtures, $expectedCommandReturnCode, $expectedTaskIsDeleted)
     {
         $this->setHttpFixtures(array_merge([
             "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
@@ -83,14 +75,15 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase
         $this->getTaskService()->perform($task);
         $this->assertNotNull($task->getOutput()->getId());
 
+        $command = $this->createReportCompletionCommand();
+
+        $returnCode = $command->run(new ArrayInput([
+            'id' => $task->getId()
+        ]), new StringOutput());
+
         $this->assertEquals(
             $expectedCommandReturnCode,
-            $this->executeCommand(
-                'simplytestable:task:reportcompletion',
-                [
-                    'id' => $task->getId()
-                ]
-            )
+            $returnCode
         );
 
         if ($expectedTaskIsDeleted) {
@@ -105,7 +98,7 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase
     /**
      * @return array
      */
-    public function executeDataProvider()
+    public function runDataProvider()
     {
         return [
             'http 200' => [
@@ -137,6 +130,19 @@ class ReportCompletionCommandTest extends ConsoleCommandBaseTestCase
                 'expectedTaskIsDeleted' => false,
             ],
         ];
+    }
+
+    /**
+     * @return ReportCompletionCommand
+     */
+    private function createReportCompletionCommand()
+    {
+        return new ReportCompletionCommand(
+            $this->container->get('logger'),
+            $this->container->get('simplytestable.services.taskservice'),
+            $this->container->get('simplytestable.services.workerservice'),
+            $this->container->get('doctrine.orm.entity_manager')
+        );
     }
 
     /**
