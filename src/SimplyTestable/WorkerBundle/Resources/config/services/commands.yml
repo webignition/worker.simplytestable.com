@@ -49,6 +49,16 @@ services:
     tags:
       - { name: console.command }
 
+  simplytestable.command.task.reportcompletionall:
+    class:   SimplyTestable\WorkerBundle\Command\Task\ReportCompletionAllCommand
+    arguments:
+        logger: "@logger"
+        taskService: "@simplytestable.services.taskservice"
+        workerService: "@simplytestable.services.workerservice"
+        entityManager: "@doctrine.orm.entity_manager"
+    tags:
+      - { name: console.command }
+
   simplytestable.command.task.reportcompletion:
     class:   SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand
     arguments:

@@ -1,13 +1,60 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
+use Doctrine\ORM\EntityManager;
+use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
-use SimplyTestable\WorkerBundle\Services\CommandService;
+use SimplyTestable\WorkerBundle\Services\TaskService;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Command\Command as BaseCommand;
 
-class ReportCompletionAllCommand extends Command
+class ReportCompletionAllCommand extends BaseCommand
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var TaskService
+     */
+    private $taskService;
+
+    /**
+     * @var WorkerService
+     */
+    private $workerService;
+
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
+     * @param LoggerInterface $logger
+     * @param TaskService $taskService
+     * @param WorkerService $workerService
+     * @param EntityManager $entityManager
+     * @param string|null $name
+     */
+    public function __construct(
+        LoggerInterface $logger,
+        TaskService $taskService,
+        WorkerService $workerService,
+        EntityManager $entityManager,
+        $name = null
+    ) {
+        parent::__construct($name);
+
+        $this->logger = $logger;
+        $this->taskService = $taskService;
+        $this->workerService = $workerService;
+        $this->entityManager = $entityManager;
+    }
+
     protected function configure()
     {
         $this
@@ -22,7 +69,7 @@ class ReportCompletionAllCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $taskIdsWithOutput = $this->getTaskService()->getEntityRepository()->getIdsWithOutput();
+        $taskIdsWithOutput = $this->taskService->getEntityRepository()->getIdsWithOutput();
         $output->writeln(count($taskIdsWithOutput).' tasks with output ready to report completion');
 
         foreach ($taskIdsWithOutput as $taskId) {
@@ -33,11 +80,18 @@ class ReportCompletionAllCommand extends Command
             if ($this->isDryRun($input)) {
                 $commandResponse = 'dry run';
             } else {
-                $commandResponse =  $this->getCommandService()->execute(
-                        'SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand',
-                        array('id' => $taskId),
-                        $outputBuffer
+                $reportCompletionCommand = new ReportCompletionCommand(
+                    $this->logger,
+                    $this->taskService,
+                    $this->workerService,
+                    $this->entityManager
                 );
+
+                $input = new ArrayInput([
+                    'id' => $taskId
+                ]);
+
+                $commandResponse = $reportCompletionCommand->run($input, $outputBuffer);
             }
 
             $output->writeln(trim($outputBuffer->getBuffer()));
@@ -55,13 +109,5 @@ class ReportCompletionAllCommand extends Command
     private function isDryRun(InputInterface $input)
     {
         return $input->getOption('dry-run') !== false;
-    }
-
-    /**
-     * @return CommandService
-     */
-    private function getCommandService()
-    {
-        return $this->getContainer()->get('simplytestable.services.commandService');
     }
 }
