@@ -75,7 +75,7 @@ abstract class BaseTestCase extends WebTestCase
     {
         return array_merge([
             new LoadDataFixturesDoctrineCommand(),
-            new DisableReadOnlyCommand(),
+//            new DisableReadOnlyCommand(),
         ], $this->getAdditionalCommands());
     }
 

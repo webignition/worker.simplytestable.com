@@ -1,4 +1,11 @@
 services:
+  simplytestable.command.maintenance.disablereadonly:
+    class: SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand
+    arguments:
+        workerService: "@simplytestable.services.workerservice"
+    tags:
+      - { name: console.command }
+
   simplytestable.command.task.perform:
     class:   SimplyTestable\WorkerBundle\Command\Task\PerformCommand
     arguments:
