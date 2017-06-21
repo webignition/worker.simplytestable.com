@@ -8,9 +8,9 @@ use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Command\Command;
 
-class ReportCompletionCommand extends BaseCommand
+class ReportCompletionCommand extends Command
 {
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;

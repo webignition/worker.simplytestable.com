@@ -5,9 +5,9 @@ use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService as ResqueJobFa
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Command\Command;
 
-class RequestIfEmptyCommand extends BaseCommand
+class RequestIfEmptyCommand extends Command
 {
     const RETURN_CODE_OK = 0;
     const QUEUE_NAME = 'tasks-request';

@@ -6,9 +6,9 @@ use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueServi
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Command\Command;
 
-class PerformEnqueueCommand extends BaseCommand
+class PerformEnqueueCommand extends Command
 {
     /**
      * @var TaskService

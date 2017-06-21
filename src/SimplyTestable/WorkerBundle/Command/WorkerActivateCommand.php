@@ -4,9 +4,9 @@ namespace SimplyTestable\WorkerBundle\Command;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Command\Command;
 
-class WorkerActivateCommand extends BaseCommand
+class WorkerActivateCommand extends Command
 {
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_UNKNOWN_ERROR = -2;

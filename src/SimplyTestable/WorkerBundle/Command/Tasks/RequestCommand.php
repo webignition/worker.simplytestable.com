@@ -9,9 +9,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
-use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Command\Command;
 
-class RequestCommand extends BaseCommand
+class RequestCommand extends Command
 {
     const RETURN_CODE_OK = 0;
     const RETURN_CODE_FAILED = 1;
