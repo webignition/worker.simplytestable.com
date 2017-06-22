@@ -40,6 +40,17 @@ services:
     tags:
       - { name: console.command }
 
+  simplytestable.command.task.performall:
+    class:   SimplyTestable\WorkerBundle\Command\Task\PerformAllCommand
+    arguments:
+        logger: "@logger"
+        taskService: "@simplytestable.services.taskservice"
+        workerService: "@simplytestable.services.workerservice"
+        resqueQueueService: "@simplytestable.services.resque.queueservice"
+        resqueJobFactory: "@simplytestable.services.resque.jobfactory"
+    tags:
+      - { name: console.command }
+
   simplytestable.command.task.performenqueue:
     class:   SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand
     arguments:

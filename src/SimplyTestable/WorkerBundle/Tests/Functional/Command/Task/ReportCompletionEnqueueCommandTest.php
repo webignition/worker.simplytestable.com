@@ -11,6 +11,14 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
 {
+    public function testGetAsService()
+    {
+        $this->assertInstanceOf(
+            ReportCompletionEnqueueCommand::class,
+            $this->container->get('simplytestable.command.task.reportcompletionenqueue')
+        );
+    }
+
     public function testRunWithEmptyQueue()
     {
         $this->removeAllTasks();

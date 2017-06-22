@@ -23,6 +23,14 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
         ];
     }
 
+    public function testGetAsService()
+    {
+        $this->assertInstanceOf(
+            PerformCommand::class,
+            $this->container->get('simplytestable.command.task.perform')
+        );
+    }
+
     public function testRunWithInvalidTask()
     {
         $command = $this->createPerformCommand();

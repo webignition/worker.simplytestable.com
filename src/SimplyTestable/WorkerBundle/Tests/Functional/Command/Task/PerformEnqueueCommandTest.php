@@ -10,6 +10,14 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
 {
+    public function testGetAsService()
+    {
+        $this->assertInstanceOf(
+            PerformEnqueueCommand::class,
+            $this->container->get('simplytestable.command.task.performenqueue')
+        );
+    }
+
     public function testEnqueueTaskPerformJobs()
     {
         $taskPropertyCollection = [
