@@ -2,7 +2,7 @@
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
 use Psr\Log\LoggerInterface;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService as ResqueJobFactoryService;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
@@ -40,16 +40,16 @@ class PerformCommand extends Command
     private $resqueQueueService;
 
     /**
-     * @var ResqueJobFactoryService
+     * @var ResqueJobFactory
      */
-    private $resqueJobFactoryService;
+    private $resqueJobFactory;
 
     /**
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactoryService $resqueJobFactoryService
+     * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
@@ -57,7 +57,7 @@ class PerformCommand extends Command
         TaskService $taskService,
         WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
-        ResqueJobFactoryService $resqueJobFactoryService,
+        ResqueJobFactory $resqueJobFactory,
         $name = null
     ) {
         parent::__construct($name);
@@ -66,7 +66,7 @@ class PerformCommand extends Command
         $this->taskService = $taskService;
         $this->workerService = $workerService;
         $this->resqueQueueService = $resqueQueueService;
-        $this->resqueJobFactoryService = $resqueJobFactoryService;
+        $this->resqueJobFactory = $resqueJobFactory;
     }
 
     /**
@@ -101,7 +101,7 @@ class PerformCommand extends Command
         if ($this->workerService->isMaintenanceReadOnly()) {
             if (!$this->resqueQueueService->contains('task-perform', ['id' => $task->getId()])) {
                 $this->resqueQueueService->enqueue(
-                    $this->resqueJobFactoryService->create('task-perform', ['id' => $task->getId()])
+                    $this->resqueJobFactory->create('task-perform', ['id' => $task->getId()])
                 );
             }
 
@@ -123,7 +123,7 @@ class PerformCommand extends Command
 
         if ($this->resqueQueueService->isEmpty('tasks-request')) {
             $this->resqueQueueService->enqueue(
-                $this->resqueJobFactoryService->create(
+                $this->resqueJobFactory->create(
                     'tasks-request'
                 )
             );
@@ -131,7 +131,7 @@ class PerformCommand extends Command
 
         if ($performResult === 0) {
             $this->resqueQueueService->enqueue(
-                $this->resqueJobFactoryService->create(
+                $this->resqueJobFactory->create(
                     'task-report-completion',
                     ['id' => $task->getId()]
                 )

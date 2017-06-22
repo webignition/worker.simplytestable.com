@@ -1,7 +1,7 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Tasks;
 
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService as ResqueJobFactoryService;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
@@ -34,22 +34,22 @@ class RequestCommand extends Command
     private $resqueQueueService;
 
     /**
-     * @var ResqueJobFactoryService
+     * @var ResqueJobFactory
      */
-    private $resqueJobFactoryService;
+    private $resqueJobFactory;
 
     /**
      * @param TasksService $tasksService
      * @param WorkerService $workerService
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactoryService $resqueJobFactoryService
+     * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
         TasksService $tasksService,
         WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
-        ResqueJobFactoryService $resqueJobFactoryService,
+        ResqueJobFactory $resqueJobFactory,
         $name = null
     ) {
         parent::__construct($name);
@@ -57,7 +57,7 @@ class RequestCommand extends Command
         $this->tasksService = $tasksService;
         $this->workerService = $workerService;
         $this->resqueQueueService = $resqueQueueService;
-        $this->resqueJobFactoryService = $resqueJobFactoryService;
+        $this->resqueJobFactory = $resqueJobFactory;
     }
 
     /**
@@ -101,7 +101,7 @@ class RequestCommand extends Command
     {
         if ($this->resqueQueueService->isEmpty('tasks-request')) {
             $this->resqueQueueService->enqueue(
-                $this->resqueJobFactoryService->create(
+                $this->resqueJobFactory->create(
                     'tasks-request'
                 )
             );

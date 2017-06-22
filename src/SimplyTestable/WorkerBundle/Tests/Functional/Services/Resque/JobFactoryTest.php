@@ -119,7 +119,6 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
                         'logger',
                         'simplytestable.services.taskservice',
                         'simplytestable.services.workerservice',
-                        'simplytestable.services.resque.queueservice',
                         'doctrine.orm.entity_manager',
                     ],
                 ],

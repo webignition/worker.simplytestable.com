@@ -15,7 +15,7 @@ services:
               - simplytestable.services.resque.queueservice
               - simplytestable.services.resque.jobfactory
           task-report-completion:
-            queue: task-perform
+            queue: task-report-completion
             jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob
             requiredArgs:
               - id
@@ -23,10 +23,9 @@ services:
               - logger
               - simplytestable.services.taskservice
               - simplytestable.services.workerservice
-              - simplytestable.services.resque.queueservice
               - doctrine.orm.entity_manager
           tasks-request:
-            queue: task-perform
+            queue: tasks-request
             jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob
             serviceIds:
               - simplytestable.services.tasksservice
