@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b799ed69297656d810c0e0273e9ad52d",
+    "content-hash": "0a703783b4d299e78e043c1b5807325e",
     "packages": [
         {
             "name": "bcc/resque-bundle",
@@ -3547,35 +3547,36 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "1.1.2",
+            "version": "1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "dd90fa8a5f94d9cd224284a4406e7f263c5ef67a"
+                "reference": "09b5c3a95b959968ef5c5be22ad6804f579a6b52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/dd90fa8a5f94d9cd224284a4406e7f263c5ef67a",
-                "reference": "dd90fa8a5f94d9cd224284a4406e7f263c5ef67a",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/09b5c3a95b959968ef5c5be22ad6804f579a6b52",
+                "reference": "09b5c3a95b959968ef5c5be22ad6804f579a6b52",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": ">=5.2.0,<5.3",
-                "php": ">=5.4.0",
+                "php": ">=5.5.0",
                 "webignition/html-document-link-finder": ">=1.3,<2.0",
                 "webignition/url": ">=1.9.6",
-                "webignition/url-health-checker": ">=0.3,<1.0",
+                "webignition/url-health-checker": ">=0.4,<1.0",
                 "webignition/web-page-model": ">=1.1,<2.0"
             },
             "require-dev": {
+                "mockery/mockery": "~0.9",
                 "phpunit/phpunit": "~4.0",
-                "webignition/guzzle-curl-exception": ">=0.1.3,<1"
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\HtmlDocument\\LinkChecker\\": "src/",
+                    "webignition\\Tests\\HtmlDocument\\LinkChecker\\": "tests/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3596,7 +3597,7 @@
                 "html",
                 "link"
             ],
-            "time": "2015-02-26T14:46:04+00:00"
+            "time": "2017-06-22T16:04:52+00:00"
         },
         {
             "name": "webignition/html-document-link-finder",
@@ -4210,16 +4211,16 @@
         },
         {
             "name": "webignition/url-health-checker",
-            "version": "0.3",
+            "version": "0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/url-health-checker.git",
-                "reference": "e11a09dd65084c6e8daab1c5edc21bdbf2f6fbc0"
+                "reference": "5b7fc549eb38da3f1cf582940c3e608030026caf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/url-health-checker/zipball/e11a09dd65084c6e8daab1c5edc21bdbf2f6fbc0",
-                "reference": "e11a09dd65084c6e8daab1c5edc21bdbf2f6fbc0",
+                "url": "https://api.github.com/repos/webignition/url-health-checker/zipball/5b7fc549eb38da3f1cf582940c3e608030026caf",
+                "reference": "5b7fc549eb38da3f1cf582940c3e608030026caf",
                 "shasum": ""
             },
             "require": {
@@ -4254,7 +4255,7 @@
                 "health",
                 "url"
             ],
-            "time": "2015-02-26T14:21:27+00:00"
+            "time": "2017-06-22T15:45:28+00:00"
         },
         {
             "name": "webignition/web-json-model",
@@ -5343,16 +5344,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.35",
+            "version": "4.8.36",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "791b1a67c25af50e230f841ee7a9c6eba507dc87"
+                "reference": "46023de9a91eec7dfb06cc56cb4e260017298517"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/791b1a67c25af50e230f841ee7a9c6eba507dc87",
-                "reference": "791b1a67c25af50e230f841ee7a9c6eba507dc87",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/46023de9a91eec7dfb06cc56cb4e260017298517",
+                "reference": "46023de9a91eec7dfb06cc56cb4e260017298517",
                 "shasum": ""
             },
             "require": {
@@ -5411,7 +5412,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-02-06T05:18:07+00:00"
+            "time": "2017-06-21T08:07:12+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
