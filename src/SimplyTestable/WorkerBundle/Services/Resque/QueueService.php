@@ -126,13 +126,13 @@ class QueueService
         return true;
     }
 
-
     /**
-     *
      * @param string $queue
+     *
      * @return int
      */
-    public function getQueueLength($queue) {
+    public function getQueueLength($queue)
+    {
         return \Resque::redis()->llen(self::QUEUE_KEY . ':' . $queue);
     }
 
@@ -140,11 +140,13 @@ class QueueService
     /**
      * @param Job $job
      * @param bool $trackStatus
-     * @return null|\Resque_Job_Status
      * @throws \CredisException
      * @throws \Exception
+     *
+     * @return null|\Resque_Job_Status
      */
-    public function enqueue(Job $job, $trackStatus = false) {
+    public function enqueue(Job $job, $trackStatus = false)
+    {
         try {
             return $this->resque->enqueue($job, $trackStatus);
         } catch (\CredisException $credisException) {
@@ -152,14 +154,13 @@ class QueueService
         }
     }
 
-
     /**
-     *
      * @param string $queue
+     *
      * @return boolean
      */
-    public function isEmpty($queue) {
+    public function isEmpty($queue)
+    {
         return $this->getQueueLength($queue) == 0;
     }
-
 }
