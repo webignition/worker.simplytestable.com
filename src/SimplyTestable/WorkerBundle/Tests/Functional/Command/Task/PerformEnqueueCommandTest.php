@@ -37,7 +37,7 @@ class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
         $this->clearRedis();
 
         $this->getResqueQueueService()->enqueue(
-            $this->getResqueJobFactoryService()->create(
+            $this->getResqueJobFactory()->create(
                 'task-perform',
                 ['id' => $tasks[0]->getId()]
             )
@@ -67,7 +67,7 @@ class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
         return new PerformEnqueueCommand(
             $this->container->get('simplytestable.services.taskservice'),
             $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+            $this->container->get('simplytestable.services.resque.jobfactory')
         );
     }
 }

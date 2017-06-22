@@ -53,7 +53,7 @@ class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
         $this->assertTrue($this->clearRedis());
 
         $this->getResqueQueueService()->enqueue(
-            $this->getResqueJobFactoryService()->create(
+            $this->getResqueJobFactory()->create(
                 'task-report-completion',
                 ['id' => $task->getId()]
             )
@@ -81,7 +81,7 @@ class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
             $this->container->get('logger'),
             $this->container->get('simplytestable.services.taskservice'),
             $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+            $this->container->get('simplytestable.services.resque.jobfactory')
         );
     }
 

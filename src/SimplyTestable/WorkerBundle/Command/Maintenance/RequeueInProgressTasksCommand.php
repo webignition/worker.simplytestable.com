@@ -1,7 +1,7 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Maintenance;
 
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService as ResqueJobFactoryService;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Command\Command;
@@ -24,9 +24,9 @@ class RequeueInProgressTasksCommand extends Command
     private $resqueQueueService;
 
     /**
-     * @var ResqueJobFactoryService
+     * @var ResqueJobFactory
      */
-    private $resqueJobFactoryService;
+    private $resqueJobFactory;
 
     /**
      * @var InputInterface
@@ -36,20 +36,20 @@ class RequeueInProgressTasksCommand extends Command
     /**
      * @param TaskService $taskService
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactoryService $resqueJobFactoryService
+     * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
         TaskService $taskService,
         ResqueQueueService $resqueQueueService,
-        ResqueJobFactoryService $resqueJobFactoryService,
+        ResqueJobFactory $resqueJobFactory,
         $name = null
     ) {
         parent::__construct($name);
 
         $this->taskService = $taskService;
         $this->resqueQueueService = $resqueQueueService;
-        $this->resqueJobFactoryService = $resqueJobFactoryService;
+        $this->resqueJobFactory = $resqueJobFactory;
     }
 
     /**
@@ -102,7 +102,7 @@ class RequeueInProgressTasksCommand extends Command
                 $this->taskService->getEntityManager()->flush();
 
                 $this->resqueQueueService->enqueue(
-                    $this->resqueJobFactoryService->create(
+                    $this->resqueJobFactory->create(
                         'task-perform',
                         ['id' => $inProgressTask->getId()]
                     )

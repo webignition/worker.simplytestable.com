@@ -204,7 +204,7 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
         return new RequeueInProgressTasksCommand(
             $this->container->get('simplytestable.services.taskservice'),
             $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+            $this->container->get('simplytestable.services.resque.jobfactory')
         );
     }
 }

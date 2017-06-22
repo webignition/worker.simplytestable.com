@@ -20,7 +20,7 @@ class RequestIfEmptyCommandTest extends BaseSimplyTestableTestCase
 
         if (!$hasEmptyQueue) {
             $this->getResqueQueueService()->enqueue(
-                $this->getResqueJobFactoryService()->create(
+                $this->getResqueJobFactory()->create(
                     'tasks-request'
                 )
             );
@@ -57,7 +57,7 @@ class RequestIfEmptyCommandTest extends BaseSimplyTestableTestCase
     {
         return new RequestIfEmptyCommand(
             $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+            $this->container->get('simplytestable.services.resque.jobfactory')
         );
     }
 }

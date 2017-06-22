@@ -31,7 +31,7 @@ class MaintenanceController extends BaseController
         return $this->executeCommand(new PerformEnqueueCommand(
             $this->container->get('simplytestable.services.taskservice'),
             $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+            $this->container->get('simplytestable.services.resque.jobfactory')
         ));
     }
 
@@ -77,7 +77,7 @@ class MaintenanceController extends BaseController
             $this->container->get('logger'),
             $this->container->get('simplytestable.services.taskservice'),
             $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+            $this->container->get('simplytestable.services.resque.jobfactory')
         );
     }
 
@@ -89,7 +89,7 @@ class MaintenanceController extends BaseController
         return new PerformEnqueueCommand(
             $this->container->get('simplytestable.services.taskservice'),
             $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+            $this->container->get('simplytestable.services.resque.jobfactory')
         );
     }
 

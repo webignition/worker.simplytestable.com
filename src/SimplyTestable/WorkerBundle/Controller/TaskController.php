@@ -119,10 +119,10 @@ class TaskController extends BaseController
     private function enqueueTaskPerformJob(Task $task)
     {
         $resqueQueueService = $this->get('simplytestable.services.resque.queueService');
-        $jobFactoryService = $this->get('simplytestable.services.resque.jobFactoryService');
+        $resqueJobFactory = $this->get('simplytestable.services.resque.jobfactory');
 
         $resqueQueueService->enqueue(
-            $jobFactoryService->create(
+            $resqueJobFactory->create(
                 'task-perform',
                 ['id' => $task->getId()]
             )

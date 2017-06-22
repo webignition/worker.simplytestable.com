@@ -2,7 +2,7 @@
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
 use Psr\Log\LoggerInterface;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService as ResqueJobFactoryService;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -35,16 +35,16 @@ class PerformAllCommand extends Command
     private $resqueQueueService;
 
     /**
-     * @var ResqueJobFactoryService
+     * @var ResqueJobFactory
      */
-    private $resqueJobFactoryService;
+    private $resqueJobFactory;
 
     /**
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactoryService $resqueJobFactoryService
+     * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
@@ -52,7 +52,7 @@ class PerformAllCommand extends Command
         TaskService $taskService,
         WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
-        ResqueJobFactoryService $resqueJobFactoryService,
+        ResqueJobFactory $resqueJobFactory,
         $name = null
     ) {
         parent::__construct($name);
@@ -61,7 +61,7 @@ class PerformAllCommand extends Command
         $this->taskService = $taskService;
         $this->workerService = $workerService;
         $this->resqueQueueService = $resqueQueueService;
-        $this->resqueJobFactoryService = $resqueJobFactoryService;
+        $this->resqueJobFactory = $resqueJobFactory;
     }
 
     /**
@@ -99,7 +99,7 @@ class PerformAllCommand extends Command
                     $this->taskService,
                     $this->workerService,
                     $this->resqueQueueService,
-                    $this->resqueJobFactoryService
+                    $this->resqueJobFactory
                 );
 
                 $input = new ArrayInput([

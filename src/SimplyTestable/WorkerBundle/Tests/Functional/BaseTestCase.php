@@ -106,7 +106,7 @@ abstract class BaseTestCase extends WebTestCase
      */
     protected function tearDown()
     {
-        $this->container->get('doctrine')->getConnection()->close();
+//        $this->container->get('doctrine')->getConnection()->close();
         parent::tearDown();
     }
 }

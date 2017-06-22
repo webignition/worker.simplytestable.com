@@ -77,7 +77,7 @@ class PerformAllCommandTest extends BaseSimplyTestableTestCase
             $this->container->get('simplytestable.services.taskservice'),
             $this->container->get('simplytestable.services.workerservice'),
             $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+            $this->container->get('simplytestable.services.resque.jobfactory')
         );
     }
 

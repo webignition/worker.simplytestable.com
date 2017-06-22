@@ -25,10 +25,10 @@ class TasksControllerTest extends BaseSimplyTestableTestCase
         $this->clearRedis();
 
         $resqueQueueService = $this->container->get('simplytestable.services.resque.queueservice');
-        $jobFactoryService = $this->container->get('simplytestable.services.resque.jobFactoryService');
+        $resqueJobFactory = $this->container->get('simplytestable.services.resque.jobfactory');
 
         $resqueQueueService->enqueue(
-            $jobFactoryService->create(
+            $resqueJobFactory->create(
                 'tasks-request',
                 ['limit' => $this->container->getParameter('worker_process_count')]
             )

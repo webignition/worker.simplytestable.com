@@ -132,7 +132,7 @@ class RequestCommandTest extends BaseSimplyTestableTestCase
             $this->container->get('simplytestable.services.tasksservice'),
             $this->container->get('simplytestable.services.workerservice'),
             $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactoryservice')
+            $this->container->get('simplytestable.services.resque.jobfactory')
         );
     }
 }

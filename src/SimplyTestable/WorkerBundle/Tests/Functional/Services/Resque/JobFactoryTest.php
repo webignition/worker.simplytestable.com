@@ -142,5 +142,39 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
             ],
         ];
     }
-}
 
+    /**
+     * @dataProvider getJobClassNameDataProvider
+     *
+     * @param string $queue
+     * @param string $expectedJobClassName
+     */
+    public function testGetJobClassName($queue, $expectedJobClassName)
+    {
+        $jobFactory = $this->container->get('simplytestable.services.resque.jobfactory');
+        $jobClassName = $jobFactory->getJobClassName($queue);
+
+        $this->assertEquals($expectedJobClassName, $jobClassName);
+    }
+
+    /**
+     * @return array
+     */
+    public function getJobClassNameDataProvider()
+    {
+        return [
+            'task-perform' => [
+                'queue' => 'task-perform',
+                'expectedJobClassName' => 'SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob',
+            ],
+            'task-report-completion' => [
+                'queue' => 'task-report-completion',
+                'expectedJobClassName' => 'SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob',
+            ],
+            'tasks-request' => [
+                'queue' => 'tasks-request',
+                'expectedJobClassName' => 'SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob',
+            ],
+        ];
+    }
+}

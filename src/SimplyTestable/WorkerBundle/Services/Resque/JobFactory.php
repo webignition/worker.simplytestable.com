@@ -74,4 +74,14 @@ class JobFactory
 
         return $job;
     }
+
+    /**
+     * @param string $queue
+     *
+     * @return string
+     */
+    public function getJobClassName($queue)
+    {
+        return $this->jobClassMap[$queue];
+    }
 }
