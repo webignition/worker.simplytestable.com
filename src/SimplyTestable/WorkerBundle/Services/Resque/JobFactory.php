@@ -82,6 +82,12 @@ class JobFactory
      */
     public function getJobClassName($queue)
     {
-        return $this->jobClassMap[$queue];
+        if (!isset($this->queues[$queue])) {
+            return null;
+        }
+
+        $queueProperties = $this->queues[$queue];
+
+        return $queueProperties[self::KEY_JOB_CLASS_NAME];
     }
 }
