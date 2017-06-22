@@ -2,10 +2,7 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Functional;
 
-use Doctrine\Bundle\FixturesBundle\Command\LoadDataFixturesDoctrineCommand;
-use SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand;
 use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -36,10 +33,6 @@ abstract class BaseTestCase extends WebTestCase
         $this->container = $this->client->getKernel()->getContainer();
         $this->application = new Application(self::$kernel);
         $this->application->setAutoExit(false);
-
-        foreach ($this->getCommands() as $command) {
-            $this->application->add($command);
-        }
     }
 
     /**
@@ -66,25 +59,6 @@ abstract class BaseTestCase extends WebTestCase
         }
 
         return $client;
-    }
-
-    /**
-     * @return ContainerAwareCommand[]
-     */
-    protected function getCommands()
-    {
-        return array_merge([
-            new LoadDataFixturesDoctrineCommand(),
-//            new DisableReadOnlyCommand(),
-        ], $this->getAdditionalCommands());
-    }
-
-    /**
-     * @return ContainerAwareCommand[]
-     */
-    protected function getAdditionalCommands()
-    {
-        return [];
     }
 
     protected function clearRedis()
