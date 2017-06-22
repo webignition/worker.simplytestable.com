@@ -16,6 +16,7 @@ before_install:
   - cp app/config/security_credentials.yml.dist app/config/security_credentials.yml
   - mv --force app/config/config_travis.yml app/config/config_test.yml
   - cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
+  - echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 install:
   - composer install
@@ -23,9 +24,6 @@ install:
   - php app/console doctrine:migrations:migrate --no-interaction
   - php app/console doctrine:fixtures:load --append
   - composer config --global process-timeout 2000
-
-before_script:
-  - echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 script:
   - composer test

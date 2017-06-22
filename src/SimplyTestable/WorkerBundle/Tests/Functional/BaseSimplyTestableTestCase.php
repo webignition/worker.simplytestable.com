@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\MemcacheService;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
@@ -67,11 +67,11 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
     }
 
     /**
-     * @return JobFactoryService
+     * @return ResqueJobFactory
      */
-    protected function getResqueJobFactoryService()
+    protected function getResqueJobFactory()
     {
-        return $this->container->get('simplytestable.services.resque.jobFactoryService');
+        return $this->container->get('simplytestable.services.resque.jobfactory');
     }
 
     /**

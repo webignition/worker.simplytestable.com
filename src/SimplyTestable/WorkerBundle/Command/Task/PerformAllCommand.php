@@ -1,13 +1,69 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
+use Psr\Log\LoggerInterface;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
-use SimplyTestable\WorkerBundle\Services\CommandService;
+use SimplyTestable\WorkerBundle\Services\TaskService;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Command\Command;
 
 class PerformAllCommand extends Command
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var TaskService
+     */
+    private $taskService;
+
+    /**
+     * @var WorkerService
+     */
+    private $workerService;
+
+    /**
+     * @var ResqueQueueService
+     */
+    private $resqueQueueService;
+
+    /**
+     * @var ResqueJobFactory
+     */
+    private $resqueJobFactory;
+
+    /**
+     * @param LoggerInterface $logger
+     * @param TaskService $taskService
+     * @param WorkerService $workerService
+     * @param ResqueQueueService $resqueQueueService
+     * @param ResqueJobFactory $resqueJobFactory
+     * @param string|null $name
+     */
+    public function __construct(
+        LoggerInterface $logger,
+        TaskService $taskService,
+        WorkerService $workerService,
+        ResqueQueueService $resqueQueueService,
+        ResqueJobFactory $resqueJobFactory,
+        $name = null
+    ) {
+        parent::__construct($name);
+
+        $this->logger = $logger;
+        $this->taskService = $taskService;
+        $this->workerService = $workerService;
+        $this->resqueQueueService = $resqueQueueService;
+        $this->resqueJobFactory = $resqueJobFactory;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -25,8 +81,8 @@ class PerformAllCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $queuedTaskIds = $this->getTaskService()->getEntityRepository()->getIdsByState(
-            $this->getTaskService()->getQueuedState()
+        $queuedTaskIds = $this->taskService->getEntityRepository()->getIdsByState(
+            $this->taskService->getQueuedState()
         );
         $output->writeln(count($queuedTaskIds).' queued tasks ready to be performed');
 
@@ -38,13 +94,19 @@ class PerformAllCommand extends Command
             if ($this->isDryRun($input)) {
                 $commandResponse = 'dry run';
             } else {
-                $commandResponse =  $this->getCommandService()->execute(
-                    'SimplyTestable\WorkerBundle\Command\Task\PerformCommand',
-                    array(
-                        'id' => $taskId
-                    ),
-                    $outputBuffer
+                $performCommand = new PerformCommand(
+                    $this->logger,
+                    $this->taskService,
+                    $this->workerService,
+                    $this->resqueQueueService,
+                    $this->resqueJobFactory
                 );
+
+                $input = new ArrayInput([
+                    'id' => $taskId
+                ]);
+
+                $commandResponse = $performCommand->run($input, $outputBuffer);
             }
 
             $output->writeln(trim($outputBuffer->getBuffer()));
@@ -62,14 +124,5 @@ class PerformAllCommand extends Command
     private function isDryRun(InputInterface $input)
     {
         return $input->getOption('dry-run') !== false;
-    }
-
-    /**
-     *
-     * @return CommandService
-     */
-    private function getCommandService()
-    {
-        return $this->getContainer()->get('simplytestable.services.commandService');
     }
 }

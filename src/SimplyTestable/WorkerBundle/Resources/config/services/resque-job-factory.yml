@@ -1,0 +1,34 @@
+services:
+  simplytestable.services.resque.jobfactory:
+    class:   SimplyTestable\WorkerBundle\Services\Resque\JobFactory
+    arguments:
+        queues:
+          task-perform:
+            queue: task-perform
+            jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob
+            requiredArgs:
+              - id
+            serviceIds:
+              - logger
+              - simplytestable.services.taskservice
+              - simplytestable.services.workerservice
+              - simplytestable.services.resque.queueservice
+              - simplytestable.services.resque.jobfactory
+          task-report-completion:
+            queue: task-report-completion
+            jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob
+            requiredArgs:
+              - id
+            serviceIds:
+              - logger
+              - simplytestable.services.taskservice
+              - simplytestable.services.workerservice
+              - doctrine.orm.entity_manager
+          tasks-request:
+            queue: tasks-request
+            jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob
+            serviceIds:
+              - simplytestable.services.tasksservice
+              - simplytestable.services.workerservice
+              - simplytestable.services.resque.queueservice
+              - simplytestable.services.resque.jobfactory

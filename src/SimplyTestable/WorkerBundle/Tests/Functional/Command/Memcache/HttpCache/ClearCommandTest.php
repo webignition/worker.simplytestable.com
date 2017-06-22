@@ -2,47 +2,60 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Memcache\HttpCache;
 
+use Memcache;
 use SimplyTestable\WorkerBundle\Command\Memcache\HttpCache\ClearCommand;
-use SimplyTestable\WorkerBundle\Tests\Functional\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Services\MemcacheService;
+use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
+use Symfony\Component\Console\Input\ArrayInput;
 
-class ClearCommandTest extends ConsoleCommandBaseTestCase
+class ClearCommandTest extends BaseSimplyTestableTestCase
 {
-    protected function getAdditionalCommands()
-    {
-        return array(
-            new ClearCommand(),
-        );
-    }
-
     /**
-     * @dataProvider executeDataProvider
+     * @dataProvider runDataProvider
      *
      * @param bool $deleteAllReturnValue
-     * @param int $expectedReturnValue
-     *
-     * @TODO: redmine-1013
+     * @param int $expectedReturnCode
      */
-    public function testExecute($deleteAllReturnValue, $expectedReturnValue)
+    public function testRun($deleteAllReturnValue, $expectedReturnCode)
     {
+        $memcache = \Mockery::mock(Memcache::class);
+        $memcache
+            ->shouldReceive('get')
+            ->andReturn(false);
+
+        $memcache
+            ->shouldReceive('set')
+            ->andReturn($deleteAllReturnValue);
+
+        $memcacheService = \Mockery::mock(MemcacheService::class);
+        $memcacheService
+            ->shouldReceive('get')
+            ->andReturn($memcache);
+
+        $command = new ClearCommand($memcacheService);
+
+        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+
         $this->assertEquals(
-            0,
-            $this->executeCommand('simplytestable:memcache:httpcache:clear')
+            $returnCode,
+            $expectedReturnCode
         );
     }
 
     /**
      * @return array
      */
-    public function executeDataProvider()
+    public function runDataProvider()
     {
         return [
             'fail' => [
                 'deleteAllReturnValue' => false,
-                'expectedReturnValue' => 1,
+                'expectedReturnCode' => 1,
             ],
             'success' => [
                 'deleteAllReturnValue' => true,
-                'expectedReturnValue' => 0,
+                'expectedReturnCode' => 0,
             ],
         ];
     }

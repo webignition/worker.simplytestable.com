@@ -1,11 +1,49 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
+use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Command\Command;
 
 class PerformEnqueueCommand extends Command
 {
+    /**
+     * @var TaskService
+     */
+    private $taskService;
+
+    /**
+     * @var ResqueQueueService
+     */
+    private $resqueQueueService;
+
+    /**
+     * @var ResqueJobFactory
+     */
+    private $resqueJobFactory;
+
+    /**
+     * @param TaskService $taskService
+     * @param ResqueQueueService $resqueQueueService
+     * @param ResqueJobFactory $resqueJobFactory
+     * @param string|null $name
+     */
+    public function __construct(
+        TaskService $taskService,
+        ResqueQueueService $resqueQueueService,
+        ResqueJobFactory $resqueJobFactory,
+        $name = null
+    ) {
+        parent::__construct($name);
+
+        $this->taskService = $taskService;
+        $this->resqueQueueService = $resqueQueueService;
+        $this->resqueJobFactory = $resqueJobFactory;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -22,19 +60,19 @@ class PerformEnqueueCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $queuedTaskIds = $this->getTaskService()->getEntityRepository()->getIdsByState(
-            $this->getTaskService()->getQueuedState()
+        $queuedTaskIds = $this->taskService->getEntityRepository()->getIdsByState(
+            $this->taskService->getQueuedState()
         );
         $output->writeln(count($queuedTaskIds).' queued tasks ready to be enqueued');
 
         foreach ($queuedTaskIds as $taskId) {
-            if ($this->getResqueQueueService()->contains('task-perform', array('id' => $taskId))) {
+            if ($this->resqueQueueService->contains('task-perform', array('id' => $taskId))) {
                 $output->writeln('Task ['.$taskId.'] is already enqueued');
             } else {
                 $output->writeln('Enqueuing task ['.$taskId.']');
 
-                $this->getResqueQueueService()->enqueue(
-                    $this->getResqueJobFactoryService()->create(
+                $this->resqueQueueService->enqueue(
+                    $this->resqueJobFactory->create(
                         'task-perform',
                         ['id' => $taskId]
                     )

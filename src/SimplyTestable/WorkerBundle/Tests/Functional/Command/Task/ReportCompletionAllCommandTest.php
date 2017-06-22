@@ -3,30 +3,24 @@
 namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionAllCommand;
-use SimplyTestable\WorkerBundle\Tests\Functional\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorFixtureFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+use Symfony\Component\Console\Input\ArrayInput;
 
-class ReportCompletionAllCommandTest extends ConsoleCommandBaseTestCase
+class ReportCompletionAllCommandTest extends BaseSimplyTestableTestCase
 {
     /**
-     * {@inheritdoc}
-     */
-    protected function getAdditionalCommands()
-    {
-        return array(
-            new ReportCompletionAllCommand()
-        );
-    }
-
-    /**
-     * @dataProvider executeDataProvider
+     * @dataProvider runDataProvider
      *
      * @param array $arguments
      * @param bool $expectedEntitiesAreRemoved
      */
-    public function testReportCompletionAll($arguments, $expectedEntitiesAreRemoved)
+    public function testRun($arguments, $expectedEntitiesAreRemoved)
     {
+        $this->removeAllTasks();
+
         $this->setHttpFixtures([
             "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
             "HTTP/1.1 200 OK",
@@ -43,9 +37,16 @@ class ReportCompletionAllCommandTest extends ConsoleCommandBaseTestCase
         $this->getTaskService()->perform($task);
         $this->assertNotNull($task->getOutput()->getId());
 
+        $command = $this->createReportCompletionAllCommand();
+
+        $returnCode = $command->run(
+            new ArrayInput($arguments),
+            new StringOutput()
+        );
+
         $this->assertEquals(
             0,
-            $this->executeCommand('simplytestable:task:reportcompletion:all', $arguments)
+            $returnCode
         );
 
         if ($expectedEntitiesAreRemoved) {
@@ -60,7 +61,7 @@ class ReportCompletionAllCommandTest extends ConsoleCommandBaseTestCase
     /**
      * @return array
      */
-    public function executeDataProvider()
+    public function runDataProvider()
     {
         return [
             'default' => [
@@ -74,6 +75,19 @@ class ReportCompletionAllCommandTest extends ConsoleCommandBaseTestCase
                 'expectedEntitiesAreRemoved' => false,
             ],
         ];
+    }
+
+    /**
+     * @return ReportCompletionAllCommand
+     */
+    private function createReportCompletionAllCommand()
+    {
+        return new ReportCompletionAllCommand(
+            $this->container->get('logger'),
+            $this->container->get('simplytestable.services.taskservice'),
+            $this->container->get('simplytestable.services.workerservice'),
+            $this->container->get('doctrine.orm.entity_manager')
+        );
     }
 
     /**

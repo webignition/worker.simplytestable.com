@@ -3,21 +3,13 @@
 namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Tasks;
 
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
-use SimplyTestable\WorkerBundle\Tests\Functional\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Tests\Factory\ConnectExceptionFactory;
+use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
+use Symfony\Component\Console\Input\ArrayInput;
 
-class RequestCommandTest extends ConsoleCommandBaseTestCase
+class RequestCommandTest extends BaseSimplyTestableTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAdditionalCommands()
-    {
-        return array(
-            new RequestCommand()
-        );
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -33,9 +25,12 @@ class RequestCommandTest extends ConsoleCommandBaseTestCase
         $this->getWorkerService()->setReadOnly();
         $this->clearRedis();
 
+        $command = $this->createRequestCommand();
+        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+
         $this->assertEquals(
             RequestCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
-            $this->executeCommand('simplytestable:tasks:request')
+            $returnCode
         );
 
         $this->assertFalse($this->getResqueQueueService()->isEmpty('tasks-request'));
@@ -55,9 +50,12 @@ class RequestCommandTest extends ConsoleCommandBaseTestCase
             ->shouldReceive('request')
             ->andReturn($tasksServiceRequestReturnValue);
 
+        $command = $this->createRequestCommand();
+        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+
         $this->assertEquals(
             $expectedCommandReturnCode,
-            $this->executeCommand('simplytestable:tasks:request')
+            $returnCode
         );
 
         $this->assertEquals($expectedQueueIsEmpty, $this->getResqueQueueService()->isEmpty('tasks-request'));
@@ -93,10 +91,12 @@ class RequestCommandTest extends ConsoleCommandBaseTestCase
         $this->setHttpFixtures($responseFixtures);
         $this->clearRedis();
 
+        $command = $this->createRequestCommand();
+        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
 
         $this->assertEquals(
             $expectedCommandReturnCode,
-            $this->executeCommand('simplytestable:tasks:request')
+            $returnCode
         );
 
         $this->assertFalse($this->getResqueQueueService()->isEmpty('tasks-request'));
@@ -121,5 +121,18 @@ class RequestCommandTest extends ConsoleCommandBaseTestCase
                 'expectedCommandReturnCode' => RequestCommand::RETURN_CODE_FAILED,
             ],
         ];
+    }
+
+    /**
+     * @return RequestCommand
+     */
+    private function createRequestCommand()
+    {
+        return new RequestCommand(
+            $this->container->get('simplytestable.services.tasksservice'),
+            $this->container->get('simplytestable.services.workerservice'),
+            $this->container->get('simplytestable.services.resque.queueservice'),
+            $this->container->get('simplytestable.services.resque.jobfactory')
+        );
     }
 }

@@ -3,23 +3,15 @@
 namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
-use SimplyTestable\WorkerBundle\Tests\Functional\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorFixtureFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+use Symfony\Component\Console\Input\ArrayInput;
 
-class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase
+class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAdditionalCommands()
-    {
-        return array(
-            new ReportCompletionEnqueueCommand()
-        );
-    }
-
-    public function testExecuteWithEmptyQueue()
+    public function testRunWithEmptyQueue()
     {
         $this->removeAllTasks();
         $this->setHttpFixtures([
@@ -33,7 +25,10 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase
 
         $this->assertTrue($this->clearRedis());
 
-        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion:enqueue'));
+        $command = $this->createReportCompletionEnqueueCommand();
+        $returnCode = $command->execute(new ArrayInput([]), new StringOutput());
+
+        $this->assertEquals(0, $returnCode);
 
         $this->assertTrue($this->getResqueQueueService()->contains(
             'task-report-completion',
@@ -43,7 +38,7 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase
         ));
     }
 
-    public function testExecuteWithNonEmptyQueue()
+    public function testRunWithNonEmptyQueue()
     {
         $this->removeAllTasks();
         $this->setHttpFixtures([
@@ -58,13 +53,16 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase
         $this->assertTrue($this->clearRedis());
 
         $this->getResqueQueueService()->enqueue(
-            $this->getResqueJobFactoryService()->create(
+            $this->getResqueJobFactory()->create(
                 'task-report-completion',
                 ['id' => $task->getId()]
             )
         );
 
-        $this->assertEquals(0, $this->executeCommand('simplytestable:task:reportcompletion:enqueue'));
+        $command = $this->createReportCompletionEnqueueCommand();
+        $returnCode = $command->execute(new ArrayInput([]), new StringOutput());
+
+        $this->assertEquals(0, $returnCode);
 
         $this->assertTrue($this->getResqueQueueService()->contains(
             'task-report-completion',
@@ -72,6 +70,19 @@ class ReportCompletionEnqueueCommandTest extends ConsoleCommandBaseTestCase
                 'id' => $task->getId()
             ]
         ));
+    }
+
+    /**
+     * @return ReportCompletionEnqueueCommand
+     */
+    private function createReportCompletionEnqueueCommand()
+    {
+        return new ReportCompletionEnqueueCommand(
+            $this->container->get('logger'),
+            $this->container->get('simplytestable.services.taskservice'),
+            $this->container->get('simplytestable.services.resque.queueservice'),
+            $this->container->get('simplytestable.services.resque.jobfactory')
+        );
     }
 
     /**

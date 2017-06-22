@@ -4,22 +4,14 @@ namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Task;
 
 use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Command\Task\PerformAllCommand;
+use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\TaskService;
-use SimplyTestable\WorkerBundle\Tests\Functional\Command\ConsoleCommandBaseTestCase;
+use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
+use Symfony\Component\Console\Input\ArrayInput;
 
-class PerformAllCommandTest extends ConsoleCommandBaseTestCase
+class PerformAllCommandTest extends BaseSimplyTestableTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAdditionalCommands()
-    {
-        return array(
-            new PerformAllCommand()
-        );
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -31,11 +23,11 @@ class PerformAllCommandTest extends ConsoleCommandBaseTestCase
     }
 
     /**
-     * @dataProvider executeDataProvider
+     * @dataProvider runDataProvider
      *
      * @param array $arguments
      */
-    public function testExecute($arguments)
+    public function testRun($arguments)
     {
         $this->removeAllTasks();
 
@@ -48,15 +40,20 @@ class PerformAllCommandTest extends ConsoleCommandBaseTestCase
             ->with($task)
             ->andReturn(0);
 
-        $response = $this->executeCommand('simplytestable:task:perform:all', $arguments);
+        $command = $this->createPerformAllCommand();
 
-        $this->assertEquals(0, $response);
+        $returnCode = $command->run(
+            new ArrayInput($arguments),
+            new StringOutput()
+        );
+
+        $this->assertEquals(0, $returnCode);
     }
 
     /**
      * @return array
      */
-    public function executeDataProvider()
+    public function runDataProvider()
     {
         return [
             'default' => [
@@ -69,6 +66,21 @@ class PerformAllCommandTest extends ConsoleCommandBaseTestCase
             ],
         ];
     }
+
+    /**
+     * @return PerformAllCommand
+     */
+    private function createPerformAllCommand()
+    {
+        return new PerformAllCommand(
+            $this->container->get('logger'),
+            $this->container->get('simplytestable.services.taskservice'),
+            $this->container->get('simplytestable.services.workerservice'),
+            $this->container->get('simplytestable.services.resque.queueservice'),
+            $this->container->get('simplytestable.services.resque.jobfactory')
+        );
+    }
+
 
     /**
      * {@inheritdoc}

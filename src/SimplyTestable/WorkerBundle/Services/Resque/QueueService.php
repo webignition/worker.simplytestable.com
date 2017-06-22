@@ -4,8 +4,6 @@ namespace SimplyTestable\WorkerBundle\Services\Resque;
 use BCC\ResqueBundle\Resque;
 use SimplyTestable\WorkerBundle\Resque\Job\Job;
 use Psr\Log\LoggerInterface;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService;
-
 
 /**
  * Wrapper for \BCC\ResqueBundle\Resque that handles exceptions
@@ -16,69 +14,67 @@ use SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService;
  * where the integration with redis is optional.
  *
  */
-class QueueService {
-
+class QueueService
+{
     const QUEUE_KEY = 'queue';
 
     /**
-     *
      * @var Resque
      */
     private $resque;
 
-
     /**
-     * @var string
-     */
-    private $environment = 'prod';
-
-    /**
-     *
      * @var LoggerInterface
      */
     private $logger;
 
+    /**
+     * @var JobFactory
+     */
+    private $jobFactory;
 
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Services\Resque\JobFactoryService
+     * @param Resque $resque
+     * @param LoggerInterface $logger
+     * @param JobFactory $jobFactory
      */
-    private $jobFactoryService;
-
-
-    public function __construct(Resque $resque, $environment = 'prod', LoggerInterface $logger, JobFactoryService $jobFactoryService) {
+    public function __construct(
+        Resque $resque,
+        LoggerInterface $logger,
+        JobFactory $jobFactory
+    ) {
         $this->resque = $resque;
-        $this->environment = $environment;
         $this->logger = $logger;
-        $this->jobFactoryService = $jobFactoryService;
+        $this->jobFactory = $jobFactory;
     }
 
-
     /**
-     *
      * @param string $queue_name
      * @param array $args
+     *
      * @return boolean
      */
-    public function contains($queue_name, $args = []) {
+    public function contains($queue_name, $args = [])
+    {
         try {
             return !is_null($this->findRedisValue($queue_name, $args));
         } catch (\CredisException $credisException) {
-            $this->logger->warning('ResqueQueueService::enqueue: Redis error ['.$credisException->getMessage().']');
+            $this->logger->warning(
+                'ResqueQueueService::enqueue: Redis error ['.$credisException->getMessage().']'
+            );
         }
 
         return false;
     }
 
-
-
     /**
-     *
      * @param string $queue
      * @param array $args
+     *
      * @return string
      */
-    private function findRedisValue($queue, $args) {
+    private function findRedisValue($queue, $args)
+    {
         $queueLength = $this->getQueueLength($queue);
 
         for ($queueIndex = 0; $queueIndex < $queueLength; $queueIndex++) {
@@ -92,20 +88,20 @@ class QueueService {
         return null;
     }
 
-
     /**
-     *
      * @param string $jobDetails
      * @param string $queue
      * @param array $args
+     *
      * @return boolean
      */
-    private function match($jobDetails, $queue, $args) {
+    private function match($jobDetails, $queue, $args)
+    {
         if (!isset($jobDetails->class)) {
             return false;
         }
 
-        if ($jobDetails->class != $this->jobFactoryService->getJobClassName($queue)) {
+        if ($jobDetails->class != $this->jobFactory->getJobClassName($queue)) {
             return false;
         }
 
@@ -130,13 +126,13 @@ class QueueService {
         return true;
     }
 
-
     /**
-     *
      * @param string $queue
+     *
      * @return int
      */
-    public function getQueueLength($queue) {
+    public function getQueueLength($queue)
+    {
         return \Resque::redis()->llen(self::QUEUE_KEY . ':' . $queue);
     }
 
@@ -144,11 +140,13 @@ class QueueService {
     /**
      * @param Job $job
      * @param bool $trackStatus
-     * @return null|\Resque_Job_Status
      * @throws \CredisException
      * @throws \Exception
+     *
+     * @return null|\Resque_Job_Status
      */
-    public function enqueue(Job $job, $trackStatus = false) {
+    public function enqueue(Job $job, $trackStatus = false)
+    {
         try {
             return $this->resque->enqueue($job, $trackStatus);
         } catch (\CredisException $credisException) {
@@ -156,14 +154,13 @@ class QueueService {
         }
     }
 
-
     /**
-     *
      * @param string $queue
+     *
      * @return boolean
      */
-    public function isEmpty($queue) {
+    public function isEmpty($queue)
+    {
         return $this->getQueueLength($queue) == 0;
     }
-
 }

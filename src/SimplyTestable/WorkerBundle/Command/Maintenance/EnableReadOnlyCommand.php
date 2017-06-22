@@ -1,13 +1,28 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Maintenance;
 
-use SimplyTestable\WorkerBundle\Command\BaseCommand;
-
+use SimplyTestable\WorkerBundle\Services\WorkerService;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class EnableReadOnlyCommand extends BaseCommand
+class EnableReadOnlyCommand extends Command
 {
+    /**
+     * @var WorkerService
+     */
+    private $workerService;
+
+    /**
+     * @param WorkerService $workerService
+     * @param string|null $name
+     */
+    public function __construct(WorkerService $workerService, $name = null)
+    {
+        parent::__construct($name);
+        $this->workerService = $workerService;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -24,7 +39,7 @@ class EnableReadOnlyCommand extends BaseCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->getWorkerService()->setReadOnly();
+        $this->workerService->setReadOnly();
         $output->writeln('Set state to maintenance-read-only');
 
         return 0;

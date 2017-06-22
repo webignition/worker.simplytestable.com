@@ -3,20 +3,53 @@
 namespace SimplyTestable\WorkerBundle\Resque\Job;
 
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
+use SimplyTestable\WorkerBundle\Services\TasksService;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 
-class TasksRequestJob extends CommandJob {
-
+class TasksRequestJob extends CommandJob
+{
     const QUEUE_NAME = 'tasks-request';
 
-    protected function getQueueName() {
+    /**
+     * {@inheritdoc}
+     */
+    protected function getQueueName()
+    {
         return self::QUEUE_NAME;
     }
 
-    protected function getCommand() {
-        return new RequestCommand();
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCommand()
+    {
+        /* @var TasksService $tasksService */
+        $tasksService = $this->getContainer()->get($this->args['serviceIds'][0]);
+
+        /* @var WorkerService $workerService */
+        $workerService = $this->getContainer()->get($this->args['serviceIds'][1]);
+
+        /* @var ResqueQueueService $resqueQueueService */
+        $resqueQueueService = $this->getContainer()->get($this->args['serviceIds'][2]);
+
+        /* @var ResqueJobFactory $resqueJobFactory */
+        $resqueJobFactory = $this->getContainer()->get($this->args['serviceIds'][3]);
+
+        return new RequestCommand(
+            $tasksService,
+            $workerService,
+            $resqueQueueService,
+            $resqueJobFactory
+        );
     }
 
-    protected function getCommandArgs() {
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCommandArgs()
+    {
         if (isset($this->args['limit'])) {
             return [
                 'limit' => $this->args['limit']
@@ -26,11 +59,19 @@ class TasksRequestJob extends CommandJob {
         return [];
     }
 
-    protected function getIdentifier() {
+    /**
+     * {@inheritdoc}
+     */
+    protected function getIdentifier()
+    {
         return 'default';
     }
 
-    protected function handleNonZeroReturnCode($returnCode, $output) {
+    /**
+     * {@inheritdoc}
+     */
+    protected function handleNonZeroReturnCode($returnCode, $output)
+    {
         $command = $this->getCommand();
 
         if ($returnCode == $command::RETURN_CODE_TASK_WORKLOAD_EXCEEDS_REQUEST_THRESHOLD) {
