@@ -4211,16 +4211,16 @@
         },
         {
             "name": "webignition/url-health-checker",
-            "version": "0.5",
+            "version": "0.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/url-health-checker.git",
-                "reference": "d0e702249415c35f9e3d172ef873804d059200ba"
+                "reference": "d6748b651fdaae9f6342d4d07c4f645bdb77b22a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/url-health-checker/zipball/d0e702249415c35f9e3d172ef873804d059200ba",
-                "reference": "d0e702249415c35f9e3d172ef873804d059200ba",
+                "url": "https://api.github.com/repos/webignition/url-health-checker/zipball/d6748b651fdaae9f6342d4d07c4f645bdb77b22a",
+                "reference": "d6748b651fdaae9f6342d4d07c4f645bdb77b22a",
                 "shasum": ""
             },
             "require": {
@@ -4255,7 +4255,7 @@
                 "health",
                 "url"
             ],
-            "time": "2017-06-22T17:02:07+00:00"
+            "time": "2017-06-22T17:19:22+00:00"
         },
         {
             "name": "webignition/web-json-model",
