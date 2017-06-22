@@ -11,6 +11,14 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 class ReportCompletionAllCommandTest extends BaseSimplyTestableTestCase
 {
+    public function testGetAsService()
+    {
+        $this->assertInstanceOf(
+            ReportCompletionAllCommand::class,
+            $this->container->get('simplytestable.command.task.reportcompletionall')
+        );
+    }
+
     /**
      * @dataProvider runDataProvider
      *

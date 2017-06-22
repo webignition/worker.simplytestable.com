@@ -23,6 +23,14 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
         ];
     }
 
+    public function testGetAsService()
+    {
+        $this->assertInstanceOf(
+            ReportCompletionCommand::class,
+            $this->container->get('simplytestable.command.task.reportcompletion')
+        );
+    }
+
     public function testRunInMaintenanceReadOnlyMode()
     {
         $this->getWorkerService()->setReadOnly();
