@@ -425,9 +425,6 @@ class TaskService extends EntityService
             $this->persistAndFlush($task);
         } catch (HttpBadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
-            if ($response->getStatusCode() == 410) {
-                return true;
-            }
 
             $this->logger->error(sprintf(
                 'TaskService::reportCompletion: Completion reporting failed for [%i] [%s]',
@@ -442,6 +439,10 @@ class TaskService extends EntityService
                 $response->getStatusCode(),
                 $response->getReasonPhrase()
             ));
+
+            if ($response->getStatusCode() !== 410) {
+                return $response->getStatusCode();
+            }
         } catch (HttpConnectException $connectException) {
             $curlExceptionFactory = new CurlExceptionFactory();
 
