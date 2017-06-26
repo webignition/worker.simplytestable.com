@@ -317,21 +317,42 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
         ];
     }
 
-    public function testReportCompletion()
+    /**
+     * @dataProvider reportCompletionDataProvider
+     *
+     * @param string $responseFixture
+     */
+    public function testReportCompletion($responseFixture)
     {
         $this->setHttpFixtures([
             "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html>",
-            "HTTP/1.1 200 OK",
+            $responseFixture,
         ]);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
 
         ]));
-        $this->getTaskService()->perform($task);
+
+        $this->assertEquals(0, $this->getTaskService()->perform($task));
 
         $this->assertTrue($this->getTaskService()->reportCompletion($task));
         $this->assertEquals(TaskService::TASK_COMPLETED_STATE, (string)$task->getState());
+    }
+
+    /**
+     * @return array
+     */
+    public function reportCompletionDataProvider()
+    {
+        return [
+            '200 OK' => [
+                'responseHttpFixture' => 'HTTP/1.1 200 OK',
+            ],
+            '410 Gone' => [
+                'responseHttpFixture' => 'HTTP/1.1 410 Gone',
+            ],
+        ];
     }
 
     public function testGetIncompleteCount()

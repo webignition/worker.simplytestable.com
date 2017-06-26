@@ -426,21 +426,21 @@ class TaskService extends EntityService
         } catch (HttpBadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
 
-            $this->logger->error(sprintf(
-                'TaskService::reportCompletion: Completion reporting failed for [%i] [%s]',
-                $task->getId(),
-                $task->getUrl()
-            ));
-
-            $this->logger->error(sprintf(
-                'TaskService::reportCompletion: [%i] %s: %s %s',
-                $task->getId(),
-                $requestUrl,
-                $response->getStatusCode(),
-                $response->getReasonPhrase()
-            ));
-
             if ($response->getStatusCode() !== 410) {
+                $this->logger->error(sprintf(
+                    'TaskService::reportCompletion: Completion reporting failed for [%i] [%s]',
+                    $task->getId(),
+                    $task->getUrl()
+                ));
+
+                $this->logger->error(sprintf(
+                    'TaskService::reportCompletion: [%i] %s: %s %s',
+                    $task->getId(),
+                    $requestUrl,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase()
+                ));
+
                 return $response->getStatusCode();
             }
         } catch (HttpConnectException $connectException) {
