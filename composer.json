@@ -30,7 +30,7 @@
         "guzzlehttp/guzzle":">=5.2.0,<5.3",
         "doctrine/doctrine-fixtures-bundle": "~2.3",
         "webignition/html-document-link-finder":">=1.2,<2.0",
-        "webignition/html-document-link-checker":">=1.2,<2.0",
+        "webignition/html-document-link-checker":">=1.2.1,<2.0",
         "webignition/html-validator-wrapper":">=0.5",
         "webignition/html-validator-output-parser":">=0.7,<1.0",
         "webignition/css-validator-wrapper":">=1.2.1,<2.0",
