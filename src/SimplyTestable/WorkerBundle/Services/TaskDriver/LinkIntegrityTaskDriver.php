@@ -5,6 +5,7 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\InternetMediaType\InternetMediaType;
+use webignition\UrlHealthChecker\Configuration as UrlHealthCheckerConfiguration;
 use webignition\WebResource\Service\Service as WebResourceService;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
 use webignition\HtmlDocument\LinkChecker\Configuration as LinkCheckerConfiguration;
@@ -103,11 +104,19 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver
      */
     private function createLinkChecker()
     {
+        $urlHealthCheckerConfiguration = new UrlHealthCheckerConfiguration([
+            UrlHealthCheckerConfiguration::CONFIG_KEY_HTTP_METHOD_LIST => [
+                LinkCheckerConfiguration::HTTP_METHOD_GET
+            ],
+            UrlHealthCheckerConfiguration::CONFIG_KEY_TOGGLE_URL_ENCODING => true,
+            UrlHealthCheckerConfiguration::CONFIG_KEY_RETRY_ON_BAD_RESPONSE => false,
+            UrlHealthCheckerConfiguration::CONFIG_KEY_USER_AGENTS => $this->userAgents,
+            UrlHealthCheckerConfiguration::CONFIG_KEY_HTTP_CLIENT => $this->getHttpClientService()->get()
+        ]);
+
         $linkChecker = new LinkChecker();
+        $linkChecker->getUrlHealthChecker()->setConfiguration($urlHealthCheckerConfiguration);
         $linkChecker->setWebPage($this->webResource);
-        $linkChecker->getUrlHealthChecker()->getConfiguration()->setHttpMethodList(array(
-            LinkCheckerConfiguration::HTTP_METHOD_GET
-        ));
 
         if ($this->task->hasParameter(self::EXCLUDED_URLS_PARAMETER_NAME)) {
             $linkChecker->getConfiguration()->setUrlsToExclude(
@@ -121,12 +130,7 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver
             );
         }
 
-        $linkChecker->getUrlHealthChecker()->getConfiguration()->enableToggleUrlEncoding();
-        $linkChecker->getUrlHealthChecker()->getConfiguration()->disableRetryOnBadResponse();
         $linkChecker->getConfiguration()->enableIgnoreFragmentInUrlComparison();
-
-        $linkChecker->getUrlHealthChecker()->getConfiguration()->setUserAgents($this->userAgents);
-        $linkChecker->getUrlHealthChecker()->getConfiguration()->setHttpClient($this->getHttpClientService()->get());
 
         return $linkChecker;
     }
