@@ -64,9 +64,8 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
      *
      * @param array $responseFixtures
      * @param int $expectedCommandReturnCode
-     * @param bool $expectedTaskIsDeleted
      */
-    public function testRun($responseFixtures, $expectedCommandReturnCode, $expectedTaskIsDeleted)
+    public function testRun($responseFixtures, $expectedCommandReturnCode)
     {
         $this->setHttpFixtures(array_merge([
             "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
@@ -93,14 +92,6 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
             $expectedCommandReturnCode,
             $returnCode
         );
-
-        if ($expectedTaskIsDeleted) {
-            $this->assertNull($task->getOutput()->getId());
-            $this->assertNull($task->getId());
-        } else {
-            $this->assertNotNull($task->getOutput()->getId());
-            $this->assertNotNull($task->getId());
-        }
     }
 
     /**
@@ -114,28 +105,24 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
                     'HTTP/1.1 200',
                 ],
                 'expectedCommandReturnCode' => 0,
-                'expectedTaskIsDeleted' => true,
             ],
             'http 404' => [
                 'responseFixtures' => [
                     'HTTP/1.1 404',
                 ],
                 'expectedCommandReturnCode' => 404,
-                'expectedTaskIsDeleted' => false,
             ],
             'http 500' => [
                 'responseFixtures' => [
                     'HTTP/1.1 500',
                 ],
                 'expectedCommandReturnCode' => 500,
-                'expectedTaskIsDeleted' => false,
             ],
             'curl 28' => [
                 'responseFixtures' => [
                     ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
                 ],
                 'expectedCommandReturnCode' => 28,
-                'expectedTaskIsDeleted' => false,
             ],
         ];
     }
@@ -148,8 +135,7 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
         return new ReportCompletionCommand(
             $this->container->get('logger'),
             $this->container->get('simplytestable.services.taskservice'),
-            $this->container->get('simplytestable.services.workerservice'),
-            $this->container->get('doctrine.orm.entity_manager')
+            $this->container->get('simplytestable.services.workerservice')
         );
     }
 

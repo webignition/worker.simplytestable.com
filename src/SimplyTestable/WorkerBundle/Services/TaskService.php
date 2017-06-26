@@ -420,9 +420,6 @@ class TaskService extends EntityService
                 $response->getStatusCode(),
                 $response->getReasonPhrase()
             ));
-
-            $task->setNextState();
-            $this->persistAndFlush($task);
         } catch (HttpBadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
 
@@ -450,6 +447,11 @@ class TaskService extends EntityService
                 return $curlExceptionFactory::fromConnectException($connectException)->getCurlCode();
             }
         }
+
+        $this->getEntityManager()->remove($task);
+        $this->getEntityManager()->remove($task->getOutput());
+        $this->getEntityManager()->remove($task->getTimePeriod());
+        $this->getEntityManager()->flush();
 
         return true;
     }

@@ -2,7 +2,6 @@
 
 namespace SimplyTestable\WorkerBundle\Resque\Job;
 
-use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -34,14 +33,10 @@ class TaskReportCompletionJob extends CommandJob
         /* @var WorkerService $workerService */
         $workerService = $this->getContainer()->get($this->args['serviceIds'][2]);
 
-        /* @var EntityManager $entityManager */
-        $entityManager = $this->getContainer()->get($this->args['serviceIds'][3]);
-
         return new ReportCompletionCommand(
             $logger,
             $taskService,
-            $workerService,
-            $entityManager
+            $workerService
         );
     }
 

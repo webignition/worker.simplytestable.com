@@ -23,7 +23,6 @@ services:
               - logger
               - simplytestable.services.taskservice
               - simplytestable.services.workerservice
-              - doctrine.orm.entity_manager
           tasks-request:
             queue: tasks-request
             jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob
