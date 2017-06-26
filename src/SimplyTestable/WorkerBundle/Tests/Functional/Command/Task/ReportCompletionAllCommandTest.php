@@ -93,8 +93,7 @@ class ReportCompletionAllCommandTest extends BaseSimplyTestableTestCase
         return new ReportCompletionAllCommand(
             $this->container->get('logger'),
             $this->container->get('simplytestable.services.taskservice'),
-            $this->container->get('simplytestable.services.workerservice'),
-            $this->container->get('doctrine.orm.entity_manager')
+            $this->container->get('simplytestable.services.workerservice')
         );
     }
 

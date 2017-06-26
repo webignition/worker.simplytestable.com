@@ -1,7 +1,6 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
-use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -29,22 +28,15 @@ class ReportCompletionAllCommand extends Command
     private $workerService;
 
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
-     * @param EntityManager $entityManager
      * @param string|null $name
      */
     public function __construct(
         LoggerInterface $logger,
         TaskService $taskService,
         WorkerService $workerService,
-        EntityManager $entityManager,
         $name = null
     ) {
         parent::__construct($name);
@@ -52,7 +44,6 @@ class ReportCompletionAllCommand extends Command
         $this->logger = $logger;
         $this->taskService = $taskService;
         $this->workerService = $workerService;
-        $this->entityManager = $entityManager;
     }
 
     protected function configure()
@@ -83,8 +74,7 @@ class ReportCompletionAllCommand extends Command
                 $reportCompletionCommand = new ReportCompletionCommand(
                     $this->logger,
                     $this->taskService,
-                    $this->workerService,
-                    $this->entityManager
+                    $this->workerService
                 );
 
                 $input = new ArrayInput([

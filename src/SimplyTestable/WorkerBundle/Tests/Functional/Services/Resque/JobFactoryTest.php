@@ -71,6 +71,9 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
      *
      * @param string $queue
      * @param array $args
+     * @param string $expectedJobClass
+     * @param string $expectedQueue
+     * @param array $expectedArgs
      */
     public function testCreate($queue, $args, $expectedJobClass, $expectedQueue, $expectedArgs)
     {
@@ -119,7 +122,6 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
                         'logger',
                         'simplytestable.services.taskservice',
                         'simplytestable.services.workerservice',
-                        'doctrine.orm.entity_manager',
                     ],
                 ],
             ],

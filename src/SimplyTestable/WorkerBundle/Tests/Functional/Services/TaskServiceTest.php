@@ -294,6 +294,9 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
 
         $this->assertEquals($expectedReturnValue, $this->getTaskService()->reportCompletion($task));
         $this->assertEquals($initialTaskState, (string)$task->getState());
+        $this->assertInternalType('int', $task->getId());
+        $this->assertInternalType('int', $task->getOutput()->getId());
+        $this->assertInternalType('int', $task->getTimePeriod()->getId());
     }
 
     /**
@@ -330,14 +333,19 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
         ]);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
-
-        ]));
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
 
         $this->assertEquals(0, $this->getTaskService()->perform($task));
+        $this->assertInternalType('int', $task->getId());
+        $this->assertInternalType('int', $task->getOutput()->getId());
+        $this->assertInternalType('int', $task->getTimePeriod()->getId());
 
         $this->assertTrue($this->getTaskService()->reportCompletion($task));
         $this->assertEquals(TaskService::TASK_COMPLETED_STATE, (string)$task->getState());
+
+        $this->assertNull($task->getId());
+        $this->assertNull($task->getOutput()->getId());
+        $this->assertNull($task->getTimePeriod()->getId());
     }
 
     /**

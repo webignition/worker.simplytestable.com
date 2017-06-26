@@ -1,7 +1,6 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
-use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
@@ -31,22 +30,15 @@ class ReportCompletionCommand extends Command
     private $workerService;
 
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
-     * @param EntityManager $entityManager
      * @param string|null $name
      */
     public function __construct(
         LoggerInterface $logger,
         TaskService $taskService,
         WorkerService $workerService,
-        EntityManager $entityManager,
         $name = null
     ) {
         parent::__construct($name);
@@ -54,7 +46,6 @@ class ReportCompletionCommand extends Command
         $this->logger = $logger;
         $this->taskService = $taskService;
         $this->workerService = $workerService;
-        $this->entityManager = $entityManager;
     }
 
     /**
@@ -94,11 +85,6 @@ class ReportCompletionCommand extends Command
 
         if ($reportCompletionResult === true) {
             $output->writeln('Reported task completion ['.$task->getId().']');
-
-            $this->entityManager->remove($task);
-            $this->entityManager->remove($task->getOutput());
-            $this->entityManager->remove($task->getTimePeriod());
-            $this->entityManager->flush();
 
             return 0;
         }
