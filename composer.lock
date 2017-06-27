@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "58fa3bcb2f298d118817ead725548945",
+    "content-hash": "4b436a686e30135d5712210909d468bd",
     "packages": [
         {
             "name": "bcc/resque-bundle",
@@ -3410,24 +3410,24 @@
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "1.2.1",
+            "version": "1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "dc592a4430bba29639034a00204aa1fb2161808a"
+                "reference": "6b57f7e063d489c9e4a0f55b92d2198ba87142f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/dc592a4430bba29639034a00204aa1fb2161808a",
-                "reference": "dc592a4430bba29639034a00204aa1fb2161808a",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/6b57f7e063d489c9e4a0f55b92d2198ba87142f7",
+                "reference": "6b57f7e063d489c9e4a0f55b92d2198ba87142f7",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": ">=5.2.0,<5.3",
                 "php": ">=5.4",
-                "webignition/absolute-url-deriver": ">=1.4.1.2",
                 "webignition/css-validator-output-parser": ">=2.2.2",
                 "webignition/guzzle-curl-exception": ">=0.1.3,<1",
+                "webignition/html-document-link-finder": ">=1.5.1,<2.0",
                 "webignition/url": ">=1.9.9",
                 "webignition/web-page-model": ">=1.1,<2.0",
                 "webignition/web-resource-service": ">=1.1,<2"
@@ -3455,7 +3455,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2017-06-06T09:41:33+00:00"
+            "time": "2017-06-27T14:50:58+00:00"
         },
         {
             "name": "webignition/disallowed-character-terminated-string",
@@ -3601,16 +3601,16 @@
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "1.4.1",
+            "version": "1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "ef9dce199d02b1101a7b15bb102d178dddba7527"
+                "reference": "2643381ea4433588452bf27126994bfe498648f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/ef9dce199d02b1101a7b15bb102d178dddba7527",
-                "reference": "ef9dce199d02b1101a7b15bb102d178dddba7527",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/2643381ea4433588452bf27126994bfe498648f3",
+                "reference": "2643381ea4433588452bf27126994bfe498648f3",
                 "shasum": ""
             },
             "require": {
@@ -3649,7 +3649,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2017-06-27T06:23:14+00:00"
+            "time": "2017-06-27T14:26:10+00:00"
         },
         {
             "name": "webignition/html-document-type-extractor",
