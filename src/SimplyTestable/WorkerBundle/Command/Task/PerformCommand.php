@@ -15,7 +15,6 @@ class PerformCommand extends Command
 {
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;
-    const RETURN_CODE_FAILED_DUE_TO_WRONG_STATE = -3;
     const RETURN_CODE_UNKNOWN_ERROR = -5;
     const RETURN_CODE_TASK_SERVICE_RAISED_EXCEPTION = -6;
 
@@ -146,12 +145,6 @@ class PerformCommand extends Command
             ));
 
             return 0;
-        }
-
-        if ($performResult === 1) {
-            $output->writeln('Task perform failed, task is in wrong state (currently:'.$task->getState().')');
-
-            return self::RETURN_CODE_FAILED_DUE_TO_WRONG_STATE;
         }
 
         $output->writeln('Task perform failed, unknown error');

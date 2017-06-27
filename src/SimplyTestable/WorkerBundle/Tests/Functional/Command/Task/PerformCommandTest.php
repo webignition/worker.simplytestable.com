@@ -137,19 +137,6 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
     public function runDataProvider()
     {
         return [
-            'task in wrong state' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_IN_PROGRESS_STATE,
-                ]),
-                'taskServiceReturnValue' => 1,
-                'expectedReturnCode' => PerformCommand::RETURN_CODE_FAILED_DUE_TO_WRONG_STATE,
-                'expectedResqueJobs' => [
-                    'tasks-request' => [],
-                ],
-                'expectedEmptyResqueQueues' => [
-                    'task-report-completion',
-                ],
-            ],
             'unknown error' => [
                 'taskValues' => TaskFactory::createTaskValuesFromDefaults([
                     'state' => TaskService::TASK_IN_PROGRESS_STATE,

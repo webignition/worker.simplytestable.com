@@ -250,16 +250,6 @@ class TaskService extends EntityService
      */
     public function perform(Task $task)
     {
-        if (TaskService::TASK_STARTING_STATE != $task->getState()) {
-            $this->logger->info(sprintf(
-                'TaskService::perform: [%d] Task state is [%s] and cannot be performed',
-                $task->getId(),
-                $task->getState()
-            ));
-
-            return 1;
-        }
-
         $this->logger->info(sprintf(
             'TaskService::perform: [%d] [%s] Initialising',
             $task->getId(),

@@ -3,7 +3,6 @@
 namespace SimplyTestable\WorkerBundle\Tests\Unit\Services;
 
 use Doctrine\ORM\EntityManager;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\State;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
@@ -55,60 +54,6 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
             'state: completed' => [
                 'stateName' => TaskService::TASK_COMPLETED_STATE,
                 'expectedEndState' => TaskService::TASK_COMPLETED_STATE,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider performTaskInIncorrectStateDataProvider
-     *
-     * @param string $stateName
-     */
-    public function testPerformTaskInIncorrectState($stateName)
-    {
-        $state = new State();
-        $state->setName($stateName);
-
-        $task = new Task();
-        $task->setState($state);
-
-        $logger = \Mockery::mock(LoggerInterface::class);
-        $logger
-            ->shouldReceive('info');
-
-        $taskService = $this->createTaskService([
-            'logger' => $logger,
-        ]);
-
-        $this->assertEquals(1, $taskService->perform($task));
-    }
-
-    /**
-     * @return array
-     */
-    public function performTaskInIncorrectStateDataProvider()
-    {
-        return [
-            'in-progress' => [
-                'stateName' => TaskService::TASK_IN_PROGRESS_STATE,
-            ],
-            'completed' => [
-                'stateName' => TaskService::TASK_COMPLETED_STATE,
-            ],
-            'cancelled' => [
-                'stateName' => TaskService::TASK_CANCELLED_STATE,
-            ],
-            'failed-no-retry-available' => [
-                'stateName' => TaskService::TASK_FAILED_NO_RETRY_AVAILABLE_STATE,
-            ],
-            'failed-retry-available' => [
-                'stateName' => TaskService::TASK_FAILED_RETRY_AVAILABLE_STATE,
-            ],
-            'failed-retry-limit-reached' => [
-                'stateName' => TaskService::TASK_FAILED_RETRY_LIMIT_REACHED_STATE,
-            ],
-            'skipped' => [
-                'stateName' => TaskService::TASK_SKIPPED_STATE,
             ],
         ];
     }
