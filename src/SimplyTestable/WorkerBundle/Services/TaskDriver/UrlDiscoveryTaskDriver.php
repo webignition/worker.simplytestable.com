@@ -4,6 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
+use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\Service\Service as WebResourceService;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
@@ -69,16 +70,20 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
      */
     protected function performValidation()
     {
-        $finder = new HtmlDocumentLinkUrlFinder();
-        $finder->getConfiguration()->setSource($this->webResource);
-        $finder->getConfiguration()->setSourceUrl($this->webResource->getUrl());
-        $finder->getConfiguration()->setElementScope('a');
-        $finder->getConfiguration()->enableIgnoreFragmentInUrlComparison();
-        $finder->getUrlScopeComparer()->addEquivalentSchemes($this->equivalentSchemes);
+        $configuration = new LinkUrlFinderConfiguration([
+            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE => $this->webResource,
+            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE_URL => $this->webResource->getUrl(),
+            LinkUrlFinderConfiguration::CONFIG_KEY_ELEMENT_SCOPE => 'a',
+            LinkUrlFinderConfiguration::CONFIG_KEY_IGNORE_FRAGMENT_IN_URL_COMPARISON => true,
+        ]);
 
         if ($this->task->hasParameter('scope')) {
-            $finder->getConfiguration()->setUrlScope($this->task->getParameter('scope'));
+            $configuration->setUrlScope($this->task->getParameter('scope'));
         }
+
+        $finder = new HtmlDocumentLinkUrlFinder();
+        $finder->setConfiguration($configuration);
+        $finder->getUrlScopeComparer()->addEquivalentSchemes($this->equivalentSchemes);
 
         return json_encode($finder->getUniqueUrls());
     }
