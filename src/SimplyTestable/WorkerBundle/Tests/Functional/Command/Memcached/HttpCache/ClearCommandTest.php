@@ -23,6 +23,7 @@ class ClearCommandTest extends BaseSimplyTestableTestCase
         $memcached = \Mockery::mock(Memcached::class);
         $memcached
             ->shouldReceive('get')
+            ->with('DoctrineNamespaceCacheKey[]')
             ->andReturn(false);
 
         $memcached
@@ -60,5 +61,14 @@ class ClearCommandTest extends BaseSimplyTestableTestCase
                 'expectedReturnCode' => 0,
             ],
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
     }
 }
