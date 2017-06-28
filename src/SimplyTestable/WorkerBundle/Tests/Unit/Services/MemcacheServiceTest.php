@@ -1,13 +1,13 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Unit\Guzzle;
+namespace SimplyTestable\WorkerBundle\Tests\Unit\Services;
 
-use Memcache;
+use Memcached;
 
 class MemcacheServiceTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHasMemcache()
+    public function testHasMemcached()
     {
-        $this->assertTrue(class_exists(Memcache::class));
+        $this->assertTrue(class_exists(Memcached::class));
     }
 }
