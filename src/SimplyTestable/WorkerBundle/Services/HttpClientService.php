@@ -1,7 +1,7 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Services;
 
-use Doctrine\Common\Cache\MemcacheCache;
+use Doctrine\Common\Cache\MemcachedCache;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Message\RequestInterface;
@@ -19,14 +19,14 @@ class HttpClientService
     protected $httpClient = null;
 
     /**
-     * @var MemcacheService
+     * @var MemcachedService
      */
-    private $memcacheService = null;
+    private $memcachedService = null;
 
     /**
-     * @var MemcacheCache
+     * @var MemcachedCache
      */
-    private $memcacheCache = null;
+    private $memcachedCache = null;
 
     /**
      * @var array
@@ -49,14 +49,14 @@ class HttpClientService
     private $retrySubscriber;
 
     /**
-     * @param MemcacheService $memcacheService
+     * @param MemcachedService $memcacheService
      * @param array $curlOptions
      */
     public function __construct(
-        MemcacheService $memcacheService,
+        MemcachedService $memcacheService,
         $curlOptions
     ) {
-        $this->memcacheService = $memcacheService;
+        $this->memcachedService = $memcacheService;
 
         foreach ($curlOptions as $curlOption) {
             if (defined($curlOption['name'])) {
@@ -138,13 +138,13 @@ class HttpClientService
      */
     private function createCacheSubscriber()
     {
-        $memcacheCache = $this->getMemcacheCache();
-        if (is_null($memcacheCache)) {
+        $memcachedCache = $this->getMemcachedCache();
+        if (is_null($memcachedCache)) {
             return null;
         }
 
         $cacheSubscriber = new CacheSubscriber(
-            new CacheStorage($memcacheCache),
+            new CacheStorage($memcachedCache),
             [
                 'GuzzleHttp\Subscriber\Cache\Utils',
                 'canCacheRequest'
@@ -198,19 +198,19 @@ class HttpClientService
     }
 
     /**
-     * @return MemcacheCache
+     * @return MemcachedCache
      */
-    public function getMemcacheCache()
+    public function getMemcachedCache()
     {
-        if (is_null($this->memcacheCache)) {
-            $memcache = $this->memcacheService->get();
-            if (!is_null($memcache)) {
-                $this->memcacheCache = new MemcacheCache();
-                $this->memcacheCache->setMemcache($memcache);
+        if (is_null($this->memcachedCache)) {
+            $memcached = $this->memcachedService->get();
+            if (!is_null($memcached)) {
+                $this->memcachedCache = new MemcachedCache();
+                $this->memcachedCache->setMemcached($memcached);
             }
         }
 
-        return $this->memcacheCache;
+        return $this->memcachedCache;
     }
 
     /**
@@ -218,7 +218,7 @@ class HttpClientService
      */
     public function hasMemcacheCache()
     {
-        return !is_null($this->getMemcacheCache());
+        return !is_null($this->getMemcachedCache());
     }
 
     /**

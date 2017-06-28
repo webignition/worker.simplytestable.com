@@ -1,11 +1,12 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Memcache\HttpCache;
+namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Memcached\HttpCache;
 
-use Memcache;
-use SimplyTestable\WorkerBundle\Command\Memcache\HttpCache\ClearCommand;
+use Memcached;
+use Mockery\MockInterface;
+use SimplyTestable\WorkerBundle\Command\Memcached\HttpCache\ClearCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
-use SimplyTestable\WorkerBundle\Services\MemcacheService;
+use SimplyTestable\WorkerBundle\Services\MemcachedService;
 use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -19,21 +20,22 @@ class ClearCommandTest extends BaseSimplyTestableTestCase
      */
     public function testRun($deleteAllReturnValue, $expectedReturnCode)
     {
-        $memcache = \Mockery::mock(Memcache::class);
-        $memcache
+        $memcached = \Mockery::mock(Memcached::class);
+        $memcached
             ->shouldReceive('get')
             ->andReturn(false);
 
-        $memcache
+        $memcached
             ->shouldReceive('set')
             ->andReturn($deleteAllReturnValue);
 
-        $memcacheService = \Mockery::mock(MemcacheService::class);
-        $memcacheService
+        /* @var MemcachedService|MockInterface $memcachedService */
+        $memcachedService = \Mockery::mock(MemcachedService::class);
+        $memcachedService
             ->shouldReceive('get')
-            ->andReturn($memcache);
+            ->andReturn($memcached);
 
-        $command = new ClearCommand($memcacheService);
+        $command = new ClearCommand($memcachedService);
 
         $returnCode = $command->run(new ArrayInput([]), new StringOutput());
 

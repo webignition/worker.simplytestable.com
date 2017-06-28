@@ -32,7 +32,7 @@ class StatusController extends BaseController
      */
     private function getHttpCacheStats()
     {
-        $httpCacheStats = $this->getHttpClientService()->getMemcacheCache()->getStats();
+        $httpCacheStats = $this->getHttpClientService()->getMemcachedCache()->getStats();
         $hitsToMissesRatio = 0;
 
         if ($httpCacheStats['hits'] > 0 && $httpCacheStats['misses'] == 0) {

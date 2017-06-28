@@ -5,14 +5,14 @@ namespace SimplyTestable\WorkerBundle\Tests\Functional;
 use Doctrine\ORM\EntityManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
-use SimplyTestable\WorkerBundle\Services\MemcacheService;
+use SimplyTestable\WorkerBundle\Services\MemcachedService;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
-use Doctrine\Common\Cache\MemcacheCache;
+use Doctrine\Common\Cache\MemcachedCache;
 use GuzzleHttp\Subscriber\Mock as HttpMockSubscriber;
 
 abstract class BaseSimplyTestableTestCase extends BaseTestCase
@@ -99,11 +99,11 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
     }
 
     /**
-     * @return MemcacheService
+     * @return MemcachedService
      */
-    protected function getMemcacheService()
+    protected function getMemcachedService()
     {
-        return $this->container->get('simplytestable.services.memcacheservice');
+        return $this->container->get('simplytestable.services.memcachedservice');
     }
 
     /**
@@ -139,8 +139,8 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
      */
     protected function setHttpFixtures($fixtures)
     {
-        $memcacheCache = new MemcacheCache();
-        $memcacheCache->setMemcache($this->getMemcacheService()->get());
+        $memcacheCache = new MemcachedCache();
+        $memcacheCache->setMemcached($this->getMemcachedService()->get());
         $memcacheCache->deleteAll();
 
         $this->getHttpClientService()->get()->getEmitter()->attach(

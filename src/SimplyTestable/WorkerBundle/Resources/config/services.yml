@@ -8,7 +8,7 @@ services:
   simplytestable.services.httpClientService:
     class:  SimplyTestable\WorkerBundle\Services\HttpClientService
     arguments:
-        memcacheService: "@simplytestable.services.memcacheService"
+        memcachedService: "@simplytestable.services.memcachedservice"
         curlOptions: %curl_options%
 
   simplytestable.services.webResourceServiceConfiguration:
@@ -94,8 +94,8 @@ services:
     arguments:
         entityManager: "@doctrine.orm.entity_manager"
 
-  simplytestable.services.memcacheService:
-    class:   SimplyTestable\WorkerBundle\Services\MemcacheService
+  simplytestable.services.memcachedservice:
+    class:   SimplyTestable\WorkerBundle\Services\MemcachedService
 
   simplytestable.services.tasksservice:
     class:   SimplyTestable\WorkerBundle\Services\TasksService
