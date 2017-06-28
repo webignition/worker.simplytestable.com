@@ -1,27 +1,27 @@
 <?php
-namespace SimplyTestable\WorkerBundle\Command\Memcache\HttpCache;
+namespace SimplyTestable\WorkerBundle\Command\Memcached\HttpCache;
 
-use SimplyTestable\WorkerBundle\Services\MemcacheService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Doctrine\Common\Cache\MemcacheCache;
 
 class ClearCommand extends Command
 {
     /**
-     * @var MemcacheService
+     * @var HttpClientService
      */
-    private $memcacheService;
+    private $httpClientService;
 
     /**
-     * @param MemcacheService $memcacheService
+     * @param HttpClientService $httpClientService
+     *
      * @param string|null $name
      */
-    public function __construct(MemcacheService $memcacheService, $name = null)
+    public function __construct(HttpClientService $httpClientService, $name = null)
     {
         parent::__construct($name);
-        $this->memcacheService = $memcacheService;
+        $this->httpClientService = $httpClientService;
     }
 
     /**
@@ -40,9 +40,6 @@ class ClearCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $memcacheCache = new MemcacheCache();
-        $memcacheCache->setMemcache($this->memcacheService->get());
-
-        return ($memcacheCache->deleteAll()) ? 0 : 1;
+        return ($this->httpClientService->getMemcachedCache()->deleteAll()) ? 0 : 1;
     }
 }

@@ -1,11 +1,12 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Memcache\HttpCache;
+namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Memcached\HttpCache;
 
-use Memcache;
-use SimplyTestable\WorkerBundle\Command\Memcache\HttpCache\ClearCommand;
+use Doctrine\Common\Cache\MemcachedCache;
+use Mockery\MockInterface;
+use SimplyTestable\WorkerBundle\Command\Memcached\HttpCache\ClearCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
-use SimplyTestable\WorkerBundle\Services\MemcacheService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -19,21 +20,18 @@ class ClearCommandTest extends BaseSimplyTestableTestCase
      */
     public function testRun($deleteAllReturnValue, $expectedReturnCode)
     {
-        $memcache = \Mockery::mock(Memcache::class);
-        $memcache
-            ->shouldReceive('get')
-            ->andReturn(false);
-
-        $memcache
-            ->shouldReceive('set')
+        $memcachedCache = \Mockery::mock(MemcachedCache::class);
+        $memcachedCache
+            ->shouldReceive('deleteAll')
             ->andReturn($deleteAllReturnValue);
 
-        $memcacheService = \Mockery::mock(MemcacheService::class);
-        $memcacheService
-            ->shouldReceive('get')
-            ->andReturn($memcache);
+        /* @var HttpClientService|MockInterface $httpClientService */
+        $httpClientService = \Mockery::mock(HttpClientService::class);
+        $httpClientService
+            ->shouldReceive('getMemcachedCache')
+            ->andReturn($memcachedCache);
 
-        $command = new ClearCommand($memcacheService);
+        $command = new ClearCommand($httpClientService);
 
         $returnCode = $command->run(new ArrayInput([]), new StringOutput());
 
@@ -58,5 +56,14 @@ class ClearCommandTest extends BaseSimplyTestableTestCase
                 'expectedReturnCode' => 0,
             ],
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
     }
 }
