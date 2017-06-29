@@ -1,7 +1,7 @@
 <?php
-namespace SimplyTestable\WorkerBundle\Command\Memcached\HttpCache;
+namespace SimplyTestable\WorkerBundle\Command\HttpCache;
 
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpCache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -9,19 +9,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ClearCommand extends Command
 {
     /**
-     * @var HttpClientService
+     * @var HttpCache
      */
-    private $httpClientService;
+    private $httpCache;
 
     /**
-     * @param HttpClientService $httpClientService
+     * @param HttpCache $httpCache
      *
      * @param string|null $name
      */
-    public function __construct(HttpClientService $httpClientService, $name = null)
+    public function __construct(HttpCache $httpCache, $name = null)
     {
         parent::__construct($name);
-        $this->httpClientService = $httpClientService;
+        $this->httpCache = $httpCache;
     }
 
     /**
@@ -30,7 +30,7 @@ class ClearCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('simplytestable:memcache:httpcache:clear')
+            ->setName('simplytestable:httpcache:clear')
             ->setDescription('Clear memcache http cache')
             ->setHelp('Clear memcache http cache');
     }
@@ -40,6 +40,6 @@ class ClearCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        return ($this->httpClientService->getMemcachedCache()->deleteAll()) ? 0 : 1;
+        return $this->httpCache->clear() ? 0 : 1;
     }
 }

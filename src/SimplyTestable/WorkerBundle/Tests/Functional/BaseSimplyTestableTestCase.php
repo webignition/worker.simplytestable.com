@@ -12,7 +12,6 @@ use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
-use Doctrine\Common\Cache\MemcachedCache;
 use GuzzleHttp\Subscriber\Mock as HttpMockSubscriber;
 
 abstract class BaseSimplyTestableTestCase extends BaseTestCase
@@ -139,9 +138,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
      */
     protected function setHttpFixtures($fixtures)
     {
-        $memcacheCache = new MemcachedCache();
-        $memcacheCache->setMemcached($this->getMemcachedService()->get());
-        $memcacheCache->deleteAll();
+        $this->container->get('simplytestable.services.httpcache')->clear();
 
         $this->getHttpClientService()->get()->getEmitter()->attach(
             new HttpMockSubscriber($fixtures)

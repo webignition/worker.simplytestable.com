@@ -1,7 +1,6 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Services;
 
-use Doctrine\Common\Cache\MemcachedCache;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Message\RequestInterface;
@@ -19,14 +18,9 @@ class HttpClientService
     protected $httpClient = null;
 
     /**
-     * @var MemcachedService
+     * @var HttpCache
      */
-    private $memcachedService = null;
-
-    /**
-     * @var MemcachedCache
-     */
-    private $memcachedCache = null;
+    private $httpCache = null;
 
     /**
      * @var array
@@ -49,14 +43,14 @@ class HttpClientService
     private $retrySubscriber;
 
     /**
-     * @param MemcachedService $memcacheService
+     * @param HttpCache $httpCache
      * @param array $curlOptions
      */
     public function __construct(
-        MemcachedService $memcacheService,
+        HttpCache $httpCache,
         $curlOptions
     ) {
-        $this->memcachedService = $memcacheService;
+        $this->httpCache = $httpCache;
 
         foreach ($curlOptions as $curlOption) {
             if (defined($curlOption['name'])) {
@@ -74,7 +68,11 @@ class HttpClientService
             ],
         ]);
 
-        $this->httpClient->getEmitter()->attach($this->createCacheSubscriber());
+        $cacheSubscriber = $this->createCacheSubscriber();
+        if (!is_null($cacheSubscriber)) {
+            $this->httpClient->getEmitter()->attach($this->createCacheSubscriber());
+        }
+
         $this->enableRetrySubscriber();
         $this->httpClient->getEmitter()->attach($this->historySubscriber);
         $this->httpClient->getEmitter()->attach($this->cookieSubscriber);
@@ -138,13 +136,12 @@ class HttpClientService
      */
     private function createCacheSubscriber()
     {
-        $memcachedCache = $this->getMemcachedCache();
-        if (is_null($memcachedCache)) {
+        if (!$this->httpCache->has()) {
             return null;
         }
 
         $cacheSubscriber = new CacheSubscriber(
-            new CacheStorage($memcachedCache),
+            new CacheStorage($this->httpCache->get()),
             [
                 'GuzzleHttp\Subscriber\Cache\Utils',
                 'canCacheRequest'
@@ -195,30 +192,6 @@ class HttpClientService
             $url,
             $options
         );
-    }
-
-    /**
-     * @return MemcachedCache
-     */
-    public function getMemcachedCache()
-    {
-        if (is_null($this->memcachedCache)) {
-            $memcached = $this->memcachedService->get();
-            if (!is_null($memcached)) {
-                $this->memcachedCache = new MemcachedCache();
-                $this->memcachedCache->setMemcached($memcached);
-            }
-        }
-
-        return $this->memcachedCache;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function hasMemcacheCache()
-    {
-        return !is_null($this->getMemcachedCache());
     }
 
     /**
