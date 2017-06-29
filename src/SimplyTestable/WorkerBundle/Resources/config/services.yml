@@ -8,7 +8,7 @@ services:
   simplytestable.services.httpClientService:
     class:  SimplyTestable\WorkerBundle\Services\HttpClientService
     arguments:
-        memcachedService: "@simplytestable.services.memcachedservice"
+        httpCacheService: "@simplytestable.services.httpcache"
         curlOptions: %curl_options%
 
   simplytestable.services.webResourceServiceConfiguration:
@@ -89,6 +89,11 @@ services:
 
   simplytestable.services.memcachedservice:
     class:   SimplyTestable\WorkerBundle\Services\MemcachedService
+
+  simplytestable.services.httpcache:
+    class:   SimplyTestable\WorkerBundle\Services\HttpCache
+    arguments:
+        memcachedService: "@simplytestable.services.memcachedservice"
 
   simplytestable.services.tasksservice:
     class:   SimplyTestable\WorkerBundle\Services\TasksService

@@ -2,11 +2,10 @@
 
 namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Memcached\HttpCache;
 
-use Doctrine\Common\Cache\MemcachedCache;
 use Mockery\MockInterface;
-use SimplyTestable\WorkerBundle\Command\Memcached\HttpCache\ClearCommand;
+use SimplyTestable\WorkerBundle\Command\HttpCache\ClearCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpCache;
 use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -15,23 +14,18 @@ class ClearCommandTest extends BaseSimplyTestableTestCase
     /**
      * @dataProvider runDataProvider
      *
-     * @param bool $deleteAllReturnValue
+     * @param bool $httpCacheClearReturnValue
      * @param int $expectedReturnCode
      */
-    public function testRun($deleteAllReturnValue, $expectedReturnCode)
+    public function testRun($httpCacheClearReturnValue, $expectedReturnCode)
     {
-        $memcachedCache = \Mockery::mock(MemcachedCache::class);
-        $memcachedCache
-            ->shouldReceive('deleteAll')
-            ->andReturn($deleteAllReturnValue);
+        /* @var HttpCache|MockInterface $httpCache */
+        $httpCache = \Mockery::mock(HttpCache::class);
+        $httpCache
+            ->shouldReceive('clear')
+            ->andReturn($httpCacheClearReturnValue);
 
-        /* @var HttpClientService|MockInterface $httpClientService */
-        $httpClientService = \Mockery::mock(HttpClientService::class);
-        $httpClientService
-            ->shouldReceive('getMemcachedCache')
-            ->andReturn($memcachedCache);
-
-        $command = new ClearCommand($httpClientService);
+        $command = new ClearCommand($httpCache);
 
         $returnCode = $command->run(new ArrayInput([]), new StringOutput());
 
@@ -48,11 +42,11 @@ class ClearCommandTest extends BaseSimplyTestableTestCase
     {
         return [
             'fail' => [
-                'deleteAllReturnValue' => false,
+                'httpCacheClearReturnValue' => false,
                 'expectedReturnCode' => 1,
             ],
             'success' => [
-                'deleteAllReturnValue' => true,
+                'httpCacheClearReturnValue' => true,
                 'expectedReturnCode' => 0,
             ],
         ];

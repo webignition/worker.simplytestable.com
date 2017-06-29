@@ -2,8 +2,8 @@
 
 namespace SimplyTestable\WorkerBundle\Controller;
 
+use SimplyTestable\WorkerBundle\Services\HttpCache;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use Symfony\Component\HttpFoundation\Response;
 
 class StatusController extends BaseController
@@ -20,7 +20,7 @@ class StatusController extends BaseController
         $status['state'] = $thisWorker->getPublicSerializedState();
         $status['version'] = $this->getLatestGitHash();
 
-        if ($this->getHttpClientService()->hasMemcacheCache()) {
+        if ($this->getHttpCache()->has()) {
             $status['http_cache_stats'] = $this->getHttpCacheStats();
         }
 
@@ -32,7 +32,7 @@ class StatusController extends BaseController
      */
     private function getHttpCacheStats()
     {
-        $httpCacheStats = $this->getHttpClientService()->getMemcachedCache()->getStats();
+        $httpCacheStats = $this->getHttpCache()->get()->getStats();
         $hitsToMissesRatio = 0;
 
         if ($httpCacheStats['hits'] > 0 && $httpCacheStats['misses'] == 0) {
@@ -58,11 +58,11 @@ class StatusController extends BaseController
     }
 
     /**
-     * @return HttpClientService
+     * @return HttpCache
      */
-    private function getHttpClientService()
+    private function getHttpCache()
     {
-        return $this->container->get('simplytestable.services.httpclientservice');
+        return $this->container->get('simplytestable.services.httpcache');
     }
 
     /**

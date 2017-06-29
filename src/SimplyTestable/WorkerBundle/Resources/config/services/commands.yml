@@ -13,10 +13,10 @@ services:
     tags:
       - { name: console.command }
 
-  simplytestable.command.memcache.httpcache.clear:
-    class: SimplyTestable\WorkerBundle\Command\Memcached\HttpCache\ClearCommand
+  simplytestable.command.httpcache.clear:
+    class: SimplyTestable\WorkerBundle\Command\HttpCache\ClearCommand
     arguments:
-        httpClientService: "@simplytestable.services.httpclientservice"
+        httpCache: "@simplytestable.services.httpcache"
     tags:
       - { name: console.command }
 
