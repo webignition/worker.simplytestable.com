@@ -1,16 +1,14 @@
 <?php
-namespace SimplyTestable\WorkerBundle\Command\Task;
+namespace SimplyTestable\WorkerBundle\Command\Tasks;
 
 use Psr\Log\LoggerInterface;
-use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand as TaskReportCompletionCommand;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
 
-class ReportCompletionAllCommand extends Command
+class ReportCompletionCommand extends AbstractTaskCollectionCommand
 {
     /**
      * @var LoggerInterface
@@ -49,7 +47,7 @@ class ReportCompletionAllCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('simplytestable:task:reportcompletion:all')
+            ->setName('simplytestable:tasks:reportcompletion')
             ->setDescription('Report completion for all jobs finished')
             ->setHelp('Report completion for all jobs finished');
     }
@@ -59,30 +57,16 @@ class ReportCompletionAllCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $taskIdsWithOutput = $this->taskService->getEntityRepository()->getIdsWithOutput();
-        $output->writeln(count($taskIdsWithOutput).' tasks with output ready to report completion');
+        $taskIds = $this->taskService->getEntityRepository()->getIdsWithOutput();
+        $output->writeln(count($taskIds).' tasks with output ready to report completion');
 
-        foreach ($taskIdsWithOutput as $taskId) {
-            $output->writeln('Issuing report completion command for task '.$taskId);
+        $reportCompletionCommand = new TaskReportCompletionCommand(
+            $this->logger,
+            $this->taskService,
+            $this->workerService
+        );
 
-            $outputBuffer = new StringOutput();
-
-            $reportCompletionCommand = new ReportCompletionCommand(
-                $this->logger,
-                $this->taskService,
-                $this->workerService
-            );
-
-            $input = new ArrayInput([
-                'id' => $taskId
-            ]);
-
-            $commandResponse = $reportCompletionCommand->run($input, $outputBuffer);
-
-
-            $output->writeln(trim($outputBuffer->getBuffer()));
-            $output->writeln('Command completed with return code '.$commandResponse);
-        }
+        $this->executeForCollection($taskIds, $reportCompletionCommand, $output);
 
         return 0;
     }

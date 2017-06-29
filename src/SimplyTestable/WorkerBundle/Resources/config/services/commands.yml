@@ -40,8 +40,8 @@ services:
     tags:
       - { name: console.command }
 
-  simplytestable.command.task.performall:
-    class:   SimplyTestable\WorkerBundle\Command\Task\PerformAllCommand
+  simplytestable.command.tasks.perform:
+    class:   SimplyTestable\WorkerBundle\Command\Tasks\PerformCommand
     arguments:
         logger: "@logger"
         taskService: "@simplytestable.services.taskservice"
@@ -60,8 +60,8 @@ services:
     tags:
       - { name: console.command }
 
-  simplytestable.command.task.reportcompletionall:
-    class:   SimplyTestable\WorkerBundle\Command\Task\ReportCompletionAllCommand
+  simplytestable.command.tasks.reportcompletion:
+    class:   SimplyTestable\WorkerBundle\Command\Tasks\ReportCompletionCommand
     arguments:
         logger: "@logger"
         taskService: "@simplytestable.services.taskservice"

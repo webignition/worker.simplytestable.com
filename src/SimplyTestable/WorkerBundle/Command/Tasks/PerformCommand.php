@@ -1,18 +1,16 @@
 <?php
-namespace SimplyTestable\WorkerBundle\Command\Task;
+namespace SimplyTestable\WorkerBundle\Command\Tasks;
 
 use Psr\Log\LoggerInterface;
+use SimplyTestable\WorkerBundle\Command\Task\PerformCommand as TaskPerformCommand;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
-use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
 
-class PerformAllCommand extends Command
+class PerformCommand extends AbstractTaskCollectionCommand
 {
     /**
      * @var LoggerInterface
@@ -70,7 +68,7 @@ class PerformAllCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('simplytestable:task:perform:all')
+            ->setName('simplytestable:tasks:perform')
             ->setDescription('Perform all jobs queued')
             ->setHelp('Perform all jobs queued');
     }
@@ -80,34 +78,18 @@ class PerformAllCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $queuedTaskIds = $this->taskService->getEntityRepository()->getIdsByState(
-            $this->taskService->getQueuedState()
+        $taskIds = $this->taskService->getEntityRepository()->getIdsByState($this->taskService->getQueuedState());
+        $output->writeln(count($taskIds).' queued tasks ready to be performed');
+
+        $performCommand = new TaskPerformCommand(
+            $this->logger,
+            $this->taskService,
+            $this->workerService,
+            $this->resqueQueueService,
+            $this->resqueJobFactory
         );
-        $output->writeln(count($queuedTaskIds).' queued tasks ready to be performed');
 
-        foreach ($queuedTaskIds as $taskId) {
-            $output->writeln('Issuing perform command for task '.$taskId);
-
-            $outputBuffer = new StringOutput();
-
-            $performCommand = new PerformCommand(
-                $this->logger,
-                $this->taskService,
-                $this->workerService,
-                $this->resqueQueueService,
-                $this->resqueJobFactory
-            );
-
-            $input = new ArrayInput([
-                'id' => $taskId
-            ]);
-
-            $commandResponse = $performCommand->run($input, $outputBuffer);
-
-
-            $output->writeln(trim($outputBuffer->getBuffer()));
-            $output->writeln('Command completed with return code '.$commandResponse);
-        }
+        $this->executeForCollection($taskIds, $performCommand, $output);
 
         return 0;
     }

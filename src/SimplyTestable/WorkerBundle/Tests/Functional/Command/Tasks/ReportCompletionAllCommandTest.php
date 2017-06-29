@@ -1,21 +1,21 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Task;
+namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Tasks;
 
-use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionAllCommand;
+use SimplyTestable\WorkerBundle\Command\Tasks\ReportCompletionCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\HtmlValidatorFixtureFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 
-class ReportCompletionAllCommandTest extends BaseSimplyTestableTestCase
+class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
 {
     public function testGetAsService()
     {
         $this->assertInstanceOf(
-            ReportCompletionAllCommand::class,
-            $this->container->get('simplytestable.command.task.reportcompletionall')
+            ReportCompletionCommand::class,
+            $this->container->get('simplytestable.command.tasks.reportcompletion')
         );
     }
 
@@ -39,7 +39,7 @@ class ReportCompletionAllCommandTest extends BaseSimplyTestableTestCase
         $this->getTaskService()->perform($task);
         $this->assertNotNull($task->getOutput()->getId());
 
-        $command = $this->createReportCompletionAllCommand();
+        $command = $this->createReportCompletionCommand();
 
         $returnCode = $command->run(
             new ArrayInput([]),
@@ -56,11 +56,11 @@ class ReportCompletionAllCommandTest extends BaseSimplyTestableTestCase
     }
 
     /**
-     * @return ReportCompletionAllCommand
+     * @return ReportCompletionCommand
      */
-    private function createReportCompletionAllCommand()
+    private function createReportCompletionCommand()
     {
-        return new ReportCompletionAllCommand(
+        return new ReportCompletionCommand(
             $this->container->get('logger'),
             $this->container->get('simplytestable.services.taskservice'),
             $this->container->get('simplytestable.services.workerservice')
