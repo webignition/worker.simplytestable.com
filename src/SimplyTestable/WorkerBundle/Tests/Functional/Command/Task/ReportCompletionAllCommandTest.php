@@ -19,13 +19,7 @@ class ReportCompletionAllCommandTest extends BaseSimplyTestableTestCase
         );
     }
 
-    /**
-     * @dataProvider runDataProvider
-     *
-     * @param array $arguments
-     * @param bool $expectedEntitiesAreRemoved
-     */
-    public function testRun($arguments, $expectedEntitiesAreRemoved)
+    public function testRun()
     {
         $this->removeAllTasks();
 
@@ -48,7 +42,7 @@ class ReportCompletionAllCommandTest extends BaseSimplyTestableTestCase
         $command = $this->createReportCompletionAllCommand();
 
         $returnCode = $command->run(
-            new ArrayInput($arguments),
+            new ArrayInput([]),
             new StringOutput()
         );
 
@@ -57,32 +51,8 @@ class ReportCompletionAllCommandTest extends BaseSimplyTestableTestCase
             $returnCode
         );
 
-        if ($expectedEntitiesAreRemoved) {
-            $this->assertNull($task->getOutput()->getId());
-            $this->assertNull($task->getId());
-        } else {
-            $this->assertNotNull($task->getOutput()->getId());
-            $this->assertNotNull($task->getId());
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function runDataProvider()
-    {
-        return [
-            'default' => [
-                'arguments' => [],
-                'expectedEntitiesAreRemoved' => true,
-            ],
-            'dry-run' => [
-                'arguments' => [
-                    '--dry-run' => true,
-                ],
-                'expectedEntitiesAreRemoved' => false,
-            ],
-        ];
+        $this->assertNull($task->getOutput()->getId());
+        $this->assertNull($task->getId());
     }
 
     /**

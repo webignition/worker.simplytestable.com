@@ -72,7 +72,6 @@ class PerformAllCommand extends Command
         $this
             ->setName('simplytestable:task:perform:all')
             ->setDescription('Perform all jobs queued')
-            ->addOption('dry-run')
             ->setHelp('Perform all jobs queued');
     }
 
@@ -91,38 +90,25 @@ class PerformAllCommand extends Command
 
             $outputBuffer = new StringOutput();
 
-            if ($this->isDryRun($input)) {
-                $commandResponse = 'dry run';
-            } else {
-                $performCommand = new PerformCommand(
-                    $this->logger,
-                    $this->taskService,
-                    $this->workerService,
-                    $this->resqueQueueService,
-                    $this->resqueJobFactory
-                );
+            $performCommand = new PerformCommand(
+                $this->logger,
+                $this->taskService,
+                $this->workerService,
+                $this->resqueQueueService,
+                $this->resqueJobFactory
+            );
 
-                $input = new ArrayInput([
-                    'id' => $taskId
-                ]);
+            $input = new ArrayInput([
+                'id' => $taskId
+            ]);
 
-                $commandResponse = $performCommand->run($input, $outputBuffer);
-            }
+            $commandResponse = $performCommand->run($input, $outputBuffer);
+
 
             $output->writeln(trim($outputBuffer->getBuffer()));
             $output->writeln('Command completed with return code '.$commandResponse);
         }
 
         return 0;
-    }
-
-    /**
-     * @param InputInterface $input
-     *
-     * @return bool
-     */
-    private function isDryRun(InputInterface $input)
-    {
-        return $input->getOption('dry-run') !== false;
     }
 }
