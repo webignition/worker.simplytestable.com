@@ -1,16 +1,16 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Task;
+namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Tasks;
 
 use Mockery\MockInterface;
-use SimplyTestable\WorkerBundle\Command\Task\PerformAllCommand;
+use SimplyTestable\WorkerBundle\Command\Tasks\PerformCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 
-class PerformAllCommandTest extends BaseSimplyTestableTestCase
+class PerformCommandTest extends BaseSimplyTestableTestCase
 {
     /**
      * {@inheritdoc}
@@ -25,8 +25,8 @@ class PerformAllCommandTest extends BaseSimplyTestableTestCase
     public function testGetAsService()
     {
         $this->assertInstanceOf(
-            PerformAllCommand::class,
-            $this->container->get('simplytestable.command.task.performall')
+            PerformCommand::class,
+            $this->container->get('simplytestable.command.tasks.perform')
         );
     }
 
@@ -43,7 +43,7 @@ class PerformAllCommandTest extends BaseSimplyTestableTestCase
             ->with($task)
             ->andReturn(0);
 
-        $command = $this->createPerformAllCommand();
+        $command = $this->createPerformCommand();
 
         $returnCode = $command->run(
             new ArrayInput([]),
@@ -54,11 +54,11 @@ class PerformAllCommandTest extends BaseSimplyTestableTestCase
     }
 
     /**
-     * @return PerformAllCommand
+     * @return PerformCommand
      */
-    private function createPerformAllCommand()
+    private function createPerformCommand()
     {
-        return new PerformAllCommand(
+        return new PerformCommand(
             $this->container->get('logger'),
             $this->container->get('simplytestable.services.taskservice'),
             $this->container->get('simplytestable.services.workerservice'),
