@@ -30,12 +30,7 @@ class PerformAllCommandTest extends BaseSimplyTestableTestCase
         );
     }
 
-    /**
-     * @dataProvider runDataProvider
-     *
-     * @param array $arguments
-     */
-    public function testRun($arguments)
+    public function testRun()
     {
         $this->removeAllTasks();
 
@@ -51,28 +46,11 @@ class PerformAllCommandTest extends BaseSimplyTestableTestCase
         $command = $this->createPerformAllCommand();
 
         $returnCode = $command->run(
-            new ArrayInput($arguments),
+            new ArrayInput([]),
             new StringOutput()
         );
 
         $this->assertEquals(0, $returnCode);
-    }
-
-    /**
-     * @return array
-     */
-    public function runDataProvider()
-    {
-        return [
-            'default' => [
-                'arguments' => [],
-            ],
-            'dry-run' => [
-                'arguments' => [
-                    '--dry-run' => true,
-                ],
-            ],
-        ];
     }
 
     /**

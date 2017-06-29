@@ -51,7 +51,6 @@ class ReportCompletionAllCommand extends Command
         $this
             ->setName('simplytestable:task:reportcompletion:all')
             ->setDescription('Report completion for all jobs finished')
-            ->addOption('dry-run')
             ->setHelp('Report completion for all jobs finished');
     }
 
@@ -68,36 +67,23 @@ class ReportCompletionAllCommand extends Command
 
             $outputBuffer = new StringOutput();
 
-            if ($this->isDryRun($input)) {
-                $commandResponse = 'dry run';
-            } else {
-                $reportCompletionCommand = new ReportCompletionCommand(
-                    $this->logger,
-                    $this->taskService,
-                    $this->workerService
-                );
+            $reportCompletionCommand = new ReportCompletionCommand(
+                $this->logger,
+                $this->taskService,
+                $this->workerService
+            );
 
-                $input = new ArrayInput([
-                    'id' => $taskId
-                ]);
+            $input = new ArrayInput([
+                'id' => $taskId
+            ]);
 
-                $commandResponse = $reportCompletionCommand->run($input, $outputBuffer);
-            }
+            $commandResponse = $reportCompletionCommand->run($input, $outputBuffer);
+
 
             $output->writeln(trim($outputBuffer->getBuffer()));
             $output->writeln('Command completed with return code '.$commandResponse);
         }
 
         return 0;
-    }
-
-    /**
-     * @param InputInterface $input
-     *
-     * @return bool
-     */
-    private function isDryRun(InputInterface $input)
-    {
-        return $input->getOption('dry-run') !== false;
     }
 }
