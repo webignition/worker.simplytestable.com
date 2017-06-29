@@ -25,6 +25,10 @@ install:
   - php app/console doctrine:fixtures:load --append
   - composer config --global process-timeout 2000
 
+before_script:
+  - php app/console --env=test cache:clear
+  - php app/console --env=test cache:warmup
+
 script:
   - composer test
 
