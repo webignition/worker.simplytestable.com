@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\Memcached\HttpCache;
+namespace SimplyTestable\WorkerBundle\Tests\Functional\Command\HttpCache;
 
 use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Command\HttpCache\ClearCommand;
