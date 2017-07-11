@@ -5,6 +5,7 @@ namespace SimplyTestable\WorkerBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use SimplyTestable\WorkerBundle\Services\StateService;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use SimplyTestable\WorkerBundle\Entity\State;
@@ -42,7 +43,6 @@ class LoadStates extends AbstractFixture implements OrderedFixtureInterface, Con
         'worker-maintenance-read-only' => null
     );
 
-
     /**
      * {@inheritdoc}
      */
@@ -61,8 +61,6 @@ class LoadStates extends AbstractFixture implements OrderedFixtureInterface, Con
                 $manager->flush();
             }
         }
-
-
     }
 
     /**
@@ -73,12 +71,11 @@ class LoadStates extends AbstractFixture implements OrderedFixtureInterface, Con
         return 1; // the order in which fixtures will be loaded
     }
 
-
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Services\StateService
+     * @return StateService
      */
-    public function getStateService() {
+    public function getStateService()
+    {
         return $this->container->get('simplytestable.services.stateservice');
     }
 }

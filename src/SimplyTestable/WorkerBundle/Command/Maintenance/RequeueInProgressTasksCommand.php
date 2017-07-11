@@ -108,8 +108,6 @@ class RequeueInProgressTasksCommand extends Command
                     )
                 );
             }
-
-
         }
 
         $output->writeln('');

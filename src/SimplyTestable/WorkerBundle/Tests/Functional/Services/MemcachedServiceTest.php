@@ -18,4 +18,3 @@ class MemcachedServiceTest extends BaseSimplyTestableTestCase
         $this->assertTrue($this->getMemcachedService()->get() instanceof Memcached);
     }
 }
-
