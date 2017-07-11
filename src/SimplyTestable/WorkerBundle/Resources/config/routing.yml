@@ -2,10 +2,6 @@ SimplyTestableWorkerBundle_verify:
     path:  /verify/
     defaults: { _controller: SimplyTestableWorkerBundle:Verify:index, _format: json }
 
-SimplyTestableWorkerBundle_task_create:
-    path:  /task/create/
-    defaults: { _controller: SimplyTestableWorkerBundle:Task:create, _format: json }
-
 SimplyTestableWorkerBundle_task_create_collection:
     path:  /task/create/collection/
     defaults: { _controller: SimplyTestableWorkerBundle:Task:createCollection, _format: json }
