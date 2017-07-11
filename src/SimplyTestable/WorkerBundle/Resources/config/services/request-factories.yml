@@ -1,34 +1,29 @@
 services:
   simplytestable.services.request.factory.task.create:
     class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFactory
-    scope: request
     arguments:
-        request: "@request"
+        request_stack: "@request_stack"
         taskTypeService: "@simplytestable.services.tasktypeservice"
 
   simplytestable.services.request.factory.task.createcollection:
     class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory
-    scope: request
     arguments:
-        request: "@request"
+        request_stack: "@request_stack"
         createRequestFactory: "@simplytestable.services.request.factory.task.create"
 
   simplytestable.services.request.factory.task.cancel:
     class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory
-    scope: request
     arguments:
-        request: "@request"
+        request_stack: "@request_stack"
         taskService: "@simplytestable.services.taskservice"
 
   simplytestable.services.request.factory.task.cancelcollection:
     class:   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory
-    scope: request
     arguments:
-        request: "@request"
+        request_stack: "@request_stack"
         createRequestFactory: "@simplytestable.services.request.factory.task.cancel"
 
   simplytestable.services.request.factory.verify:
     class:   SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory
-    scope: request
     arguments:
-        request: "@request"
+        request_stack: "@request_stack"

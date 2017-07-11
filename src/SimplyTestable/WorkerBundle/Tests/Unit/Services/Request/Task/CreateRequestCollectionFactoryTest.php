@@ -8,6 +8,7 @@ use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFacto
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\Request;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CreateRequestCollectionFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,6 +20,9 @@ class CreateRequestCollectionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreate(Request $request, $expectedCollectionCount)
     {
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
         $taskType = new TaskType();
         $taskType->setName('foo');
 
@@ -35,8 +39,8 @@ class CreateRequestCollectionFactoryTest extends \PHPUnit_Framework_TestCase
             ->with('bar')
             ->andReturn(null);
 
-        $createRequestFactory = new CreateRequestFactory($request, $taskTypeService);
-        $createRequestCollectionFactory = new CreateRequestCollectionFactory($request, $createRequestFactory);
+        $createRequestFactory = new CreateRequestFactory($requestStack, $taskTypeService);
+        $createRequestCollectionFactory = new CreateRequestCollectionFactory($requestStack, $createRequestFactory);
         $createRequestCollection = $createRequestCollectionFactory->create();
 
         $this->assertCount($expectedCollectionCount, $createRequestCollection->getCreateRequests());

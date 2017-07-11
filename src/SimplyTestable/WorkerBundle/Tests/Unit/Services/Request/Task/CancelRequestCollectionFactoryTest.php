@@ -8,6 +8,7 @@ use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestColle
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CancelRequestCollectionFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,6 +20,9 @@ class CancelRequestCollectionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreate(Request $request, $expectedCollectionCount)
     {
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
         $task = new Task();
 
         /* @var TaskService|MockInterface $taskService */
@@ -34,8 +38,8 @@ class CancelRequestCollectionFactoryTest extends \PHPUnit_Framework_TestCase
             ->with('2')
             ->andReturn(null);
 
-        $cancelRequestFactory = new CancelRequestFactory($request, $taskService);
-        $cancelRequestCollectionFactory = new CancelRequestCollectionFactory($request, $cancelRequestFactory);
+        $cancelRequestFactory = new CancelRequestFactory($requestStack, $taskService);
+        $cancelRequestCollectionFactory = new CancelRequestCollectionFactory($requestStack, $cancelRequestFactory);
         $cancelRequestCollection = $cancelRequestCollectionFactory->create();
 
         $this->assertCount($expectedCollectionCount, $cancelRequestCollection->getCancelRequests());

@@ -4,7 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\Request\Factory\Task;
 
 use SimplyTestable\WorkerBundle\Request\Task\CancelRequestCollection;
 use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CancelRequestCollectionFactory
 {
@@ -21,12 +21,12 @@ class CancelRequestCollectionFactory
     private $cancelRequestFactory;
 
     /**
-     * @param Request $request
+     * @param RequestStack $requestStack
      * @param CancelRequestFactory $cancelRequestFactory
      */
-    public function __construct(Request $request, CancelRequestFactory $cancelRequestFactory)
+    public function __construct(RequestStack $requestStack, CancelRequestFactory $cancelRequestFactory)
     {
-        $this->requestParameters = $request->request;
+        $this->requestParameters = $requestStack->getCurrentRequest()->request;
         $this->cancelRequestFactory = $cancelRequestFactory;
     }
 
