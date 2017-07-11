@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use SimplyTestable\WorkerBundle\Request\Task\CreateRequest;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CreateRequestFactory
 {
@@ -25,12 +25,12 @@ class CreateRequestFactory
     private $taskTypeService;
 
     /**
-     * @param Request $request
+     * @param RequestStack $requestStack
      * @param TaskTypeService $taskTypeService
      */
-    public function __construct(Request $request, TaskTypeService $taskTypeService)
+    public function __construct(RequestStack $requestStack, TaskTypeService $taskTypeService)
     {
-        $this->requestParameters = $request->request;
+        $this->requestParameters = $requestStack->getCurrentRequest()->request;
         $this->taskTypeService = $taskTypeService;
     }
 

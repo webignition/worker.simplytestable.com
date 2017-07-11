@@ -4,7 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\Request\Factory\Task;
 
 use SimplyTestable\WorkerBundle\Request\Task\CreateRequestCollection;
 use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CreateRequestCollectionFactory
 {
@@ -21,12 +21,12 @@ class CreateRequestCollectionFactory
     private $createRequestFactory;
 
     /**
-     * @param Request $request
+     * @param RequestStack $requestStack
      * @param CreateRequestFactory $createRequestFactory
      */
-    public function __construct(Request $request, CreateRequestFactory $createRequestFactory)
+    public function __construct(RequestStack $requestStack, CreateRequestFactory $createRequestFactory)
     {
-        $this->requestParameters = $request->request;
+        $this->requestParameters = $requestStack->getCurrentRequest()->request;
         $this->createRequestFactory = $createRequestFactory;
     }
 

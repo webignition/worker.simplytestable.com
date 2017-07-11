@@ -7,6 +7,7 @@ use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CancelRequestFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +23,10 @@ class CancelRequestFactoryTest extends \PHPUnit_Framework_TestCase
         TaskService $taskService,
         $expectedTask
     ) {
-        $cancelRequestFactory = new CancelRequestFactory($request, $taskService);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $cancelRequestFactory = new CancelRequestFactory($requestStack, $taskService);
         $cancelRequest = $cancelRequestFactory->create();
 
         $this->assertEquals($expectedTask, $cancelRequest->getTask());

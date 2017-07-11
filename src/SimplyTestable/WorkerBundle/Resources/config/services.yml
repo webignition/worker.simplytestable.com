@@ -8,8 +8,8 @@ services:
   simplytestable.services.httpClientService:
     class:  SimplyTestable\WorkerBundle\Services\HttpClientService
     arguments:
-        httpCacheService: "@simplytestable.services.httpcache"
-        curlOptions: %curl_options%
+        httpCacheService: '@simplytestable.services.httpcache'
+        curlOptions: '%curl_options%'
 
   simplytestable.services.webResourceServiceConfiguration:
     class:  webignition\WebResource\Service\Configuration
@@ -17,12 +17,12 @@ services:
         configurationValues:
           allow-uknown-resource-types: true
           retry-with-url-encoding-disabled: true
-          content-type-web-resource-map: %content_type_web_resource_map%
+          content-type-web-resource-map: '%content_type_web_resource_map%'
 
   simplytestable.services.webResourceService:
     class:  webignition\WebResource\Service\Service
     calls:
-      - [setConfiguration, [@simplytestable.services.webResourceServiceConfiguration]]
+      - [setConfiguration, ['@simplytestable.services.webResourceServiceConfiguration']]
 
   simplytestable.services.htmlValidatorWrapperService:
     class:  webignition\HtmlValidator\Wrapper\Wrapper
@@ -36,19 +36,19 @@ services:
   simplytestable.services.stateservice:
     class:  SimplyTestable\WorkerBundle\Services\StateService
     arguments:
-        entityManager: "@doctrine.orm.entity_manager"
+        entityManager: '@doctrine.orm.entity_manager'
 
   simplytestable.services.workerService:
     class:  SimplyTestable\WorkerBundle\Services\WorkerService
     arguments:
-        entityManager: "@doctrine.orm.entity_manager"
-        logger: "@logger"
-        salt: %secret%
-        hostname: %hostname%
-        coreApplicationRouter: "@simplytestable.services.coreapplicationrouter"
-        stateService: "@simplytestable.services.stateservice"
-        httpClientService: "@simplytestable.services.httpClientService"
-        urlService: "@simplytestable.services.urlService"
+        entityManager: '@doctrine.orm.entity_manager'
+        logger: '@logger'
+        salt: '%secret%'
+        hostname: '%hostname%'
+        coreApplicationRouter: '@simplytestable.services.coreapplicationrouter'
+        stateService: '@simplytestable.services.stateservice'
+        httpClientService: '@simplytestable.services.httpClientService'
+        urlService: '@simplytestable.services.urlService'
 
   simplytestable.services.urlService:
     class:  SimplyTestable\WorkerBundle\Services\UrlService
@@ -56,36 +56,36 @@ services:
   simplytestable.services.taskservice:
     class:   SimplyTestable\WorkerBundle\Services\TaskService
     arguments:
-        entityManager: "@doctrine.orm.entity_manager"
-        logger: "@logger"
-        stateService: "@simplytestable.services.stateservice"
-        urlService: "@simplytestable.services.urlservice"
-        coreApplicationRouter: "@simplytestable.services.coreapplicationrouter"
-        workerService: "@simplytestable.services.workerservice"
-        httpClientService: "@simplytestable.services.httpClientService"
+        entityManager: '@doctrine.orm.entity_manager'
+        logger: '@logger'
+        stateService: '@simplytestable.services.stateservice'
+        urlService: '@simplytestable.services.urlservice'
+        coreApplicationRouter: '@simplytestable.services.coreapplicationrouter'
+        workerService: '@simplytestable.services.workerservice'
+        httpClientService: '@simplytestable.services.httpClientService'
     calls:
-      - [addTaskDriver, ['html validation', "@simplytestable.services.taskdriver.htmlvalidation"]]
-      - [addTaskDriver, ['css validation', "@simplytestable.services.taskdriver.cssvalidation"]]
-      - [addTaskDriver, ['js static analysis', "@simplytestable.services.taskdriver.jslint"]]
-      - [addTaskDriver, ['link integrity', "@simplytestable.services.taskdriver.linkintegrity"]]
-      - [addTaskDriver, ['url discovery', "@simplytestable.services.taskdriver.urldiscovery"]]
+      - [addTaskDriver, ['html validation', '@simplytestable.services.taskdriver.htmlvalidation']]
+      - [addTaskDriver, ['css validation', '@simplytestable.services.taskdriver.cssvalidation']]
+      - [addTaskDriver, ['js static analysis', '@simplytestable.services.taskdriver.jslint']]
+      - [addTaskDriver, ['link integrity', '@simplytestable.services.taskdriver.linkintegrity']]
+      - [addTaskDriver, ['url discovery', '@simplytestable.services.taskdriver.urldiscovery']]
 
   simplytestable.services.tasktypeservice:
     class:   SimplyTestable\WorkerBundle\Services\TaskTypeService
     arguments:
-        entityManager: "@doctrine.orm.entity_manager"
+        entityManager: '@doctrine.orm.entity_manager'
 
   simplytestable.services.resque.queueService:
     class:   SimplyTestable\WorkerBundle\Services\Resque\QueueService
     arguments:
-      resque: "@bcc_resque.resque"
-      logger: "@logger"
-      jobFactory: "@simplytestable.services.resque.jobfactory"
+      resque: '@bcc_resque.resque'
+      logger: '@logger'
+      jobFactory: '@simplytestable.services.resque.jobfactory'
 
   simplytestable.services.timecachedtaskoutputservice:
     class:   SimplyTestable\WorkerBundle\Services\TimeCachedTaskOutputService
     arguments:
-        entityManager: "@doctrine.orm.entity_manager"
+        entityManager: '@doctrine.orm.entity_manager'
 
   simplytestable.services.memcachedservice:
     class:   SimplyTestable\WorkerBundle\Services\MemcachedService
@@ -93,24 +93,24 @@ services:
   simplytestable.services.httpcache:
     class:   SimplyTestable\WorkerBundle\Services\HttpCache
     arguments:
-        memcachedService: "@simplytestable.services.memcachedservice"
+        memcachedService: '@simplytestable.services.memcachedservice'
 
   simplytestable.services.tasksservice:
     class:   SimplyTestable\WorkerBundle\Services\TasksService
     arguments:
-        logger: "@logger"
-        urlService: "@simplytestable.services.urlservice"
-        coreApplicationRouter: "@simplytestable.services.coreapplicationrouter"
-        workerService: "@simplytestable.services.workerservice"
-        httpClientService: "@simplytestable.services.httpClientService"
+        logger: '@logger'
+        urlService: '@simplytestable.services.urlservice'
+        coreApplicationRouter: '@simplytestable.services.coreapplicationrouter'
+        workerService: '@simplytestable.services.workerservice'
+        httpClientService: '@simplytestable.services.httpClientService'
         taskService: "@simplytestable.services.taskservice"
     calls:
-      - [setWorkerProcessCount, [%worker_process_count%]]
-      - [setMaxTasksRequestFactor, [%max_tasks_request_factor%]]
+      - [setWorkerProcessCount, ['%worker_process_count%']]
+      - [setMaxTasksRequestFactor, ['%max_tasks_request_factor%']]
 
   simplytestable.services.coreapplicationrouter:
     class:   SimplyTestable\WorkerBundle\Services\CoreApplicationRouter
     arguments:
-        baseUrl: "%core_url%"
-        kernel: "@kernel"
-        cachePath: "%kernel.cache_dir%"
+        baseUrl: '%core_url%'
+        kernel: '@kernel'
+        cachePath: '%kernel.cache_dir%'

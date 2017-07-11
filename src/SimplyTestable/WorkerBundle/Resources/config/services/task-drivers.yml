@@ -2,44 +2,44 @@ services:
   simplytestable.services.taskdriver.htmlvalidation:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver
     arguments:
-        httpClientService: "@simplytestable.services.httpclientservice"
-        webResourceService: "@simplytestable.services.webResourceService"
-        htmlValidatorWrapper: "@simplytestable.services.htmlValidatorWrapperService"
-        stateService: "@simplytestable.services.stateService"
-        validatorPath: %html-validator-path%
+        httpClientService: '@simplytestable.services.httpclientservice'
+        webResourceService: '@simplytestable.services.webResourceService'
+        htmlValidatorWrapper: '@simplytestable.services.htmlValidatorWrapperService'
+        stateService: '@simplytestable.services.stateService'
+        validatorPath: '%html-validator-path%'
 
   simplytestable.services.taskdriver.cssvalidation:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
     arguments:
-        httpClientService: "@simplytestable.services.httpclientservice"
-        webResourceService: "@simplytestable.services.webResourceService"
-        cssValidatorWrapper: "@simplytestable.services.cssValidatorWrapperService"
-        serializer: "@jms_serializer"
-        stateService: "@simplytestable.services.stateService"
-        cssValidatorJarPath: %css-validator-jar-path%
+        httpClientService: '@simplytestable.services.httpclientservice'
+        webResourceService: '@simplytestable.services.webResourceService'
+        cssValidatorWrapper: '@simplytestable.services.cssValidatorWrapperService'
+        serializer: '@jms_serializer'
+        stateService: '@simplytestable.services.stateService'
+        cssValidatorJarPath: '%css-validator-jar-path%'
 
   simplytestable.services.taskdriver.jslint:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver
     arguments:
-        httpClientService: "@simplytestable.services.httpclientservice"
-        webResourceService: "@simplytestable.services.webResourceService"
-        nodeJsLintWrapper: "@simplytestable.services.nodeJslintWrapperService"
-        stateService: "@simplytestable.services.stateService"
-        logger: "@logger"
-        nodePath: %node-path%
-        nodeJsLintPath: %node-jslint-path%
+        httpClientService: '@simplytestable.services.httpclientservice'
+        webResourceService: '@simplytestable.services.webResourceService'
+        nodeJsLintWrapper: '@simplytestable.services.nodeJslintWrapperService'
+        stateService: '@simplytestable.services.stateService'
+        logger: '@logger'
+        nodePath: '%node-path%'
+        nodeJsLintPath: '%node-jslint-path%'
 
   simplytestable.services.taskdriver.linkintegrity:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver
     arguments:
-        httpClientService: "@simplytestable.services.httpclientservice"
-        webResourceService: "@simplytestable.services.webResourceService"
-        stateService: "@simplytestable.services.stateService"
-        userAgents: %link-integrity-user-agents%
+        httpClientService: '@simplytestable.services.httpclientservice'
+        webResourceService: '@simplytestable.services.webResourceService'
+        stateService: '@simplytestable.services.stateService'
+        userAgents: '%link-integrity-user-agents%'
 
   simplytestable.services.taskdriver.urldiscovery:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver
     arguments:
-        httpClientService: "@simplytestable.services.httpclientservice"
-        webResourceService: "@simplytestable.services.webResourceService"
-        stateService: "@simplytestable.services.stateService"
+        httpClientService: '@simplytestable.services.httpclientservice'
+        webResourceService: '@simplytestable.services.webResourceService'
+        stateService: '@simplytestable.services.stateService'

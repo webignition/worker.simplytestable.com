@@ -7,6 +7,7 @@ use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFacto
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\Request;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CreateRequestFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,7 +27,10 @@ class CreateRequestFactoryTest extends \PHPUnit_Framework_TestCase
         $expectedUrl,
         $expectedParameters
     ) {
-        $createRequestFactory = new CreateRequestFactory($request, $taskTypeService);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $createRequestFactory = new CreateRequestFactory($requestStack, $taskTypeService);
         $createRequest = $createRequestFactory->create();
 
         $this->assertEquals($expectedTaskType, $createRequest->getTaskType());
