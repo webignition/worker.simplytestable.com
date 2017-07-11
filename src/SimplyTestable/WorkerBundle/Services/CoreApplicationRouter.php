@@ -43,6 +43,7 @@ class CoreApplicationRouter
         $locator = new FileLocator([$kernel->locateResource(self::BUNDLE_CONFIG_PATH)]);
         $requestContext = new RequestContext();
         $requestContext->fromRequest(Request::createFromGlobals());
+        $requestContext->setBaseUrl($baseUrl);
 
         $this->router = new Router(
             new YamlFileLoader($locator),
@@ -63,15 +64,15 @@ class CoreApplicationRouter
             $originalUrl = $parameters['url'];
             $parameters['url'] = '{{url}}';
 
-            $relativeUrl = str_replace(
+            $url = str_replace(
                 $this->encodedUrlPlaceholder,
                 urlencode($originalUrl),
-                $this->router->generate($name, $parameters, false)
+                $this->router->generate($name, $parameters, UrlGeneratorInterface::ABSOLUTE_URL)
             );
         } else {
-            $relativeUrl = $this->router->generate($name, $parameters, false);
+            $url = $this->router->generate($name, $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
         }
 
-        return $this->baseUrl . $relativeUrl;
+        return $url;
     }
 }
