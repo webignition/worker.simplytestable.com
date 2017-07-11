@@ -4,12 +4,13 @@ namespace SimplyTestable\WorkerBundle\Controller;
 
 use SimplyTestable\WorkerBundle\Services\HttpCache;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-class StatusController extends BaseController
+class StatusController extends Controller
 {
     /**
-     * @return Response
+     * @return JsonResponse
      */
     public function indexAction()
     {
@@ -17,14 +18,14 @@ class StatusController extends BaseController
         $thisWorker = $this->getWorkerService()->get();
 
         $status['hostname'] = $thisWorker->getHostname();
-        $status['state'] = $thisWorker->getPublicSerializedState();
+        $status['state'] = $thisWorker->getState()->getName();
         $status['version'] = $this->getLatestGitHash();
 
         if ($this->getHttpCache()->has()) {
             $status['http_cache_stats'] = $this->getHttpCacheStats();
         }
 
-        return $this->sendResponse($status);
+        return new JsonResponse($status);
     }
 
     /**

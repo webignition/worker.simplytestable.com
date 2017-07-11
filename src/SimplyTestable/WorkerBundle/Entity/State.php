@@ -4,43 +4,35 @@ namespace SimplyTestable\WorkerBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * 
  * @ORM\Entity
  */
 class State
-{    
+{
     /**
-     * 
      * @var integer
-     * 
+     *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
-    
-    
+
     /**
-     *
      * @var string
-     * 
+     *
      * @ORM\Column(type="string", unique=true, nullable=false)
      */
     protected $name;
-    
-    
+
     /**
-     *
      * @var State
-     * 
+     *
      * @ORM\OneToOne(targetEntity="State")
      */
     protected $nextState;
 
     /**
-     * Get id
-     *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -48,9 +40,8 @@ class State
     }
 
     /**
-     * Set name
-     *
      * @param string $name
+     *
      * @return State
      */
     public function setName($name)
@@ -60,9 +51,7 @@ class State
     }
 
     /**
-     * Get name
-     *
-     * @return string 
+     * @return string
      */
     public function getName()
     {
@@ -70,9 +59,8 @@ class State
     }
 
     /**
-     * Set nextState
-     *
      * @param State $nextState
+     *
      * @return State
      */
     public function setNextState(State $nextState = null)
@@ -82,31 +70,28 @@ class State
     }
 
     /**
-     * Get nextState
-     *
-     * @return State 
+     * @return State
      */
     public function getNextState()
     {
         return $this->nextState;
     }
-    
-    
+
     /**
-     *
      * @return string
      */
-    public function __toString() {
+    public function __toString()
+    {
         return $this->getName();
     }
-    
-    
+
     /**
-     *
      * @param State $state
+     *
      * @return boolean
      */
-    public function equals(State $state) {
+    public function equals(State $state)
+    {
         return $this->getName() == $state->getName();
     }
 }

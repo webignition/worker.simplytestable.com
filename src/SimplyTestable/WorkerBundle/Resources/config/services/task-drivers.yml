@@ -14,7 +14,6 @@ services:
         httpClientService: '@simplytestable.services.httpclientservice'
         webResourceService: '@simplytestable.services.webResourceService'
         cssValidatorWrapper: '@simplytestable.services.cssValidatorWrapperService'
-        serializer: '@jms_serializer'
         stateService: '@simplytestable.services.stateService'
         cssValidatorJarPath: '%css-validator-jar-path%'
 

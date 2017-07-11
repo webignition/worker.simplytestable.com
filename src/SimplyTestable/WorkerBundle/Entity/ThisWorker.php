@@ -3,11 +3,9 @@
 namespace SimplyTestable\WorkerBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as SerializerAnnotation;
 
 /**
  * @ORM\Entity
- * @SerializerAnnotation\ExclusionPolicy("all")
  */
 class ThisWorker
 {
@@ -20,12 +18,10 @@ class ThisWorker
      */
     protected $id;
 
-
     /**
      * @var string
      *
      * @ORM\Column(type="string", unique=true, nullable=false)
-     * @SerializerAnnotation\Expose
      */
     protected $hostname;
 
@@ -35,10 +31,6 @@ class ThisWorker
      *
      * @ORM\ManyToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\State")
      * @ORM\JoinColumn(name="state_id", referencedColumnName="id", nullable=false)
-     *
-     * @SerializerAnnotation\Expose
-     * @SerializerAnnotation\Accessor(getter="getPublicSerializedState")
-     * @SerializerAnnotation\Type("string")
      */
     protected $state;
 
@@ -50,8 +42,6 @@ class ThisWorker
     protected $activationToken;
 
     /**
-     * Get id
-     *
      * @return integer
      */
     public function getId()
@@ -60,10 +50,9 @@ class ThisWorker
     }
 
     /**
-     * Set url
-     *
      * @param string $hostname
-     * @return ThisWorker
+     *
+     * @return $this
      */
     public function setHostname($hostname)
     {
@@ -73,8 +62,6 @@ class ThisWorker
     }
 
     /**
-     * Get url
-     *
      * @return string
      */
     public function getHostname()
@@ -83,11 +70,9 @@ class ThisWorker
     }
 
     /**
-     * Set state
-     *
      * @param State $state
      *
-     * @return ThisWorker
+     * @return $this
      */
     public function setState(State $state)
     {
@@ -97,8 +82,6 @@ class ThisWorker
     }
 
     /**
-     * Get state
-     *
      * @return State
      */
     public function getState()
@@ -107,11 +90,9 @@ class ThisWorker
     }
 
     /**
-     * Set activationToken
-     *
      * @param string $activationToken
      *
-     * @return ThisWorker
+     * @return $this
      */
     public function setActivationToken($activationToken)
     {
@@ -121,8 +102,6 @@ class ThisWorker
     }
 
     /**
-     * Get activationToken
-     *
      * @return string
      */
     public function getActivationToken()
@@ -131,20 +110,12 @@ class ThisWorker
     }
 
     /**
-     * @return ThisWorker
+     * @return $this
      */
     public function setNextState()
     {
         $this->state = $this->getState()->getNextState();
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPublicSerializedState()
-    {
-        return str_replace('worker-', '', (string)$this->getState());
     }
 }

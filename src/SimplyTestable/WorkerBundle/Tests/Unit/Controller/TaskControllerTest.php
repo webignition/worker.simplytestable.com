@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Unit\Controller\Job;
+namespace SimplyTestable\WorkerBundle\Tests\Unit\Controller;
 
 use SimplyTestable\WorkerBundle\Request\Task\CancelRequest;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
@@ -8,19 +8,22 @@ use SimplyTestable\WorkerBundle\Tests\Factory\ContainerFactory;
 use SimplyTestable\WorkerBundle\Controller\TaskController;
 use SimplyTestable\WorkerBundle\Tests\Factory\WorkerServiceFactory;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class TaskControllerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreateCollectionActionInMaintenanceReadOnlyMode()
     {
-        $response = $this->createTaskControllerForMaintenanceReadOnlyMode()->createCollectionAction();
-        $this->assertEquals(503, $response->getStatusCode());
+        $this->expectException(ServiceUnavailableHttpException::class);
+
+        $this->createTaskControllerForMaintenanceReadOnlyMode()->createCollectionAction();
     }
 
     public function testCancelActionInMaintenanceReadOnlyMode()
     {
-        $response = $this->createTaskControllerForMaintenanceReadOnlyMode()->cancelAction();
-        $this->assertEquals(503, $response->getStatusCode());
+        $this->expectException(ServiceUnavailableHttpException::class);
+
+        $this->createTaskControllerForMaintenanceReadOnlyMode()->cancelAction();
     }
 
     public function testCancelActionWithInvalidRequest()
@@ -43,17 +46,16 @@ class TaskControllerTest extends \PHPUnit_Framework_TestCase
             ])
         );
 
-        $this->setExpectedException(
-            BadRequestHttpException::class
-        );
+        $this->expectException(BadRequestHttpException::class);
 
         $controller->cancelAction();
     }
 
     public function testCancelCollectionActionInMaintenanceReadOnlyMode()
     {
-        $response = $this->createTaskControllerForMaintenanceReadOnlyMode()->cancelCollectionAction();
-        $this->assertEquals(503, $response->getStatusCode());
+        $this->expectException(ServiceUnavailableHttpException::class);
+
+        $this->createTaskControllerForMaintenanceReadOnlyMode()->cancelCollectionAction();
     }
 
     /**

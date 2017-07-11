@@ -17,9 +17,9 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
      * @dataProvider createCollectionActionDataProvider
      *
      * @param array $postData
-     * @param int $expectedResponseTaskCollectionCount
+     * @param array $expectedResponseTaskCollection
      */
-    public function testCreateCollectionAction($postData, $expectedResponseTaskCollectionCount)
+    public function testCreateCollectionAction($postData, $expectedResponseTaskCollection)
     {
         $this->removeAllTasks();
 
@@ -34,7 +34,14 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
 
         $decodedResponseContent = json_decode($response->getContent(), true);
 
-        $this->assertCount($expectedResponseTaskCollectionCount, $decodedResponseContent);
+        $this->assertCount(count($expectedResponseTaskCollection), $decodedResponseContent);
+
+        foreach ($decodedResponseContent as $taskIndex => $responseTask) {
+            $expectedResponseTask = $expectedResponseTaskCollection[$taskIndex];
+            $this->assertInternalType('int', $responseTask['id']);
+            $this->assertEquals($expectedResponseTask['type'], $responseTask['type']);
+            $this->assertEquals($expectedResponseTask['url'], $responseTask['url']);
+        }
     }
 
     /**
@@ -45,13 +52,13 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         return [
             'no tasks data' => [
                 'postData' => new ParameterBag([]),
-                'expectedResponseTaskCollectionCount' => 0,
+                'expectedResponseTaskCollection' => []
             ],
             'empty tasks data' => [
                 'postData' => new ParameterBag([
                     'tasks' => [],
                 ]),
-                'expectedResponseTaskCollectionCount' => 0,
+                'expectedResponseTaskCollection' => [],
             ],
             'single invalid task' => [
                 'postData' => new ParameterBag([
@@ -62,7 +69,7 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
                         ],
                     ],
                 ]),
-                'expectedResponseTaskCollectionCount' => 0,
+                'expectedResponseTaskCollection' => [],
             ],
             'valid tasks' => [
                 'postData' => new ParameterBag([
@@ -77,7 +84,16 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
                         ],
                     ],
                 ]),
-                'expectedResponseTaskCollectionCount' => 2,
+                'expectedResponseTaskCollection' => [
+                    [
+                        'type' => 'HTML validation',
+                        'url' => 'http://example.com/',
+                    ],
+                    [
+                        'type' => 'CSS validation',
+                        'url' => 'http://example.com/',
+                    ],
+                ],
             ],
         ];
     }
