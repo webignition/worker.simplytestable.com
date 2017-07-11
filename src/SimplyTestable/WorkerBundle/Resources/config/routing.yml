@@ -1,50 +1,50 @@
 SimplyTestableWorkerBundle_verify:
-    pattern:  /verify/
-    defaults: { _controller: SimplyTestableWorkerBundle:Verify:index, _format: json }   
-    
+    path:  /verify/
+    defaults: { _controller: SimplyTestableWorkerBundle:Verify:index, _format: json }
+
 SimplyTestableWorkerBundle_task_create:
-    pattern:  /task/create/
-    defaults: { _controller: SimplyTestableWorkerBundle:Task:create, _format: json }       
-    
+    path:  /task/create/
+    defaults: { _controller: SimplyTestableWorkerBundle:Task:create, _format: json }
+
 SimplyTestableWorkerBundle_task_create_collection:
-    pattern:  /task/create/collection/
-    defaults: { _controller: SimplyTestableWorkerBundle:Task:createCollection, _format: json }     
-    
+    path:  /task/create/collection/
+    defaults: { _controller: SimplyTestableWorkerBundle:Task:createCollection, _format: json }
+
 SimplyTestableWorkerBundle_task_cancel:
-    pattern:  /task/cancel/
+    path:  /task/cancel/
     defaults: { _controller: SimplyTestableWorkerBundle:Task:cancel, _format: json }
-    
+
 SimplyTestableWorkerBundle_task_cancel_collection:
-    pattern:  /task/cancel/collection/
-    defaults: { _controller: SimplyTestableWorkerBundle:Task:cancelCollection, _format: json }    
-    
+    path:  /task/cancel/collection/
+    defaults: { _controller: SimplyTestableWorkerBundle:Task:cancelCollection, _format: json }
+
 SimplyTestableWorkerBundle_status:
-    pattern:  /status/
-    defaults: { _controller: SimplyTestableWorkerBundle:Status:index, _format: json }    
+    path:  /status/
+    defaults: { _controller: SimplyTestableWorkerBundle:Status:index, _format: json }
 
 SimplyTestableWorkerBundle_default:
-    pattern:  / 
+    path:  /
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: SimplyTestableWorkerBundle_status
         permanent: true
 
 SimplyTestableWorkerBundle_disable_readonly:
-    pattern: /maintenance/disable-read-only/
-    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:disableReadOnly, _format: json }            
-        
+    path: /maintenance/disable-read-only/
+    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:disableReadOnly, _format: json }
+
 SimplyTestableWorkerBundle_enable_readonly:
-    pattern: /maintenance/enable-read-only/
-    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:enableReadOnly, _format: json }         
-    
+    path: /maintenance/enable-read-only/
+    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:enableReadOnly, _format: json }
+
 SimplyTestableWorkerBundle_task_perform_enqueue:
-    pattern: /maintenance/task-perform-enqueue/
-    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:taskPerformEnqueue, _format: json }        
-    
+    path: /maintenance/task-perform-enqueue/
+    defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:taskPerformEnqueue, _format: json }
+
 SimplyTestableWorkerBundle_leave_readonly:
-    pattern: /maintenance/leave-read-only/
+    path: /maintenance/leave-read-only/
     defaults: { _controller: SimplyTestableWorkerBundle:Maintenance:leaveReadOnly, _format: json }
 
 tasks_notify:
-    pattern: /tasks/notify/
+    path: /tasks/notify/
     defaults: { _controller: SimplyTestableWorkerBundle:Tasks:notify }
