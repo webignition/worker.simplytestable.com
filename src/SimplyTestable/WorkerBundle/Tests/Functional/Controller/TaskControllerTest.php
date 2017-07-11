@@ -10,7 +10,6 @@ use SimplyTestable\WorkerBundle\Tests\Functional\BaseSimplyTestableTestCase;
 use SimplyTestable\WorkerBundle\Tests\Factory\TaskFactory;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class TaskControllerTest extends BaseSimplyTestableTestCase
 {
@@ -26,7 +25,7 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
 
         $request = new Request();
         $request->request = $postData;
-        $this->addRequestToContainer($request);
+        $this->container->get('request_stack')->push($request);
 
         $response = $this->createTaskController()->createAction();
 
@@ -132,7 +131,7 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
 
         $request = new Request();
         $request->request = $postData;
-        $this->addRequestToContainer($request);
+        $this->container->get('request_stack')->push($request);
 
         $response = $this->createTaskController()->createCollectionAction();
 
@@ -199,7 +198,7 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         $request->request = new ParameterBag([
             CancelRequestFactory::PARAMETER_ID => $task->getId(),
         ]);
-        $this->addRequestToContainer($request);
+        $this->container->get('request_stack')->push($request);
 
         $response = $this->createTaskController()->cancelAction();
 
@@ -229,7 +228,7 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         $request->request = new ParameterBag([
             CancelRequestCollectionFactory::PARAMETER_IDS => $taskIds,
         ]);
-        $this->addRequestToContainer($request);
+        $this->container->get('request_stack')->push($request);
 
         $response = $this->createTaskController()->cancelCollectionAction();
 
@@ -249,14 +248,5 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         $controller->setContainer($this->container);
 
         return $controller;
-    }
-
-    /**
-     * @param Request $request
-     */
-    private function addRequestToContainer(Request $request)
-    {
-        $this->container->set('request', $request);
-        $this->container->enterScope('request');
     }
 }
