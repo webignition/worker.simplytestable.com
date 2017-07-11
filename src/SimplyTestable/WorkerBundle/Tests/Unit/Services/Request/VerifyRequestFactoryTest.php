@@ -4,6 +4,7 @@ namespace SimplyTestable\WorkerBundle\Tests\Unit\Request;
 
 use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class VerifyRequestFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +17,10 @@ class VerifyRequestFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreate(Request $request, $expectedHostname, $expectedToken)
     {
-        $createRequestFactory = new VerifyRequestFactory($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $createRequestFactory = new VerifyRequestFactory($requestStack);
         $verifyRequest = $createRequestFactory->create();
 
         $this->assertEquals($expectedHostname, $verifyRequest->getHostname());
