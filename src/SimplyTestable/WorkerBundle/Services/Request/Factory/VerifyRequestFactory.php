@@ -4,7 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\Request\Factory;
 
 use SimplyTestable\WorkerBundle\Request\VerifyRequest;
 use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class VerifyRequestFactory
 {
@@ -17,11 +17,11 @@ class VerifyRequestFactory
     private $requestParameters;
 
     /**
-     * @param Request $request
+     * @param RequestStack $requestStack
      */
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->requestParameters = $request->request;
+        $this->requestParameters = $requestStack->getCurrentRequest()->request;
     }
 
     /**

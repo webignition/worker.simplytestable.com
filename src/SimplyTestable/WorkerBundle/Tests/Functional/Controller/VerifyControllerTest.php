@@ -35,7 +35,7 @@ class VerifyControllerTest extends BaseSimplyTestableTestCase
 
         $request = new Request();
         $request->request = $postData;
-        $this->addRequestToContainer($request);
+        $this->container->get('request_stack')->push($request);
 
         $response = $this->createVerifyController()->indexAction();
         $this->assertEquals(200, $response->getStatusCode());
@@ -67,15 +67,6 @@ class VerifyControllerTest extends BaseSimplyTestableTestCase
         $controller->setContainer($this->container);
 
         return $controller;
-    }
-
-    /**
-     * @param Request $request
-     */
-    private function addRequestToContainer(Request $request)
-    {
-        $this->container->set('request', $request);
-        $this->container->enterScope('request');
     }
 
     /**
