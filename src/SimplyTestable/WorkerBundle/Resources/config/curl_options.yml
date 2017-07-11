@@ -1,0 +1,3 @@
+- {name: "CURLOPT_SSL_VERIFYPEER", value: false}
+- {name: "CURLOPT_SSL_VERIFYHOST", value: false}
+- {name: "CURLOPT_TIMEOUT_MS", value: 30}
