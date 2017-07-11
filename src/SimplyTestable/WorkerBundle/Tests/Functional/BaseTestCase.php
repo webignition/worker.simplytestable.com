@@ -74,13 +74,4 @@ abstract class BaseTestCase extends WebTestCase
 
         return $returnValue === 0;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-//        $this->container->get('doctrine')->getConnection()->close();
-        parent::tearDown();
-    }
 }
