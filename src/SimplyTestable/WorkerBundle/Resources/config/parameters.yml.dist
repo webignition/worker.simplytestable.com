@@ -1,22 +1,10 @@
 parameters:
   bcc_resque_prefix: worker
-  curl_options:
-   - {name: "CURLOPT_SSL_VERIFYPEER", value: false}
-   - {name: "CURLOPT_SSL_VERIFYHOST", value: false}
-   - {name: "CURLOPT_TIMEOUT_MS", value: 30}
   core_url: http://app.simplytestable.com
   html-validator-path: /usr/lib/cgi-bin/w3c-markup-validator/check
   css-validator-jar-path: /usr/share/css-validator/2002/css-validator/css-validator.jar
   node-path: /usr/bin/nodejs
   node-jslint-path: /usr/share/node-jslint/node_modules/jslint/bin/jslint.js
-  link-integrity-user-agents:
-    - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
-    - Mozilla/5.0
-  content_type_web_resource_map:
-    default: webignition\WebResource\WebResource
-    text/html: webignition\WebResource\WebPage\WebPage
-    application/xhtml+xml: webignition\WebResource\WebPage\WebPage
-    application/json: webignition\WebResource\JsonDocument\JsonDocument
   resque_pid: "simplytestable_workerbundle"
   hostname: hydrogen.worker.simplytestable.com
   admin_password: password
