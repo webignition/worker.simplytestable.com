@@ -15,6 +15,12 @@ use Symfony\Component\Yaml\Yaml;
  */
 class SimplyTestableWorkerExtension extends Extension
 {
+    private $parameterFiles = [
+        'curl_options.yml',
+        'content_type_web_resource_map.yml',
+        'link_integrity_user_agents.yml',
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -30,7 +36,12 @@ class SimplyTestableWorkerExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, $fileLocator);
         $loader->load('services.yml');
 
-        $curlOptionsData = Yaml::parse(file_get_contents($fileLocator->locate('curl_options.yml')));
-        $container->setParameter('curl_options', $curlOptionsData);
+        foreach ($this->parameterFiles as $parameterFile) {
+            $parameterName = str_replace('.yml', '', $parameterFile);
+            $container->setParameter(
+                $parameterName,
+                Yaml::parse(file_get_contents($fileLocator->locate($parameterFile)))
+            );
+        }
     }
 }

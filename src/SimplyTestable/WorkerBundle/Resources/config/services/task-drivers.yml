@@ -35,7 +35,7 @@ services:
         httpClientService: '@simplytestable.services.httpclientservice'
         webResourceService: '@simplytestable.services.webResourceService'
         stateService: '@simplytestable.services.stateService'
-        userAgents: '%link-integrity-user-agents%'
+        userAgents: '%link_integrity_user_agents%'
 
   simplytestable.services.taskdriver.urldiscovery:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver
