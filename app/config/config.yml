@@ -2,7 +2,7 @@ imports:
     - { resource: parameters.yml }
     - { resource: "@SimplyTestableWorkerBundle/Resources/config/parameters.yml" }
     - { resource: security.yml }
-    - { resource: "@SimplyTestableWorkerBundle/Resources/config/services.yml" }    
+    - { resource: "@SimplyTestableWorkerBundle/Resources/config/services.yml" }
 
 framework:
     #esi:             ~
@@ -23,19 +23,6 @@ framework:
 twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
-
-# Assetic Configuration
-assetic:
-    debug:          %kernel.debug%
-    use_controller: false
-    bundles:        [ ]
-    #java: /usr/bin/java
-    filters:
-        cssrewrite: ~
-        #closure:
-        #    jar: %kernel.root_dir%/Resources/java/compiler.jar
-        #yui_css:
-        #    jar: %kernel.root_dir%/Resources/java/yuicompressor-2.4.7.jar
 
 # Doctrine Configuration
 doctrine:
