@@ -9,27 +9,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class TaskController extends BaseController
 {
-    public function createAction()
-    {
-        if ($this->isInMaintenanceReadOnlyMode()) {
-            return $this->sendServiceUnavailableResponse();
-        }
-
-        $createRequest = $this->container->get('simplytestable.services.request.factory.task.create')->create();
-
-        if (!$createRequest->isValid()) {
-            throw new BadRequestHttpException();
-        }
-
-        $task = $this->createTaskFromCreateRequest($createRequest);
-        $this->getTaskService()->getEntityManager()->persist($task);
-        $this->getTaskService()->getEntityManager()->flush();
-
-        $this->enqueueTaskPerformJob($task);
-
-        return $this->sendResponse($task);
-    }
-
     public function createCollectionAction()
     {
         if ($this->isInMaintenanceReadOnlyMode()) {

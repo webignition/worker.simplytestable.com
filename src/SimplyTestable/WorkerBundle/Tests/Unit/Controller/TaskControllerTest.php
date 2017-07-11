@@ -3,9 +3,7 @@
 namespace SimplyTestable\WorkerBundle\Tests\Unit\Controller\Job;
 
 use SimplyTestable\WorkerBundle\Request\Task\CancelRequest;
-use SimplyTestable\WorkerBundle\Request\Task\CreateRequest;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
-use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\ContainerFactory;
 use SimplyTestable\WorkerBundle\Controller\TaskController;
 use SimplyTestable\WorkerBundle\Tests\Factory\WorkerServiceFactory;
@@ -13,39 +11,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class TaskControllerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCreateActionInMaintenanceReadOnlyMode()
-    {
-        $response = $this->createTaskControllerForMaintenanceReadOnlyMode()->createAction();
-        $this->assertEquals(503, $response->getStatusCode());
-    }
-
-    public function testCreateActionWithInvalidRequest()
-    {
-        $taskCreateRequest = \Mockery::mock(CreateRequest::class);
-        $taskCreateRequest
-            ->shouldReceive('isValid')
-            ->andReturn(false);
-
-        $taskCreateRequestFactory = \Mockery::mock(CreateRequestFactory::class);
-        $taskCreateRequestFactory
-            ->shouldReceive('create')
-            ->andReturn($taskCreateRequest);
-
-        $controller = new TaskController();
-        $controller->setContainer(
-            ContainerFactory::create([
-                'simplytestable.services.workerservice' => WorkerServiceFactory::create(false),
-                'simplytestable.services.request.factory.task.create' => $taskCreateRequestFactory,
-            ])
-        );
-
-        $this->setExpectedException(
-            BadRequestHttpException::class
-        );
-
-        $controller->createAction();
-    }
-
     public function testCreateCollectionActionInMaintenanceReadOnlyMode()
     {
         $response = $this->createTaskControllerForMaintenanceReadOnlyMode()->createCollectionAction();
