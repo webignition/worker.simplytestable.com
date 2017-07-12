@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "54741040709c802fa341ca42141a74e8",
+    "content-hash": "f95a609b8d50d9da0b94f65eb75af41d",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -2639,16 +2639,16 @@
         },
         {
             "name": "symfony/symfony",
-            "version": "v3.1.10",
+            "version": "v3.2.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/symfony.git",
-                "reference": "96e7dede3ddc9e3b3392f5cc93e26eca77545a89"
+                "reference": "697ece8d9a4e07349bf5d222204fc878b3199f03"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/symfony/zipball/96e7dede3ddc9e3b3392f5cc93e26eca77545a89",
-                "reference": "96e7dede3ddc9e3b3392f5cc93e26eca77545a89",
+                "url": "https://api.github.com/repos/symfony/symfony/zipball/697ece8d9a4e07349bf5d222204fc878b3199f03",
+                "reference": "697ece8d9a4e07349bf5d222204fc878b3199f03",
                 "shasum": ""
             },
             "require": {
@@ -2661,11 +2661,12 @@
                 "symfony/polyfill-php56": "~1.0",
                 "symfony/polyfill-php70": "~1.0",
                 "symfony/polyfill-util": "~1.0",
-                "twig/twig": "~1.28|~2.0"
+                "twig/twig": "~1.34|~2.4"
             },
             "conflict": {
                 "phpdocumentor/reflection-docblock": "<3.0",
-                "phpdocumentor/type-resolver": "<0.2.0"
+                "phpdocumentor/type-resolver": "<0.2.0",
+                "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
             },
             "provide": {
                 "psr/cache-implementation": "1.0"
@@ -2716,6 +2717,7 @@
                 "symfony/validator": "self.version",
                 "symfony/var-dumper": "self.version",
                 "symfony/web-profiler-bundle": "self.version",
+                "symfony/workflow": "self.version",
                 "symfony/yaml": "self.version"
             },
             "require-dev": {
@@ -2725,7 +2727,7 @@
                 "doctrine/dbal": "~2.4",
                 "doctrine/doctrine-bundle": "~1.4",
                 "doctrine/orm": "~2.4,>=2.4.5",
-                "egulias/email-validator": "~1.2,>=1.2.1",
+                "egulias/email-validator": "~1.2,>=1.2.8|~2.0",
                 "monolog/monolog": "~1.11",
                 "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
                 "phpdocumentor/reflection-docblock": "^3.0",
@@ -2738,7 +2740,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "3.2-dev"
                 }
             },
             "autoload": {
@@ -2746,7 +2748,6 @@
                     "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",
                     "Symfony\\Bridge\\Monolog\\": "src/Symfony/Bridge/Monolog/",
                     "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
-                    "Symfony\\Bridge\\Swiftmailer\\": "src/Symfony/Bridge/Swiftmailer/",
                     "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
                     "Symfony\\Bundle\\": "src/Symfony/Bundle/",
                     "Symfony\\Component\\": "src/Symfony/Component/"
@@ -2777,7 +2778,7 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2017-01-28T02:53:38+00:00"
+            "time": "2017-07-05T10:25:23+00:00"
         },
         {
             "name": "twig/twig",
