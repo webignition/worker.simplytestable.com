@@ -8,6 +8,7 @@
         "classmap": [ "app/AppKernel.php", "app/AppCache.php" ]
     },
     "autoload-dev": {
+        "psr-4": { "Tests\\": "tests/" },
         "files": [ "vendor/symfony/symfony/src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
     },
     "require": {
@@ -73,13 +74,13 @@
         "post-update-cmd": [
             "@symfony-scripts"
         ],
-        "test-unit": "./vendor/bin/phpunit -c app --colors src/SimplyTestable/WorkerBundle/Tests/Unit/",
-        "test-functional": "./vendor/bin/phpunit -c app --colors src/SimplyTestable/WorkerBundle/Tests/Functional/",
+        "test-unit": "./vendor/bin/phpunit --colors tests/WorkerBundle/Unit",
+        "test-functional": "./vendor/bin/phpunit --colors tests/WorkerBundle/Functional/",
         "test": [
             "@composer test-unit",
             "@composer test-functional"
         ],
-        "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php src/SimplyTestable/WorkerBundle",
+        "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php src/SimplyTestable/WorkerBundle tests/",
         "ci": [
             "@composer cs",
             "@composer test"
