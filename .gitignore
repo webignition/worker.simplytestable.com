@@ -1,15 +1,26 @@
-web/bundles/
 app/bootstrap.php.cache
 app/cache/*
 app/logs/*
-build/
-vendor
-composer.phar
-app/config/parameters.yml
 app/config/security_credentials.yml
-src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
 /bin
 
+/app/config/parameters.yml
+/build/
+/phpunit.xml
+/var/*
+!/var/cache
+/var/cache/*
+!var/cache/.gitkeep
+!/var/logs
+/var/logs/*
+!var/logs/.gitkeep
+!/var/sessions
+/var/sessions/*
+!var/sessions/.gitkeep
+!var/SymfonyRequirements.php
+/vendor/
+/web/bundles/
+src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
+
 # IDE meta
-/nbproject
 /.idea
