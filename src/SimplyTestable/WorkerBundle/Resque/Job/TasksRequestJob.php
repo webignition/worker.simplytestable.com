@@ -75,7 +75,8 @@ class TasksRequestJob extends CommandJob
         $command = $this->getCommand();
 
         if ($returnCode == $command::RETURN_CODE_TASK_WORKLOAD_EXCEEDS_REQUEST_THRESHOLD) {
-            $this->getContainer()->get('logger')->info(get_class($this) . ': task [' . $this->getIdentifier() . '] returned ' . $returnCode);
+            $this->getContainer()->get('logger')
+                ->info(get_class($this) . ': task [' . $this->getIdentifier() . '] returned ' . $returnCode);
             return true;
         }
 

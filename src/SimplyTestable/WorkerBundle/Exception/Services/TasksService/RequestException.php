@@ -2,5 +2,6 @@
 
 namespace SimplyTestable\WorkerBundle\Exception\Services\TasksService;
 
-class RequestException extends \Exception {
+class RequestException extends \Exception
+{
 }

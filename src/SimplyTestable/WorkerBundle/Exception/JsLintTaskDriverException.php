@@ -2,5 +2,6 @@
 
 namespace SimplyTestable\WorkerBundle\Exception;
 
-class JsLintTaskDriverException extends \Exception {    
+class JsLintTaskDriverException extends \Exception
+{
 }

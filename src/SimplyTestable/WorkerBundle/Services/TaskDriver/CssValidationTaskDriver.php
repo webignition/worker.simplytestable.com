@@ -29,15 +29,9 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
     private $cssValidatorJarPath;
 
     /**
-     * @var Serializer
-     */
-    private $serializer;
-
-    /**
      * @param HttpClientService $httpClientService
      * @param WebResourceService $webResourceService
      * @param CssValidatorWrapper $cssValidatorWrapper
-     * @param Serializer $serializer
      * @param StateService $stateService
      * @param string $cssValidatorJarPath
      */
@@ -45,14 +39,12 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
         HttpClientService $httpClientService,
         WebResourceService $webResourceService,
         CssValidatorWrapper $cssValidatorWrapper,
-        Serializer $serializer,
         StateService $stateService,
         $cssValidatorJarPath
     ) {
         $this->setHttpClientService($httpClientService);
         $this->setWebResourceService($webResourceService);
         $this->setCssValidatorWrapper($cssValidatorWrapper);
-        $this->serializer = $serializer;
         $this->setStateService($stateService);
         $this->cssValidatorJarPath = $cssValidatorJarPath;
     }
@@ -174,9 +166,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
         $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
         $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
 
-        return $this->serializer->serialize(
-            $this->prepareCssValidatorOutput($cssValidatorOutput), 'json'
-        );
+        return json_encode($this->prepareCssValidatorOutput($cssValidatorOutput));
     }
 
     private function prepareCssValidatorOutput(CssValidatorOutput $cssValidatorOutput)

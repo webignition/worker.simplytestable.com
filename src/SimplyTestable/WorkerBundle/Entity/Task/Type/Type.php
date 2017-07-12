@@ -2,18 +2,14 @@
 namespace SimplyTestable\WorkerBundle\Entity\Task\Type;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as SerializerAnnotation;
 
 /**
- *
  * @ORM\Entity
  * @ORM\Table(name="TaskType")
- * @SerializerAnnotation\ExclusionPolicy("all")
- */
+  */
 class Type
 {
     /**
-     *
      * @var integer
      *
      * @ORM\Id
@@ -22,27 +18,21 @@ class Type
      */
     protected $id;
 
-
     /**
      *
      * @var string
      * @ORM\Column(type="string", unique=true, nullable=false)
-     * @SerializerAnnotation\Expose
      */
     protected $name;
 
-
     /**
-     *
      * @var string
      * @ORM\Column(type="text", nullable=false)
      */
     protected $description;
 
-
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass
+     * @var TaskTypeClass
      *
      * @ORM\ManyToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass")
      * @ORM\JoinColumn(name="tasktypeclass_id", referencedColumnName="id", nullable=false)
@@ -50,16 +40,12 @@ class Type
     protected $class;
 
     /**
-     *
      * @var boolean
      * @ORM\Column(type="boolean", name="selectable", nullable=false)
      */
     protected $selectable = false;
 
-
     /**
-     * Get id
-     *
      * @return integer
      */
     public function getId()
@@ -68,20 +54,18 @@ class Type
     }
 
     /**
-     * Set name
-     *
      * @param string $name
-     * @return Type
+     *
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
     /**
-     * Get name
-     *
      * @return string
      */
     public function getName()
@@ -90,20 +74,18 @@ class Type
     }
 
     /**
-     * Set description
-     *
      * @param string $description
-     * @return Type
+     *
+     * @return $this
      */
     public function setDescription($description)
     {
         $this->description = $description;
+
         return $this;
     }
 
     /**
-     * Get description
-     *
      * @return string
      */
     public function getDescription()
@@ -112,21 +94,21 @@ class Type
     }
 
     /**
-     * Set class
+     * @param TaskTypeClass $class
      *
-     * @param \SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass $class
-     * @return Type
+     * @return $this
      */
-    public function setClass(\SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass $class)
+    public function setClass(TaskTypeClass $class)
     {
         $this->class = $class;
+
         return $this;
     }
 
     /**
      * Get class
      *
-     * @return \SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass
+     * @return TaskTypeClass
      */
     public function getClass()
     {
@@ -140,20 +122,18 @@ class Type
     }
 
     /**
-     * Set selectable
-     *
      * @param boolean $selectable
-     * @return Type
+     *
+     * @return $this
      */
     public function setSelectable($selectable)
     {
         $this->selectable = $selectable;
+
         return $this;
     }
 
     /**
-     * Get selectable
-     *
      * @return boolean
      */
     public function getSelectable()
@@ -161,22 +141,21 @@ class Type
         return $this->selectable;
     }
 
-
     /**
-     *
      * @param Type $taskType
+     *
      * @return boolean
      */
-    public function equals(Type $taskType) {
+    public function equals(Type $taskType)
+    {
         return $this->getName() == $taskType->getName();
     }
 
-
     /**
-     *
      * @return string
      */
-    public function __toString() {
+    public function __toString()
+    {
         return $this->getName();
     }
 }

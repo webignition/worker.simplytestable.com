@@ -5,6 +5,7 @@ namespace SimplyTestable\WorkerBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 
 class LoadTaskTypes extends AbstractFixture implements OrderedFixtureInterface
@@ -42,7 +43,7 @@ class LoadTaskTypes extends AbstractFixture implements OrderedFixtureInterface
      */
     public function load(ObjectManager $manager)
     {
-        $taskTypeClassRepository = $manager->getRepository('SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass');
+        $taskTypeClassRepository = $manager->getRepository(TaskTypeClass::class);
         $taskTypeRepository = $manager->getRepository('SimplyTestable\WorkerBundle\Entity\Task\Type\Type');
 
         foreach ($this->taskTypes as $name => $properties) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace SimplyTestable\WorkerBundle\Tests\Unit\Controller\Job;
+namespace SimplyTestable\WorkerBundle\Tests\Unit\Controller;
 
 use SimplyTestable\WorkerBundle\Controller\VerifyController;
 use SimplyTestable\WorkerBundle\Request\VerifyRequest;
@@ -8,6 +8,7 @@ use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\ContainerFactory;
 use SimplyTestable\WorkerBundle\Tests\Factory\WorkerServiceFactory;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class VerifyControllerTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,8 +21,9 @@ class VerifyControllerTest extends \PHPUnit_Framework_TestCase
             ])
         );
 
-        $response = $controller->indexAction();
-        $this->assertEquals(503, $response->getStatusCode());
+        $this->expectException(ServiceUnavailableHttpException::class);
+
+        $controller->indexAction();
     }
 
     public function testVerifyActionWithInvalidRequest()
@@ -44,9 +46,7 @@ class VerifyControllerTest extends \PHPUnit_Framework_TestCase
             ])
         );
 
-        $this->setExpectedException(
-            BadRequestHttpException::class
-        );
+        $this->expectException(BadRequestHttpException::class);
 
         $controller->indexAction();
     }

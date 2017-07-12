@@ -4,7 +4,6 @@ namespace SimplyTestable\WorkerBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * 
  * @ORM\Entity
  * @ORM\Table(
  *     name="TimeCachedTaskOutput",
@@ -14,101 +13,80 @@ use Doctrine\ORM\Mapping as ORM;
  * )
  */
 class TimeCachedTaskOutput
-{    
+{
     /**
-     * 
      * @var integer
-     * 
+     *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
-    
-    
+
     /**
-     *
      * @var string
-     * 
+     *
      * @ORM\Column(type="string")
      */
     protected $hash;
-    
-    
+
     /**
-     *
      * @var string
-     * 
+     *
      * @ORM\Column(type="text")
      */
     protected $output;
-    
-    
+
     /**
-     *
      * @var int
-     * 
+     *
      * @ORM\Column(type="integer")
      */
     protected $errorCount = 0;
-    
-    
+
     /**
-     *
      * @var int
-     * 
+     *
      * @ORM\Column(type="integer")
      */
     protected $warningCount = 0;
-    
-    
+
     /**
-     * 
-     * 
      * @var int
-     * 
+     *
      * @ORM\Column(type="integer")
      */
     protected $maxAge = 0;
-    
-    
+
     /**
-     *
      * @var \DateTime
-     * 
+     *
      * @ORM\Column(type="datetime")
      */
     protected $lastModified;
-  
 
     /**
-     * Get id
-     *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
         return $this->id;
     }
 
-
     /**
-     * Set hash
-     *
      * @param string $hash
-     * @return TimeCachedTaskOutput
+     *
+     * @return $this
      */
     public function setHash($hash)
     {
         $this->hash = $hash;
-    
+
         return $this;
     }
 
     /**
-     * Get hash
-     *
-     * @return string 
+     * @return string
      */
     public function getHash()
     {
@@ -116,22 +94,19 @@ class TimeCachedTaskOutput
     }
 
     /**
-     * Set output
-     *
      * @param string $output
-     * @return TimeCachedTaskOutput
+     *
+     * @return $this
      */
     public function setOutput($output)
     {
         $this->output = $output;
-    
+
         return $this;
     }
 
     /**
-     * Get output
-     *
-     * @return string 
+     * @return string
      */
     public function getOutput()
     {
@@ -139,97 +114,85 @@ class TimeCachedTaskOutput
     }
 
     /**
-     * Set errorCount
-     *
      * @param integer $errorCount
-     * @return TimeCachedTaskOutput
+     *
+     * @return $this
      */
     public function setErrorCount($errorCount)
     {
         $this->errorCount = $errorCount;
-    
+
         return $this;
     }
 
     /**
-     * Get errorCount
-     *
-     * @return integer 
+     * @return integer
      */
     public function getErrorCount()
     {
         return $this->errorCount;
     }
-    
-    
+
+
     /**
-     * Set warningCount
-     *
      * @param integer $warningCount
-     * @return TimeCachedTaskOutput
+     *
+     * @return $this
      */
     public function setWarningCount($warningCount)
     {
         $this->warningCount = $warningCount;
-    
+
         return $this;
     }
 
     /**
-     * Get warningCount
-     *
-     * @return integer 
+     * @return integer
      */
     public function getWarningCount()
     {
         return $this->warningCount;
-    } 
-    
-    
+    }
+
+
     /**
-     * Set maxAge
-     *
      * @param integer $maxAge
-     * @return TimeCachedTaskOutput
+     *
+     * @return $this
      */
     public function setMaxAge($maxAge)
     {
         $this->maxAge = $maxAge;
-    
+
         return $this;
     }
 
     /**
-     * Get maxAge
-     *
-     * @return integer 
+     * @return integer
      */
     public function getMaxAge()
     {
         return $this->maxAge;
     }
-    
-    
+
+
     /**
-     * Set lastModified
-     *
      * @param \DateTime $lastModified
-     * @return TimePeriod
+     *
+     * @return $this
      */
     public function setLastModified($lastModified)
     {
         $this->lastModified = $lastModified;
-    
+
         return $this;
     }
 
     /**
-     * Get lastModified
-     *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getLastModified()
     {
         return $this->lastModified;
-    }    
+    }
 }

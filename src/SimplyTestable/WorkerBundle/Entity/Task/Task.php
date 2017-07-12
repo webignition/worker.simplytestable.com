@@ -2,120 +2,73 @@
 namespace SimplyTestable\WorkerBundle\Entity\Task;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as SerializerAnnotation;
+use SimplyTestable\WorkerBundle\Entity\State;
+use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
+use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 
 /**
- *
  * @ORM\Entity
  * @ORM\Table(
  *     name="Task"
  * )
- * @SerializerAnnotation\ExclusionPolicy("all")
  * @ORM\Entity(repositoryClass="SimplyTestable\WorkerBundle\Repository\TaskRepository")
  */
-class Task
+class Task implements \JsonSerializable
 {
     /**
-     *
      * @var integer
      *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @SerializerAnnotation\Expose
-     *
      */
     protected $id;
 
-
     /**
-     *
      * @var string
-     * @ORM\Column(type="text", nullable=false)
-     * @SerializerAnnotation\Expose
      *
+     * @ORM\Column(type="text", nullable=false)
      */
     protected $url;
 
-
     /**
-     *
-     * @var SimplyTestable\WorkerBundle\Entity\State
+     * @var State
      *
      * @ORM\ManyToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\State")
      * @ORM\JoinColumn(name="state_id", referencedColumnName="id", nullable=false)
-     *
-     * @SerializerAnnotation\Accessor(getter="getPublicSerializedState")
-     * @SerializerAnnotation\Expose
-     * @SerializerAnnotation\Type("string")
      */
     protected $state;
 
-
     /**
-     *
-     * @var SimplyTestable\WorkerBundle\Entity\Task\Type\Type
+     * @var TaskType
      *
      * @ORM\ManyToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\Task\Type\Type")
      * @ORM\JoinColumn(name="tasktype_id", referencedColumnName="id", nullable=false)
-     *
-     * @SerializerAnnotation\Accessor(getter="getPublicSerializedType")
-     * @SerializerAnnotation\Expose
-     * @SerializerAnnotation\Type("string")
      */
     protected $type;
 
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Entity\TimePeriod
+     * @var TimePeriod
      *
      * @ORM\OneToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\TimePeriod", cascade={"persist"})
-     * @SerializerAnnotation\Expose
-     *
      */
     protected $timePeriod;
 
-
     /**
-     *
-     * @var \SimplyTestable\WorkerBundle\Entity\Task\Output
+     * @var Output
      *
      * @ORM\OneToOne(targetEntity="SimplyTestable\WorkerBundle\Entity\Task\Output", cascade={"persist"})
-     * @SerializerAnnotation\Expose
-     *
      */
     protected $output;
 
     /**
-     *
      * @var string
-     * @ORM\Column(type="text", nullable=true)
-     * @SerializerAnnotation\Expose
      *
+     * @ORM\Column(type="text", nullable=true)
      */
     protected $parameters;
 
-
-
     /**
-     *
-     * @return string
-     */
-    public function getPublicSerializedState() {
-        return str_replace('task-', '', (string)$this->getState());
-    }
-
-    /**
-     *
-     * @return string
-     */
-    public function getPublicSerializedType() {
-        return (string)$this->getType();
-    }
-
-    /**
-     * Get id
-     *
      * @return integer
      */
     public function getId()
@@ -124,9 +77,8 @@ class Task
     }
 
     /**
-     * Set url
-     *
      * @param string $url
+     *
      * @return Task
      */
     public function setUrl($url)
@@ -137,8 +89,6 @@ class Task
     }
 
     /**
-     * Get url
-     *
      * @return string
      */
     public function getUrl()
@@ -147,12 +97,11 @@ class Task
     }
 
     /**
-     * Set state
+     * @param State $state
      *
-     * @param SimplyTestable\WorkerBundle\Entity\State $state
      * @return Task
      */
-    public function setState(\SimplyTestable\WorkerBundle\Entity\State $state)
+    public function setState(State $state)
     {
         $this->state = $state;
 
@@ -160,9 +109,7 @@ class Task
     }
 
     /**
-     * Get state
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\State
+     * @return State
      */
     public function getState()
     {
@@ -170,12 +117,11 @@ class Task
     }
 
     /**
-     * Set type
+     * @param TaskType $type
      *
-     * @param SimplyTestable\WorkerBundle\Entity\Task\Type\Type $type
      * @return Task
      */
-    public function setType(\SimplyTestable\WorkerBundle\Entity\Task\Type\Type $type)
+    public function setType(TaskType $type)
     {
         $this->type = $type;
 
@@ -183,9 +129,7 @@ class Task
     }
 
     /**
-     * Get type
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\Task\Type\Type
+     * @return TaskType
      */
     public function getType()
     {
@@ -193,12 +137,11 @@ class Task
     }
 
     /**
-     * Set timePeriod
+     * @param TimePeriod $timePeriod
      *
-     * @param SimplyTestable\WorkerBundle\Entity\TimePeriod $timePeriod
      * @return Task
      */
-    public function setTimePeriod(\SimplyTestable\WorkerBundle\Entity\TimePeriod $timePeriod = null)
+    public function setTimePeriod(TimePeriod $timePeriod = null)
     {
         $this->timePeriod = $timePeriod;
 
@@ -206,9 +149,7 @@ class Task
     }
 
     /**
-     * Get timePeriod
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\TimePeriod
+     * @return TimePeriod
      */
     public function getTimePeriod()
     {
@@ -216,12 +157,11 @@ class Task
     }
 
     /**
-     * Set output
+     * @param Output $output
      *
-     * @param \SimplyTestable\WorkerBundle\Entity\Task\Output $output
      * @return Task
      */
-    public function setOutput(\SimplyTestable\WorkerBundle\Entity\Task\Output $output)
+    public function setOutput(Output $output)
     {
         $this->output = $output;
 
@@ -229,9 +169,7 @@ class Task
     }
 
     /**
-     * Get output
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\Task\Output
+     * @return Output
      */
     public function getOutput()
     {
@@ -239,10 +177,10 @@ class Task
     }
 
     /**
-     *
-     * @return \SimplyTestable\WorkerBundle\Entity\Task\Task
+     * @return Task
      */
-    public function setNextState() {
+    public function setNextState()
+    {
         if (!is_null($this->getState()->getNextState())) {
             $this->state = $this->getState()->getNextState();
         }
@@ -251,17 +189,16 @@ class Task
     }
 
     /**
-     *
      * @return boolean
      */
-    public function hasOutput() {
+    public function hasOutput()
+    {
         return !is_null($this->output);
     }
 
     /**
-     * Set parameters
-     *
      * @param string $parameters
+     *
      * @return Task
      */
     public function setParameters($parameters)
@@ -272,8 +209,6 @@ class Task
     }
 
     /**
-     * Get parameters
-     *
      * @return string
      */
     public function getParameters()
@@ -281,50 +216,49 @@ class Task
         return $this->parameters;
     }
 
-
     /**
-     *
      * @return string
      */
-    public function getParametersHash() {
+    public function getParametersHash()
+    {
         return md5($this->getParameters());
     }
 
     /**
-     *
      * @return boolean
      */
-    public function hasParameters() {
+    public function hasParameters()
+    {
         return $this->getParameters() != '';
     }
-
 
     /**
      *
      * @return array
      */
-    public function getParametersArray() {
+    public function getParametersArray()
+    {
         return json_decode($this->getParameters(), true);
     }
 
-
     /**
-     *
      * @param string $name
+     *
      * @return boolean
      */
-    public function hasParameter($name) {
+    public function hasParameter($name)
+    {
         $parameters = $this->getParametersArray();
         return isset($parameters[$name]);
     }
 
-
     /**
-     *
      * @param string $name
+     *
      * @return mixed
      */
-    public function getParameter($name) {
+    public function getParameter($name)
+    {
         if (!$this->hasParameter($name)) {
             return null;
         }
@@ -333,17 +267,29 @@ class Task
         return $parameters[$name];
     }
 
-
     /**
-     *
      * @param string $parameterName
+     *
      * @return boolean
      */
-    public function isTrue($parameterName) {
+    public function isTrue($parameterName)
+    {
         if (!$this->hasParameter($parameterName)) {
             return false;
         }
 
         return filter_var($this->getParameter($parameterName), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'type' => (string)$this->getType(),
+            'url' => $this->getUrl(),
+        ];
     }
 }

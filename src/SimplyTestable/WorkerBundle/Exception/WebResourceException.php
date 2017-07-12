@@ -1,51 +1,50 @@
 <?php
 
 namespace SimplyTestable\WorkerBundle\Exception;
-use \Exception as BaseException;
 
-class WebResourceException extends BaseException {    
-    
+use \Exception as BaseException;
+use GuzzleHttp\Message\Request;
+use GuzzleHttp\Message\Response;
+
+class WebResourceException extends BaseException
+{
     /**
-     *
-     * @var \Guzzle\Http\Message\Request
+     * @var Response
      */
     private $response;
-    
-    
+
     /**
      *
-     * @var \Guzzle\Http\Message\Response
+     * @var Request
      */
     private $request;
-    
-    
+
     /**
-     * 
-     * @param \Guzzle\Http\Message\Response $response
-     * @param \Guzzle\Http\Message\Request $request
+     *
+     * @param Response $response
+     * @param Request $request
      */
-    public function __construct(\Guzzle\Http\Message\Response $response, \Guzzle\Http\Message\Request $request = null) {
+    public function __construct(Response $response, Request $request = null)
+    {
         $this->response = $response;
         $this->request = $request;
-        
+
         parent::__construct($response->getReasonPhrase(), $response->getStatusCode());
     }
-    
-    
+
     /**
-     * 
-     * @return \Guzzle\Http\Message\Response
+     * @return Response
      */
-    public function getResponse() {
+    public function getResponse()
+    {
         return $this->response;
     }
-    
+
     /**
-     * 
-     * @return \Guzzle\Http\Message\Request
+     * @return Request
      */
-    public function getRequest() {
+    public function getRequest()
+    {
         return $this->request;
     }
-    
 }

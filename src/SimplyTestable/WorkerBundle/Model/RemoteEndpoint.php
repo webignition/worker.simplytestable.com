@@ -1,9 +1,6 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Model;
 
-/**
- *
- */
 class RemoteEndpoint
 {
     /**
@@ -13,7 +10,6 @@ class RemoteEndpoint
      */
     private $identifier;
 
-
     /**
      * Full absolute URL to the remote endpoint
      *
@@ -22,18 +18,14 @@ class RemoteEndpoint
      */
     private $url;
 
-
     /**
-     *
      * @var int
      */
     private $method = 'GET';
 
-
     /**
-     * Set url
-     *
      * @param string $url
+     *
      * @return RemoteEndpoint
      */
     public function setUrl($url)
@@ -43,8 +35,6 @@ class RemoteEndpoint
     }
 
     /**
-     * Get url
-     *
      * @return string
      */
     public function getUrl()
@@ -52,11 +42,9 @@ class RemoteEndpoint
         return $this->url;
     }
 
-
     /**
-     * Set identifier
-     *
      * @param mixed $identifier
+     *
      * @return RemoteEndpoint
      */
     public function setIdentifier($identifier)
@@ -66,8 +54,6 @@ class RemoteEndpoint
     }
 
     /**
-     * Get identifier
-     *
      * @return string
      */
     public function getIdentifier()
@@ -75,11 +61,10 @@ class RemoteEndpoint
         return $this->identifier;
     }
 
-
     /**
-     *
      * @param int $method
-     * @return \SimplyTestable\WorkerBundle\Model\RemoteEndpoint
+     *
+     * @return RemoteEndpoint
      */
     public function setMethod($method)
     {

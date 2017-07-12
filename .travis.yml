@@ -30,7 +30,7 @@ before_script:
   - php app/console --env=test cache:warmup
 
 script:
-  - composer test
+  - composer ci
 
 matrix:
   allow_failures:

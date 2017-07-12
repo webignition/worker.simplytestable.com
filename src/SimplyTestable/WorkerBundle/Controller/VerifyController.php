@@ -4,14 +4,17 @@ namespace SimplyTestable\WorkerBundle\Controller;
 
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Request\VerifyRequest;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
-class VerifyController extends BaseController
+class VerifyController extends Controller
 {
     public function indexAction()
     {
-        if ($this->isInMaintenanceReadOnlyMode()) {
-            return $this->sendServiceUnavailableResponse();
+        if ($this->container->get('simplytestable.services.workerservice')->isMaintenanceReadOnly()) {
+            throw new ServiceUnavailableHttpException();
         }
 
         $verifyRequest = $this->container->get('simplytestable.services.request.factory.verify')->create();
@@ -28,7 +31,7 @@ class VerifyController extends BaseController
 
         $workerService->verify();
 
-        return $this->sendSuccessResponse();
+        return new Response();
     }
 
     /**

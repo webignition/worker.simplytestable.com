@@ -2,7 +2,10 @@
 
 namespace SimplyTestable\WorkerBundle\Controller;
 
-class TasksController extends BaseController
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
+
+class TasksController extends Controller
 {
     public function notifyAction()
     {
@@ -18,6 +21,6 @@ class TasksController extends BaseController
             );
         }
 
-        return $this->sendResponse();
+        return new Response();
     }
 }

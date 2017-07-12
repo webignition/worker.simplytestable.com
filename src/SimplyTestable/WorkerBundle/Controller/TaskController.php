@@ -3,26 +3,34 @@
 namespace SimplyTestable\WorkerBundle\Controller;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Model\TaskCollection;
 use SimplyTestable\WorkerBundle\Request\Task\CreateRequest;
 use SimplyTestable\WorkerBundle\Services\TaskService;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
-class TaskController extends BaseController
+class TaskController extends Controller
 {
+    /**
+     * @return Response|JsonResponse
+     */
     public function createCollectionAction()
     {
-        if ($this->isInMaintenanceReadOnlyMode()) {
-            return $this->sendServiceUnavailableResponse();
+        if ($this->container->get('simplytestable.services.workerservice')->isMaintenanceReadOnly()) {
+            throw new ServiceUnavailableHttpException();
         }
 
         $createCollectionRequest =
             $this->container->get('simplytestable.services.request.factory.task.createcollection')->create();
 
-        $tasks = [];
+        $tasks = new TaskCollection();
 
         foreach ($createCollectionRequest->getCreateRequests() as $createRequest) {
             $task = $this->createTaskFromCreateRequest($createRequest);
-            $tasks[] = $task;
+            $tasks->add($task);
 
             $this->getTaskService()->getEntityManager()->persist($task);
         }
@@ -33,13 +41,13 @@ class TaskController extends BaseController
             $this->enqueueTaskPerformJob($task);
         }
 
-        return $this->sendResponse($tasks);
+        return new JsonResponse($tasks->jsonSerialize());
     }
 
     public function cancelAction()
     {
-        if ($this->isInMaintenanceReadOnlyMode()) {
-            return $this->sendServiceUnavailableResponse();
+        if ($this->container->get('simplytestable.services.workerservice')->isMaintenanceReadOnly()) {
+            throw new ServiceUnavailableHttpException();
         }
 
         $cancelRequest = $this->container->get('simplytestable.services.request.factory.task.cancel')->create();
@@ -52,13 +60,13 @@ class TaskController extends BaseController
         $this->getTaskService()->getEntityManager()->remove($cancelRequest->getTask());
         $this->getTaskService()->getEntityManager()->flush();
 
-        return $this->sendSuccessResponse();
+        return new Response();
     }
 
     public function cancelCollectionAction()
     {
-        if ($this->isInMaintenanceReadOnlyMode()) {
-            return $this->sendServiceUnavailableResponse();
+        if ($this->container->get('simplytestable.services.workerservice')->isMaintenanceReadOnly()) {
+            throw new ServiceUnavailableHttpException();
         }
 
         $cancelCollectionRequest =
@@ -75,7 +83,7 @@ class TaskController extends BaseController
             $this->getTaskService()->getEntityManager()->flush();
         }
 
-        return $this->sendSuccessResponse();
+        return new Response();
     }
 
     /**

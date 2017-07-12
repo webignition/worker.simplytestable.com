@@ -28,4 +28,3 @@ class EnableReadOnlyCommandTest extends BaseSimplyTestableTestCase
         );
     }
 }
-

@@ -4,21 +4,21 @@ namespace SimplyTestable\WorkerBundle\Services;
 use webignition\NormalisedUrl\NormalisedUrl;
 
 /**
- * URL handling tasks 
+ * URL handling tasks
  */
-class DevUrlService extends UrlService { 
-    
+class DevUrlService extends UrlService
+{
     const DEV_ENVIRONMENT_PATH_PREFIX = '/app_dev.php';
-    
+
     /**
-     *
      * @param string $url
+     *
      * @return string
      */
-    public function prepare($url) {
-        $normalisedUrl = new NormalisedUrl($url);        
-        $normalisedUrl->setPath(self::DEV_ENVIRONMENT_PATH_PREFIX . $normalisedUrl->getPath());        
+    public function prepare($url)
+    {
+        $normalisedUrl = new NormalisedUrl($url);
+        $normalisedUrl->setPath(self::DEV_ENVIRONMENT_PATH_PREFIX . $normalisedUrl->getPath());
         return (string)$normalisedUrl;
     }
-    
 }

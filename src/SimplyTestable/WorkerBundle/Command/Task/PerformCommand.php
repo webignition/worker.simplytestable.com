@@ -77,8 +77,7 @@ class PerformCommand extends Command
             ->setName('simplytestable:task:perform')
             ->setDescription('Start a task')
             ->addArgument('id', InputArgument::REQUIRED, 'id of task to start')
-            ->setHelp('Start a task'
-        );
+            ->setHelp('Start a task');
     }
 
     /**
