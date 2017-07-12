@@ -1,6 +1,4 @@
 app/bootstrap.php.cache
-app/cache/*
-app/logs/*
 app/config/security_credentials.yml
 /bin
 
