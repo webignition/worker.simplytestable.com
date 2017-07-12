@@ -78,7 +78,7 @@ services:
   simplytestable.services.resque.queueService:
     class:   SimplyTestable\WorkerBundle\Services\Resque\QueueService
     arguments:
-      resque: '@bcc_resque.resque'
+      resque: '@resque'
       logger: '@logger'
       jobFactory: '@simplytestable.services.resque.jobfactory'
 

@@ -1,12 +1,12 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Services\Resque;
 
-use BCC\ResqueBundle\Resque;
+use ResqueBundle\Resque\Resque;
 use SimplyTestable\WorkerBundle\Resque\Job\Job;
 use Psr\Log\LoggerInterface;
 
 /**
- * Wrapper for \BCC\ResqueBundle\Resque that handles exceptions
+ * Wrapper for \ResqueBundle\Resque\Resque that handles exceptions
  * when trying to interact with queues.
  *
  * Exceptions generally occur when trying to establish a socket connection to
