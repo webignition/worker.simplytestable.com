@@ -1,10 +1,6 @@
 imports:
     - { resource: security_credentials.yml }
 
-jms_security_extra:
-    secure_all_services: false
-    expressions: true
-
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext
@@ -14,12 +10,12 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     firewalls:
-        main:         
+        main:
             pattern: ^/
             anonymous: ~
-            form_login: false            
+            form_login: false
             http_basic:
-                realm: "Simply Testable Core Application"         
-            
+                realm: "Simply Testable Core Application"
+
     access_control:
         - { path: ^/maintenance/, role: ROLE_ADMIN }
