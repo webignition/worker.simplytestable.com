@@ -11,24 +11,25 @@ use Symfony\Component\Console\Input\ArrayInput;
 class WorkerActivateCommandTest extends BaseSimplyTestableTestCase
 {
     /**
+     * @var WorkerActivateCommand
+     */
+    private $command;
+
+    /**
      * {@inheritdoc}
      */
-    protected static function getServicesToMock()
+    protected function setUp()
     {
-        return [
-            'simplytestable.services.workerservice',
-        ];
+        parent::setUp();
+
+        $this->command = $this->container->get(WorkerActivateCommand::class);
     }
 
     public function testRunInMaintenanceReadOnlyMode()
     {
         $this->container->get(WorkerService::class)->setReadOnly();
 
-        $command = new WorkerActivateCommand(
-            $this->container->get('simplytestable.services.workerservice')
-        );
-
-        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->run(new ArrayInput([]), new StringOutput());
 
         $this->assertEquals(
             WorkerActivateCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
@@ -44,15 +45,10 @@ class WorkerActivateCommandTest extends BaseSimplyTestableTestCase
      */
     public function testRun($activationResult, $expectedReturnCode)
     {
-        $this->container->get('simplytestable.services.workerservice')
-            ->shouldReceive('activate')
-            ->andReturn($activationResult);
+        $this->container->get(WorkerService::class)
+            ->setActivateResult($activationResult);
 
-        $command = new WorkerActivateCommand(
-            $this->container->get('simplytestable.services.workerservice')
-        );
-
-        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->run(new ArrayInput([]), new StringOutput());
 
         $this->assertEquals($expectedReturnCode, $returnCode);
     }

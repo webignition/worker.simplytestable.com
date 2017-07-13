@@ -63,3 +63,15 @@ services:
     calls:
       - [setWorkerProcessCount, ['%worker_process_count%']]
       - [setMaxTasksRequestFactor, ['%max_tasks_request_factor%']]
+
+  SimplyTestable\WorkerBundle\Services\WorkerService:
+    class:   Tests\WorkerBundle\Services\TestWorkerService
+    arguments:
+        - '@doctrine.orm.entity_manager'
+        - '@logger'
+        - '%secret%'
+        - '%hostname%'
+        - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
+        - '@SimplyTestable\WorkerBundle\Services\StateService'
+        - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
+        - '@SimplyTestable\WorkerBundle\Services\UrlService'
