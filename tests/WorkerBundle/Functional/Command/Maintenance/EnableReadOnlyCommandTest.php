@@ -12,9 +12,7 @@ class EnableReadOnlyCommandTest extends BaseSimplyTestableTestCase
 {
     public function testRun()
     {
-        $command = new EnableReadOnlyCommand(
-            $this->container->get('simplytestable.services.workerservice')
-        );
+        $command = $this->container->get(EnableReadOnlyCommand::class);
 
         $returnCode = $command->run(
             new ArrayInput([]),
@@ -24,7 +22,7 @@ class EnableReadOnlyCommandTest extends BaseSimplyTestableTestCase
         $this->assertEquals(0, $returnCode);
         $this->assertEquals(
             WorkerService::WORKER_MAINTENANCE_READ_ONLY_STATE,
-            $this->getWorkerService()->get()->getState()->getName()
+            $this->container->get(WorkerService::class)->get()->getState()->getName()
         );
     }
 }

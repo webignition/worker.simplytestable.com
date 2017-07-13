@@ -12,9 +12,7 @@ class DisableReadOnlyCommandTest extends BaseSimplyTestableTestCase
 {
     public function testRun()
     {
-        $command = new DisableReadOnlyCommand(
-            $this->container->get('simplytestable.services.workerservice')
-        );
+        $command = $this->container->get(DisableReadOnlyCommand::class);
 
         $returnCode = $command->run(
             new ArrayInput([]),
@@ -24,7 +22,7 @@ class DisableReadOnlyCommandTest extends BaseSimplyTestableTestCase
         $this->assertEquals(0, $returnCode);
         $this->assertEquals(
             WorkerService::WORKER_ACTIVE_STATE,
-            $this->getWorkerService()->get()->getState()->getName()
+            $this->container->get(WorkerService::class)->get()->getState()->getName()
         );
     }
 }
