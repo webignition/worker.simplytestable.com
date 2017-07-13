@@ -2,6 +2,7 @@
 
 namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
@@ -21,7 +22,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = $this->container->get('simplytestable.services.taskdriver.linkintegrity');
+        $this->taskDriver = $this->container->get(LinkIntegrityTaskDriver::class);
     }
 
     /**
@@ -240,7 +241,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+        foreach ($this->container->get(HttpClientService::class)->getHistory()->getRequests(true) as $request) {
             $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
         }
     }
@@ -268,7 +269,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+        foreach ($this->container->get(HttpClientService::class)->getHistory()->getRequests(true) as $request) {
             $decodedAuthorizationHeaderValue = base64_decode(
                 str_replace('Basic', '', $request->getHeader('authorization'))
             );
