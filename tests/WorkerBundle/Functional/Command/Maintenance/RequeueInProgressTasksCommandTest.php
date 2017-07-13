@@ -31,11 +31,13 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
         $this->removeAllTasks();
         $this->clearRedis();
 
+        $taskService = $this->container->get(TaskService::class);
+
         /* @var Task[] $tasks */
         $tasks = [];
 
-        $queuedState = $this->getTaskService()->getQueuedState();
-        $inProgressState = $this->getTaskService()->getInProgressState();
+        $queuedState = $taskService->getQueuedState();
+        $inProgressState = $taskService->getInProgressState();
 
         foreach ($taskValuesCollection as $taskValues) {
             $tasks[] = $this->getTaskFactory()->create($taskValues);
@@ -43,15 +45,16 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
 
         $this->assertCount(
             $expectedInitialQueuedTaskCount,
-            $this->getTaskService()->getEntityRepository()->getIdsByState($queuedState)
+            $taskService->getEntityRepository()->getIdsByState($queuedState)
         );
 
         $this->assertCount(
             $expectedInitialInProgressTaskCount,
-            $this->getTaskService()->getEntityRepository()->getIdsByState($inProgressState)
+            $taskService->getEntityRepository()->getIdsByState($inProgressState)
         );
 
-        $command = $this->createRequeueInProgressTasksCommand();
+        $command = $this->container->get(RequeueInProgressTasksCommand::class);
+
         $returnCode = $command->run(
             new ArrayInput($commandArguments),
             new StringOutput()
@@ -61,7 +64,7 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
 
         $this->assertCount(
             $expectedQueuedTaskCount,
-            $this->getTaskService()->getEntityRepository()->getIdsByState($queuedState)
+            $taskService->getEntityRepository()->getIdsByState($queuedState)
         );
     }
 
@@ -194,17 +197,5 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
                 'expectedQueuedTaskCount' => 2,
             ],
         ];
-    }
-
-    /**
-     * @return RequeueInProgressTasksCommand
-     */
-    private function createRequeueInProgressTasksCommand()
-    {
-        return new RequeueInProgressTasksCommand(
-            $this->container->get('simplytestable.services.taskservice'),
-            $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactory')
-        );
     }
 }
