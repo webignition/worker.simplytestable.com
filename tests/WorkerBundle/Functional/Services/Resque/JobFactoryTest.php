@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\WorkerBundle\Functional\Guzzle;
+namespace Tests\WorkerBundle\Functional\Services\Resque;
 
 use SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob;
 use SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob;
@@ -10,7 +10,20 @@ use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
 class JobFactoryTest extends BaseSimplyTestableTestCase
 {
-    const RESQUE_JOB_FACTORY_SERVICE_ID = 'simplytestable.services.resque.jobfactory';
+    /**
+     * @var JobFactory
+     */
+    private $jobFactory;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->jobFactory = $this->container->get(JobFactory::class);
+    }
 
     public function testCreateWithInvalidQueue()
     {
@@ -20,8 +33,7 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
             JobFactory::EXCEPTION_CODE_INVALID_QUEUE
         );
 
-        $jobFactory = $this->container->get(self::RESQUE_JOB_FACTORY_SERVICE_ID);
-        $jobFactory->create('foo');
+        $this->jobFactory->create('foo');
     }
 
     /**
@@ -39,8 +51,7 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
             JobFactory::EXCEPTION_CODE_MISSING_REQUIRED_ARG
         );
 
-        $jobFactory = $this->container->get('simplytestable.services.resque.jobfactory');
-        $jobFactory->create($queue, $args);
+        $this->jobFactory->create($queue, $args);
     }
 
     /**
@@ -77,8 +88,7 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
      */
     public function testCreate($queue, $args, $expectedJobClass, $expectedQueue, $expectedArgs)
     {
-        $jobFactory = $this->container->get('simplytestable.services.resque.jobfactory');
-        $job = $jobFactory->create($queue, $args);
+        $job = $this->jobFactory->create($queue, $args);
 
         $this->assertInstanceOf($expectedJobClass, $job);
         $this->assertEquals($job->queue, $expectedQueue);
@@ -153,8 +163,7 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
      */
     public function testGetJobClassName($queue, $expectedJobClassName)
     {
-        $jobFactory = $this->container->get('simplytestable.services.resque.jobfactory');
-        $jobClassName = $jobFactory->getJobClassName($queue);
+        $jobClassName = $this->jobFactory->getJobClassName($queue);
 
         $this->assertEquals($expectedJobClassName, $jobClassName);
     }

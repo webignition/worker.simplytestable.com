@@ -96,8 +96,6 @@ services:
 #    arguments:
 #        entityManager: '@doctrine.orm.entity_manager'
 #
-#  simplytestable.services.memcachedservice:
-#    class:   SimplyTestable\WorkerBundle\Services\MemcachedService
 #
 #  simplytestable.services.httpcache:
 #    class:   SimplyTestable\WorkerBundle\Services\HttpCache

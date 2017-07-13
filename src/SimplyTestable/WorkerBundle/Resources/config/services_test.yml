@@ -4,3 +4,12 @@ services:
       arguments:
         - '@kernel'
 
+  SimplyTestable\WorkerBundle\Services\MemcachedService:
+      public: true
+
+  SimplyTestable\WorkerBundle\Services\Resque\QueueService:
+      public: true
+      arguments:
+        - '@resque'
+        - '@logger'
+        - '@SimplyTestable\WorkerBundle\Services\Resque\JobFactory'
