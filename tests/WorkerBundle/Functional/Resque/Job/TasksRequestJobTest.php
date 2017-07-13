@@ -4,6 +4,8 @@ namespace Tests\WorkerBundle\Functional\Resque\Job;
 
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
 use SimplyTestable\WorkerBundle\Resque\Job\Job;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Factory\TaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
@@ -13,7 +15,7 @@ class TasksRequestJobTest extends BaseSimplyTestableTestCase
 
     public function testRunInMaintenanceReadOnlyMode()
     {
-        $this->getWorkerService()->setReadOnly();
+        $this->container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
 
         $tasksRequestJob = $this->createTasksRequestJob();
@@ -27,13 +29,11 @@ class TasksRequestJobTest extends BaseSimplyTestableTestCase
     }
 
     /**
-     * @param int $taskId
-     *
      * @return Job
      */
     private function createTasksRequestJob()
     {
-        $resqueJobFactory = $this->container->get('simplytestable.services.resque.jobfactory');
+        $resqueJobFactory = $this->container->get(JobFactory::class);
 
         $tasksRequestJob = $resqueJobFactory->create(self::QUEUE, []);
 
