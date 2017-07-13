@@ -4,6 +4,9 @@ namespace Tests\WorkerBundle\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
+use SimplyTestable\WorkerBundle\Services\TaskService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TaskFactory;
@@ -11,12 +14,19 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
 {
-    public function testGetAsService()
+    /**
+     * @var ReportCompletionEnqueueCommand
+     */
+    private $command;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
     {
-        $this->assertInstanceOf(
-            ReportCompletionEnqueueCommand::class,
-            $this->container->get('simplytestable.command.task.reportcompletionenqueue')
-        );
+        parent::setUp();
+
+        $this->command = $this->container->get(ReportCompletionEnqueueCommand::class);
     }
 
     public function testRunWithEmptyQueue()
@@ -29,16 +39,17 @@ class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
-        $this->getTaskService()->perform($task);
+        $this->container->get(TaskService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
 
-        $command = $this->createReportCompletionEnqueueCommand();
-        $returnCode = $command->execute(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->execute(new ArrayInput([]), new StringOutput());
 
         $this->assertEquals(0, $returnCode);
 
-        $this->assertTrue($this->getResqueQueueService()->contains(
+        $resqueQueueService = $this->container->get(QueueService::class);
+
+        $this->assertTrue($resqueQueueService->contains(
             'task-report-completion',
             [
                 'id' => $task->getId()
@@ -56,41 +67,30 @@ class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
-        $this->getTaskService()->perform($task);
+        $this->container->get(TaskService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
 
-        $this->getResqueQueueService()->enqueue(
-            $this->getResqueJobFactory()->create(
+        $resqueQueueService = $this->container->get(QueueService::class);
+        $resqueJobFactory = $this->container->get(JobFactory::class);
+
+        $resqueQueueService->enqueue(
+            $resqueJobFactory->create(
                 'task-report-completion',
                 ['id' => $task->getId()]
             )
         );
 
-        $command = $this->createReportCompletionEnqueueCommand();
-        $returnCode = $command->execute(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->execute(new ArrayInput([]), new StringOutput());
 
         $this->assertEquals(0, $returnCode);
 
-        $this->assertTrue($this->getResqueQueueService()->contains(
+        $this->assertTrue($resqueQueueService->contains(
             'task-report-completion',
             [
                 'id' => $task->getId()
             ]
         ));
-    }
-
-    /**
-     * @return ReportCompletionEnqueueCommand
-     */
-    private function createReportCompletionEnqueueCommand()
-    {
-        return new ReportCompletionEnqueueCommand(
-            $this->container->get('logger'),
-            $this->container->get('simplytestable.services.taskservice'),
-            $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactory')
-        );
     }
 
     /**
