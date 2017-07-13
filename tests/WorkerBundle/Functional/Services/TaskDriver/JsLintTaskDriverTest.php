@@ -3,6 +3,7 @@
 namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 
 use Mockery\MockInterface;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
@@ -28,7 +29,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = $this->container->get('simplytestable.services.taskdriver.jslint');
+        $this->taskDriver = $this->container->get(JsLintTaskDriver::class);
     }
 
     /**
@@ -405,10 +406,9 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             JsLintFixtureFactory::load('no-errors.json')
         ]);
 
-
         /* @var NodeJslintWrapper|MockInterface $nodeJslintWrapper */
         $nodeJslintWrapper = \Mockery::spy(
-            $this->container->get('simplytestable.services.nodejslintwrapperservice')
+            $this->container->get('simplytestable.services.nodejslintwrapper')
         );
 
         $this->getTaskDriver()->setNodeJsLintWrapper($nodeJslintWrapper);
@@ -504,7 +504,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+        foreach ($this->container->get(HttpClientService::class)->getHistory()->getRequests(true) as $request) {
             $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
         }
     }
@@ -535,7 +535,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+        foreach ($this->container->get(HttpClientService::class)->getHistory()->getRequests(true) as $request) {
             $decodedAuthorizationHeaderValue = base64_decode(
                 str_replace('Basic', '', $request->getHeader('authorization'))
             );
