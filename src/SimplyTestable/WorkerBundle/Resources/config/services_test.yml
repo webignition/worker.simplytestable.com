@@ -1,15 +1,28 @@
 services:
   SimplyTestable\WorkerBundle\Services\ResourceLocator:
-      public: true
-      arguments:
-        - '@kernel'
+    public: true
+    arguments:
+      - '@kernel'
 
   SimplyTestable\WorkerBundle\Services\MemcachedService:
-      public: true
+    public: true
 
   SimplyTestable\WorkerBundle\Services\Resque\QueueService:
-      public: true
-      arguments:
-        - '@resque'
-        - '@logger'
-        - '@SimplyTestable\WorkerBundle\Services\Resque\JobFactory'
+    public: true
+    arguments:
+      - '@resque'
+      - '@logger'
+      - '@SimplyTestable\WorkerBundle\Services\Resque\JobFactory'
+
+  SimplyTestable\WorkerBundle\Services\TaskTypeService:
+    public: true
+    arguments:
+      - '@doctrine.orm.entity_manager'
+
+  SimplyTestable\WorkerBundle\Services\StateService:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+
+  SimplyTestable\WorkerBundle\Services\HttpCache:
+    arguments:
+      - '@SimplyTestable\WorkerBundle\Services\MemcachedService'

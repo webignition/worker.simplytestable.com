@@ -4,10 +4,12 @@ namespace Tests\WorkerBundle\Functional;
 
 use Doctrine\ORM\EntityManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Services\HttpCache;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\MemcachedService;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
+use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
@@ -35,12 +37,14 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
      */
     protected function getTaskFactory()
     {
-        $stateService = $this->container->get('simplytestable.services.stateservice');
+        $stateService = $this->container->get(StateService::class);
+        $taskService = $this->container->get(TaskService::class);
+        $taskTypeService = $this->container->get(TaskTypeService::class);
 
         if (is_null($this->taskFactory)) {
             $this->taskFactory = new TaskFactory(
-                $this->getTaskService(),
-                $this->getTaskTypeService(),
+                $taskService,
+                $taskTypeService,
                 $stateService,
                 $this->getEntityManager()
             );
@@ -138,9 +142,11 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
      */
     protected function setHttpFixtures($fixtures)
     {
-        $this->container->get('simplytestable.services.httpcache')->clear();
+        $httpCache = $this->container->get(HttpCache::class);
+        $httpCache->clear();
 
-        $this->getHttpClientService()->get()->getEmitter()->attach(
+        $httpClientService = $this->container->get(HttpClientService::class);
+        $httpClientService->get()->getEmitter()->attach(
             new HttpMockSubscriber($fixtures)
         );
     }

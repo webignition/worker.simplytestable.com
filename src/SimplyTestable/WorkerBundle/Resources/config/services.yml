@@ -1,5 +1,5 @@
 imports:
-#    - { resource: services/task-drivers.yml }
+    - { resource: services/task-drivers.yml }
 #    - { resource: services/request-factories.yml }
 #    - { resource: services/commands.yml }
     - { resource: services/resque-job-factory.yml }
@@ -21,33 +21,28 @@ services:
         - '@SimplyTestable\WorkerBundle\Services\HttpCache'
         - '%curl_options%'
 
-#  simplytestable.services.webResourceServiceConfiguration:
-#    class:  webignition\WebResource\Service\Configuration
-#    arguments:
-#        configurationValues:
-#          allow-uknown-resource-types: true
-#          retry-with-url-encoding-disabled: true
-#          content-type-web-resource-map: '%content_type_web_resource_map%'
-#
-#  simplytestable.services.webResourceService:
-#    class:  webignition\WebResource\Service\Service
-#    calls:
-#      - [setConfiguration, ['@simplytestable.services.webResourceServiceConfiguration']]
-#
-#  simplytestable.services.htmlValidatorWrapperService:
-#    class:  webignition\HtmlValidator\Wrapper\Wrapper
-#
-#  simplytestable.services.cssValidatorWrapperService:
-#    class:  webignition\CssValidatorWrapper\Wrapper
-#
-#  simplytestable.services.nodeJslintWrapperService:
-#    class:  webignition\NodeJslint\Wrapper\Wrapper
-#
-#  simplytestable.services.stateservice:
-#    class:  SimplyTestable\WorkerBundle\Services\StateService
-#    arguments:
-#        entityManager: '@doctrine.orm.entity_manager'
-#
+  simplytestable.services.webresourceserviceconfiguration:
+    class:  webignition\WebResource\Service\Configuration
+    arguments:
+        $configurationValues:
+          allow-uknown-resource-types: true
+          retry-with-url-encoding-disabled: true
+          content-type-web-resource-map: '%content_type_web_resource_map%'
+
+  simplytestable.services.webresourceservice:
+    class:  webignition\WebResource\Service\Service
+    calls:
+      - [setConfiguration, ['@simplytestable.services.webresourceserviceconfiguration']]
+
+  simplytestable.services.htmlvalidatorwrapper:
+    class:  webignition\HtmlValidator\Wrapper\Wrapper
+
+  simplytestable.services.cssvalidatorwrapper:
+    class:  webignition\CssValidatorWrapper\Wrapper
+
+  simplytestable.services.nodejslintwrapper:
+    class:  webignition\NodeJslint\Wrapper\Wrapper
+
   SimplyTestable\WorkerBundle\Services\WorkerService:
     arguments:
         - '@doctrine.orm.entity_manager'
@@ -62,22 +57,21 @@ services:
 #  simplytestable.services.urlService:
 #    class:  SimplyTestable\WorkerBundle\Services\UrlService
 #
-#  simplytestable.services.taskservice:
-#    class:   SimplyTestable\WorkerBundle\Services\TaskService
-#    arguments:
-#        entityManager: '@doctrine.orm.entity_manager'
-#        logger: '@logger'
-#        stateService: '@simplytestable.services.stateservice'
-#        urlService: '@simplytestable.services.urlservice'
-#        coreApplicationRouter: '@simplytestable.services.coreapplicationrouter'
-#        workerService: '@simplytestable.services.workerservice'
-#        httpClientService: '@simplytestable.services.httpClientService'
-#    calls:
-#      - [addTaskDriver, ['html validation', '@simplytestable.services.taskdriver.htmlvalidation']]
-#      - [addTaskDriver, ['css validation', '@simplytestable.services.taskdriver.cssvalidation']]
-#      - [addTaskDriver, ['js static analysis', '@simplytestable.services.taskdriver.jslint']]
-#      - [addTaskDriver, ['link integrity', '@simplytestable.services.taskdriver.linkintegrity']]
-#      - [addTaskDriver, ['url discovery', '@simplytestable.services.taskdriver.urldiscovery']]
+  SimplyTestable\WorkerBundle\Services\TaskService:
+    arguments:
+        - '@doctrine.orm.entity_manager'
+        - '@logger'
+        - '@SimplyTestable\WorkerBundle\Services\StateService'
+        - '@SimplyTestable\WorkerBundle\Services\UrlService'
+        - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
+        - '@SimplyTestable\WorkerBundle\Services\WorkerService'
+        - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
+    calls:
+      - [addTaskDriver, ['html validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver']]
+      - [addTaskDriver, ['css validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver']]
+      - [addTaskDriver, ['js static analysis', '@SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver']]
+      - [addTaskDriver, ['link integrity', '@SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver']]
+      - [addTaskDriver, ['url discovery', '@SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver']]
 #
 #  simplytestable.services.tasktypeservice:
 #    class:   SimplyTestable\WorkerBundle\Services\TaskTypeService
@@ -97,10 +91,6 @@ services:
 #        entityManager: '@doctrine.orm.entity_manager'
 #
 #
-#  simplytestable.services.httpcache:
-#    class:   SimplyTestable\WorkerBundle\Services\HttpCache
-#    arguments:
-#        memcachedService: '@simplytestable.services.memcachedservice'
 #
 #  simplytestable.services.tasksservice:
 #    class:   SimplyTestable\WorkerBundle\Services\TasksService
