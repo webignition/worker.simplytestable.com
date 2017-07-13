@@ -50,3 +50,16 @@ services:
       - [addTaskDriver, ['js static analysis', '@SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver']]
       - [addTaskDriver, ['link integrity', '@SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver']]
       - [addTaskDriver, ['url discovery', '@SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver']]
+
+  SimplyTestable\WorkerBundle\Services\TasksService:
+    class:   Tests\WorkerBundle\Services\TestTasksService
+    arguments:
+      - '@logger'
+      - '@SimplyTestable\WorkerBundle\Services\UrlService'
+      - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
+      - '@SimplyTestable\WorkerBundle\Services\WorkerService'
+      - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
+      - '@SimplyTestable\WorkerBundle\Services\TaskService'
+    calls:
+      - [setWorkerProcessCount, ['%worker_process_count%']]
+      - [setMaxTasksRequestFactor, ['%max_tasks_request_factor%']]

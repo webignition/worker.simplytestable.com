@@ -4,6 +4,9 @@ namespace Tests\WorkerBundle\Functional\Command\Tasks;
 
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
+use SimplyTestable\WorkerBundle\Services\TasksService;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -11,29 +14,33 @@ use Symfony\Component\Console\Input\ArrayInput;
 class RequestCommandTest extends BaseSimplyTestableTestCase
 {
     /**
+     * @var RequestCommand
+     */
+    private $command;
+
+    /**
      * {@inheritdoc}
      */
-    protected static function getServicesToMock()
+    protected function setUp()
     {
-        return [
-            'simplytestable.services.tasksservice',
-        ];
+        parent::setUp();
+
+        $this->command = $this->container->get(RequestCommand::class);
     }
 
     public function testMaintenanceMode()
     {
-        $this->getWorkerService()->setReadOnly();
+        $this->container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
 
-        $command = $this->createRequestCommand();
-        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->run(new ArrayInput([]), new StringOutput());
 
         $this->assertEquals(
             RequestCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
             $returnCode
         );
 
-        $this->assertFalse($this->getResqueQueueService()->isEmpty('tasks-request'));
+        $this->assertFalse($this->container->get(QueueService::class)->isEmpty('tasks-request'));
     }
 
     /**
@@ -46,19 +53,21 @@ class RequestCommandTest extends BaseSimplyTestableTestCase
     {
         $this->clearRedis();
 
-        $this->container->get('simplytestable.services.tasksservice')
-            ->shouldReceive('request')
-            ->andReturn($tasksServiceRequestReturnValue);
+        $tasksService = $this->container->get(TasksService::class);
+        $tasksService
+            ->setRequestResult($tasksServiceRequestReturnValue);
 
-        $command = $this->createRequestCommand();
-        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->run(new ArrayInput([]), new StringOutput());
 
         $this->assertEquals(
             $expectedCommandReturnCode,
             $returnCode
         );
 
-        $this->assertEquals($expectedQueueIsEmpty, $this->getResqueQueueService()->isEmpty('tasks-request'));
+        $this->assertEquals(
+            $expectedQueueIsEmpty,
+            $this->container->get(QueueService::class)->isEmpty('tasks-request')
+        );
     }
 
     /**
@@ -91,15 +100,14 @@ class RequestCommandTest extends BaseSimplyTestableTestCase
         $this->setHttpFixtures($responseFixtures);
         $this->clearRedis();
 
-        $command = $this->createRequestCommand();
-        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->run(new ArrayInput([]), new StringOutput());
 
         $this->assertEquals(
             $expectedCommandReturnCode,
             $returnCode
         );
 
-        $this->assertFalse($this->getResqueQueueService()->isEmpty('tasks-request'));
+        $this->assertFalse($this->container->get(QueueService::class)->isEmpty('tasks-request'));
     }
 
     /**
@@ -121,18 +129,5 @@ class RequestCommandTest extends BaseSimplyTestableTestCase
                 'expectedCommandReturnCode' => RequestCommand::RETURN_CODE_FAILED,
             ],
         ];
-    }
-
-    /**
-     * @return RequestCommand
-     */
-    private function createRequestCommand()
-    {
-        return new RequestCommand(
-            $this->container->get('simplytestable.services.tasksservice'),
-            $this->container->get('simplytestable.services.workerservice'),
-            $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactory')
-        );
     }
 }

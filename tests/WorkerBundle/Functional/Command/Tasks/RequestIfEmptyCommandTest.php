@@ -4,6 +4,8 @@ namespace Tests\WorkerBundle\Functional\Command\Tasks;
 
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestIfEmptyCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -18,15 +20,18 @@ class RequestIfEmptyCommandTest extends BaseSimplyTestableTestCase
     {
         $this->clearRedis();
 
+        $resqueQueueService = $this->container->get(QueueService::class);
+        $resqueJobFactory = $this->container->get(JobFactory::class);
+
         if (!$hasEmptyQueue) {
-            $this->getResqueQueueService()->enqueue(
-                $this->getResqueJobFactory()->create(
+            $resqueQueueService->enqueue(
+                $resqueJobFactory->create(
                     'tasks-request'
                 )
             );
         }
 
-        $command = $this->createRequestIfEmptyCommand();
+        $command = $this->container->get(RequestIfEmptyCommand::class);
         $returnCode = $command->run(new ArrayInput([]), new StringOutput());
 
         $this->assertEquals(
@@ -34,10 +39,13 @@ class RequestIfEmptyCommandTest extends BaseSimplyTestableTestCase
             $returnCode
         );
 
-        $this->assertFalse($this->getResqueQueueService()->isEmpty('tasks-request'));
-        $this->assertEquals(1, $this->getResqueQueueService()->getQueueLength('tasks-request'));
+        $this->assertFalse($resqueQueueService->isEmpty('tasks-request'));
+        $this->assertEquals(1, $resqueQueueService->getQueueLength('tasks-request'));
     }
 
+    /**
+     * @return array
+     */
     public function runDataProvider()
     {
         return [
@@ -48,16 +56,5 @@ class RequestIfEmptyCommandTest extends BaseSimplyTestableTestCase
                 'hasEmptyQueue' => false,
             ],
         ];
-    }
-
-    /**
-     * @return RequestIfEmptyCommand
-     */
-    private function createRequestIfEmptyCommand()
-    {
-        return new RequestIfEmptyCommand(
-            $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactory')
-        );
     }
 }
