@@ -22,7 +22,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->getWorkerService()->setActive();
+        $this->container->get('SimplyTestable\WorkerBundle\Services\WorkerService')->setActive();
     }
 
     /**
@@ -49,13 +49,13 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
         return $this->taskFactory;
     }
 
-    /**
-     * @return WorkerService
-     */
-    protected function getWorkerService()
-    {
-        return $this->container->get('simplytestable.services.workerservice');
-    }
+//    /**
+//     * @return WorkerService
+//     */
+//    protected function getWorkerService()
+//    {
+//        return $this->container->get('simplytestable.services.workerservice');
+//    }
 
     /**
      * @return QueueService

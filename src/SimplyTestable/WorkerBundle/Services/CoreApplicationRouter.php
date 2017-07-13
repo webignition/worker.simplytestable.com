@@ -16,10 +16,10 @@ class CoreApplicationRouter
     const ROUTING_RESOURCE = 'coreapplicationrouting.yml';
     const URL_PLACEHOLDER = '{{url}}';
 
-    /**
-     * @var string
-     */
-    private $baseUrl;
+//    /**
+//     * @var string
+//     */
+//    private $baseUrl;
 
     /**
      * @var RouterInterface
@@ -32,27 +32,44 @@ class CoreApplicationRouter
     private $encodedUrlPlaceholder = null;
 
     /**
-     * @param string $baseUrl
-     * @param KernelInterface $kernel
-     * @param string $cachePath
+     * @param $baseUrl
+     * @param ResourceLocator $resourceLocator
+     * @param ApplicationConfigurationService $applicationConfigurationService
      */
-    public function __construct($baseUrl, KernelInterface $kernel, $cachePath)
-    {
-        $this->baseUrl = $baseUrl;
-
-        $locator = new FileLocator([$kernel->locateResource(self::BUNDLE_CONFIG_PATH)]);
+    public function __construct(
+        $baseUrl,
+        ResourceLocator $resourceLocator,
+        ApplicationConfigurationService $applicationConfigurationService
+    ) {
+        $locator = new FileLocator($resourceLocator->locate(self::BUNDLE_CONFIG_PATH));
         $requestContext = new RequestContext();
         $requestContext->fromRequest(Request::createFromGlobals());
-        $requestContext->setBaseUrl($baseUrl);
 
         $this->router = new Router(
             new YamlFileLoader($locator),
             self::ROUTING_RESOURCE,
-            ['cache_dir' => $cachePath],
+            ['cache_dir' => $applicationConfigurationService->getCacheDir()],
             $requestContext
         );
 
+        $this->router->getContext()->setBaseUrl($baseUrl);
+
         $this->encodedUrlPlaceholder = rawurlencode(self::URL_PLACEHOLDER);
+//        $this->baseUrl = $baseUrl;
+//
+//        $locator = new FileLocator([$kernel->locateResource(self::BUNDLE_CONFIG_PATH)]);
+//        $requestContext = new RequestContext();
+//        $requestContext->fromRequest(Request::createFromGlobals());
+//        $requestContext->setBaseUrl($baseUrl);
+//
+//        $this->router = new Router(
+//            new YamlFileLoader($locator),
+//            self::ROUTING_RESOURCE,
+//            ['cache_dir' => $cachePath],
+//            $requestContext
+//        );
+//
+//        $this->encodedUrlPlaceholder = rawurlencode(self::URL_PLACEHOLDER);
     }
 
     /**

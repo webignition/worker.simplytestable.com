@@ -1,8 +1,7 @@
 services:
-  simplytestable.services.resque.jobfactory:
-    class:   SimplyTestable\WorkerBundle\Services\Resque\JobFactory
+  SimplyTestable\WorkerBundle\Services\Resque\JobFactory:
     arguments:
-        queues:
+        $queues:
           task-perform:
             queue: task-perform
             jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob

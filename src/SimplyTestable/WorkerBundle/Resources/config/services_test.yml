@@ -1,6 +1,6 @@
-#services:
-#  simplytestable.services.cssValidatorWrapperService:
-#    class:  webignition\CssValidatorWrapper\Mock\Wrapper
-#
-#  simplytestable.services.nodeJslintWrapperService:
-#    class:  webignition\NodeJslint\Wrapper\Mock\Wrapper
+services:
+  SimplyTestable\WorkerBundle\Services\ResourceLocator:
+      public: true
+      arguments:
+        - '@kernel'
+

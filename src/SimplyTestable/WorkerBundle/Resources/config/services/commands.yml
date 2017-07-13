@@ -1,115 +1,115 @@
 services:
-  simplytestable.command.maintenance.disablereadonly:
-    class: SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand
-    arguments:
-        workerService: '@simplytestable.services.workerservice'
-    tags:
-      - { name: console.command }
-
-  simplytestable.command.maintenance.enablereadonly:
-    class: SimplyTestable\WorkerBundle\Command\Maintenance\EnableReadOnlyCommand
-    arguments:
-        workerService: '@simplytestable.services.workerservice'
-    tags:
-      - { name: console.command }
-
-  simplytestable.command.httpcache.clear:
-    class: SimplyTestable\WorkerBundle\Command\HttpCache\ClearCommand
-    arguments:
-        httpCache: '@simplytestable.services.httpcache'
-    tags:
-      - { name: console.command }
-
-  simplytestable.command.maintenance.requeinprogresstasks:
-    class: SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand
-    arguments:
-        taskService: '@simplytestable.services.taskservice'
-        resqueQueueService: '@simplytestable.services.resque.queueservice'
-        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
-    tags:
-      - { name: console.command }
-
-  simplytestable.command.task.perform:
-    class:   SimplyTestable\WorkerBundle\Command\Task\PerformCommand
-    arguments:
-        logger: '@logger'
-        taskService: '@simplytestable.services.taskservice'
-        workerService: '@simplytestable.services.workerservice'
-        resqueQueueService: '@simplytestable.services.resque.queueservice'
-        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
-    tags:
-      - { name: console.command }
-
-  simplytestable.command.tasks.perform:
-    class:   SimplyTestable\WorkerBundle\Command\Tasks\PerformCommand
-    arguments:
-        logger: '@logger'
-        taskService: '@simplytestable.services.taskservice'
-        workerService: '@simplytestable.services.workerservice'
-        resqueQueueService: '@simplytestable.services.resque.queueservice'
-        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
-    tags:
-      - { name: console.command }
-
-  simplytestable.command.task.performenqueue:
-    class:   SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand
-    arguments:
-        taskService: '@simplytestable.services.taskservice'
-        resqueQueueService: '@simplytestable.services.resque.queueservice'
-        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
-    tags:
-      - { name: console.command }
-
-  simplytestable.command.tasks.reportcompletion:
-    class:   SimplyTestable\WorkerBundle\Command\Tasks\ReportCompletionCommand
-    arguments:
-        logger: '@logger'
-        taskService: '@simplytestable.services.taskservice'
-        workerService: '@simplytestable.services.workerservice'
-    tags:
-      - { name: console.command }
-
-  simplytestable.command.task.reportcompletion:
-    class:   SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand
-    arguments:
-        logger: '@logger'
-        taskService: '@simplytestable.services.taskservice'
-        workerService: '@simplytestable.services.workerservice'
-    tags:
-      - { name: console.command }
-
-  simplytestable.command.task.reportcompletionenqueue:
-    class:   SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand
-    arguments:
-        logger: '@logger'
-        taskService: '@simplytestable.services.taskservice'
-        resqueQueueService: '@simplytestable.services.resque.queueservice'
-        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
-    tags:
-      - { name: console.command }
-
-  simplytestable.command.tasks.request:
-    class:   SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand
-    arguments:
-        tasksService: '@simplytestable.services.tasksservice'
-        workerService: '@simplytestable.services.workerservice'
-        resqueQueueService: '@simplytestable.services.resque.queueservice'
-        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
-    tags:
-      - { name: console.command }
-
-  simplytestable.command.tasks.requestifempty:
-    class:   SimplyTestable\WorkerBundle\Command\Tasks\RequestIfEmptyCommand
-    arguments:
-        resqueQueueService: '@simplytestable.services.resque.queueservice'
-        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
-    tags:
-      - { name: console.command }
-
-
-  simplytestable.command.worker.activate:
-    class:   SimplyTestable\WorkerBundle\Command\WorkerActivateCommand
-    arguments:
-        workerService: '@simplytestable.services.workerservice'
-    tags:
-      - { name: console.command }
+#  simplytestable.command.maintenance.disablereadonly:
+#    class: SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand
+#    arguments:
+#        workerService: '@simplytestable.services.workerservice'
+#    tags:
+#      - { name: console.command }
+#
+#  simplytestable.command.maintenance.enablereadonly:
+#    class: SimplyTestable\WorkerBundle\Command\Maintenance\EnableReadOnlyCommand
+#    arguments:
+#        workerService: '@simplytestable.services.workerservice'
+#    tags:
+#      - { name: console.command }
+#
+#  simplytestable.command.httpcache.clear:
+#    class: SimplyTestable\WorkerBundle\Command\HttpCache\ClearCommand
+#    arguments:
+#        httpCache: '@simplytestable.services.httpcache'
+#    tags:
+#      - { name: console.command }
+#
+#  simplytestable.command.maintenance.requeinprogresstasks:
+#    class: SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand
+#    arguments:
+#        taskService: '@simplytestable.services.taskservice'
+#        resqueQueueService: '@simplytestable.services.resque.queueservice'
+#        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
+#    tags:
+#      - { name: console.command }
+#
+#  simplytestable.command.task.perform:
+#    class:   SimplyTestable\WorkerBundle\Command\Task\PerformCommand
+#    arguments:
+#        logger: '@logger'
+#        taskService: '@simplytestable.services.taskservice'
+#        workerService: '@simplytestable.services.workerservice'
+#        resqueQueueService: '@simplytestable.services.resque.queueservice'
+#        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
+#    tags:
+#      - { name: console.command }
+#
+#  simplytestable.command.tasks.perform:
+#    class:   SimplyTestable\WorkerBundle\Command\Tasks\PerformCommand
+#    arguments:
+#        logger: '@logger'
+#        taskService: '@simplytestable.services.taskservice'
+#        workerService: '@simplytestable.services.workerservice'
+#        resqueQueueService: '@simplytestable.services.resque.queueservice'
+#        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
+#    tags:
+#      - { name: console.command }
+#
+#  simplytestable.command.task.performenqueue:
+#    class:   SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand
+#    arguments:
+#        taskService: '@simplytestable.services.taskservice'
+#        resqueQueueService: '@simplytestable.services.resque.queueservice'
+#        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
+#    tags:
+#      - { name: console.command }
+#
+#  simplytestable.command.tasks.reportcompletion:
+#    class:   SimplyTestable\WorkerBundle\Command\Tasks\ReportCompletionCommand
+#    arguments:
+#        logger: '@logger'
+#        taskService: '@simplytestable.services.taskservice'
+#        workerService: '@simplytestable.services.workerservice'
+#    tags:
+#      - { name: console.command }
+#
+#  simplytestable.command.task.reportcompletion:
+#    class:   SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand
+#    arguments:
+#        logger: '@logger'
+#        taskService: '@simplytestable.services.taskservice'
+#        workerService: '@simplytestable.services.workerservice'
+#    tags:
+#      - { name: console.command }
+#
+#  simplytestable.command.task.reportcompletionenqueue:
+#    class:   SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand
+#    arguments:
+#        logger: '@logger'
+#        taskService: '@simplytestable.services.taskservice'
+#        resqueQueueService: '@simplytestable.services.resque.queueservice'
+#        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
+#    tags:
+#      - { name: console.command }
+#
+#  simplytestable.command.tasks.request:
+#    class:   SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand
+#    arguments:
+#        tasksService: '@simplytestable.services.tasksservice'
+#        workerService: '@simplytestable.services.workerservice'
+#        resqueQueueService: '@simplytestable.services.resque.queueservice'
+#        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
+#    tags:
+#      - { name: console.command }
+#
+#  simplytestable.command.tasks.requestifempty:
+#    class:   SimplyTestable\WorkerBundle\Command\Tasks\RequestIfEmptyCommand
+#    arguments:
+#        resqueQueueService: '@simplytestable.services.resque.queueservice'
+#        resqueJobFactory: '@simplytestable.services.resque.jobfactory'
+#    tags:
+#      - { name: console.command }
+#
+#
+#  simplytestable.command.worker.activate:
+#    class:   SimplyTestable\WorkerBundle\Command\WorkerActivateCommand
+#    arguments:
+#        workerService: '@simplytestable.services.workerservice'
+#    tags:
+#      - { name: console.command }

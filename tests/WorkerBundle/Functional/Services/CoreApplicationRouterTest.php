@@ -2,6 +2,7 @@
 
 namespace Tests\WorkerBundle\Functional\Guzzle;
 
+use SimplyTestable\WorkerBundle\Services\CoreApplicationRouter;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
 class CoreApplicationRouterTest extends BaseSimplyTestableTestCase
@@ -15,7 +16,7 @@ class CoreApplicationRouterTest extends BaseSimplyTestableTestCase
      */
     public function testGenerate($name, $parameters, $expectedUrl)
     {
-        $coreApplicationRouter = $this->container->get('simplytestable.services.coreapplicationrouter');
+        $coreApplicationRouter = $this->container->get(CoreApplicationRouter::class);
         $this->assertEquals($expectedUrl, $coreApplicationRouter->generate($name, $parameters));
     }
 
