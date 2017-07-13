@@ -60,54 +60,46 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
 //    {
 //        return $this->container->get('simplytestable.services.workerservice');
 //    }
-
-    /**
-     * @return QueueService
-     */
-    protected function getResqueQueueService()
-    {
-        return $this->container->get('simplytestable.services.resque.queueservice');
-    }
-
-    /**
-     * @return ResqueJobFactory
-     */
-    protected function getResqueJobFactory()
-    {
-        return $this->container->get('simplytestable.services.resque.jobfactory');
-    }
-
-    /**
-     * @return HttpClientService
-     */
-    protected function getHttpClientService()
-    {
-        return $this->container->get('simplytestable.services.httpclientservice');
-    }
-
-    /**
-     * @return TaskService
-     */
-    protected function getTaskService()
-    {
-        return $this->container->get('simplytestable.services.taskservice');
-    }
-
-    /**
-     * @return TaskTypeService
-     */
-    protected function getTaskTypeService()
-    {
-        return $this->container->get('simplytestable.services.tasktypeservice');
-    }
-
-    /**
-     * @return MemcachedService
-     */
-    protected function getMemcachedService()
-    {
-        return $this->container->get('simplytestable.services.memcachedservice');
-    }
+//
+//    /**
+//     * @return QueueService
+//     */
+//    protected function getResqueQueueService()
+//    {
+//        return $this->container->get('simplytestable.services.resque.queueservice');
+//    }
+//
+//    /**
+//     * @return ResqueJobFactory
+//     */
+//    protected function getResqueJobFactory()
+//    {
+//        return $this->container->get('simplytestable.services.resque.jobfactory');
+//    }
+//
+//    /**
+//     * @return TaskService
+//     */
+//    protected function getTaskService()
+//    {
+//        return $this->container->get('simplytestable.services.taskservice');
+//    }
+//
+//    /**
+//     * @return TaskTypeService
+//     */
+//    protected function getTaskTypeService()
+//    {
+//        return $this->container->get('simplytestable.services.tasktypeservice');
+//    }
+//
+//    /**
+//     * @return MemcachedService
+//     */
+//    protected function getMemcachedService()
+//    {
+//        return $this->container->get('simplytestable.services.memcachedservice');
+//    }
 
     /**
      * @return EntityManager

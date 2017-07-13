@@ -2,7 +2,7 @@
 
 namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 
-use phpmock\mockery\PHPMockery;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
@@ -21,7 +21,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = $this->container->get('simplytestable.services.taskdriver.htmlvalidation');
+        $this->taskDriver = $this->container->get(HtmlValidationTaskDriver::class);
     }
 
     /**
@@ -275,7 +275,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $request = $this->getHttpClientService()->getHistory()->getLastRequest();
+        $request = $this->container->get(HttpClientService::class)->getHistory()->getLastRequest();
         $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
     }
 
@@ -299,7 +299,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $request = $this->getHttpClientService()->getHistory()->getLastRequest();
+        $request = $this->container->get(HttpClientService::class)->getHistory()->getLastRequest();
 
         $decodedAuthorizationHeaderValue = base64_decode(
             str_replace('Basic', '', $request->getHeader('authorization'))
