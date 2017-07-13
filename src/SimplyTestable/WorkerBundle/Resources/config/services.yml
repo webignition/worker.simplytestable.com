@@ -92,18 +92,17 @@ services:
 #
 #
 #
-#  simplytestable.services.tasksservice:
-#    class:   SimplyTestable\WorkerBundle\Services\TasksService
-#    arguments:
-#        logger: '@logger'
-#        urlService: '@simplytestable.services.urlservice'
-#        coreApplicationRouter: '@simplytestable.services.coreapplicationrouter'
-#        workerService: '@simplytestable.services.workerservice'
-#        httpClientService: '@simplytestable.services.httpClientService'
-#        taskService: "@simplytestable.services.taskservice"
-#    calls:
-#      - [setWorkerProcessCount, ['%worker_process_count%']]
-#      - [setMaxTasksRequestFactor, ['%max_tasks_request_factor%']]
+  SimplyTestable\WorkerBundle\Services\TasksService:
+    arguments:
+      - '@logger'
+      - '@SimplyTestable\WorkerBundle\Services\UrlService'
+      - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
+      - '@SimplyTestable\WorkerBundle\Services\WorkerService'
+      - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
+      - '@SimplyTestable\WorkerBundle\Services\TaskService'
+    calls:
+      - [setWorkerProcessCount, ['%worker_process_count%']]
+      - [setMaxTasksRequestFactor, ['%max_tasks_request_factor%']]
 #
 #  simplytestable.services.coreapplicationrouter:
 #    class:   SimplyTestable\WorkerBundle\Services\CoreApplicationRouter

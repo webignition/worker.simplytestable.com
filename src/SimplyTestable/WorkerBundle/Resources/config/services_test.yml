@@ -1,4 +1,11 @@
 services:
+  SimplyTestable\WorkerBundle\Command\:
+      resource: '../../Command'
+      public: true
+      autowire: true
+      autoconfigure: true
+      tags: ['console.command']
+
   SimplyTestable\WorkerBundle\Services\ResourceLocator:
     public: true
     arguments:
@@ -26,3 +33,20 @@ services:
   SimplyTestable\WorkerBundle\Services\HttpCache:
     arguments:
       - '@SimplyTestable\WorkerBundle\Services\MemcachedService'
+
+  SimplyTestable\WorkerBundle\Services\TaskService:
+    class:   Tests\WorkerBundle\Services\TestTaskService
+    arguments:
+        - '@doctrine.orm.entity_manager'
+        - '@logger'
+        - '@SimplyTestable\WorkerBundle\Services\StateService'
+        - '@SimplyTestable\WorkerBundle\Services\UrlService'
+        - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
+        - '@SimplyTestable\WorkerBundle\Services\WorkerService'
+        - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
+    calls:
+      - [addTaskDriver, ['html validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver']]
+      - [addTaskDriver, ['css validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver']]
+      - [addTaskDriver, ['js static analysis', '@SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver']]
+      - [addTaskDriver, ['link integrity', '@SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver']]
+      - [addTaskDriver, ['url discovery', '@SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver']]

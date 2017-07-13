@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f860e8c5a9fc26928036c96e5d5830a6",
+    "content-hash": "7de8744d7e3cc5f43f359941e215e114",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -100,16 +100,16 @@
         },
         {
             "name": "colinmollenhour/credis",
-            "version": "1.8.1",
+            "version": "1.8.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/colinmollenhour/credis.git",
-                "reference": "215810e7161748a99dbc37020d38068a80aa0805"
+                "reference": "9c14b4bb0779127638a17dd8aab8f05f28c6df43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/colinmollenhour/credis/zipball/215810e7161748a99dbc37020d38068a80aa0805",
-                "reference": "215810e7161748a99dbc37020d38068a80aa0805",
+                "url": "https://api.github.com/repos/colinmollenhour/credis/zipball/9c14b4bb0779127638a17dd8aab8f05f28c6df43",
+                "reference": "9c14b4bb0779127638a17dd8aab8f05f28c6df43",
                 "shasum": ""
             },
             "require": {
@@ -120,7 +120,8 @@
                 "classmap": [
                     "Client.php",
                     "Cluster.php",
-                    "Sentinel.php"
+                    "Sentinel.php",
+                    "Module.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -135,7 +136,7 @@
             ],
             "description": "Credis is a lightweight interface to the Redis key-value store which wraps the phpredis library when available for better performance.",
             "homepage": "https://github.com/colinmollenhour/credis",
-            "time": "2017-03-25T03:27:34+00:00"
+            "time": "2017-07-05T15:32:38+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -5463,6 +5464,58 @@
             "time": "2017-06-30T09:13:00+00:00"
         },
         {
+            "name": "polishsymfonycommunity/symfony-mocker-container",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PolishSymfonyCommunity/SymfonyMockerContainer.git",
+                "reference": "111537c17f32f1bda5ed0253e723b57915c08ff4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PolishSymfonyCommunity/SymfonyMockerContainer/zipball/111537c17f32f1bda5ed0253e723b57915c08ff4",
+                "reference": "111537c17f32f1bda5ed0253e723b57915c08ff4",
+                "shasum": ""
+            },
+            "require": {
+                "mockery/mockery": ">=0.7.0",
+                "php": ">=5.3.2",
+                "symfony/dependency-injection": ">=2.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PSS\\SymfonyMockerContainer": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Polish Symfony Community",
+                    "homepage": "http://symfonylab.pl"
+                },
+                {
+                    "name": "Jakub Zalas",
+                    "email": "jakub@zalas.pl",
+                    "homepage": "http://www.zalas.eu"
+                }
+            ],
+            "description": "Provides base Symfony dependency injection container enabling service mocking.",
+            "homepage": "http://symfonylab.pl",
+            "keywords": [
+                "BDD",
+                "Behat",
+                "TDD",
+                "mock",
+                "mockery",
+                "test"
+            ],
+            "time": "2016-03-04T08:53:43+00:00"
+        },
+        {
             "name": "sebastian/code-unit-reverse-lookup",
             "version": "1.0.1",
             "source": {
@@ -5977,16 +6030,16 @@
         },
         {
             "name": "sensio/generator-bundle",
-            "version": "v3.1.4",
+            "version": "v3.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensiolabs/SensioGeneratorBundle.git",
-                "reference": "37f9f4e165b033fb76cc2320838321cc57140e65"
+                "reference": "535417a99ac1b387df3bfbc0c060122c24665b78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sensiolabs/SensioGeneratorBundle/zipball/37f9f4e165b033fb76cc2320838321cc57140e65",
-                "reference": "37f9f4e165b033fb76cc2320838321cc57140e65",
+                "url": "https://api.github.com/repos/sensiolabs/SensioGeneratorBundle/zipball/535417a99ac1b387df3bfbc0c060122c24665b78",
+                "reference": "535417a99ac1b387df3bfbc0c060122c24665b78",
                 "shasum": ""
             },
             "require": {
@@ -6027,7 +6080,7 @@
                 }
             ],
             "description": "This bundle generates code for you",
-            "time": "2017-03-15T01:02:10+00:00"
+            "time": "2017-07-12T17:28:00+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",

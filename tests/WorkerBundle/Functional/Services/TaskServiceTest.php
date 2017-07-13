@@ -2,12 +2,14 @@
 
 namespace Tests\WorkerBundle\Functional\Services;
 
+use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Utility\File;
 
 class TaskServiceTest extends BaseSimplyTestableTestCase
 {
@@ -35,6 +37,74 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
 
         $this->taskService = $this->container->get(TaskService::class);
         $this->taskTypeService = $this->container->get(TaskTypeService::class);
+    }
+
+    /**
+     * @dataProvider createDataProvider
+     *
+     * @param $url
+     * @param $taskTypeName
+     * @param $parameters
+     */
+    public function testCreate($url, $taskTypeName, $parameters)
+    {
+        $taskType = $this->taskTypeService->fetch($taskTypeName);
+        $task = $this->taskService->create($url, $taskType, $parameters);
+        $this->assertInstanceOf(Task::class, $task);
+        $this->assertEquals(TaskService::TASK_STARTING_STATE, $task->getState());
+        $this->assertEquals($url, $task->getUrl());
+        $this->assertEquals(strtolower($taskTypeName), strtolower($task->getType()));
+        $this->assertEquals($parameters, $task->getParameters());
+    }
+    /**
+     * @return array
+     */
+    public function createDataProvider()
+    {
+        return [
+            'html validation default' => [
+                'url' => self::DEFAULT_TASK_URL,
+                'taskTypeName' => TaskTypeService::HTML_VALIDATION_NAME,
+                'parameters' => self::DEFAULT_TASK_PARAMETERS,
+            ],
+            'css validation default' => [
+                'url' => self::DEFAULT_TASK_URL,
+                'taskTypeName' => TaskTypeService::CSS_VALIDATION_NAME,
+                'parameters' => self::DEFAULT_TASK_PARAMETERS,
+            ],
+            'js static analysis default' => [
+                'url' => self::DEFAULT_TASK_URL,
+                'taskTypeName' => TaskTypeService::JS_STATIC_ANALYSIS_NAME,
+                'parameters' => self::DEFAULT_TASK_PARAMETERS,
+            ],
+            'link integrity default' => [
+                'url' => self::DEFAULT_TASK_URL,
+                'taskTypeName' => TaskTypeService::LINK_INTEGRITY_NAME,
+                'parameters' => self::DEFAULT_TASK_PARAMETERS,
+            ],
+            'url discovery default' => [
+                'url' => self::DEFAULT_TASK_URL,
+                'taskTypeName' => TaskTypeService::URL_DISCOVERY_NAME,
+                'parameters' => self::DEFAULT_TASK_PARAMETERS,
+            ],
+        ];
+    }
+
+    public function testCreateUsesExistingMatchingTask()
+    {
+        $this->removeAllTasks();
+        $existingTask = $this->taskService->create(
+            self::DEFAULT_TASK_URL,
+            $this->taskTypeService->getHtmlValidationTaskType(),
+            ''
+        );
+        $this->taskService->persistAndFlush($existingTask);
+        $newTask = $this->taskService->create(
+            self::DEFAULT_TASK_URL,
+            $this->taskTypeService->getHtmlValidationTaskType(),
+            ''
+        );
+        $this->assertEquals($existingTask->getId(), $newTask->getId());
     }
 
     /**
@@ -148,6 +218,23 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
         $this->getEntityManager()->detach($task);
 
         $this->assertEquals($id, $this->taskService->getById($id)->getId());
+    }
+
+    public function testReportCompletionNoOutput()
+    {
+        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $this->taskService->reportCompletion($task);
+
+        $lastLogLine = File::tail($this->container->get('kernel')->getLogDir() . '/test.log', 1);
+        $this->assertRegExp(
+            sprintf(
+                '/%s/',
+                preg_quote(
+                    "TaskService::reportCompletion: Task state is [task-queued], we can't report back just yet"
+                )
+            ),
+            $lastLogLine
+        );
     }
 
     /**

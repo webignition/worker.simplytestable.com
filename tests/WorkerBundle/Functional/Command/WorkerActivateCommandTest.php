@@ -4,6 +4,7 @@ namespace Tests\WorkerBundle\Functional\Command;
 
 use SimplyTestable\WorkerBundle\Command\WorkerActivateCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -21,7 +22,7 @@ class WorkerActivateCommandTest extends BaseSimplyTestableTestCase
 
     public function testRunInMaintenanceReadOnlyMode()
     {
-        $this->getWorkerService()->setReadOnly();
+        $this->container->get(WorkerService::class)->setReadOnly();
 
         $command = new WorkerActivateCommand(
             $this->container->get('simplytestable.services.workerservice')
