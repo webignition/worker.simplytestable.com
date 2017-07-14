@@ -4,26 +4,26 @@ namespace SimplyTestable\WorkerBundle\Controller;
 
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Request\VerifyRequest;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
-class VerifyController extends Controller
+class VerifyController extends AbstractController
 {
-    public function indexAction()
+    public function indexAction(WorkerService $workerService, VerifyRequestFactory $verifyRequestFactory)
     {
-        if ($this->container->get('simplytestable.services.workerservice')->isMaintenanceReadOnly()) {
+        if ($workerService->isMaintenanceReadOnly()) {
             throw new ServiceUnavailableHttpException();
         }
 
-        $verifyRequest = $this->container->get('simplytestable.services.request.factory.verify')->create();
+        $verifyRequest = $verifyRequestFactory->create();
 
         if (!$verifyRequest->isValid()) {
             throw new BadRequestHttpException();
         }
-
-        $workerService = $this->container->get('simplytestable.services.workerservice');
 
         if (!$this->doesVerifyRequestMatchWorker($workerService->get(), $verifyRequest)) {
             throw new BadRequestHttpException();

@@ -4,40 +4,36 @@ namespace Tests\WorkerBundle\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
+use SimplyTestable\WorkerBundle\Services\TaskService;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
 class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
 {
     /**
+     * @var ReportCompletionCommand
+     */
+    private $command;
+
+    /**
      * {@inheritdoc}
      */
-    protected static function getServicesToMock()
+    protected function setUp()
     {
-        return [
-            'simplytestable.services.workerservice',
-            'simplytestable.services.taskservice',
-        ];
-    }
+        parent::setUp();
 
-    public function testGetAsService()
-    {
-        $this->assertInstanceOf(
-            ReportCompletionCommand::class,
-            $this->container->get('simplytestable.command.task.reportcompletion')
-        );
+        $this->command = $this->container->get(ReportCompletionCommand::class);
     }
 
     public function testRunInMaintenanceReadOnlyMode()
     {
-        $this->getWorkerService()->setReadOnly();
+        $this->container->get(WorkerService::class)->setReadOnly();
 
-        $command = $this->createReportCompletionCommand();
-
-        $returnCode = $command->execute(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->execute(new ArrayInput([]), new StringOutput());
 
         $this->assertEquals(
             ReportCompletionCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
@@ -47,11 +43,9 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
 
     public function testRunForInvalidTask()
     {
-        $command = $this->createReportCompletionCommand();
-
-        $returnCode = $command->run(new ArrayInput([
+         $returnCode = $this->command->run(new ArrayInput([
             'id' => -1
-        ]), new StringOutput());
+         ]), new StringOutput());
 
         $this->assertEquals(
             ReportCompletionCommand::RETURN_CODE_TASK_DOES_NOT_EXIST,
@@ -73,18 +67,16 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'url' => 'http://example.com/',
             'type' => 'html validation',
         ]));
         $this->assertNotNull($task->getId());
 
-        $this->getTaskService()->perform($task);
+        $this->container->get(TaskService::class)->perform($task);
         $this->assertNotNull($task->getOutput()->getId());
 
-        $command = $this->createReportCompletionCommand();
-
-        $returnCode = $command->run(new ArrayInput([
+        $returnCode = $this->command->run(new ArrayInput([
             'id' => $task->getId()
         ]), new StringOutput());
 

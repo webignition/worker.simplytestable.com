@@ -6,8 +6,8 @@ use SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksComman
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\TaskService;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
-use Tests\WorkerBundle\Factory\TaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 
 class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
@@ -31,27 +31,30 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
         $this->removeAllTasks();
         $this->clearRedis();
 
+        $taskService = $this->container->get(TaskService::class);
+
         /* @var Task[] $tasks */
         $tasks = [];
 
-        $queuedState = $this->getTaskService()->getQueuedState();
-        $inProgressState = $this->getTaskService()->getInProgressState();
+        $queuedState = $taskService->getQueuedState();
+        $inProgressState = $taskService->getInProgressState();
 
         foreach ($taskValuesCollection as $taskValues) {
-            $tasks[] = $this->getTaskFactory()->create($taskValues);
+            $tasks[] = $this->getTestTaskFactory()->create($taskValues);
         }
 
         $this->assertCount(
             $expectedInitialQueuedTaskCount,
-            $this->getTaskService()->getEntityRepository()->getIdsByState($queuedState)
+            $taskService->getEntityRepository()->getIdsByState($queuedState)
         );
 
         $this->assertCount(
             $expectedInitialInProgressTaskCount,
-            $this->getTaskService()->getEntityRepository()->getIdsByState($inProgressState)
+            $taskService->getEntityRepository()->getIdsByState($inProgressState)
         );
 
-        $command = $this->createRequeueInProgressTasksCommand();
+        $command = $this->container->get(RequeueInProgressTasksCommand::class);
+
         $returnCode = $command->run(
             new ArrayInput($commandArguments),
             new StringOutput()
@@ -61,7 +64,7 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
 
         $this->assertCount(
             $expectedQueuedTaskCount,
-            $this->getTaskService()->getEntityRepository()->getIdsByState($queuedState)
+            $taskService->getEntityRepository()->getIdsByState($queuedState)
         );
     }
 
@@ -73,7 +76,7 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
         return [
             'no in-progress tasks' => [
                 'taskValuesCollection' => [
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
                         'state' => TaskService::TASK_STARTING_STATE,
                     ]),
@@ -85,12 +88,12 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
             ],
             'one in-progress task not of suitable default age' => [
                 'taskValuesCollection' => [
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
                         'state' => TaskService::TASK_IN_PROGRESS_STATE,
                         'age' => '10 minute',
                     ]),
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
                         'state' => TaskService::TASK_STARTING_STATE,
                     ]),
@@ -102,12 +105,12 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
             ],
             'one in-progress task of suitable default age' => [
                 'taskValuesCollection' => [
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
                         'state' => TaskService::TASK_IN_PROGRESS_STATE,
                         'age' => '1 hour',
                     ]),
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
                         'state' => TaskService::TASK_STARTING_STATE,
                     ]),
@@ -119,12 +122,12 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
             ],
             'one in-progress task of suitable default age, dry run' => [
                 'taskValuesCollection' => [
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
                         'state' => TaskService::TASK_IN_PROGRESS_STATE,
                         'age' => '1 hour',
                     ]),
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
                         'state' => TaskService::TASK_STARTING_STATE,
                     ]),
@@ -138,12 +141,12 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
             ],
             'one in-progress task of suitable non-default age' => [
                 'taskValuesCollection' => [
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
                         'state' => TaskService::TASK_IN_PROGRESS_STATE,
                         'age' => '12 hour',
                     ]),
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
                         'state' => TaskService::TASK_STARTING_STATE,
                     ]),
@@ -157,12 +160,12 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
             ],
             'one in-progress task of suitable default age, invalid bool age-in-hours' => [
                 'taskValuesCollection' => [
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
                         'state' => TaskService::TASK_IN_PROGRESS_STATE,
                         'age' => '12 hour',
                     ]),
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
                         'state' => TaskService::TASK_STARTING_STATE,
                     ]),
@@ -176,12 +179,12 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
             ],
             'one in-progress task of suitable default age, invalid zero age-in-hours' => [
                 'taskValuesCollection' => [
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
                         'state' => TaskService::TASK_IN_PROGRESS_STATE,
                         'age' => '12 hour',
                     ]),
-                    TaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
                         'state' => TaskService::TASK_STARTING_STATE,
                     ]),
@@ -194,17 +197,5 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
                 'expectedQueuedTaskCount' => 2,
             ],
         ];
-    }
-
-    /**
-     * @return RequeueInProgressTasksCommand
-     */
-    private function createRequeueInProgressTasksCommand()
-    {
-        return new RequeueInProgressTasksCommand(
-            $this->container->get('simplytestable.services.taskservice'),
-            $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactory')
-        );
     }
 }

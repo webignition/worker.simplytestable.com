@@ -2,15 +2,14 @@
 
 namespace Tests\WorkerBundle\Functional\Services;
 
-use Mockery\MockInterface;
-use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
+use Tests\WorkerBundle\Utility\File;
 
 class TaskServiceTest extends BaseSimplyTestableTestCase
 {
@@ -20,47 +19,24 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     const DEFAULT_TASK_STATE = TaskService::TASK_STARTING_STATE;
 
     /**
+     * @var TaskService
+     */
+    private $taskService;
+
+    /**
+     * @var TaskTypeService
+     */
+    private $taskTypeService;
+
+    /**
      * {@inheritdoc}
      */
-    protected static function getServicesToMock()
+    protected function setUp()
     {
-        return [
-            'logger',
-        ];
-    }
+        parent::setUp();
 
-    /**
-     * @dataProvider cancelDataProvider
-     *
-     * @param array $taskValues
-     * @param string $expectedEndState
-     */
-    public function testCancel(array $taskValues, $expectedEndState)
-    {
-        $task = $this->getTaskFactory()->create($taskValues);
-        $this->assertEquals($taskValues['state'], $task->getState());
-
-        $this->getTaskService()->cancel($task);
-        $this->assertEquals($expectedEndState, $task->getState());
-    }
-
-    /**
-     * @return array
-     */
-    public function cancelDataProvider()
-    {
-        return [
-            'state: queued' => [
-                'task' => TaskFactory::createTaskValuesFromDefaults(),
-                'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
-            ],
-            'state: in-progress' => [
-                'task' => TaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_IN_PROGRESS_STATE,
-                ]),
-                'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
-            ],
-        ];
+        $this->taskService = $this->container->get(TaskService::class);
+        $this->taskTypeService = $this->container->get(TaskTypeService::class);
     }
 
     /**
@@ -72,17 +48,14 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
      */
     public function testCreate($url, $taskTypeName, $parameters)
     {
-        $taskType = $this->getTaskTypeService()->fetch($taskTypeName);
-
-        $task = $this->getTaskService()->create($url, $taskType, $parameters);
-
+        $taskType = $this->taskTypeService->fetch($taskTypeName);
+        $task = $this->taskService->create($url, $taskType, $parameters);
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals(TaskService::TASK_STARTING_STATE, $task->getState());
         $this->assertEquals($url, $task->getUrl());
         $this->assertEquals(strtolower($taskTypeName), strtolower($task->getType()));
         $this->assertEquals($parameters, $task->getParameters());
     }
-
     /**
      * @return array
      */
@@ -120,20 +93,17 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     public function testCreateUsesExistingMatchingTask()
     {
         $this->removeAllTasks();
-        $existingTask = $this->getTaskService()->create(
+        $existingTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
-            $this->getTaskTypeService()->getHtmlValidationTaskType(),
+            $this->taskTypeService->getHtmlValidationTaskType(),
             ''
         );
-
-        $this->getTaskService()->persistAndFlush($existingTask);
-
-        $newTask = $this->getTaskService()->create(
+        $this->taskService->persistAndFlush($existingTask);
+        $newTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
-            $this->getTaskTypeService()->getHtmlValidationTaskType(),
+            $this->taskTypeService->getHtmlValidationTaskType(),
             ''
         );
-
         $this->assertEquals($existingTask->getId(), $newTask->getId());
     }
 
@@ -145,7 +115,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
      */
     public function testGetState($method, $expectedStateName)
     {
-        $state = call_user_func(array($this->getTaskService(), $method));
+        $state = call_user_func(array($this->taskService, $method));
         $this->assertEquals($expectedStateName, $state->getName());
     }
 
@@ -202,9 +172,9 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
         $this->setHttpFixtures($httpFixtures);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create($taskValues);
+        $task = $this->getTestTaskFactory()->create($taskValues);
 
-        $this->getTaskService()->perform($task);
+        $this->taskService->perform($task);
 
         $this->assertEquals($expectedFinishedStateName, $task->getState());
     }
@@ -216,21 +186,21 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     {
         return [
             'default' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html><head></head><body></body>"
                 ],
                 'expectedFinishedStateName' => TaskService::TASK_COMPLETED_STATE,
             ],
             'skipped' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     "HTTP/1.1 200 OK\nContent-type:application/pdf"
                 ],
                 'expectedFinishedStateName' => TaskService::TASK_SKIPPED_STATE,
             ],
             'failed, no retry available' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     "HTTP/1.1 404",
                     "HTTP/1.1 404",
@@ -242,36 +212,29 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
 
     public function testGetById()
     {
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults());
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults());
         $id = $task->getId();
 
         $this->getEntityManager()->detach($task);
 
-        $this->assertEquals($id, $this->getTaskService()->getById($id)->getId());
+        $this->assertEquals($id, $this->taskService->getById($id)->getId());
     }
 
     public function testReportCompletionNoOutput()
     {
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $this->taskService->reportCompletion($task);
 
-        /* @var LoggerInterface|MockInterface $logger */
-        $logger = $this->container->get('logger');
-
-        $logger
-            ->shouldReceive('info')
-            ->with(sprintf(
-                'TaskService::reportCompletion: Initialising [%d]',
-                $task->getId()
-            ));
-
-        $logger
-            ->shouldReceive('info')
-            ->with(sprintf(
-                'TaskService::reportCompletion: Task state is [%s], we can\'t report back just yet',
-                $task->getState()
-            ));
-
-        $this->getTaskService()->reportCompletion($task);
+        $lastLogLine = File::tail($this->container->get('kernel')->getLogDir() . '/test.log', 1);
+        $this->assertRegExp(
+            sprintf(
+                '/%s/',
+                preg_quote(
+                    "TaskService::reportCompletion: Task state is [task-queued], we can't report back just yet"
+                )
+            ),
+            $lastLogLine
+        );
     }
 
     /**
@@ -288,11 +251,11 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
         ]);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
-        $this->getTaskService()->perform($task);
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $this->taskService->perform($task);
         $initialTaskState = (string)$task->getState();
 
-        $this->assertEquals($expectedReturnValue, $this->getTaskService()->reportCompletion($task));
+        $this->assertEquals($expectedReturnValue, $this->taskService->reportCompletion($task));
         $this->assertEquals($initialTaskState, (string)$task->getState());
         $this->assertInternalType('int', $task->getId());
         $this->assertInternalType('int', $task->getOutput()->getId());
@@ -333,14 +296,14 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
         ]);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
-        $this->assertEquals(0, $this->getTaskService()->perform($task));
+        $this->assertEquals(0, $this->taskService->perform($task));
         $this->assertInternalType('int', $task->getId());
         $this->assertInternalType('int', $task->getOutput()->getId());
         $this->assertInternalType('int', $task->getTimePeriod()->getId());
 
-        $this->assertTrue($this->getTaskService()->reportCompletion($task));
+        $this->assertTrue($this->taskService->reportCompletion($task));
         $this->assertEquals(TaskService::TASK_COMPLETED_STATE, (string)$task->getState());
 
         $this->assertNull($task->getId());
@@ -367,17 +330,17 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     {
         $this->removeAllTasks();
 
-        $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'state' => TaskService::TASK_STARTING_STATE,
             'type' => TaskTypeService::HTML_VALIDATION_NAME,
         ]));
 
-        $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'state' => TaskService::TASK_IN_PROGRESS_STATE,
             'type' => TaskTypeService::CSS_VALIDATION_NAME,
         ]));
 
-        $this->assertEquals(2, $this->getTaskService()->getInCompleteCount());
+        $this->assertEquals(2, $this->taskService->getInCompleteCount());
     }
 
     /**

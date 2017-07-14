@@ -2,9 +2,9 @@
 
 namespace Tests\WorkerBundle\Functional;
 
+use PSS\SymfonyMockerContainer\DependencyInjection\MockerContainer;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class BaseTestCase extends WebTestCase
 {
@@ -14,7 +14,7 @@ abstract class BaseTestCase extends WebTestCase
     private $client;
 
     /**
-     * @var ContainerInterface
+     * @var MockerContainer
      */
     protected $container;
 
@@ -25,32 +25,6 @@ abstract class BaseTestCase extends WebTestCase
     {
         $this->client = static::createClient();
         $this->container = $this->client->getKernel()->getContainer();
-    }
-
-    /**
-     * @return string[]
-     */
-    protected static function getServicesToMock()
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected static function createClient(array $options = array(), array $server = array())
-    {
-        $client = parent::createClient($options, $server);
-
-        foreach (static::getServicesToMock() as $serviceId) {
-            $mockedService = \Mockery::mock(
-                $client->getContainer()->get($serviceId)
-            );
-
-            $client->getContainer()->set($serviceId, $mockedService);
-        }
-
-        return $client;
     }
 
     protected function clearRedis()
@@ -65,5 +39,21 @@ abstract class BaseTestCase extends WebTestCase
         }
 
         return $returnValue === 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+//        foreach ($this->container->getMockedServices() as $id => $service) {
+//            $this->container->unmock($id);
+//        }
+
+        \Mockery::close();
+
+        $this->client = null;
+
+        parent::tearDown();
     }
 }

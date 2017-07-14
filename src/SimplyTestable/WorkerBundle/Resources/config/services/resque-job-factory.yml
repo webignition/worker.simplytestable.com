@@ -1,8 +1,8 @@
 services:
-  simplytestable.services.resque.jobfactory:
-    class:   SimplyTestable\WorkerBundle\Services\Resque\JobFactory
+  SimplyTestable\WorkerBundle\Services\Resque\JobFactory:
+    public: true
     arguments:
-        queues:
+        $queues:
           task-perform:
             queue: task-perform
             jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob
@@ -10,10 +10,10 @@ services:
               - id
             serviceIds:
               - logger
-              - simplytestable.services.taskservice
-              - simplytestable.services.workerservice
-              - simplytestable.services.resque.queueservice
-              - simplytestable.services.resque.jobfactory
+              - SimplyTestable\WorkerBundle\Services\TaskService
+              - SimplyTestable\WorkerBundle\Services\WorkerService
+              - SimplyTestable\WorkerBundle\Services\Resque\QueueService
+              - SimplyTestable\WorkerBundle\Services\Resque\JobFactory
           task-report-completion:
             queue: task-report-completion
             jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob
@@ -21,13 +21,13 @@ services:
               - id
             serviceIds:
               - logger
-              - simplytestable.services.taskservice
-              - simplytestable.services.workerservice
+              - SimplyTestable\WorkerBundle\Services\TaskService
+              - SimplyTestable\WorkerBundle\Services\WorkerService
           tasks-request:
             queue: tasks-request
             jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob
             serviceIds:
-              - simplytestable.services.tasksservice
-              - simplytestable.services.workerservice
-              - simplytestable.services.resque.queueservice
-              - simplytestable.services.resque.jobfactory
+              - SimplyTestable\WorkerBundle\Services\TasksService
+              - SimplyTestable\WorkerBundle\Services\WorkerService
+              - SimplyTestable\WorkerBundle\Services\Resque\QueueService
+              - SimplyTestable\WorkerBundle\Services\Resque\JobFactory

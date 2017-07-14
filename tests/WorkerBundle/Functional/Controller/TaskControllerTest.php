@@ -5,14 +5,59 @@ namespace Tests\WorkerBundle\Functional\Controller;
 use SimplyTestable\WorkerBundle\Controller\TaskController;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
+use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFactory;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
+use SimplyTestable\WorkerBundle\Services\TaskFactory;
+use SimplyTestable\WorkerBundle\Services\TaskService;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
-use Tests\WorkerBundle\Factory\TaskFactory;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
 class TaskControllerTest extends BaseSimplyTestableTestCase
 {
+    /**
+     * @var TaskController
+     */
+    private $taskController;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->taskController = new TaskController(
+            $this->container->get(WorkerService::class),
+            $this->container->get(TaskService::class)
+        );
+    }
+
+    public function testCreateCollectionActionInMaintenanceReadOnlyMode()
+    {
+        $this->expectException(ServiceUnavailableHttpException::class);
+
+        $request = new Request();
+        $request->request = [];
+        $this->container->get('request_stack')->push($request);
+
+        $workerService = $this->container->get(WorkerService::class);
+        $workerService->setReadOnly();
+
+        $this->taskController->createCollectionAction(
+            $this->container->get(CreateRequestCollectionFactory::class),
+            $this->container->get(TaskFactory::class),
+            $this->container->get(QueueService::class),
+            $this->container->get(JobFactory::class)
+        );
+    }
+
     /**
      * @dataProvider createCollectionActionDataProvider
      *
@@ -27,7 +72,12 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         $request->request = $postData;
         $this->container->get('request_stack')->push($request);
 
-        $response = $this->createTaskController()->createCollectionAction();
+        $response = $this->taskController->createCollectionAction(
+            $this->container->get(CreateRequestCollectionFactory::class),
+            $this->container->get(TaskFactory::class),
+            $this->container->get(QueueService::class),
+            $this->container->get(JobFactory::class)
+        );
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('application/json', $response->headers->get('content-type'));
@@ -98,10 +148,39 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         ];
     }
 
+    public function testCancelCollectionActionInMaintenanceReadOnlyMode()
+    {
+        $this->expectException(ServiceUnavailableHttpException::class);
+
+        $request = new Request();
+        $request->request = new ParameterBag();
+        $this->container->get('request_stack')->push($request);
+
+        $workerService = $this->container->get(WorkerService::class);
+        $workerService->setReadOnly();
+
+        $this->taskController->cancelAction(
+            $this->container->get(CancelRequestFactory::class)
+        );
+    }
+
+    public function testCancelActionWithInvalidRequest()
+    {
+        $this->expectException(BadRequestHttpException::class);
+
+        $request = new Request();
+        $request->request = new ParameterBag();
+        $this->container->get('request_stack')->push($request);
+
+        $this->taskController->cancelAction(
+            $this->container->get(CancelRequestFactory::class)
+        );
+    }
+
     public function testCancelAction()
     {
         $this->removeAllTasks();
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults());
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults());
         $this->assertEquals('task-queued', $task->getState());
 
         $request = new Request();
@@ -110,7 +189,9 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         ]);
         $this->container->get('request_stack')->push($request);
 
-        $response = $this->createTaskController()->cancelAction();
+        $response = $this->taskController->cancelAction(
+            $this->container->get(CancelRequestFactory::class)
+        );
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('task-cancelled', $task->getState());
@@ -122,10 +203,10 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
 
         $taskIds = [];
         $tasks = [];
-        $tasks[] = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'html validation',
         ]));
-        $tasks[] = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'css validation',
         ]));
 
@@ -140,23 +221,14 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         ]);
         $this->container->get('request_stack')->push($request);
 
-        $response = $this->createTaskController()->cancelCollectionAction();
+        $response = $this->taskController->cancelCollectionAction(
+            $this->container->get(CancelRequestCollectionFactory::class)
+        );
 
         $this->assertEquals(200, $response->getStatusCode());
 
         foreach ($tasks as $task) {
             $this->assertEquals('task-cancelled', $task->getState());
         }
-    }
-
-    /**
-     * @return TaskController
-     */
-    private function createTaskController()
-    {
-        $controller = new TaskController();
-        $controller->setContainer($this->container);
-
-        return $controller;
     }
 }

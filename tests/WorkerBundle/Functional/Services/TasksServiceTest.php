@@ -2,30 +2,33 @@
 
 namespace Tests\WorkerBundle\Functional\Services;
 
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Post\PostBodyInterface;
 use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
+use Tests\WorkerBundle\Utility\File;
 
 class TasksServiceTest extends BaseSimplyTestableTestCase
 {
     /**
-     * {@inheritdoc}
+     * @var TasksService
      */
-    protected static function getServicesToMock()
+    private $tasksService;
+
+    protected function setUp()
     {
-        return [
-            'logger',
-            'simplytestable.services.taskservice',
-        ];
+        parent::setUp();
+        $this->tasksService = $this->container->get(TasksService::class);
     }
 
     public function testGetMaxTasksRequestFactor()
     {
         $this->assertEquals(
             $this->container->getParameter('max_tasks_request_factor'),
-            $this->getTasksService()->getMaxTasksRequestFactor()
+            $this->tasksService->getMaxTasksRequestFactor()
         );
     }
 
@@ -33,47 +36,35 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
     {
         $this->assertEquals(
             $this->container->getParameter('worker_process_count'),
-            $this->getTasksService()->getWorkerProcessCount()
+            $this->tasksService->getWorkerProcessCount()
         );
-    }
-
-    public function testRequestNotWithinThreshold()
-    {
-        $this->getTaskService()
-            ->shouldReceive('getInCompleteCount')
-            ->andReturn($this->getTasksService()->getWorkerProcessCount() + 1);
-
-        $this->assertFalse($this->getTasksService()->request());
     }
 
     /**
      * @dataProvider requestHttpRequestFailureDataProvider
      *
-     * @param $httpResponseFixture
-     * @param $expectedLogErrorMessage
-     * @param $expectedException
+     * @param string|ConnectException $httpResponseFixture
+     * @param string $expectedLogErrorMessage
+     * @param array $expectedException
      */
     public function testRequestHttpRequestFailure($httpResponseFixture, $expectedLogErrorMessage, $expectedException)
     {
-        $this->getTaskService()
-            ->shouldReceive('getInCompleteCount')
-            ->andReturn($this->getTasksService()->getWorkerProcessCount());
+        $this->removeAllTasks();
 
         $this->setHttpFixtures([
             $httpResponseFixture
         ]);
 
-        $this->setExpectedException(
-            $expectedException['class'],
-            $expectedException['message'],
-            $expectedException['code']
-        );
+        try {
+            $this->tasksService->request();
+        } catch (\Exception $exception) {
+            $this->assertEquals($expectedException['class'], get_class($exception));
+            $this->assertEquals($expectedException['message'], $exception->getMessage());
+            $this->assertEquals($expectedException['code'], $exception->getCode());
+        }
 
-        $this->getTasksService()->request();
-
-        $this->container->get('logger')
-            ->shouldHaveReceived('error')
-            ->with($expectedLogErrorMessage);
+        $lastLogLine = File::tail($this->container->get('kernel')->getLogDir() . '/test.log');
+        $this->assertRegExp('/' . preg_quote($expectedLogErrorMessage) .'/', $lastLogLine);
     }
 
     /**
@@ -116,25 +107,24 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
      * @dataProvider requestSuccessDataProvider
      *
      * @param int $requestedLimit
+     * @param int $expectedLimit
      */
     public function testRequestSuccess($requestedLimit, $expectedLimit)
     {
-        $this->getTaskService()
-            ->shouldReceive('getInCompleteCount')
-            ->andReturn($this->getTasksService()->getWorkerProcessCount());
+        $this->removeAllTasks();
 
         $this->setHttpFixtures([
             'HTTP/1.1 200 OK'
         ]);
 
         $this->assertTrue(
-            $this->getTasksService()->request($requestedLimit)
+            $this->tasksService->request($requestedLimit)
         );
 
         /**
          * @var PostBodyInterface
          */
-        $body = $this->getHttpClientService()->getHistory()->getLastRequest()->getBody();
+        $body = $this->container->get(HttpClientService::class)->getHistory()->getLastRequest()->getBody();
 
         $this->assertEquals($expectedLimit, $body->getFields()['limit']);
     }
@@ -147,7 +137,7 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
         return [
             'null' => [
                 'requestedLimit' => null,
-                'expectedLimit' => 5,
+                'expectedLimit' => 10,
             ],
             'zero' => [
                 'requestedLimit' => 0,
@@ -158,17 +148,9 @@ class TasksServiceTest extends BaseSimplyTestableTestCase
                 'expectedLimit' => 4,
             ],
             'greater than hard limit' => [
-                'requestedLimit' => 6,
-                'expectedLimit' => 5,
+                'requestedLimit' => 11,
+                'expectedLimit' => 10,
             ],
         ];
-    }
-
-    /**
-     * @return TasksService
-     */
-    private function getTasksService()
-    {
-        return $this->container->get('simplytestable.services.tasksservice');
     }
 }

@@ -9,7 +9,7 @@ use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 
-class TaskFactory
+class TestTaskFactory
 {
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';

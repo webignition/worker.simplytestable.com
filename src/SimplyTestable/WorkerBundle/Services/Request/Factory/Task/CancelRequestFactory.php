@@ -55,6 +55,10 @@ class CancelRequestFactory
      */
     private function getTaskFromRequestParameters()
     {
+        if (!$this->requestParameters->has(self::PARAMETER_ID)) {
+            return null;
+        }
+
         $requestTaskId = trim($this->requestParameters->get(self::PARAMETER_ID));
         if (empty($requestTaskId) || !ctype_digit($requestTaskId)) {
             return null;

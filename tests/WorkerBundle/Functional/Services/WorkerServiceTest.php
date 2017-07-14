@@ -4,18 +4,33 @@ namespace Tests\WorkerBundle\Functional\Services;
 
 use GuzzleHttp\Exception\ConnectException;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
+use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 
 class WorkerServiceTest extends BaseSimplyTestableTestCase
 {
+    /**
+     * @var WorkerService
+     */
+    private $workerService;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->workerService = $this->container->get(WorkerService::class);
+    }
+
     public function testActivateWhenNotNew()
     {
-        $worker = $this->getWorkerService()->get();
+        $worker = $this->workerService->get();
         $this->setWorkerState($worker, WorkerService::WORKER_ACTIVE_STATE);
 
-        $this->assertEquals(0, $this->getWorkerService()->activate());
+        $this->assertEquals(0, $this->workerService->activate());
     }
 
 
@@ -32,12 +47,12 @@ class WorkerServiceTest extends BaseSimplyTestableTestCase
             $responseFixture,
         ]);
 
-        $worker = $this->getWorkerService()->get();
+        $worker = $this->workerService->get();
         $this->setWorkerState($worker, WorkerService::WORKER_NEW_STATE);
 
         $this->assertEquals(
             $expectedReturnCode,
-            $this->getWorkerService()->activate()
+            $this->workerService->activate()
         );
 
         $this->assertEquals($expectedWorkerState, $worker->getState());
@@ -78,7 +93,7 @@ class WorkerServiceTest extends BaseSimplyTestableTestCase
             $this->removeWorker();
         }
 
-        $this->getWorkerService()->get();
+        $this->workerService->get();
     }
 
     /**
@@ -105,11 +120,11 @@ class WorkerServiceTest extends BaseSimplyTestableTestCase
      */
     public function testIsState($stateName, $expectedIsActive, $expectedIsMaintenanceReadOnly)
     {
-        $worker = $this->getWorkerService()->get();
+        $worker = $this->workerService->get();
         $this->setWorkerState($worker, $stateName);
 
-        $this->assertEquals($expectedIsActive, $this->getWorkerService()->isActive());
-        $this->assertEquals($expectedIsMaintenanceReadOnly, $this->getWorkerService()->isMaintenanceReadOnly());
+        $this->assertEquals($expectedIsActive, $this->workerService->isActive());
+        $this->assertEquals($expectedIsMaintenanceReadOnly, $this->workerService->isMaintenanceReadOnly());
     }
 
     /**
@@ -173,10 +188,10 @@ class WorkerServiceTest extends BaseSimplyTestableTestCase
      */
     public function testSetActive($stateName)
     {
-        $worker = $this->getWorkerService()->get();
+        $worker = $this->workerService->get();
         $this->setWorkerState($worker, $stateName);
 
-        $this->getWorkerService()->setActive();
+        $this->workerService->setActive();
 
         $this->assertEquals(WorkerService::WORKER_ACTIVE_STATE, $worker->getState());
     }
@@ -188,10 +203,10 @@ class WorkerServiceTest extends BaseSimplyTestableTestCase
      */
     public function testSetReadOnly($stateName)
     {
-        $worker = $this->getWorkerService()->get();
+        $worker = $this->workerService->get();
         $this->setWorkerState($worker, $stateName);
 
-        $this->getWorkerService()->setReadOnly();
+        $this->workerService->setReadOnly();
         $this->assertEquals(WorkerService::WORKER_MAINTENANCE_READ_ONLY_STATE, $worker->getState());
     }
 
@@ -224,10 +239,10 @@ class WorkerServiceTest extends BaseSimplyTestableTestCase
      */
     public function testVerify($stateName, $expectedWorkerState)
     {
-        $worker = $this->getWorkerService()->get();
+        $worker = $this->workerService->get();
         $this->setWorkerState($worker, $stateName);
 
-        $this->getWorkerService()->verify();
+        $this->workerService->verify();
         $this->assertEquals($expectedWorkerState, $worker->getState());
     }
 
@@ -262,7 +277,7 @@ class WorkerServiceTest extends BaseSimplyTestableTestCase
      */
     private function setWorkerState(ThisWorker $worker, $stateName)
     {
-        $stateService = $this->container->get('simplytestable.services.stateservice');
+        $stateService = $this->container->get(StateService::class);
 
         $worker->setState($stateService->fetch($stateName));
         $this->getEntityManager()->persist($worker);

@@ -1,0 +1,28 @@
+# Services that need to be public to allow them to be retrieved from the container in functional tests
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  SimplyTestable\WorkerBundle\Services\ResourceLocator:
+
+  SimplyTestable\WorkerBundle\Services\MemcachedService:
+
+  SimplyTestable\WorkerBundle\Services\Resque\QueueService:
+
+  SimplyTestable\WorkerBundle\Services\TaskTypeService:
+
+  SimplyTestable\WorkerBundle\Services\StateService:
+
+  SimplyTestable\WorkerBundle\Services\HttpCache:
+
+  SimplyTestable\WorkerBundle\Services\TaskFactory:
+
+  SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory:
+
+  SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory:
+
+  SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory:
+
+  SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory:

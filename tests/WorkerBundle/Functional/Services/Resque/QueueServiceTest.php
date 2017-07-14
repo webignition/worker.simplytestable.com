@@ -2,6 +2,8 @@
 
 namespace Tests\WorkerBundle\Functional\Guzzle;
 
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
 class QueueServiceTest extends BaseSimplyTestableTestCase
@@ -9,6 +11,27 @@ class QueueServiceTest extends BaseSimplyTestableTestCase
     const QUEUE_TASK_PERFORM = 'task-perform';
     const QUEUE_TASK_REPORT_COMPLETION = 'task-report-completion';
     const QUEUE_TASKS_REQUEST = 'tasks-request';
+
+    /**
+     * @var JobFactory
+     */
+    private $jobFactory;
+
+    /**
+     * @var QueueService
+     */
+    private $queueService;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->jobFactory = $this->container->get(JobFactory::class);
+        $this->queueService = $this->container->get(QueueService::class);
+    }
 
     /**
      * @dataProvider testIsEmptyDataProvider
@@ -19,16 +42,14 @@ class QueueServiceTest extends BaseSimplyTestableTestCase
     public function testIsEmpty($queue, $jobArgs)
     {
         $this->clearRedis();
-        $resqueQueueService = $this->container->get('simplytestable.services.resque.queueservice');
 
-        $this->assertTrue($resqueQueueService->isEmpty($queue));
+        $this->assertTrue($this->queueService->isEmpty($queue));
 
-        $resqueJobFactory = $this->container->get('simplytestable.services.resque.jobfactory');
 
-        $resqueQueueService->enqueue(
-            $resqueJobFactory->create($queue, $jobArgs)
+        $this->queueService->enqueue(
+            $this->jobFactory->create($queue, $jobArgs)
         );
-        $this->assertFalse($resqueQueueService->isEmpty($queue));
+        $this->assertFalse($this->queueService->isEmpty($queue));
     }
 
     /**
@@ -67,20 +88,16 @@ class QueueServiceTest extends BaseSimplyTestableTestCase
     public function testContains($queue, $args, $jobDataCollection, $expectedContains)
     {
         $this->clearRedis();
-        $resqueQueueService = $this->container->get('simplytestable.services.resque.queueservice');
-        $resqueJobFactory = $this->container->get('simplytestable.services.resque.jobfactory');
 
         foreach ($jobDataCollection as $jobData) {
-            $resqueQueueService->enqueue(
-                $resqueJobFactory->create($jobData['queue'], $jobData['args'])
+            $this->queueService->enqueue(
+                $this->jobFactory->create($jobData['queue'], $jobData['args'])
             );
         }
 
-        $resqueQueueService = $this->container->get('simplytestable.services.resque.queueservice');
-
         $this->assertEquals(
             $expectedContains,
-            $resqueQueueService->contains($queue, $args)
+            $this->queueService->contains($queue, $args)
         );
     }
 
@@ -192,20 +209,16 @@ class QueueServiceTest extends BaseSimplyTestableTestCase
     public function testGetQueueLength($queue, $jobDataCollection, $expectedQueueLength)
     {
         $this->clearRedis();
-        $resqueQueueService = $this->container->get('simplytestable.services.resque.queueservice');
-        $resqueJobFactory = $this->container->get('simplytestable.services.resque.jobfactory');
 
         foreach ($jobDataCollection as $jobData) {
-            $resqueQueueService->enqueue(
-                $resqueJobFactory->create($jobData['queue'], $jobData['args'])
+            $this->queueService->enqueue(
+                $this->jobFactory->create($jobData['queue'], $jobData['args'])
             );
         }
 
-        $resqueQueueService = $this->container->get('simplytestable.services.resque.queueservice');
-
         $this->assertEquals(
             $expectedQueueLength,
-            $resqueQueueService->getQueueLength($queue)
+            $this->queueService->getQueueLength($queue)
         );
     }
 

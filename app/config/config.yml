@@ -2,6 +2,7 @@ imports:
     - { resource: parameters.yml }
     - { resource: "@SimplyTestableWorkerBundle/Resources/config/parameters.yml" }
     - { resource: security.yml }
+    - { resource: services.yml }
     - { resource: "@SimplyTestableWorkerBundle/Resources/config/services.yml" }
 
 framework:

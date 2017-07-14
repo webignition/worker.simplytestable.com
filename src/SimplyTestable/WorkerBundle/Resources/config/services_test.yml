@@ -1,6 +1,4 @@
-#services:
-#  simplytestable.services.cssValidatorWrapperService:
-#    class:  webignition\CssValidatorWrapper\Mock\Wrapper
-#
-#  simplytestable.services.nodeJslintWrapperService:
-#    class:  webignition\NodeJslint\Wrapper\Mock\Wrapper
+imports:
+    - { resource: services_test/commands.yml }
+    - { resource: services_test/public.yml }
+    - { resource: services_test/test_services.yml }

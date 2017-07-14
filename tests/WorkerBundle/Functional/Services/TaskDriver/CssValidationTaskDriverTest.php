@@ -3,12 +3,13 @@
 namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 
 use Mockery\MockInterface;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\CssValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\HtmlDocumentFactory;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
 use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\CssValidatorWrapper\Configuration\Configuration as CssValidatorWrapperConfiguration;
@@ -27,7 +28,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = $this->container->get('simplytestable.services.taskdriver.cssvalidation');
+        $this->taskDriver = $this->container->get(CssValidationTaskDriver::class);
     }
 
     /**
@@ -70,8 +71,8 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
     ) {
         $this->setHttpFixtures($httpFixtures);
 
-        $task = $this->getTaskFactory()->create(
-            TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(
+            TestTaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
             ])
@@ -306,8 +307,8 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200 OK\nContent-type:text/html\n\n" . $content,
         ]);
 
-        $task = $this->getTaskFactory()->create(
-            TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(
+            TestTaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
             ])
@@ -317,7 +318,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         /* @var CssValidatorWrapper|MockInterface $cssValidatorWrapper */
         $cssValidatorWrapper = \Mockery::spy(
-            $this->container->get('simplytestable.services.cssvalidatorwrapperservice')
+            $this->container->get('simplytestable.services.cssvalidatorwrapper')
         );
 
         $this->getTaskDriver()->setCssValidatorWrapper($cssValidatorWrapper);
@@ -332,7 +333,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             CssValidatorWrapperConfiguration::CONFIG_KEY_CONTENT_TO_VALIDATE =>
                 $content,
             CssValidatorWrapperConfiguration::CONFIG_KEY_HTTP_CLIENT =>
-                $this->getHttpClientService()->get(),
+                $this->container->get(HttpClientService::class)->get(),
         ];
 
         $cssValidatorWrapper
@@ -398,7 +399,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200 OK\nContent-type:text/css\n\n"
         ]);
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -407,7 +408,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+        foreach ($this->container->get(HttpClientService::class)->getHistory()->getRequests(true) as $request) {
             $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
         }
     }
@@ -427,7 +428,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200 OK\nContent-type:text-css\n\n"
         ]);
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -436,7 +437,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        foreach ($this->getHttpClientService()->getHistory()->getRequests(true) as $request) {
+        foreach ($this->container->get(HttpClientService::class)->getHistory()->getRequests(true) as $request) {
             $decodedAuthorizationHeaderValue = base64_decode(
                 str_replace('Basic', '', $request->getHeader('authorization'))
             );
