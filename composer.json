@@ -55,8 +55,7 @@
         "phpunit/phpunit": "~5.0",
         "squizlabs/php_codesniffer": "3.*",
         "mockery/mockery": "~0.9",
-        "php-mock/php-mock-mockery": "1.1.0",
-        "polishsymfonycommunity/symfony-mocker-container": "1.0.2"
+        "php-mock/php-mock-mockery": "1.1.0"
     },
     "scripts": {
         "symfony-scripts": [
