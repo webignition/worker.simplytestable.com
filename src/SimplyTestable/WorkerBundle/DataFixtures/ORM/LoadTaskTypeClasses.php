@@ -20,7 +20,7 @@ class LoadTaskTypeClasses extends AbstractFixture implements OrderedFixtureInter
      */
     public function load(ObjectManager $manager)
     {
-        $repository = $manager->getRepository('SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass');
+        $repository = $manager->getRepository(TaskTypeClass::class);
 
         foreach ($this->taskTypeClasses as $name => $description) {
             if (is_null($repository->findOneByName($name))) {

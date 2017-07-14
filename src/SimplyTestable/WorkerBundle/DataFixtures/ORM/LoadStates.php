@@ -48,13 +48,15 @@ class LoadStates extends AbstractFixture implements OrderedFixtureInterface, Con
      */
     public function load(ObjectManager $manager)
     {
+        $stateService = $this->container->get(StateService::class);
+
         foreach ($this->stateDetails as $name => $nextStateName) {
-            if (!$this->getStateService()->has($name)) {
+            if (!$stateService->has($name)) {
                 $state = new State();
                 $state->setName($name);
 
                 if (!is_null($nextStateName)) {
-                    $state->setNextState($this->getStateService()->find($nextStateName));
+                    $state->setNextState($stateService->find($nextStateName));
                 }
 
                 $manager->persist($state);
@@ -69,13 +71,5 @@ class LoadStates extends AbstractFixture implements OrderedFixtureInterface, Con
     public function getOrder()
     {
         return 1; // the order in which fixtures will be loaded
-    }
-
-    /**
-     * @return StateService
-     */
-    public function getStateService()
-    {
-        return $this->container->get('simplytestable.services.stateservice');
     }
 }
