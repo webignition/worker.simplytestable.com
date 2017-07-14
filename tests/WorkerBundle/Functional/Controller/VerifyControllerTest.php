@@ -7,12 +7,60 @@ use SimplyTestable\WorkerBundle\Entity\State;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
 class VerifyControllerTest extends BaseSimplyTestableTestCase
 {
+    /**
+     * @var VerifyController
+     */
+    private $verifyController;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->verifyController = new VerifyController();
+    }
+
+    public function testIndexActionInMaintenanceReadOnlyMode()
+    {
+        $this->expectException(ServiceUnavailableHttpException::class);
+
+        $request = new Request();
+        $request->request = new ParameterBag();
+        $this->container->get('request_stack')->push($request);
+
+        $workerService = $this->container->get(WorkerService::class);
+        $workerService->setReadOnly();
+
+        $this->verifyController->indexAction(
+            $workerService,
+            $this->container->get(VerifyRequestFactory::class)
+        );
+    }
+
+    public function testIndexActionWithInvalidRequest()
+    {
+        $this->expectException(BadRequestHttpException::class);
+
+        $request = new Request();
+        $request->request = new ParameterBag();
+        $this->container->get('request_stack')->push($request);
+
+        $this->verifyController->indexAction(
+            $this->container->get(WorkerService::class),
+            $this->container->get(VerifyRequestFactory::class)
+        );
+    }
+
     /**
      * @dataProvider indexActionDataProvider
      *
@@ -37,9 +85,7 @@ class VerifyControllerTest extends BaseSimplyTestableTestCase
         $request->request = $postData;
         $this->container->get('request_stack')->push($request);
 
-        $verifyController = new VerifyController();
-
-        $response = $verifyController->indexAction(
+        $response = $this->verifyController->indexAction(
             $workerService,
             $this->container->get(VerifyRequestFactory::class)
         );

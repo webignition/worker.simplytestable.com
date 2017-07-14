@@ -9,16 +9,6 @@ use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
 class StatusControllerTest extends BaseSimplyTestableTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected static function getServicesToMock()
-    {
-        return [
-            'simplytestable.services.httpclientservice',
-        ];
-    }
-
     public function testIndexAction()
     {
         $statusController = new StatusController();
