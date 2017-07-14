@@ -13,6 +13,11 @@ use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 class MaintenanceControllerTest extends BaseSimplyTestableTestCase
 {
     /**
+     * @var MaintenanceController
+     */
+    private $maintenanceController;
+
+    /**
      * @var WorkerService
      */
     private $workerService;
@@ -24,12 +29,13 @@ class MaintenanceControllerTest extends BaseSimplyTestableTestCase
     {
         parent::setUp();
 
+        $this->maintenanceController = new MaintenanceController();
         $this->workerService = $this->container->get(WorkerService::class);
     }
 
     public function testEnableReadOnlyAction()
     {
-        $response = $this->createMaintenanceController()->enableReadOnlyAction(
+        $response = $this->maintenanceController->enableReadOnlyAction(
             $this->container->get(EnableReadOnlyCommand::class)
         );
 
@@ -43,7 +49,7 @@ class MaintenanceControllerTest extends BaseSimplyTestableTestCase
 
     public function testDisableReadOnlyAction()
     {
-        $response = $this->createMaintenanceController()->disableReadOnlyAction(
+        $response = $this->maintenanceController->disableReadOnlyAction(
             $this->container->get(DisableReadOnlyCommand::class)
         );
 
@@ -57,7 +63,7 @@ class MaintenanceControllerTest extends BaseSimplyTestableTestCase
 
     public function testTaskPerformEnqueueAction()
     {
-        $response = $this->createMaintenanceController()->taskPerformEnqueueAction(
+        $response = $this->maintenanceController->taskPerformEnqueueAction(
             $this->container->get(PerformEnqueueCommand::class)
         );
 
@@ -71,7 +77,7 @@ class MaintenanceControllerTest extends BaseSimplyTestableTestCase
     {
         $this->removeAllTasks();
 
-        $response = $this->createMaintenanceController()->leaveReadOnlyAction(
+        $response = $this->maintenanceController->leaveReadOnlyAction(
             $this->container->get(DisableReadOnlyCommand::class),
             $this->container->get(ReportCompletionEnqueueCommand::class),
             $this->container->get(PerformEnqueueCommand::class)
@@ -83,15 +89,5 @@ class MaintenanceControllerTest extends BaseSimplyTestableTestCase
         );
         $this->assertFalse($this->workerService->isMaintenanceReadOnly());
         $this->assertTrue($this->workerService->isActive());
-    }
-
-    /**
-     * @return MaintenanceController
-     */
-    private function createMaintenanceController()
-    {
-        $controller = new MaintenanceController();
-
-        return $controller;
     }
 }
