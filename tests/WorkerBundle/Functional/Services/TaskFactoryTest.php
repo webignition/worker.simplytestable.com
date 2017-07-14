@@ -22,7 +22,7 @@ class TaskFactoryTest extends BaseSimplyTestableTestCase
     {
         parent::setUp();
 
-        $this->taskFactory = $this->container->get(TestTaskFactory::class);
+        $this->taskFactory = $this->container->get(TaskFactory::class);
     }
 
     /**
@@ -54,7 +54,7 @@ class TaskFactoryTest extends BaseSimplyTestableTestCase
     public function createDataProvider()
     {
         return [
-            'foo' => [
+            'default' => [
                 'taskTypeName' => 'HTML validation',
                 'url' => 'http://example.com',
                 'parameters' => '',
