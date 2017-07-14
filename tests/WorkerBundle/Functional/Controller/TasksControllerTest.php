@@ -3,54 +3,80 @@
 namespace Tests\WorkerBundle\Functional\Controller;
 
 use SimplyTestable\WorkerBundle\Controller\TasksController;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
+use SimplyTestable\WorkerBundle\Services\TasksService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
 class TasksControllerTest extends BaseSimplyTestableTestCase
 {
+    /**
+     * @var TasksController
+     */
+    private $tasksController;
+
+    /**
+     * @var QueueService
+     */
+    private $resqueQueueService;
+
+    /**
+     * @var JobFactory
+     */
+    private $resqueJobFactory;
+
+    /**
+     * @var TasksService
+     */
+    private $tasksService;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->tasksController = new TasksController();
+    }
+
     public function testNotifyActionWithResqueQueueEmpty()
     {
         $this->clearRedis();
-        $resqueQueueService = $this->container->get('simplytestable.services.resque.queueservice');
-        $this->assertTrue($resqueQueueService->isEmpty('tasks-request'));
+        $this->assertTrue($this->resqueQueueService->isEmpty('tasks-request'));
 
-        $response = $this->createTasksController()->notifyAction();
+        $response = $this->tasksController->notifyAction(
+            $this->resqueQueueService,
+            $this->resqueJobFactory,
+            $this->tasksService
+        );
         $this->assertEquals(200, $response->getStatusCode());
 
-        $this->assertFalse($resqueQueueService->isEmpty('tasks-request'));
-        $this->assertEquals(1, $resqueQueueService->getQueueLength('tasks-request'));
+        $this->assertFalse($this->resqueQueueService->isEmpty('tasks-request'));
+        $this->assertEquals(1, $this->resqueQueueService->getQueueLength('tasks-request'));
     }
 
     public function testNotifyActionWithResqueQueueNotEmpty()
     {
         $this->clearRedis();
 
-        $resqueQueueService = $this->container->get('simplytestable.services.resque.queueservice');
-        $resqueJobFactory = $this->container->get('simplytestable.services.resque.jobfactory');
-
-        $resqueQueueService->enqueue(
-            $resqueJobFactory->create(
+        $this->resqueQueueService->enqueue(
+            $this->resqueJobFactory->create(
                 'tasks-request',
                 ['limit' => $this->container->getParameter('worker_process_count')]
             )
         );
 
-        $this->assertFalse($resqueQueueService->isEmpty('tasks-request'));
-        $this->assertEquals(1, $resqueQueueService->getQueueLength('tasks-request'));
+        $this->assertFalse($this->resqueQueueService->isEmpty('tasks-request'));
+        $this->assertEquals(1, $this->resqueQueueService->getQueueLength('tasks-request'));
 
-        $response = $this->createTasksController()->notifyAction();
+        $response = $this->tasksController->notifyAction(
+            $this->resqueQueueService,
+            $this->resqueJobFactory,
+            $this->tasksService
+        );
         $this->assertEquals(200, $response->getStatusCode());
 
-        $this->assertEquals(1, $resqueQueueService->getQueueLength('tasks-request'));
-    }
-
-    /**
-     * @return TasksController
-     */
-    private function createTasksController()
-    {
-        $controller = new TasksController();
-        $controller->setContainer($this->container);
-
-        return $controller;
+        $this->assertEquals(1, $this->resqueQueueService->getQueueLength('tasks-request'));
     }
 }
