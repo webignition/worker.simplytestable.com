@@ -66,6 +66,9 @@ class HttpClientService
             'config' => [
                 'curl' => $this->curlOptions
             ],
+            'defaults' => [
+                'verify' => false,
+            ],
         ]);
 
         $cacheSubscriber = $this->createCacheSubscriber();
