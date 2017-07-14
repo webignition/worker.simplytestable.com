@@ -7,40 +7,59 @@ use SimplyTestable\WorkerBundle\Command\Maintenance\EnableReadOnlyCommand;
 use SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class MaintenanceController extends Controller
+class MaintenanceController extends AbstractController
 {
-    public function enableReadOnlyAction()
+    /**
+     * @param EnableReadOnlyCommand $enableReadOnlyCommand
+     *
+     * @return JsonResponse
+     */
+    public function enableReadOnlyAction(EnableReadOnlyCommand $enableReadOnlyCommand)
     {
-        return $this->executeCommand(new EnableReadOnlyCommand(
-            $this->container->get('simplytestable.services.workerservice')
-        ));
+        return $this->executeCommand($enableReadOnlyCommand);
     }
 
-    public function disableReadOnlyAction()
+    /**
+     * @param DisableReadOnlyCommand $disableReadOnlyCommand
+     *
+     * @return JsonResponse
+     */
+    public function disableReadOnlyAction(DisableReadOnlyCommand $disableReadOnlyCommand)
     {
-        return $this->executeCommand($this->createDisableReadOnlyCommand());
+        return $this->executeCommand($disableReadOnlyCommand);
     }
 
-    public function taskPerformEnqueueAction()
+    /**
+     * @param PerformEnqueueCommand $performEnqueueCommand
+     *
+     * @return JsonResponse
+     */
+    public function taskPerformEnqueueAction(PerformEnqueueCommand $performEnqueueCommand)
     {
-        return $this->executeCommand(new PerformEnqueueCommand(
-            $this->container->get('simplytestable.services.taskservice'),
-            $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactory')
-        ));
+        return $this->executeCommand($performEnqueueCommand);
     }
 
-    public function leaveReadOnlyAction()
-    {
+    /**
+     * @param DisableReadOnlyCommand $disableReadOnlyCommand
+     * @param ReportCompletionEnqueueCommand $reportCompletionEnqueueCommand
+     * @param PerformEnqueueCommand $performEnqueueCommand
+     *
+     * @return JsonResponse
+     */
+    public function leaveReadOnlyAction(
+        DisableReadOnlyCommand $disableReadOnlyCommand,
+        ReportCompletionEnqueueCommand $reportCompletionEnqueueCommand,
+        PerformEnqueueCommand $performEnqueueCommand
+    ) {
         $commands = [
-            $this->createDisableReadOnlyCommand(),
-            $this->createReportCompletionEnqueueCommand(),
-            $this->createPerformEnqueueCommand()
+            $disableReadOnlyCommand,
+            $reportCompletionEnqueueCommand,
+            $performEnqueueCommand
         ];
 
         $responseLines = array();
@@ -56,41 +75,6 @@ class MaintenanceController extends Controller
         }
 
         return new JsonResponse($responseLines);
-    }
-
-    /**
-     * @return DisableReadOnlyCommand
-     */
-    private function createDisableReadOnlyCommand()
-    {
-        return new DisableReadOnlyCommand(
-            $this->container->get('simplytestable.services.workerservice')
-        );
-    }
-
-    /**
-     * @return ReportCompletionEnqueueCommand
-     */
-    private function createReportCompletionEnqueueCommand()
-    {
-        return new ReportCompletionEnqueueCommand(
-            $this->container->get('logger'),
-            $this->container->get('simplytestable.services.taskservice'),
-            $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactory')
-        );
-    }
-
-    /**
-     * @return PerformEnqueueCommand
-     */
-    private function createPerformEnqueueCommand()
-    {
-        return new PerformEnqueueCommand(
-            $this->container->get('simplytestable.services.taskservice'),
-            $this->container->get('simplytestable.services.resque.queueservice'),
-            $this->container->get('simplytestable.services.resque.jobfactory')
-        );
     }
 
     /**
