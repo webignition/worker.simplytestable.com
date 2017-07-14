@@ -1,6 +1,7 @@
 <?php
 namespace Tests\WorkerBundle\Services;
 
+use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 
 class TestWorkerService extends WorkerService
@@ -11,11 +12,24 @@ class TestWorkerService extends WorkerService
     private $activateResult;
 
     /**
+     * @var ThisWorker
+     */
+    private $getResult;
+
+    /**
      * @param int $activateResult
      */
     public function setActivateResult($activateResult)
     {
         $this->activateResult = $activateResult;
+    }
+
+    /**
+     * @param ThisWorker $worker
+     */
+    public function setGetResult(ThisWorker $worker)
+    {
+        $this->getResult = $worker;
     }
 
     /**
@@ -30,5 +44,17 @@ class TestWorkerService extends WorkerService
             return $activateResult;
         }
         return parent::activate();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get()
+    {
+        if (!empty($this->getResult)) {
+            return $this->getResult;
+        }
+
+        return parent::get();
     }
 }

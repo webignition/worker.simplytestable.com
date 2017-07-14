@@ -24,3 +24,5 @@ services:
   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory:
 
   SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory:
+
+  SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory:

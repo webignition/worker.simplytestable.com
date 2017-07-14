@@ -3,25 +3,16 @@
 namespace Tests\WorkerBundle\Functional\Controller;
 
 use SimplyTestable\WorkerBundle\Controller\VerifyController;
+use SimplyTestable\WorkerBundle\Entity\State;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class VerifyControllerTest extends BaseSimplyTestableTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected static function getServicesToMock()
-    {
-        return [
-            'simplytestable.services.workerservice',
-        ];
-    }
-
     /**
      * @dataProvider indexActionDataProvider
      *
@@ -31,13 +22,27 @@ class VerifyControllerTest extends BaseSimplyTestableTestCase
      */
     public function testIndexAction(ParameterBag $postData, $workerHostname, $workerToken)
     {
-        $this->mockWorkerService($workerHostname, $workerToken);
+        $workerActiveState = new State();
+        $workerActiveState->setName(WorkerService::WORKER_ACTIVE_STATE);
+
+        $worker = new ThisWorker();
+        $worker->setHostname($workerHostname);
+        $worker->setActivationToken($workerToken);
+        $worker->setState($workerActiveState);
+
+        $workerService = $this->container->get(WorkerService::class);
+        $workerService->setGetResult($worker);
 
         $request = new Request();
         $request->request = $postData;
         $this->container->get('request_stack')->push($request);
 
-        $response = $this->createVerifyController()->indexAction();
+        $verifyController = new VerifyController();
+
+        $response = $verifyController->indexAction(
+            $workerService,
+            $this->container->get(VerifyRequestFactory::class)
+        );
         $this->assertEquals(200, $response->getStatusCode());
     }
 
@@ -56,31 +61,5 @@ class VerifyControllerTest extends BaseSimplyTestableTestCase
                 'workerToken' => 'bar',
             ],
         ];
-    }
-
-    /**
-     * @return VerifyController
-     */
-    private function createVerifyController()
-    {
-        $controller = new VerifyController();
-        $controller->setContainer($this->container);
-
-        return $controller;
-    }
-
-    /**
-     * @param string $hostname
-     * @param string $token
-     */
-    private function mockWorkerService($hostname, $token)
-    {
-        $worker = new ThisWorker();
-        $worker->setHostname($hostname);
-        $worker->setActivationToken($token);
-
-        $this->container->get('simplytestable.services.workerservice')
-            ->shouldReceive('get')
-            ->andReturn($worker);
     }
 }
