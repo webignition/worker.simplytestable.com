@@ -18,3 +18,9 @@ services:
   SimplyTestable\WorkerBundle\Services\HttpCache:
 
   SimplyTestable\WorkerBundle\Services\TaskFactory:
+
+  SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory:
+
+  SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory:
+
+  SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory:

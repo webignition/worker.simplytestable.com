@@ -2,125 +2,134 @@
 
 namespace SimplyTestable\WorkerBundle\Controller;
 
-use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Model\TaskCollection;
-use SimplyTestable\WorkerBundle\Request\Task\CreateRequest;
+use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
+use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
+use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
+use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
+use SimplyTestable\WorkerBundle\Services\TaskFactory;
 use SimplyTestable\WorkerBundle\Services\TaskService;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use SimplyTestable\WorkerBundle\Services\WorkerService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
-class TaskController extends Controller
+class TaskController extends AbstractController
 {
     /**
-     * @return Response|JsonResponse
+     * @var WorkerService
      */
-    public function createCollectionAction()
+    private $workerService;
+
+    /**
+     * @var TaskService
+     */
+    private $taskService;
+
+    /**
+     * @param WorkerService $workerService
+     * @param TaskService $taskService
+     */
+    public function __construct(WorkerService $workerService, TaskService $taskService)
     {
-        if ($this->container->get('simplytestable.services.workerservice')->isMaintenanceReadOnly()) {
+        $this->workerService = $workerService;
+        $this->taskService = $taskService;
+    }
+
+    /**
+     * @param CreateRequestCollectionFactory $createRequestCollectionFactory
+     * @param TaskFactory $taskFactory
+     * @param QueueService $resqueQueueService
+     * @param JobFactory $resqueJobFactory
+     *
+     * @return JsonResponse|Response
+     */
+    public function createCollectionAction(
+        CreateRequestCollectionFactory $createRequestCollectionFactory,
+        TaskFactory $taskFactory,
+        QueueService $resqueQueueService,
+        JobFactory $resqueJobFactory
+    ) {
+        if ($this->workerService->isMaintenanceReadOnly()) {
             throw new ServiceUnavailableHttpException();
         }
 
-        $createCollectionRequest =
-            $this->container->get('simplytestable.services.request.factory.task.createcollection')->create();
+        $createCollectionRequest = $createRequestCollectionFactory->create();
 
         $tasks = new TaskCollection();
 
         foreach ($createCollectionRequest->getCreateRequests() as $createRequest) {
-            $task = $this->createTaskFromCreateRequest($createRequest);
+            $task = $taskFactory->createFromRequest($createRequest);
             $tasks->add($task);
 
-            $this->getTaskService()->getEntityManager()->persist($task);
+            $this->taskService->getEntityManager()->persist($task);
         }
 
-        $this->getTaskService()->getEntityManager()->flush();
+        $this->taskService->getEntityManager()->flush();
 
         foreach ($tasks as $task) {
-            $this->enqueueTaskPerformJob($task);
+            $resqueQueueService->enqueue(
+                $resqueJobFactory->create(
+                    'task-perform',
+                    ['id' => $task->getId()]
+                )
+            );
         }
 
         return new JsonResponse($tasks->jsonSerialize());
     }
 
-    public function cancelAction()
+    /**
+     * @param CancelRequestFactory $cancelRequestFactory
+     *
+     * @return Response
+     */
+    public function cancelAction(CancelRequestFactory $cancelRequestFactory)
     {
-        if ($this->container->get('simplytestable.services.workerservice')->isMaintenanceReadOnly()) {
+        if ($this->workerService->isMaintenanceReadOnly()) {
             throw new ServiceUnavailableHttpException();
         }
 
-        $cancelRequest = $this->container->get('simplytestable.services.request.factory.task.cancel')->create();
+        $cancelRequest = $cancelRequestFactory->create();
 
         if (!$cancelRequest->isValid()) {
             throw new BadRequestHttpException();
         }
 
-        $this->getTaskService()->cancel($cancelRequest->getTask());
-        $this->getTaskService()->getEntityManager()->remove($cancelRequest->getTask());
-        $this->getTaskService()->getEntityManager()->flush();
+        $this->taskService->cancel($cancelRequest->getTask());
+        $this->taskService->getEntityManager()->remove($cancelRequest->getTask());
+        $this->taskService->getEntityManager()->flush();
 
         return new Response();
     }
 
-    public function cancelCollectionAction()
+    /**
+     * @param CancelRequestCollectionFactory $cancelRequestCollectionFactory
+     *
+     * @return Response
+     */
+    public function cancelCollectionAction(CancelRequestCollectionFactory $cancelRequestCollectionFactory)
     {
-        if ($this->container->get('simplytestable.services.workerservice')->isMaintenanceReadOnly()) {
+        if ($this->workerService->isMaintenanceReadOnly()) {
             throw new ServiceUnavailableHttpException();
         }
 
-        $cancelCollectionRequest =
-            $this->container->get('simplytestable.services.request.factory.task.cancelcollection')->create();
+        $cancelCollectionRequest = $cancelRequestCollectionFactory->create();
 
         $cancelledTaskCount = 0;
         foreach ($cancelCollectionRequest->getCancelRequests() as $cancelRequest) {
-            $this->getTaskService()->cancel($cancelRequest->getTask());
-            $this->getTaskService()->getEntityManager()->remove($cancelRequest->getTask());
+            $this->taskService->cancel($cancelRequest->getTask());
+            $this->taskService->getEntityManager()->remove($cancelRequest->getTask());
             $cancelledTaskCount++;
         }
 
         if ($cancelledTaskCount > 0) {
-            $this->getTaskService()->getEntityManager()->flush();
+            $this->taskService->getEntityManager()->flush();
         }
 
         return new Response();
-    }
-
-    /**
-     * @param CreateRequest $createRequest
-     *
-     * @return Task
-     */
-    private function createTaskFromCreateRequest(CreateRequest $createRequest)
-    {
-        return $this->getTaskService()->create(
-            $createRequest->getUrl(),
-            $createRequest->getTaskType(),
-            $createRequest->getParameters()
-        );
-    }
-
-    /**
-     * @param Task $task
-     */
-    private function enqueueTaskPerformJob(Task $task)
-    {
-        $resqueQueueService = $this->get('simplytestable.services.resque.queueService');
-        $resqueJobFactory = $this->get('simplytestable.services.resque.jobfactory');
-
-        $resqueQueueService->enqueue(
-            $resqueJobFactory->create(
-                'task-perform',
-                ['id' => $task->getId()]
-            )
-        );
-    }
-
-    /**
-     * @return TaskService
-     */
-    private function getTaskService()
-    {
-        return $this->container->get('simplytestable.services.taskservice');
     }
 }

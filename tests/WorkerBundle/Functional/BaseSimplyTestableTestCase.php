@@ -6,14 +6,11 @@ use Doctrine\ORM\EntityManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpCache;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
-use SimplyTestable\WorkerBundle\Services\MemcachedService;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
-use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use GuzzleHttp\Subscriber\Mock as HttpMockSubscriber;
 
 abstract class BaseSimplyTestableTestCase extends BaseTestCase
@@ -24,82 +21,30 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->container->get('SimplyTestable\WorkerBundle\Services\WorkerService')->setActive();
+        $this->container->get(WorkerService::class)->setActive();
     }
 
     /**
-     * @var TaskFactory
+     * @var TestTaskFactory
      */
     private $taskFactory;
 
     /**
-     * @return TaskFactory
+     * @return TestTaskFactory
      */
     protected function getTaskFactory()
     {
-        $stateService = $this->container->get(StateService::class);
-        $taskService = $this->container->get(TaskService::class);
-        $taskTypeService = $this->container->get(TaskTypeService::class);
-
         if (is_null($this->taskFactory)) {
-            $this->taskFactory = new TaskFactory(
-                $taskService,
-                $taskTypeService,
-                $stateService,
+            $this->taskFactory = new TestTaskFactory(
+                $this->container->get(TaskService::class),
+                $this->container->get(TaskTypeService::class),
+                $this->container->get(StateService::class),
                 $this->getEntityManager()
             );
         }
 
         return $this->taskFactory;
     }
-
-//    /**
-//     * @return WorkerService
-//     */
-//    protected function getWorkerService()
-//    {
-//        return $this->container->get('simplytestable.services.workerservice');
-//    }
-//
-//    /**
-//     * @return QueueService
-//     */
-//    protected function getResqueQueueService()
-//    {
-//        return $this->container->get('simplytestable.services.resque.queueservice');
-//    }
-//
-//    /**
-//     * @return ResqueJobFactory
-//     */
-//    protected function getResqueJobFactory()
-//    {
-//        return $this->container->get('simplytestable.services.resque.jobfactory');
-//    }
-//
-//    /**
-//     * @return TaskService
-//     */
-//    protected function getTaskService()
-//    {
-//        return $this->container->get('simplytestable.services.taskservice');
-//    }
-//
-//    /**
-//     * @return TaskTypeService
-//     */
-//    protected function getTaskTypeService()
-//    {
-//        return $this->container->get('simplytestable.services.tasktypeservice');
-//    }
-//
-//    /**
-//     * @return MemcachedService
-//     */
-//    protected function getMemcachedService()
-//    {
-//        return $this->container->get('simplytestable.services.memcachedservice');
-//    }
 
     /**
      * @return EntityManager
