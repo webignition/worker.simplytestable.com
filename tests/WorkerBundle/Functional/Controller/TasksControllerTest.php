@@ -38,6 +38,9 @@ class TasksControllerTest extends BaseSimplyTestableTestCase
         parent::setUp();
 
         $this->tasksController = new TasksController();
+        $this->resqueQueueService = $this->container->get(QueueService::class);
+        $this->resqueJobFactory = $this->container->get(JobFactory::class);
+        $this->tasksService = $this->container->get(TasksService::class);
     }
 
     public function testNotifyActionWithResqueQueueEmpty()
