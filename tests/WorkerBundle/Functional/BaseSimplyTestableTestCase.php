@@ -32,7 +32,7 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
     /**
      * @return TestTaskFactory
      */
-    protected function getTaskFactory()
+    protected function getTestTaskFactory()
     {
         if (is_null($this->taskFactory)) {
             $this->taskFactory = new TestTaskFactory(

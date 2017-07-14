@@ -22,7 +22,7 @@ class TaskFactoryTest extends BaseSimplyTestableTestCase
     {
         parent::setUp();
 
-        $this->taskFactory = $this->container->get(TaskFactory::class);
+        $this->taskFactory = $this->container->get(TestTaskFactory::class);
     }
 
     /**

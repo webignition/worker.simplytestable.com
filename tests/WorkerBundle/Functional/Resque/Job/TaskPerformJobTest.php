@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Command\Task\PerformCommand;
 use SimplyTestable\WorkerBundle\Resque\Job\Job;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
 class TaskPerformJobTest extends BaseSimplyTestableTestCase
@@ -26,7 +26,7 @@ class TaskPerformJobTest extends BaseSimplyTestableTestCase
     {
         $this->container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $taskPerformJob = $this->createTaskPerformJob($task->getId());
 

@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 
 class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 {
@@ -52,8 +52,8 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $content
         ]);
 
-        $task = $this->getTaskFactory()->create(
-            TaskFactory::createTaskValuesFromDefaults()
+        $task = $this->getTestTaskFactory()->create(
+            TestTaskFactory::createTaskValuesFromDefaults()
         );
 
         $taskDriverResponse = $this->taskDriver->perform($task);
@@ -121,8 +121,8 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.0 200\nContent-Type:text/html\n\n" . $content
         ]);
 
-        $task = $this->getTaskFactory()->create(
-            TaskFactory::createTaskValuesFromDefaults()
+        $task = $this->getTestTaskFactory()->create(
+            TestTaskFactory::createTaskValuesFromDefaults()
         );
 
         HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
@@ -268,7 +268,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -292,7 +292,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
         ]));
@@ -330,8 +330,8 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create(
-            TaskFactory::createTaskValuesFromDefaults()
+        $task = $this->getTestTaskFactory()->create(
+            TestTaskFactory::createTaskValuesFromDefaults()
         );
 
         $this->taskDriver->perform($task);

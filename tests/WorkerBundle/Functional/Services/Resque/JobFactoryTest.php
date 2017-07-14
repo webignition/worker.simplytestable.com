@@ -86,7 +86,7 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
      * @param string $expectedQueue
      * @param array $expectedArgs
      */
-    public function testCreate($queue, $args, $expectedJobClass, $expectedQueue, $expectedArgs)
+    public function testCreateFoo($queue, $args, $expectedJobClass, $expectedQueue, $expectedArgs)
     {
         $job = $this->jobFactory->create($queue, $args);
 
@@ -112,10 +112,10 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
                     'id' => 1,
                     'serviceIds' => [
                         'logger',
-                        'simplytestable.services.taskservice',
-                        'simplytestable.services.workerservice',
-                        'simplytestable.services.resque.queueservice',
-                        'simplytestable.services.resque.jobfactory',
+                        'SimplyTestable\WorkerBundle\Services\TaskService',
+                        'SimplyTestable\WorkerBundle\Services\WorkerService',
+                        'SimplyTestable\WorkerBundle\Services\Resque\QueueService',
+                        'SimplyTestable\WorkerBundle\Services\Resque\JobFactory',
                     ],
                 ],
             ],
@@ -130,8 +130,8 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
                     'id' => 1,
                     'serviceIds' => [
                         'logger',
-                        'simplytestable.services.taskservice',
-                        'simplytestable.services.workerservice',
+                        'SimplyTestable\WorkerBundle\Services\TaskService',
+                        'SimplyTestable\WorkerBundle\Services\WorkerService',
                     ],
                 ],
             ],
@@ -145,10 +145,10 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
                 'expectedArgs' => [
                     'id' => 1,
                     'serviceIds' => [
-                        'simplytestable.services.tasksservice',
-                        'simplytestable.services.workerservice',
-                        'simplytestable.services.resque.queueservice',
-                        'simplytestable.services.resque.jobfactory',
+                        'SimplyTestable\WorkerBundle\Services\TasksService',
+                        'SimplyTestable\WorkerBundle\Services\WorkerService',
+                        'SimplyTestable\WorkerBundle\Services\Resque\QueueService',
+                        'SimplyTestable\WorkerBundle\Services\Resque\JobFactory',
                     ],
                 ],
             ],

@@ -9,7 +9,7 @@ use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 
 class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
@@ -38,7 +38,7 @@ class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $this->container->get(TaskService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
@@ -66,7 +66,7 @@ class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $this->container->get(TaskService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());

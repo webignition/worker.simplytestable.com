@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\HtmlDocumentFactory;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 
 class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
 {
@@ -58,8 +58,8 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
     ) {
         $this->setHttpFixtures([$httpFixture]);
 
-        $task = $this->getTaskFactory()->create(
-            TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(
+            TestTaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
             ])
@@ -136,7 +136,7 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html><html>"
         ]);
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -158,7 +158,7 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html><html>"
         ]);
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters),
         ]));

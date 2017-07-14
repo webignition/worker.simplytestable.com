@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Command\Tasks\PerformCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 
 class PerformCommandTest extends BaseSimplyTestableTestCase
@@ -15,7 +15,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
     {
         $this->removeAllTasks();
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $taskService = $this->container->get(TaskService::class);
         $taskService

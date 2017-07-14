@@ -6,8 +6,8 @@ use SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand;
 use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
-use Tests\WorkerBundle\Factory\TaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 
 class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
@@ -31,7 +31,7 @@ class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
 
         $tasks = array();
         foreach ($taskPropertyCollection as $taskProperties) {
-            $tasks[] = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults(
+            $tasks[] = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults(
                 $taskProperties
             ));
         }

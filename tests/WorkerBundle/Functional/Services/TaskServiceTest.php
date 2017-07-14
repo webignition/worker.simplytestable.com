@@ -8,7 +8,7 @@ use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Utility\File;
 
 class TaskServiceTest extends BaseSimplyTestableTestCase
@@ -172,7 +172,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
         $this->setHttpFixtures($httpFixtures);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create($taskValues);
+        $task = $this->getTestTaskFactory()->create($taskValues);
 
         $this->taskService->perform($task);
 
@@ -186,21 +186,21 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     {
         return [
             'default' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html><head></head><body></body>"
                 ],
                 'expectedFinishedStateName' => TaskService::TASK_COMPLETED_STATE,
             ],
             'skipped' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     "HTTP/1.1 200 OK\nContent-type:application/pdf"
                 ],
                 'expectedFinishedStateName' => TaskService::TASK_SKIPPED_STATE,
             ],
             'failed, no retry available' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     "HTTP/1.1 404",
                     "HTTP/1.1 404",
@@ -212,7 +212,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
 
     public function testGetById()
     {
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults());
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults());
         $id = $task->getId();
 
         $this->getEntityManager()->detach($task);
@@ -222,7 +222,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
 
     public function testReportCompletionNoOutput()
     {
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $this->taskService->reportCompletion($task);
 
         $lastLogLine = File::tail($this->container->get('kernel')->getLogDir() . '/test.log', 1);
@@ -251,7 +251,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
         ]);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $this->taskService->perform($task);
         $initialTaskState = (string)$task->getState();
 
@@ -296,7 +296,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
         ]);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $this->assertEquals(0, $this->taskService->perform($task));
         $this->assertInternalType('int', $task->getId());
@@ -330,12 +330,12 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     {
         $this->removeAllTasks();
 
-        $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'state' => TaskService::TASK_STARTING_STATE,
             'type' => TaskTypeService::HTML_VALIDATION_NAME,
         ]));
 
-        $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'state' => TaskService::TASK_IN_PROGRESS_STATE,
             'type' => TaskTypeService::CSS_VALIDATION_NAME,
         ]));

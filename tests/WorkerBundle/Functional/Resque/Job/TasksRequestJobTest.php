@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
 use SimplyTestable\WorkerBundle\Resque\Job\Job;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
 class TasksRequestJobTest extends BaseSimplyTestableTestCase

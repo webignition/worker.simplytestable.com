@@ -7,7 +7,7 @@ use SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlDocumentFactory;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 
 class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
 {
@@ -63,7 +63,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
     ) {
         $this->setHttpFixtures($httpFixtures);
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters),
         ]));
@@ -234,7 +234,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200 OK\nContent-type:text-plain\n\n"
         ]);
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -262,7 +262,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
         ]);
 
 
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));

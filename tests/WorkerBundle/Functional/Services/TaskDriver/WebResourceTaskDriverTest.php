@@ -8,7 +8,7 @@ use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 
 abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
 {
@@ -56,8 +56,8 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
             new ConnectException('foo', $request)
         ]);
 
-        $task = $this->getTaskFactory()->create(
-            TaskFactory::createTaskValuesFromDefaults()
+        $task = $this->getTestTaskFactory()->create(
+            TestTaskFactory::createTaskValuesFromDefaults()
         );
 
         $this->setExpectedException(
@@ -89,8 +89,8 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
         $webResourceService = $this->container->get('simplytestable.services.webresourceservice');
         $webResourceService->getConfiguration()->disableRetryWithUrlEncodingDisabled();
 
-        $task = $this->getTaskFactory()->create(
-            TaskFactory::createTaskValuesFromDefaults()
+        $task = $this->getTestTaskFactory()->create(
+            TestTaskFactory::createTaskValuesFromDefaults()
         );
 
         $taskDriver = $this->getTaskDriver();
@@ -112,12 +112,12 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
         return [
             'http too many redirects' => [
                 'httpResponseFixtures' => [
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "1",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "2",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "3",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "4",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "5",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "6",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "1",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "2",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "3",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "4",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "5",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "6",
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -134,12 +134,12 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
             ],
             'http redirect loop' => [
                 'httpResponseFixtures' => [
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "1",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "2",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "3",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL,
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "1",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TaskFactory::DEFAULT_TASK_URL . "2",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "1",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "2",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "3",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL,
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "1",
+                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "2",
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,

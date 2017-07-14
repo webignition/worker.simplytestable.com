@@ -130,7 +130,7 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
     public function testCancelAction()
     {
         $this->removeAllTasks();
-        $task = $this->getTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults());
         $this->assertEquals('task-queued', $task->getState());
 
         $request = new Request();
@@ -153,10 +153,10 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
 
         $taskIds = [];
         $tasks = [];
-        $tasks[] = $this->getTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'html validation',
         ]));
-        $tasks[] = $this->getTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'css validation',
         ]));
 

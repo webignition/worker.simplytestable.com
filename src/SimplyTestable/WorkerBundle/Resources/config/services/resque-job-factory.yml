@@ -1,5 +1,6 @@
 services:
   SimplyTestable\WorkerBundle\Services\Resque\JobFactory:
+    public: true
     arguments:
         $queues:
           task-perform:

@@ -7,7 +7,7 @@ use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Factory\TaskFactory;
+use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -42,7 +42,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
     {
         $this->container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $returnCode = $this->command->run(
             new ArrayInput([
@@ -62,7 +62,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
 
     public function testTaskServiceRaisesException()
     {
-        $task = $this->getTaskFactory()->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $taskService = $this->container->get(TaskService::class);
         $taskService->setPerformException(new \Exception());
@@ -93,7 +93,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
         $expectedResqueJobs,
         $expectedEmptyResqueQueues
     ) {
-        $task = $this->getTaskFactory()->create($taskValues);
+        $task = $this->getTestTaskFactory()->create($taskValues);
         $this->clearRedis();
 
         $taskService = $this->container->get(TaskService::class);
@@ -133,7 +133,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
     {
         return [
             'unknown error' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
                     'state' => TaskService::TASK_IN_PROGRESS_STATE,
                 ]),
                 'taskServiceReturnValue' => 99,
@@ -146,7 +146,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
                 ],
             ],
             'success' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
                     'state' => TaskService::TASK_IN_PROGRESS_STATE,
                 ]),
                 'taskServiceReturnValue' => 0,
