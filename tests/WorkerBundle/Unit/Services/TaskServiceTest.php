@@ -40,7 +40,7 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $taskService->cancel($task);
-        $this->assertEquals($expectedEndState, $task->getState());
+        $this->assertEquals($expectedEndState, $task->getState()->getName());
     }
 
     /**
@@ -90,7 +90,7 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $taskService->cancel($task);
-        $this->assertEquals($expectedEndState, $task->getState());
+        $this->assertEquals($expectedEndState, $task->getState()->getName());
     }
 
     /**

@@ -325,8 +325,8 @@ class TaskService extends EntityService
      */
     public function cancel(Task $task)
     {
-        $isCancelled = TaskService::TASK_CANCELLED_STATE == $task->getState();
-        $isCompleted = TaskService::TASK_COMPLETED_STATE == $task->getState();
+        $isCancelled = TaskService::TASK_CANCELLED_STATE == $task->getState()->getName();
+        $isCompleted = TaskService::TASK_COMPLETED_STATE == $task->getState()->getName();
 
         if ($isCancelled || $isCompleted) {
             return $task;
