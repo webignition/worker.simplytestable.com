@@ -6,10 +6,10 @@ use SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand;
 use SimplyTestable\WorkerBundle\Command\Maintenance\EnableReadOnlyCommand;
 use SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
-use SimplyTestable\WorkerBundle\Output\StringOutput;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class MaintenanceController extends AbstractController
@@ -84,10 +84,10 @@ class MaintenanceController extends AbstractController
      */
     private function executeCommand(Command $command)
     {
-        $output = new StringOutput();
+        $output = new BufferedOutput();
         $commandResponse = $command->run(new ArrayInput([]), $output);
 
-        $outputLines = explode("\n", trim($output->getBuffer()));
+        $outputLines = explode("\n", trim($output->fetch()));
 
         return new JsonResponse($outputLines, $commandResponse === 0 ? 200 : 500);
     }

@@ -3,10 +3,10 @@
 namespace Tests\WorkerBundle\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
-use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
@@ -43,7 +43,7 @@ class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
 
         $this->assertTrue($this->clearRedis());
 
-        $returnCode = $this->command->execute(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->execute(new ArrayInput([]), new BufferedOutput());
 
         $this->assertEquals(0, $returnCode);
 
@@ -81,7 +81,7 @@ class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
             )
         );
 
-        $returnCode = $this->command->execute(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->execute(new ArrayInput([]), new BufferedOutput());
 
         $this->assertEquals(0, $returnCode);
 

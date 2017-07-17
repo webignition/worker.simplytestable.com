@@ -3,9 +3,9 @@
 namespace Tests\WorkerBundle\Functional\Command\Tasks;
 
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestIfEmptyCommand;
-use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -32,7 +32,7 @@ class RequestIfEmptyCommandTest extends BaseSimplyTestableTestCase
         }
 
         $command = $this->container->get(RequestIfEmptyCommand::class);
-        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+        $returnCode = $command->run(new ArrayInput([]), new BufferedOutput());
 
         $this->assertEquals(
             0,

@@ -2,9 +2,9 @@
 
 namespace SimplyTestable\WorkerBundle\Resque\Job;
 
-use SimplyTestable\WorkerBundle\Output\StringOutput;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 abstract class CommandJob extends Job
 {
@@ -38,7 +38,7 @@ abstract class CommandJob extends Job
         $command = $this->getCommand();
 
         $input = new ArrayInput($this->getCommandArgs());
-        $output = new StringOutput();
+        $output = new BufferedOutput();
 
         $returnCode = $command->run($input, $output);
 
@@ -51,7 +51,7 @@ abstract class CommandJob extends Job
 
     /**
      * @param int $returnCode
-     * @param string $output
+     * @param BufferedOutput $output
      *
      * @return int
      */
@@ -71,7 +71,7 @@ abstract class CommandJob extends Job
             '%s: task [%s] output %s',
             get_class($this),
             $this->getIdentifier(),
-            trim($output->getBuffer())
+            trim($output->fetch())
         ));
 
         return $returnCode;

@@ -4,8 +4,8 @@ namespace Tests\WorkerBundle\Functional\Command\Maintenance;
 
 use SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\TaskService;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -57,7 +57,7 @@ class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
 
         $returnCode = $command->run(
             new ArrayInput($commandArguments),
-            new StringOutput()
+            new BufferedOutput()
         );
 
         $this->assertEquals(0, $returnCode);

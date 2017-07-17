@@ -3,8 +3,8 @@
 namespace Tests\WorkerBundle\Functional\Command\Tasks;
 
 use SimplyTestable\WorkerBundle\Command\Tasks\PerformCommand;
-use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\TaskService;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -25,7 +25,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
 
         $returnCode = $command->run(
             new ArrayInput([]),
-            new StringOutput()
+            new BufferedOutput()
         );
 
         $this->assertEquals(0, $returnCode);

@@ -3,8 +3,8 @@
 namespace Tests\WorkerBundle\Functional\Command;
 
 use SimplyTestable\WorkerBundle\Command\WorkerActivateCommand;
-use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -29,7 +29,7 @@ class WorkerActivateCommandTest extends BaseSimplyTestableTestCase
     {
         $this->container->get(WorkerService::class)->setReadOnly();
 
-        $returnCode = $this->command->run(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->run(new ArrayInput([]), new BufferedOutput());
 
         $this->assertEquals(
             WorkerActivateCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
@@ -48,7 +48,7 @@ class WorkerActivateCommandTest extends BaseSimplyTestableTestCase
         $this->container->get(WorkerService::class)
             ->setActivateResult($activationResult);
 
-        $returnCode = $this->command->run(new ArrayInput([]), new StringOutput());
+        $returnCode = $this->command->run(new ArrayInput([]), new BufferedOutput());
 
         $this->assertEquals($expectedReturnCode, $returnCode);
     }

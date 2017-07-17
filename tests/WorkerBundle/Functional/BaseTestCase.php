@@ -2,9 +2,9 @@
 
 namespace Tests\WorkerBundle\Functional;
 
-use PSS\SymfonyMockerContainer\DependencyInjection\MockerContainer;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class BaseTestCase extends WebTestCase
 {
@@ -14,7 +14,7 @@ abstract class BaseTestCase extends WebTestCase
     private $client;
 
     /**
-     * @var MockerContainer
+     * @var ContainerInterface
      */
     protected $container;
 
