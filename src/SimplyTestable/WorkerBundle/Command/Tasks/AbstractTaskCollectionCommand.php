@@ -1,8 +1,8 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Tasks;
 
-use SimplyTestable\WorkerBundle\Output\StringOutput;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 
@@ -18,7 +18,7 @@ abstract class AbstractTaskCollectionCommand extends Command
         foreach ($taskIds as $taskId) {
             $output->writeln('Issuing command for task '.$taskId);
 
-            $outputBuffer = new StringOutput();
+            $outputBuffer = new BufferedOutput();
 
             $commandResponse = $command->run(
                 new ArrayInput([
@@ -27,7 +27,7 @@ abstract class AbstractTaskCollectionCommand extends Command
                 $outputBuffer
             );
 
-            $output->writeln(trim($outputBuffer->getBuffer()));
+            $output->writeln(trim($outputBuffer->fetch()));
             $output->writeln('Completed with return code '.$commandResponse);
         }
     }

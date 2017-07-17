@@ -4,8 +4,8 @@ namespace Tests\WorkerBundle\Functional\Command\HttpCache;
 
 use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Command\HttpCache\ClearCommand;
-use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\HttpCache;
+use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -27,7 +27,7 @@ class ClearCommandTest extends BaseSimplyTestableTestCase
 
         $command = new ClearCommand($httpCache);
 
-        $returnCode = $command->run(new ArrayInput([]), new StringOutput());
+        $returnCode = $command->run(new ArrayInput([]), new NullOutput());
 
         $this->assertEquals(
             $returnCode,

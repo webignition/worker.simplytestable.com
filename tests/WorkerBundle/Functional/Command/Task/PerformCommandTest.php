@@ -3,10 +3,10 @@
 namespace Tests\WorkerBundle\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\PerformCommand;
-use SimplyTestable\WorkerBundle\Output\StringOutput;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
+use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -33,7 +33,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
                 new ArrayInput([
                     'id' => 0,
                 ]),
-                new StringOutput()
+                new NullOutput()
             )
         );
     }
@@ -48,7 +48,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
             new ArrayInput([
                 'id' => $task->getId(),
             ]),
-            new StringOutput()
+            new NullOutput()
         );
 
         $this->assertEquals(PerformCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE, $returnCode);
@@ -71,7 +71,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
             new ArrayInput([
                 'id' => $task->getId(),
             ]),
-            new StringOutput()
+            new NullOutput()
         );
 
         $this->assertEquals(PerformCommand::RETURN_CODE_TASK_SERVICE_RAISED_EXCEPTION, $returnCode);
@@ -103,7 +103,7 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
             new ArrayInput([
                 'id' => $task->getId(),
             ]),
-            new StringOutput()
+            new NullOutput()
         );
 
         $this->assertEquals($expectedReturnCode, $returnCode);
