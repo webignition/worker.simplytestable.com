@@ -5,6 +5,7 @@ namespace Tests\WorkerBundle\Functional\Command\Maintenance;
 use SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -16,7 +17,7 @@ class DisableReadOnlyCommandTest extends BaseSimplyTestableTestCase
 
         $returnCode = $command->run(
             new ArrayInput([]),
-            new BufferedOutput()
+            new NullOutput()
         );
 
         $this->assertEquals(0, $returnCode);

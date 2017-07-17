@@ -4,7 +4,7 @@ namespace Tests\WorkerBundle\Functional\Command\Tasks;
 
 use SimplyTestable\WorkerBundle\Command\Tasks\ReportCompletionCommand;
 use SimplyTestable\WorkerBundle\Services\TaskService;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
@@ -36,7 +36,7 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
 
         $returnCode = $command->run(
             new ArrayInput([]),
-            new BufferedOutput()
+            new NullOutput()
         );
 
         $this->assertEquals(

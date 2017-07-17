@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -33,7 +33,7 @@ class RequestCommandTest extends BaseSimplyTestableTestCase
         $this->container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
 
-        $returnCode = $this->command->run(new ArrayInput([]), new BufferedOutput());
+        $returnCode = $this->command->run(new ArrayInput([]), new NullOutput());
 
         $this->assertEquals(
             RequestCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
@@ -57,7 +57,7 @@ class RequestCommandTest extends BaseSimplyTestableTestCase
         $tasksService
             ->setRequestResult($tasksServiceRequestReturnValue);
 
-        $returnCode = $this->command->run(new ArrayInput([]), new BufferedOutput());
+        $returnCode = $this->command->run(new ArrayInput([]), new NullOutput());
 
         $this->assertEquals(
             $expectedCommandReturnCode,
@@ -100,7 +100,7 @@ class RequestCommandTest extends BaseSimplyTestableTestCase
         $this->setHttpFixtures($responseFixtures);
         $this->clearRedis();
 
-        $returnCode = $this->command->run(new ArrayInput([]), new BufferedOutput());
+        $returnCode = $this->command->run(new ArrayInput([]), new NullOutput());
 
         $this->assertEquals(
             $expectedCommandReturnCode,

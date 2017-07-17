@@ -5,7 +5,7 @@ namespace Tests\WorkerBundle\Functional\Command\Task;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
@@ -33,7 +33,7 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
     {
         $this->container->get(WorkerService::class)->setReadOnly();
 
-        $returnCode = $this->command->execute(new ArrayInput([]), new BufferedOutput());
+        $returnCode = $this->command->execute(new ArrayInput([]), new NullOutput());
 
         $this->assertEquals(
             ReportCompletionCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
@@ -45,7 +45,7 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
     {
          $returnCode = $this->command->run(new ArrayInput([
             'id' => -1
-         ]), new BufferedOutput());
+         ]), new NullOutput());
 
         $this->assertEquals(
             ReportCompletionCommand::RETURN_CODE_TASK_DOES_NOT_EXIST,
@@ -78,7 +78,7 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
 
         $returnCode = $this->command->run(new ArrayInput([
             'id' => $task->getId()
-        ]), new BufferedOutput());
+        ]), new NullOutput());
 
         $this->assertEquals(
             $expectedCommandReturnCode,

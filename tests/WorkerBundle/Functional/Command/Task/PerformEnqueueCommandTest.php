@@ -5,7 +5,7 @@ namespace Tests\WorkerBundle\Functional\Command\Task;
 use SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -52,7 +52,7 @@ class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
 
         $returnCode = $command->execute(
             new ArrayInput([]),
-            new BufferedOutput()
+            new NullOutput()
         );
 
         $this->assertEquals(0, $returnCode);
