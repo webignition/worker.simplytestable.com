@@ -10,7 +10,6 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFacto
 use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\WebResource;
 use webignition\WebResource\Exception\Exception as WebResourceException;
-use GuzzleHttp\Message\Request as HttpRequest;
 use webignition\WebResource\Service\Service as WebResourceService;
 
 abstract class WebResourceTaskDriver extends TaskDriver
@@ -77,12 +76,12 @@ abstract class WebResourceTaskDriver extends TaskDriver
         $this->getHttpClientService()->clearCookies();
         $this->getHttpClientService()->clearBasicHttpAuthorization();
 
-        if (!$this->response->hasSucceeded()) {
-            return $this->hasNotSucceededHandler();
-        }
-
         if (!$this->webResource instanceof WebPage) {
             return $this->isNotCorrectWebResourceTypeHandler();
+        }
+
+        if (!$this->response->hasSucceeded()) {
+            return $this->hasNotSucceededHandler();
         }
 
         if (empty($this->webResource->getContent())) {

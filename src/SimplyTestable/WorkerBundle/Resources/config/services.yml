@@ -24,7 +24,7 @@ services:
     class:  webignition\WebResource\Service\Configuration
     arguments:
         $configurationValues:
-          allow-uknown-resource-types: true
+          allow-unknown-resource-types: false
           retry-with-url-encoding-disabled: true
           content-type-web-resource-map: '%content_type_web_resource_map%'
 
