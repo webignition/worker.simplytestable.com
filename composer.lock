@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f860e8c5a9fc26928036c96e5d5830a6",
+    "content-hash": "104af322279d10326a4e320789a9419a",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -60,7 +60,7 @@
                 "redis",
                 "resque"
             ],
-            "time": "2017-04-12 21:58:19"
+            "time": "2017-04-12T21:58:19+00:00"
         },
         {
             "name": "chrisboulton/php-resque-scheduler",
@@ -96,7 +96,7 @@
                 }
             ],
             "description": "php-resque-scheduler is a PHP port of resque-scheduler, which adds support for scheduling items in the future to Resque.",
-            "time": "2016-11-28 22:38:06"
+            "time": "2016-11-28T22:38:06+00:00"
         },
         {
             "name": "colinmollenhour/credis",
@@ -1375,7 +1375,7 @@
                 "Guzzle",
                 "cache"
             ],
-            "time": "2016-03-04 00:44:30"
+            "time": "2016-03-04T00:44:30+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2272,7 +2272,7 @@
                 "symfony",
                 "symfony3"
             ],
-            "time": "2017-04-24 10:11:17"
+            "time": "2017-04-24T10:11:17+00:00"
         },
         {
             "name": "sensio/distribution-bundle",
@@ -4003,7 +4003,7 @@
                 "jslint",
                 "wrapper"
             ],
-            "time": "2017-06-08 18:29:04"
+            "time": "2017-06-08T18:29:04+00:00"
         },
         {
             "name": "webignition/quoted-string",
@@ -4341,16 +4341,16 @@
         },
         {
             "name": "webignition/web-resource-service",
-            "version": "1.2.1",
+            "version": "1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-service.git",
-                "reference": "63fff81b0e27d2585aaf37bb969b8b54b7116e50"
+                "reference": "861b90aa5dd0b95e40e1e5872a28368ad391ffa7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/63fff81b0e27d2585aaf37bb969b8b54b7116e50",
-                "reference": "63fff81b0e27d2585aaf37bb969b8b54b7116e50",
+                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/861b90aa5dd0b95e40e1e5872a28368ad391ffa7",
+                "reference": "861b90aa5dd0b95e40e1e5872a28368ad391ffa7",
                 "shasum": ""
             },
             "require": {
@@ -4385,7 +4385,7 @@
                 "service",
                 "web"
             ],
-            "time": "2017-06-05T13:29:23+00:00"
+            "time": "2017-09-28T16:14:50+00:00"
         },
         {
             "name": "xrstf/ip-utils",
