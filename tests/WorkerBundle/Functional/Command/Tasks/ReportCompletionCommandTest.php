@@ -17,6 +17,7 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
         $this->removeAllTasks();
 
         $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html;",
             "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
             "HTTP/1.1 200 OK",
         ]);
