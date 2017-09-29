@@ -43,20 +43,20 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
     /**
      * @dataProvider performDataProvider
      *
-     * @param $httpFixture
+     * @param $httpFixtures
      * @param $taskParameters
      * @param $expectedHasSucceeded
      * @param $expectedIsRetryable
      * @param $expectedDecodedOutput
      */
     public function testPerform(
-        $httpFixture,
+        $httpFixtures,
         $taskParameters,
         $expectedHasSucceeded,
         $expectedIsRetryable,
         $expectedDecodedOutput
     ) {
-        $this->setHttpFixtures([$httpFixture]);
+        $this->setHttpFixtures($httpFixtures);
 
         $task = $this->getTestTaskFactory()->create(
             TestTaskFactory::createTaskValuesFromDefaults([
@@ -79,20 +79,26 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
     {
         return [
             'no urls' => [
-                'httpFixture' => sprintf(
-                    "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
-                    HtmlDocumentFactory::load('minimal')
-                ),
+                'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('minimal')
+                    ),
+                ],
                 'taskParameters' => [],
                 'expectedHasSucceeded' => true,
                 'expectedIsRetryable' => true,
                 'expectedDecodedOutput' => [],
             ],
             'no scope' => [
-                'httpFixture' => sprintf(
-                    "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
-                    HtmlDocumentFactory::load('css-link-js-link-image-anchors')
-                ),
+                'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('css-link-js-link-image-anchors')
+                    ),
+                ],
                 'taskParameters' => [],
                 'expectedHasSucceeded' => true,
                 'expectedIsRetryable' => true,
@@ -104,10 +110,13 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
                 ],
             ],
             'has scope' => [
-                'httpFixture' => sprintf(
-                    "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
-                    HtmlDocumentFactory::load('css-link-js-link-image-anchors')
-                ),
+                'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
+                    sprintf(
+                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                        HtmlDocumentFactory::load('css-link-js-link-image-anchors')
+                    ),
+                ],
                 'taskParameters' => [
                     'scope' => [
                         'http://example.com',
@@ -133,7 +142,8 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
     public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
     {
         $this->setHttpFixtures([
-            "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html><html>"
+            "HTTP/1.0 200\nContent-Type:text/html",
+            "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html><html>",
         ]);
 
         $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
@@ -155,6 +165,7 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
     public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
         $this->setHttpFixtures([
+            "HTTP/1.0 200\nContent-Type:text/html",
             "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html><html>"
         ]);
 

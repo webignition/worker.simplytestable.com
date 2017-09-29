@@ -188,6 +188,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
             'default' => [
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html><head></head><body></body>"
                 ],
                 'expectedFinishedStateName' => TaskService::TASK_COMPLETED_STATE,
@@ -202,6 +203,10 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
             'failed, no retry available' => [
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
+                    "HTTP/1.1 404",
+                    "HTTP/1.1 404",
+                    "HTTP/1.1 404",
+                    "HTTP/1.1 404",
                     "HTTP/1.1 404",
                     "HTTP/1.1 404",
                 ],
@@ -246,6 +251,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     public function testReportCompletionFailure($responseFixture, $expectedReturnValue)
     {
         $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html",
             "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html>",
             $responseFixture,
         ]);
@@ -291,6 +297,7 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
     public function testReportCompletion($responseFixture)
     {
         $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html",
             "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html>",
             $responseFixture,
         ]);

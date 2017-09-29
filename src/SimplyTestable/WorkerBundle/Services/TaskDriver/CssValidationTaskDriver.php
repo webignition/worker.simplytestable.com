@@ -2,7 +2,6 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
-use JMS\Serializer\Serializer;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
@@ -12,6 +11,7 @@ use webignition\CssValidatorOutput\Message\Error as CssValidatorOutputError;
 use webignition\CssValidatorWrapper\Configuration\Configuration as CssValidatorWrapperConfiguration;
 use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
+use webignition\WebResource\Service\Configuration;
 use webignition\WebResource\Service\Service as WebResourceService;
 use webignition\CssValidatorWrapper\Configuration\Flags as CssValidatorWrapperConfigurationFlags;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
@@ -135,11 +135,15 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
 
         $this->cssValidatorWrapper->createConfiguration($configurationValues);
 
-        $this->cssValidatorWrapper
+        $cssValidatorWebResourceService = $this->cssValidatorWrapper->getConfiguration()->getWebResourceService();
+        $newCssValidatorWebResourceServiceConfiguration = $cssValidatorWebResourceService
             ->getConfiguration()
-            ->getWebResourceService()
-            ->getConfiguration()
-            ->enableRetryWithUrlEncodingDisabled();
+            ->createFromCurrent([
+                Configuration::CONFIG_RETRY_WITH_URL_ENCODING_DISABLED => true,
+            ]);
+
+        $cssValidatorWebResourceService
+            ->setConfiguration($newCssValidatorWebResourceServiceConfiguration);
 
         $this->getHttpClientService()->setCookies($this->task->getParameter('cookies'));
         $this->getHttpClientService()->setBasicHttpAuthorization(

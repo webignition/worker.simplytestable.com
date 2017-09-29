@@ -7,10 +7,10 @@ use GuzzleHttp\Exception\TooManyRedirectsException;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use webignition\GuzzleHttp\Exception\CurlException\Exception as CurlException;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
+use webignition\WebResource\Exception\InvalidContentTypeException;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\WebResource;
 use webignition\WebResource\Exception\Exception as WebResourceException;
-use GuzzleHttp\Message\Request as HttpRequest;
 use webignition\WebResource\Service\Service as WebResourceService;
 
 abstract class WebResourceTaskDriver extends TaskDriver
@@ -113,6 +113,8 @@ abstract class WebResourceTaskDriver extends TaskDriver
             );
 
             return $this->webResourceService->get($request);
+        } catch (InvalidContentTypeException $invalidContentTypeException) {
+            $this->isNotCorrectWebResourceTypeHandler();
         } catch (WebResourceException $webResourceException) {
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);

@@ -85,6 +85,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
         return [
             'no links' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     $this->createHtmlDocumentHttpFixture(
                         200,
                         '<!doctype html><html><head></head><body></body></html>'
@@ -99,6 +100,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'single 200 OK link' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     $this->createHtmlDocumentHttpFixture(
                         200,
                         '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
@@ -121,6 +123,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'single 404 Not Found link' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     $this->createHtmlDocumentHttpFixture(
                         200,
                         '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
@@ -146,6 +149,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'single curl 28 link' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     $this->createHtmlDocumentHttpFixture(
                         200,
                         '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
@@ -168,6 +172,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'excluded urls' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     $this->createHtmlDocumentHttpFixture(
                         200,
                         '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
@@ -186,6 +191,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'excluded domains' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     $this->createHtmlDocumentHttpFixture(
                         200,
                         '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
@@ -204,6 +210,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'ignored schemes' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     $this->createHtmlDocumentHttpFixture(
                         200,
                         HtmlDocumentFactory::load('ignored-link-integrity-schemes')

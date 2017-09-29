@@ -9,6 +9,7 @@ use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\NodeJslint\Wrapper\Wrapper as NodeJsLintWrapper;
 use webignition\NodeJslintOutput\NodeJslintOutput;
+use webignition\WebResource\Service\Configuration;
 use webignition\WebResource\Service\Service as WebResourceService;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\Url\Url;
@@ -347,11 +348,18 @@ class JsLintTaskDriver extends WebResourceTaskDriver
             ->getConfiguration()
             ->setHttpClient($this->getHttpClientService()->get());
 
-        $this->nodeJsLintWrapper
+        $nodeJsLintWrapperWebResourceService = $this->nodeJsLintWrapper
             ->getLocalProxy()
-            ->getWebResourceService()
+            ->getWebResourceService();
+
+        $newNodeJsLintWrapperWebResourceServiceConfiguration = $nodeJsLintWrapperWebResourceService
             ->getConfiguration()
-            ->enableRetryWithUrlEncodingDisabled();
+            ->createFromCurrent([
+                Configuration::CONFIG_RETRY_WITH_URL_ENCODING_DISABLED => true,
+            ]);
+
+        $nodeJsLintWrapperWebResourceService
+            ->setConfiguration($newNodeJsLintWrapperWebResourceServiceConfiguration);
 
         $configurationValues = array_merge([
             NodeJslintWrapperConfiguration::CONFIG_KEY_NODE_JSLINT_PATH => $this->nodeJsLintPath,

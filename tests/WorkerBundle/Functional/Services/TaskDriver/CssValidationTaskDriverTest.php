@@ -97,6 +97,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
         return [
             'unknown validator exception' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
                 ],
                 'taskParameters' => [],
@@ -118,6 +119,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'no errors, ignore warnings' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
                 ],
                 'taskParameters' => [
@@ -132,6 +134,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'no errors, ignore vendor extension warnings' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
                 ],
                 'taskParameters' => [
@@ -146,6 +149,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'three errors' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
                 ],
                 'taskParameters' => [
@@ -182,10 +186,15 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'http 404 getting linked resource' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('empty-body-single-css-link')
                     ),
+                    "HTTP/1.1 404 Not Found",
+                    "HTTP/1.1 404 Not Found",
+                    "HTTP/1.1 404 Not Found",
+                    "HTTP/1.1 404 Not Found",
                     "HTTP/1.1 404 Not Found",
                     "HTTP/1.1 404 Not Found",
                 ],
@@ -207,10 +216,35 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'http 500 getting linked resource' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('empty-body-single-css-link')
                     ),
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
                     "HTTP/1.1 500 Internal Server Error",
                     "HTTP/1.1 500 Internal Server Error",
                     "HTTP/1.1 500 Internal Server Error",
@@ -242,6 +276,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'curl 6 getting linked resource' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('empty-body-single-css-link')
@@ -266,6 +301,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'invalid content type getting linked resource' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('empty-body-single-css-link')
@@ -304,6 +340,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
         $content = 'foo';
 
         $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html",
             "HTTP/1.1 200 OK\nContent-type:text/html\n\n" . $content,
         ]);
 

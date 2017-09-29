@@ -62,6 +62,7 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
     public function testRun($responseFixtures, $expectedCommandReturnCode)
     {
         $this->setHttpFixtures(array_merge([
+            "HTTP/1.1 200 OK\nContent-type:text/html;",
             "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
         ], $responseFixtures));
 
@@ -117,18 +118,6 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
                 'expectedCommandReturnCode' => 28,
             ],
         ];
-    }
-
-    /**
-     * @return ReportCompletionCommand
-     */
-    private function createReportCompletionCommand()
-    {
-        return new ReportCompletionCommand(
-            $this->container->get('logger'),
-            $this->container->get('simplytestable.services.taskservice'),
-            $this->container->get('simplytestable.services.workerservice')
-        );
     }
 
     /**
