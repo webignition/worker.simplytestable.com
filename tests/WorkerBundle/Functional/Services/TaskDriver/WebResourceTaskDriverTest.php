@@ -9,6 +9,7 @@ use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
+use webignition\WebResource\Service\Configuration;
 
 abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
 {
@@ -87,7 +88,13 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
     ) {
         $this->setHttpFixtures($httpResponseFixtures);
         $webResourceService = $this->container->get('simplytestable.services.webresourceservice');
-        $webResourceService->getConfiguration()->disableRetryWithUrlEncodingDisabled();
+
+        $webResourceServiceConfiguration = $webResourceService->getConfiguration();
+        $newWebResourceServiceConfiguration = $webResourceServiceConfiguration->createFromCurrent([
+            Configuration::CONFIG_RETRY_WITH_URL_ENCODING_DISABLED => false,
+        ]);
+
+        $webResourceService->setConfiguration($newWebResourceServiceConfiguration);
 
         $task = $this->getTestTaskFactory()->create(
             TestTaskFactory::createTaskValuesFromDefaults()
@@ -157,6 +164,7 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
             'http 404' => [
                 'httpResponseFixtures' => [
                     'HTTP/1.1 404 Not Found',
+                    'HTTP/1.1 404 Not Found',
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -179,6 +187,13 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
                     'HTTP/1.1 500 Internal Server Error',
                     'HTTP/1.1 500 Internal Server Error',
                     'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+                    'HTTP/1.1 500 Internal Server Error',
+
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -273,6 +288,7 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
             ],
             'empty content' => [
                 'httpResponseFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     "HTTP/1.1 200 OK\nContent-type:text/html",
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => true,
