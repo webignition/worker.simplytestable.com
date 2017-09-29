@@ -51,11 +51,13 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
     public function testIncorrectPathToNodeJsLint()
     {
         $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html",
             sprintf(
                 "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                 HtmlDocumentFactory::load('empty-body-single-js-link')
             ),
-            "HTTP/1.1 200 OK\nContent-type:application/javascript\n\n",
+            "HTTP/1.1 200 OK\nContent-type:application/javascript",
+            "HTTP/1.1 200 OK\nContent-type:application/javascript",
         ]);
 
         $task = $this->getTestTaskFactory()->create(
@@ -89,7 +91,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
      * @param int $expectedWarningCount
      * @param string[] $expectedDecodedOutputKeys
      */
-    public function testPerformFoo(
+    public function testPerform(
         $httpFixtures,
         $taskParameters,
         $jsLintRawOutput,
@@ -128,6 +130,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
         return [
             'no js' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('minimal')
@@ -143,11 +146,13 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'script elements, has errors' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('js-script-elements')
                     ),
-                    "HTTP/1.1 200 OK\nContent-type:application/javascript\n\n",
+                    "HTTP/1.1 200 OK\nContent-type:application/javascript",
+                    "HTTP/1.1 200 OK\nContent-type:application/javascript",
                 ],
                 'taskParameters' => [
                     'domains-to-ignore' => [
@@ -173,12 +178,15 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'redirect impacts script url' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 301 Moved Permanently\nLocation: http://sub.example.com",
+                    "HTTP/1.1 301 Moved PermanentlyContent-type:text/html\nLocation: http://sub.example.com",
+                    "HTTP/1.1 200 OK\nContent-type:text/html\nCache-Control: no-cache, no-store, must-revalidate",
+                    "HTTP/1.1 301 Moved PermanentlyContent-type:text/html\nLocation: http://sub.example.com",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('js-script-elements')
                     ),
-                    "HTTP/1.1 200 OK\nContent-type:application/javascript\n\n",
+                    "HTTP/1.1 200 OK\nContent-type:application/javascript",
+                    "HTTP/1.1 200 OK\nContent-type:application/javascript",
                 ],
                 'taskParameters' => [
                     'domains-to-ignore' => [
@@ -204,11 +212,13 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'script elements, stopped' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('js-script-elements')
                     ),
-                    "HTTP/1.1 200 OK\nContent-type:application/javascript\n\n",
+                    "HTTP/1.1 200 OK\nContent-type:application/javascript",
+                    "HTTP/1.1 200 OK\nContent-type:application/javascript",
                 ],
                 'taskParameters' => [
                     'domains-to-ignore' => [
@@ -231,6 +241,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'invalid content type exception on linked resource' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('js-script-elements')
@@ -258,10 +269,15 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'http 404 getting linked resource' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('js-script-elements')
                     ),
+                    "HTTP/1.1 404 Not Found",
+                    "HTTP/1.1 404 Not Found",
+                    "HTTP/1.1 404 Not Found",
+                    "HTTP/1.1 404 Not Found",
                     "HTTP/1.1 404 Not Found",
                     "HTTP/1.1 404 Not Found",
                 ],
@@ -286,10 +302,35 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'http 500 getting linked resource' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('js-script-elements')
                     ),
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
+                    "HTTP/1.1 500 Internal Server Error",
                     "HTTP/1.1 500 Internal Server Error",
                     "HTTP/1.1 500 Internal Server Error",
                     "HTTP/1.1 500 Internal Server Error",
@@ -324,6 +365,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'curl 6 getting linked resource' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('js-script-elements')
@@ -351,6 +393,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'curl 28 getting linked resource' => [
                 'httpFixtures' => [
+                    "HTTP/1.1 200 OK\nContent-type:text/html",
                     sprintf(
                         "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
                         HtmlDocumentFactory::load('js-script-elements')
@@ -392,6 +435,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
         $content = 'foo';
 
         $this->setHttpFixtures([
+            "HTTP/1.1 200 OK\nContent-type:text/html",
             "HTTP/1.1 200 OK\nContent-type:text/html\n\n" . $content,
         ]);
 
