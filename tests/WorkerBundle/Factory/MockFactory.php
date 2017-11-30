@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
+use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskFactory;
@@ -140,6 +141,14 @@ class MockFactory
                 ->andReturn($callValues['return']);
         }
 
+        if (isset($calls['get'])) {
+            $callValues = $calls['get'];
+
+            $workerService
+                ->shouldReceive('get')
+                ->andReturn($callValues['return']);
+        }
+
         return $workerService;
     }
 
@@ -216,5 +225,26 @@ class MockFactory
         $cancelRequestCollectionFactory = \Mockery::mock(CancelRequestCollectionFactory::class);
 
         return $cancelRequestCollectionFactory;
+    }
+
+    /**
+     * @param array $calls
+     *
+     * @return Mock|VerifyRequestFactory
+     */
+    public static function createVerifyRequestFactory($calls = [])
+    {
+        /* @var Mock|VerifyRequestFactory $verifyRequestFactory */
+        $verifyRequestFactory = \Mockery::mock(VerifyRequestFactory::class);
+
+        if (isset($calls['create'])) {
+            $callValues = $calls['create'];
+
+            $verifyRequestFactory
+                ->shouldReceive('create')
+                ->andReturn($callValues['return']);
+        }
+
+        return $verifyRequestFactory;
     }
 }
