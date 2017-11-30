@@ -1,5 +1,4 @@
 services:
-  #SimplyTestable\WorkerBundle\Services\Resque\JobFactory:
   webignition\ResqueJobFactory\ResqueJobFactory:
     public: true
     arguments:
