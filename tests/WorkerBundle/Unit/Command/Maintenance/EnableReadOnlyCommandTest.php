@@ -6,13 +6,12 @@ use Mockery\Mock;
 use SimplyTestable\WorkerBundle\Command\Maintenance\EnableReadOnlyCommand;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
 /**
  * @group Command/Maintenance/EnableReadOnlyCommand
  */
-class EnableReadOnlyCommandTest extends BaseSimplyTestableTestCase
+class EnableReadOnlyCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @throws \Exception

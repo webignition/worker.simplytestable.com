@@ -11,6 +11,9 @@ use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
+/**
+ * @group Command/Task/PerformCommand
+ */
 class PerformCommandTest extends BaseSimplyTestableTestCase
 {
     /**
@@ -25,19 +28,9 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
         $this->command = $this->container->get(PerformCommand::class);
     }
 
-    public function testRunWithInvalidTask()
-    {
-        $this->assertEquals(
-            PerformCommand::RETURN_CODE_TASK_DOES_NOT_EXIST,
-            $this->command->run(
-                new ArrayInput([
-                    'id' => 0,
-                ]),
-                new NullOutput()
-            )
-        );
-    }
-
+    /**
+     * @throws \Exception
+     */
     public function testRunInMaintenanceReadOnlyMode()
     {
         $this->container->get(WorkerService::class)->setReadOnly();
@@ -60,6 +53,9 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
         ));
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testTaskServiceRaisesException()
     {
         $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
@@ -85,6 +81,8 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
      * @param int $expectedReturnCode
      * @param array $expectedResqueJobs
      * @param array $expectedEmptyResqueQueues
+     *
+     * @throws \Exception
      */
     public function testRun(
         $taskValues,

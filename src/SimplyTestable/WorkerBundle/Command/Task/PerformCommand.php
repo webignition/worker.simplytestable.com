@@ -85,10 +85,15 @@ class PerformCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $task = $this->taskService->getById($input->getArgument('id'));
+        $taskId = $input->getArgument('id');
+
+        $task = $this->taskService->getById($taskId);
 
         if (is_null($task)) {
-            $this->logger->error("TaskPerformCommand::execute: [".$input->getArgument('id')."] does not exist");
+            $this->logger->error(sprintf(
+                'TaskPerformCommand::execute: [%s] does not exist',
+                $taskId
+            ));
             $output->writeln('Unable to execute, task '.$input->getArgument('id').' does not exist');
 
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
