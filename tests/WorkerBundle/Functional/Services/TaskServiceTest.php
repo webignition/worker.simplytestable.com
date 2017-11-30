@@ -220,7 +220,8 @@ class TaskServiceTest extends BaseSimplyTestableTestCase
         $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults());
         $id = $task->getId();
 
-        $this->getEntityManager()->detach($task);
+        $entityManager = $this->container->get('doctrine.orm.entity_manager');
+        $entityManager->detach($task);
 
         $this->assertEquals($id, $this->taskService->getById($id)->getId());
     }

@@ -3,6 +3,7 @@
 namespace Tests\WorkerBundle\Functional;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpCache;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
@@ -35,23 +36,18 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
     protected function getTestTaskFactory()
     {
         if (is_null($this->taskFactory)) {
+            /* @var EntityManagerInterface $entityManager */
+            $entityManager = $this->container->get('doctrine')->getManager();
+
             $this->taskFactory = new TestTaskFactory(
                 $this->container->get(TaskService::class),
                 $this->container->get(TaskTypeService::class),
                 $this->container->get(StateService::class),
-                $this->getEntityManager()
+                $entityManager
             );
         }
 
         return $this->taskFactory;
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->container->get('doctrine')->getManager();
     }
 
     protected function removeAllTasks()
@@ -64,13 +60,15 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
      */
     private function removeAllForEntity($entityName)
     {
-        $entities = $this->getEntityManager()->getRepository($entityName)->findAll();
+        $entityManager = $this->container->get('doctrine')->getManager();
+
+        $entities = $entityManager->getRepository($entityName)->findAll();
         if (is_array($entities) && count($entities) > 0) {
             foreach ($entities as $entity) {
-                $this->getEntityManager()->remove($entity);
+                $entityManager->remove($entity);
             }
 
-            $this->getEntityManager()->flush();
+            $entityManager->flush();
         }
     }
 

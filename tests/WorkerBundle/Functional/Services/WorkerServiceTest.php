@@ -274,22 +274,28 @@ class WorkerServiceTest extends BaseSimplyTestableTestCase
     /**
      * @param ThisWorker $worker
      * @param string $stateName
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     private function setWorkerState(ThisWorker $worker, $stateName)
     {
         $stateService = $this->container->get(StateService::class);
+        $entityManager = $this->container->get('doctrine.orm.entity_manager');
 
         $worker->setState($stateService->fetch($stateName));
-        $this->getEntityManager()->persist($worker);
-        $this->getEntityManager()->flush();
+        $entityManager->persist($worker);
+        $entityManager->flush();
     }
 
+    /**
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
     private function removeWorker()
     {
-        $entities = $this->getEntityManager()->getRepository(ThisWorker::class)->findAll();
+        $entityManager = $this->container->get('doctrine.orm.entity_manager');
+        $entities = $entityManager->getRepository(ThisWorker::class)->findAll();
         if (!empty($entities)) {
-            $this->getEntityManager()->remove($entities[0]);
-            $this->getEntityManager()->flush();
+            $entityManager->remove($entities[0]);
+            $entityManager->flush();
         }
     }
 }

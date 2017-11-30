@@ -2,7 +2,7 @@
 
 namespace Tests\WorkerBundle\Factory;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Services\StateService;
@@ -42,7 +42,7 @@ class TestTaskFactory
     private $stateService;
 
     /**
-     * @var EntityManager
+     * @var EntityManagerInterface
      */
     private $entityManager;
 
@@ -50,13 +50,13 @@ class TestTaskFactory
      * @param TaskService $taskService
      * @param TaskTypeService $taskTypeService
      * @param StateService $stateService
-     * @param EntityManager $entityManager
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
         TaskService $taskService,
         TaskTypeService $taskTypeService,
         StateService $stateService,
-        EntityManager $entityManager
+        EntityManagerInterface $entityManager
     ) {
         $this->taskService = $taskService;
         $this->taskTypeService = $taskTypeService;
