@@ -7,10 +7,9 @@ services:
 
   SimplyTestable\WorkerBundle\Services\Resque\QueueService:
 
+  # For retrieval of commands from container in resque jobs
   SimplyTestable\WorkerBundle\Command\Task\PerformCommand:
 
   SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand:
-
-  SimplyTestable\WorkerBundle\Command\Tasks\Request:
 
   SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand:
