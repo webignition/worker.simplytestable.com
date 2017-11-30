@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b169f0d34b6d721154f97ee68e56dc94",
+    "content-hash": "cee0fd8a3e446ceb945f85111d1cbd58",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4063,16 +4063,16 @@
         },
         {
             "name": "webignition/resque-job-factory",
-            "version": "0.1",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/resque-job-factory.git",
-                "reference": "5745196f1d90082fc9fbfa6e6906f53ed008612e"
+                "reference": "73ba4d4390195a48d56fe5508f88f08cbd447f05"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/resque-job-factory/zipball/5745196f1d90082fc9fbfa6e6906f53ed008612e",
-                "reference": "5745196f1d90082fc9fbfa6e6906f53ed008612e",
+                "url": "https://api.github.com/repos/webignition/resque-job-factory/zipball/73ba4d4390195a48d56fe5508f88f08cbd447f05",
+                "reference": "73ba4d4390195a48d56fe5508f88f08cbd447f05",
                 "shasum": ""
             },
             "require": {
@@ -4108,7 +4108,7 @@
                 "job",
                 "resque"
             ],
-            "time": "2017-11-30T18:20:37+00:00"
+            "time": "2017-11-30T18:53:32+00:00"
         },
         {
             "name": "webignition/string-parser",
