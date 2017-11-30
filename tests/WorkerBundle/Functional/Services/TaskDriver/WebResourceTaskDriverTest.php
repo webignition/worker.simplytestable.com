@@ -61,11 +61,9 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
-        $this->setExpectedException(
-            ConnectException::class,
-            'foo',
-            0
-        );
+        $this->expectException(ConnectException::class);
+        $this->expectExceptionMessage('foo');
+        $this->expectExceptionCode(0);
 
         $this->getTaskDriver()->perform($task);
     }

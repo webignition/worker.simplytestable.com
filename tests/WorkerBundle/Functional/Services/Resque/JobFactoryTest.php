@@ -27,11 +27,9 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
 
     public function testCreateWithInvalidQueue()
     {
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
-            'Queue "foo" is not valid',
-            JobFactory::EXCEPTION_CODE_INVALID_QUEUE
-        );
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Queue "foo" is not valid');
+        $this->expectExceptionCode(JobFactory::EXCEPTION_CODE_INVALID_QUEUE);
 
         $this->jobFactory->create('foo');
     }
@@ -45,11 +43,9 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
      */
     public function testCreateWithMissingRequiredArgs($queue, $args, $expectedExceptionMessage)
     {
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
-            $expectedExceptionMessage,
-            JobFactory::EXCEPTION_CODE_MISSING_REQUIRED_ARG
-        );
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->expectExceptionCode(JobFactory::EXCEPTION_CODE_MISSING_REQUIRED_ARG);
 
         $this->jobFactory->create($queue, $args);
     }
