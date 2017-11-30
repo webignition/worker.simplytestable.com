@@ -120,4 +120,13 @@ class WorkerActivateCommandTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
+    }
 }

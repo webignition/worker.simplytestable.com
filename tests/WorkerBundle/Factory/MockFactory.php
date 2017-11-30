@@ -4,6 +4,8 @@ namespace Tests\WorkerBundle\Factory;
 
 use Mockery\Mock;
 use Psr\Log\LoggerInterface;
+use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
+use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
@@ -173,5 +175,37 @@ class MockFactory
         $taskFactory = \Mockery::mock(TaskFactory::class);
 
         return $taskFactory;
+    }
+
+    /**
+     * @param array $calls
+     *
+     * @return Mock|CancelRequestFactory
+     */
+    public static function createCancelRequestFactory($calls = [])
+    {
+        /* @var Mock|CancelRequestFactory $cancelRequestFactory */
+        $cancelRequestFactory = \Mockery::mock(CancelRequestFactory::class);
+
+        if (isset($calls['create'])) {
+            $callValues = $calls['create'];
+
+            $cancelRequestFactory
+                ->shouldReceive('create')
+                ->andReturn($callValues['return']);
+        }
+
+        return $cancelRequestFactory;
+    }
+
+    /**
+     * @return Mock|CancelRequestCollectionFactory
+     */
+    public static function createCancelRequestCollectionFactory()
+    {
+        /* @var Mock|CancelRequestCollectionFactory $cancelRequestCollectionFactory */
+        $cancelRequestCollectionFactory = \Mockery::mock(CancelRequestCollectionFactory::class);
+
+        return $cancelRequestCollectionFactory;
     }
 }

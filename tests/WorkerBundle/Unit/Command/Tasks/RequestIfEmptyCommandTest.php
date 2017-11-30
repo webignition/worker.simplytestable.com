@@ -98,4 +98,13 @@ class RequestIfEmptyCommandTest extends \PHPUnit_Framework_TestCase
             $services[ResqueJobFactory::class]
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
+    }
 }
