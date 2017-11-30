@@ -63,7 +63,7 @@ class ReportCompletionCommand extends Command
     /**
      * {@inheritdoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($this->workerService->isMaintenanceReadOnly()) {
             $output->writeln('Unable to report completion, worker application is in maintenance read-only mode');
@@ -71,12 +71,15 @@ class ReportCompletionCommand extends Command
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }
 
-        $task = $this->taskService->getById($input->getArgument('id'));
+        $taskId = $input->getArgument('id');
+
+        $task = $this->taskService->getById($taskId);
         if (is_null($task)) {
-            $this->logger->error(
-                "TaskReportCompletionCommand::execute: [".$input->getArgument('id')."] does not exist"
-            );
-            $output->writeln("[" . $input->getArgument('id')."] does not exist");
+            $this->logger->error(sprintf(
+                'TaskReportCompletionCommand::execute: [%s] does not exist',
+                $taskId
+            ));
+            $output->writeln(sprintf('[%s] does not exist', $taskId));
 
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
         }

@@ -19,6 +19,9 @@ use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @group Controller/TaskController
+ */
 class TaskControllerTest extends BaseSimplyTestableTestCase
 {
     /**
@@ -36,25 +39,6 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         $this->taskController = new TaskController(
             $this->container->get(WorkerService::class),
             $this->container->get(TaskService::class)
-        );
-    }
-
-    public function testCreateCollectionActionInMaintenanceReadOnlyMode()
-    {
-        $this->expectException(ServiceUnavailableHttpException::class);
-
-        $request = new Request();
-        $request->request = [];
-        $this->container->get('request_stack')->push($request);
-
-        $workerService = $this->container->get(WorkerService::class);
-        $workerService->setReadOnly();
-
-        $this->taskController->createCollectionAction(
-            $this->container->get(CreateRequestCollectionFactory::class),
-            $this->container->get(TaskFactory::class),
-            $this->container->get(QueueService::class),
-            $this->container->get(JobFactory::class)
         );
     }
 
@@ -146,35 +130,6 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
                 ],
             ],
         ];
-    }
-
-    public function testCancelCollectionActionInMaintenanceReadOnlyMode()
-    {
-        $this->expectException(ServiceUnavailableHttpException::class);
-
-        $request = new Request();
-        $request->request = new ParameterBag();
-        $this->container->get('request_stack')->push($request);
-
-        $workerService = $this->container->get(WorkerService::class);
-        $workerService->setReadOnly();
-
-        $this->taskController->cancelAction(
-            $this->container->get(CancelRequestFactory::class)
-        );
-    }
-
-    public function testCancelActionWithInvalidRequest()
-    {
-        $this->expectException(BadRequestHttpException::class);
-
-        $request = new Request();
-        $request->request = new ParameterBag();
-        $this->container->get('request_stack')->push($request);
-
-        $this->taskController->cancelAction(
-            $this->container->get(CancelRequestFactory::class)
-        );
     }
 
     public function testCancelAction()

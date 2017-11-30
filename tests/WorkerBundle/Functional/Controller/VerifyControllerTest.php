@@ -7,12 +7,13 @@ use SimplyTestable\WorkerBundle\Entity\State;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @group Controller/VerifyController
+ */
 class VerifyControllerTest extends BaseSimplyTestableTestCase
 {
     /**
@@ -28,37 +29,6 @@ class VerifyControllerTest extends BaseSimplyTestableTestCase
         parent::setUp();
 
         $this->verifyController = new VerifyController();
-    }
-
-    public function testIndexActionInMaintenanceReadOnlyMode()
-    {
-        $this->expectException(ServiceUnavailableHttpException::class);
-
-        $request = new Request();
-        $request->request = new ParameterBag();
-        $this->container->get('request_stack')->push($request);
-
-        $workerService = $this->container->get(WorkerService::class);
-        $workerService->setReadOnly();
-
-        $this->verifyController->indexAction(
-            $workerService,
-            $this->container->get(VerifyRequestFactory::class)
-        );
-    }
-
-    public function testIndexActionWithInvalidRequest()
-    {
-        $this->expectException(BadRequestHttpException::class);
-
-        $request = new Request();
-        $request->request = new ParameterBag();
-        $this->container->get('request_stack')->push($request);
-
-        $this->verifyController->indexAction(
-            $this->container->get(WorkerService::class),
-            $this->container->get(VerifyRequestFactory::class)
-        );
     }
 
     /**

@@ -11,11 +11,14 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 class PerformCommandTest extends BaseSimplyTestableTestCase
 {
+    /**
+     * @throws \Exception
+     */
     public function testRun()
     {
         $this->removeAllTasks();
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $taskService = $this->container->get(TaskService::class);
         $taskService

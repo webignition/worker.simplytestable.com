@@ -1,25 +1,28 @@
 <?php
 
-namespace Tests\WorkerBundle\Functional\Command\HttpCache;
+namespace Tests\WorkerBundle\Unit\Command\HttpCache;
 
-use Mockery\MockInterface;
+use Mockery\Mock;
 use SimplyTestable\WorkerBundle\Command\HttpCache\ClearCommand;
 use SimplyTestable\WorkerBundle\Services\HttpCache;
 use Symfony\Component\Console\Output\NullOutput;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
-class ClearCommandTest extends BaseSimplyTestableTestCase
+/**
+ * @group Command/HttpCache/ClearCommand
+ */
+class ClearCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider runDataProvider
      *
      * @param bool $httpCacheClearReturnValue
      * @param int $expectedReturnCode
+     * @throws \Exception
      */
     public function testRun($httpCacheClearReturnValue, $expectedReturnCode)
     {
-        /* @var HttpCache|MockInterface $httpCache */
+        /* @var HttpCache|Mock $httpCache */
         $httpCache = \Mockery::mock(HttpCache::class);
         $httpCache
             ->shouldReceive('clear')

@@ -4,7 +4,6 @@ namespace Tests\WorkerBundle\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand;
 use SimplyTestable\WorkerBundle\Services\TaskService;
-use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
@@ -12,6 +11,9 @@ use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
+/**
+ * @group Command/Task/ReportCompletionCommand
+ */
 class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
 {
     /**
@@ -29,35 +31,12 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
         $this->command = $this->container->get(ReportCompletionCommand::class);
     }
 
-    public function testRunInMaintenanceReadOnlyMode()
-    {
-        $this->container->get(WorkerService::class)->setReadOnly();
-
-        $returnCode = $this->command->execute(new ArrayInput([]), new NullOutput());
-
-        $this->assertEquals(
-            ReportCompletionCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
-            $returnCode
-        );
-    }
-
-    public function testRunForInvalidTask()
-    {
-         $returnCode = $this->command->run(new ArrayInput([
-            'id' => -1
-         ]), new NullOutput());
-
-        $this->assertEquals(
-            ReportCompletionCommand::RETURN_CODE_TASK_DOES_NOT_EXIST,
-            $returnCode
-        );
-    }
-
     /**
      * @dataProvider runDataProvider
      *
      * @param array $responseFixtures
      * @param int $expectedCommandReturnCode
+     * @throws \Exception
      */
     public function testRun($responseFixtures, $expectedCommandReturnCode)
     {
