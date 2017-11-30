@@ -41,6 +41,8 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
     }
 
     /**
+     * @dataProvider createCollectionActionDataProvider
+     *
      * @param array $postData
      * @param array $expectedResponseTaskCollection
      *
