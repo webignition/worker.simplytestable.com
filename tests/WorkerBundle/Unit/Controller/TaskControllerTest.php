@@ -4,22 +4,11 @@ namespace Tests\WorkerBundle\Unit\Controller;
 
 use SimplyTestable\WorkerBundle\Controller\TaskController;
 use SimplyTestable\WorkerBundle\Request\Task\CancelRequest;
-use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
-use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
-use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
-use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFactory;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
-use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
-use SimplyTestable\WorkerBundle\Services\TaskFactory;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Tests\WorkerBundle\Factory\MockFactory;
-use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
-use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @group Controller/TaskController

@@ -144,13 +144,22 @@ class MockFactory
     }
 
     /**
+     * @param array $calls
+     *
      * @return Mock|TasksService
      */
-    public static function createTasksService()
+    public static function createTasksService($calls = [])
     {
         /* @var Mock|TasksService $tasksService */
         $tasksService = \Mockery::mock(TasksService::class);
 
+        if (isset($calls['getWorkerProcessCount'])) {
+            $callValues = $calls['getWorkerProcessCount'];
+
+            $tasksService
+                ->shouldReceive('getWorkerProcessCount')
+                ->andReturn($callValues['return']);
+        }
 
         return $tasksService;
     }
