@@ -4,8 +4,10 @@ namespace Tests\WorkerBundle\Factory;
 
 use Mockery\Mock;
 use Psr\Log\LoggerInterface;
+use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
+use SimplyTestable\WorkerBundle\Services\TaskFactory;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
@@ -149,5 +151,27 @@ class MockFactory
 
 
         return $tasksService;
+    }
+
+    /**
+     * @return Mock|CreateRequestCollectionFactory
+     */
+    public static function createCreateRequestCollectionFactory()
+    {
+        /* @var Mock|CreateRequestCollectionFactory $createRequestCollectionFactory */
+        $createRequestCollectionFactory = \Mockery::mock(CreateRequestCollectionFactory::class);
+
+        return $createRequestCollectionFactory;
+    }
+
+    /**
+     * @return Mock|TaskFactory
+     */
+    public static function createTaskFactory()
+    {
+        /* @var Mock|TaskFactory $taskFactory */
+        $taskFactory = \Mockery::mock(TaskFactory::class);
+
+        return $taskFactory;
     }
 }
