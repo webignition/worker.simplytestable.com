@@ -37,36 +37,12 @@ class MockFactory
     }
 
     /**
-     * @param array $calls
-     *
      * @return Mock|ResqueQueueService
      */
-    public static function createResqueQueueService($calls = [])
+    public static function createResqueQueueService()
     {
         /* @var Mock|ResqueQueueService $resqueQueueService */
         $resqueQueueService = \Mockery::mock(ResqueQueueService::class);
-
-        if (isset($calls['enqueue'])) {
-            $callValues = $calls['enqueue'];
-
-            $with = $callValues['with'];
-
-            $resqueQueueService
-                ->shouldReceive('enqueue')
-                ->with($with);
-        }
-
-        if (isset($calls['contains'])) {
-            $callValues = $calls['contains'];
-
-            $withArgs = $callValues['withArgs'];
-            $return = $callValues['return'];
-
-            $resqueQueueService
-                ->shouldReceive('contains')
-                ->withArgs($withArgs)
-                ->andReturn($return);
-        }
 
         return $resqueQueueService;
     }
@@ -84,13 +60,10 @@ class MockFactory
         if (isset($calls['create'])) {
             $callValues = $calls['create'];
 
-            $withArgs = $callValues['withArgs'];
-            $return = $callValues['return'];
-
             $resqueJobFactory
                 ->shouldReceive('create')
-                ->withArgs($withArgs)
-                ->andReturn($return);
+                ->withArgs($callValues['withArgs'])
+                ->andReturn($callValues['return']);
         }
 
         return $resqueJobFactory;
@@ -109,23 +82,31 @@ class MockFactory
         if (isset($calls['error'])) {
             $callValues = $calls['error'];
 
-            $with = $callValues['with'];
-
             $logger
                 ->shouldReceive('error')
-                ->with($with);
+                ->with($callValues['with']);
         }
 
         return $logger;
     }
 
     /**
+     * @param array $calls
+     *
      * @return Mock|WorkerService
      */
-    public static function createWorkerService()
+    public static function createWorkerService($calls = [])
     {
         /* @var Mock|WorkerService $workerService */
         $workerService = \Mockery::mock(WorkerService::class);
+
+        if (isset($calls['isMaintenanceReadOnly'])) {
+            $callValues = $calls['isMaintenanceReadOnly'];
+
+            $workerService
+                ->shouldReceive('isMaintenanceReadOnly')
+                ->andReturn($callValues['return']);
+        }
 
         return $workerService;
     }
