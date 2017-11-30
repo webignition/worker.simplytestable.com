@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
+use SimplyTestable\WorkerBundle\Services\TasksService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 
 class MockFactory
@@ -37,12 +38,31 @@ class MockFactory
     }
 
     /**
+     * @param array $calls
+     *
      * @return Mock|ResqueQueueService
      */
-    public static function createResqueQueueService()
+    public static function createResqueQueueService($calls = [])
     {
         /* @var Mock|ResqueQueueService $resqueQueueService */
         $resqueQueueService = \Mockery::mock(ResqueQueueService::class);
+
+        if (isset($calls['isEmpty'])) {
+            $callValues = $calls['isEmpty'];
+
+            $resqueQueueService
+                ->shouldReceive('isEmpty')
+                ->with($callValues['with'])
+                ->andReturn($callValues['return']);
+        }
+
+        if (isset($calls['enqueue'])) {
+            $callValues = $calls['enqueue'];
+
+            $resqueQueueService
+                ->shouldReceive('enqueue')
+                ->with($callValues['with']);
+        }
 
         return $resqueQueueService;
     }
@@ -109,5 +129,17 @@ class MockFactory
         }
 
         return $workerService;
+    }
+
+    /**
+     * @return Mock|TasksService
+     */
+    public static function createTasksService()
+    {
+        /* @var Mock|TasksService $tasksService */
+        $tasksService = \Mockery::mock(TasksService::class);
+
+
+        return $tasksService;
     }
 }

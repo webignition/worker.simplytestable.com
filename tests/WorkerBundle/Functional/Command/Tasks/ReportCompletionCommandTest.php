@@ -12,6 +12,9 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
 {
+    /**
+     * @throws \Exception
+     */
     public function testRun()
     {
         $this->removeAllTasks();
