@@ -25,54 +25,6 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
         $this->jobFactory = $this->container->get(ResqueJobFactory::class);
     }
 
-    public function testCreateWithInvalidQueue()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Queue "foo" is not valid');
-        $this->expectExceptionCode(ResqueJobFactory::EXCEPTION_CODE_INVALID_QUEUE);
-
-        $this->jobFactory->create('foo');
-    }
-
-    /**
-     * @dataProvider createWithMissingRequiredArgsDataProvider
-     *
-     * @param string $queue
-     * @param array $args
-     * @param string $expectedExceptionMessage
-     */
-    public function testCreateWithMissingRequiredArgs($queue, $args, $expectedExceptionMessage)
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-        $this->expectExceptionCode(ResqueJobFactory::EXCEPTION_CODE_MISSING_REQUIRED_ARG);
-
-        $this->jobFactory->create($queue, $args);
-    }
-
-    /**
-     * @return array
-     */
-    public function createWithMissingRequiredArgsDataProvider()
-    {
-        return [
-            'task-perform' => [
-                'queue' => 'task-perform',
-                'args' => [
-                    'foo' => 'bar',
-                ],
-                'expectedExceptionMessage' => 'Required argument "id" is missing',
-            ],
-            'task-report-completion' => [
-                'queue' => 'task-report-completion',
-                'args' => [
-                    'foo' => 'bar',
-                ],
-                'expectedExceptionMessage' => 'Required argument "id" is missing',
-            ],
-        ];
-    }
-
     /**
      * @dataProvider createDataProvider
      *
@@ -82,7 +34,7 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
      * @param string $expectedQueue
      * @param array $expectedArgs
      */
-    public function testCreateFoo($queue, $args, $expectedJobClass, $expectedQueue, $expectedArgs)
+    public function testCreateSuccess($queue, $args, $expectedJobClass, $expectedQueue, $expectedArgs)
     {
         $job = $this->jobFactory->create($queue, $args);
 
