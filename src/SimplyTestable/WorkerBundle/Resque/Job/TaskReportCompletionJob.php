@@ -2,10 +2,7 @@
 
 namespace SimplyTestable\WorkerBundle\Resque\Job;
 
-use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand;
-use SimplyTestable\WorkerBundle\Services\TaskService;
-use SimplyTestable\WorkerBundle\Services\WorkerService;
 
 class TaskReportCompletionJob extends CommandJob
 {
@@ -22,22 +19,9 @@ class TaskReportCompletionJob extends CommandJob
     /**
      * {@inheritdoc}
      */
-    protected function getCommand()
+    protected function getCommandName()
     {
-        /* @var LoggerInterface $logger */
-        $logger = $this->getContainer()->get($this->args['serviceIds'][0]);
-
-        /* @var TaskService $taskService */
-        $taskService = $this->getContainer()->get($this->args['serviceIds'][1]);
-
-        /* @var WorkerService $workerService */
-        $workerService = $this->getContainer()->get($this->args['serviceIds'][2]);
-
-        return new ReportCompletionCommand(
-            $logger,
-            $taskService,
-            $workerService
-        );
+        return ReportCompletionCommand::NAME;
     }
 
     /**

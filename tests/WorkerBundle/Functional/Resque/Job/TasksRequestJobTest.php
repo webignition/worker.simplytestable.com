@@ -3,13 +3,10 @@
 namespace Tests\WorkerBundle\Functional\Resque\Job;
 
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
-use SimplyTestable\WorkerBundle\Resque\Job\Job;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
-class TasksRequestJobTest extends BaseSimplyTestableTestCase
+class TasksRequestJobTest extends AbstractJobTest
 {
     const QUEUE = 'tasks-request';
 
@@ -18,30 +15,15 @@ class TasksRequestJobTest extends BaseSimplyTestableTestCase
         $this->container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
 
-        $tasksRequestJob = $this->createTasksRequestJob();
-
-        $returnCode = $tasksRequestJob->run([]);
-
-        $this->assertEquals(
-            RequestCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
-            $returnCode
+        $job = $this->createJob(
+            [],
+            self::QUEUE,
+            $this->container->get(RequestCommand::class)
         );
-    }
+        $this->assertInstanceOf(TasksRequestJob::class, $job);
 
-    /**
-     * @return Job
-     */
-    private function createTasksRequestJob()
-    {
-        $resqueJobFactory = $this->container->get(JobFactory::class);
+        $returnCode = $job->run([]);
 
-        $tasksRequestJob = $resqueJobFactory->create(self::QUEUE, []);
-
-        $tasksRequestJob->setKernelOptions([
-            'kernel.root_dir' => $this->container->getParameter('kernel.root_dir'),
-            'kernel.environment' => $this->container->getParameter('kernel.environment'),
-        ]);
-
-        return $tasksRequestJob;
+        $this->assertEquals(RequestCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE, $returnCode);
     }
 }

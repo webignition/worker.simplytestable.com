@@ -3,26 +3,26 @@
 namespace Tests\WorkerBundle\Functional\Resque\Job;
 
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand;
-use SimplyTestable\WorkerBundle\Resque\Job\Job;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
-class TaskReportCompletionJobTest extends BaseSimplyTestableTestCase
+class TaskReportCompletionJobTest extends AbstractJobTest
 {
     const QUEUE = 'task-report-completion';
 
     public function testRunWithInvalidTask()
     {
-        $taskReportCompletionJob = $this->createTaskReportCompletionJob(-1);
-
-        $returnCode = $taskReportCompletionJob->run([]);
-
-        $this->assertEquals(
-            ReportCompletionCommand::RETURN_CODE_TASK_DOES_NOT_EXIST,
-            $returnCode
+        $job = $this->createJob(
+            ['id' => 1],
+            self::QUEUE,
+            $this->container->get(ReportCompletionCommand::class)
         );
+        $this->assertInstanceOf(TaskReportCompletionJob::class, $job);
+
+        $returnCode = $job->run([]);
+
+        $this->assertEquals(ReportCompletionCommand::RETURN_CODE_TASK_DOES_NOT_EXIST, $returnCode);
     }
 
     public function testRunInMaintenanceReadOnlyMode()
@@ -31,34 +31,15 @@ class TaskReportCompletionJobTest extends BaseSimplyTestableTestCase
         $this->clearRedis();
         $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
-        $taskReportCompletionJob = $this->createTaskReportCompletionJob($task->getId());
-
-        $returnCode = $taskReportCompletionJob->run([]);
-
-        $this->assertEquals(
-            ReportCompletionCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
-            $returnCode
+        $job = $this->createJob(
+            ['id' => $task->getId()],
+            self::QUEUE,
+            $this->container->get(ReportCompletionCommand::class)
         );
-    }
+        $this->assertInstanceOf(TaskReportCompletionJob::class, $job);
 
-    /**
-     * @param int $taskId
-     *
-     * @return Job
-     */
-    private function createTaskReportCompletionJob($taskId)
-    {
-        $resqueJobFactory = $this->container->get(JobFactory::class);
+        $returnCode = $job->run([]);
 
-        $taskReportCompletionJob = $resqueJobFactory->create(self::QUEUE, [
-            'id' => $taskId,
-        ]);
-
-        $taskReportCompletionJob->setKernelOptions([
-            'kernel.root_dir' => $this->container->getParameter('kernel.root_dir'),
-            'kernel.environment' => $this->container->getParameter('kernel.environment'),
-        ]);
-
-        return $taskReportCompletionJob;
+        $this->assertEquals(ReportCompletionCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE, $returnCode);
     }
 }

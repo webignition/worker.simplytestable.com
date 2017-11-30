@@ -8,26 +8,11 @@ services:
             jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob
             requiredArgs:
               - id
-            serviceIds:
-              - logger
-              - SimplyTestable\WorkerBundle\Services\TaskService
-              - SimplyTestable\WorkerBundle\Services\WorkerService
-              - SimplyTestable\WorkerBundle\Services\Resque\QueueService
-              - SimplyTestable\WorkerBundle\Services\Resque\JobFactory
           task-report-completion:
             queue: task-report-completion
             jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob
             requiredArgs:
               - id
-            serviceIds:
-              - logger
-              - SimplyTestable\WorkerBundle\Services\TaskService
-              - SimplyTestable\WorkerBundle\Services\WorkerService
           tasks-request:
             queue: tasks-request
             jobClassName: SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob
-            serviceIds:
-              - SimplyTestable\WorkerBundle\Services\TasksService
-              - SimplyTestable\WorkerBundle\Services\WorkerService
-              - SimplyTestable\WorkerBundle\Services\Resque\QueueService
-              - SimplyTestable\WorkerBundle\Services\Resque\JobFactory
