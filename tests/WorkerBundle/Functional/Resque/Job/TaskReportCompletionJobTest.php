@@ -15,8 +15,7 @@ class TaskReportCompletionJobTest extends AbstractJobTest
     {
         $job = $this->createJob(
             ['id' => 1],
-            self::QUEUE,
-            $this->container->get(ReportCompletionCommand::class)
+            self::QUEUE
         );
         $this->assertInstanceOf(TaskReportCompletionJob::class, $job);
 
@@ -33,8 +32,7 @@ class TaskReportCompletionJobTest extends AbstractJobTest
 
         $job = $this->createJob(
             ['id' => $task->getId()],
-            self::QUEUE,
-            $this->container->get(ReportCompletionCommand::class)
+            self::QUEUE
         );
         $this->assertInstanceOf(TaskReportCompletionJob::class, $job);
 

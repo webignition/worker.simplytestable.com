@@ -3,6 +3,7 @@
 namespace SimplyTestable\WorkerBundle\Resque\Job;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -11,7 +12,7 @@ abstract class CommandJob extends Job
     /**
      * @return string
      */
-    abstract protected function getCommandName();
+    abstract protected function getCommandClassName();
 
     /**
      * Get the arguments required by the to-be-run command.
@@ -32,6 +33,7 @@ abstract class CommandJob extends Job
      * @param array $args
      *
      * @return bool
+     * @throws \Exception
      */
     public function run($args)
     {
@@ -41,12 +43,15 @@ abstract class CommandJob extends Job
         $application = new Application($kernel);
         $application->setAutoExit(false);
 
-        if ('test' === $this->args['kernel.environment'] && isset($this->args['command'])) {
-            $application->add($this->args['command']);
-        }
+        $container = $kernel->getContainer();
+
+        /* @var Command $command */
+        $command = $container->get($this->getCommandClassName());
+
+        $application->add($command);
 
         $input = new ArrayInput(array_merge([
-            'command' => $this->getCommandName(),
+            'command' => $command->getName(),
         ], $this->getCommandArgs()));
 
         $output = new BufferedOutput();

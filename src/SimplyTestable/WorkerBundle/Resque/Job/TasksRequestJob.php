@@ -19,9 +19,9 @@ class TasksRequestJob extends CommandJob
     /**
      * {@inheritdoc}
      */
-    protected function getCommandName()
+    protected function getCommandClassName()
     {
-        return RequestCommand::NAME;
+        return RequestCommand::class;
     }
 
     /**

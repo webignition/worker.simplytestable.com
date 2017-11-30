@@ -18,8 +18,6 @@ class PerformCommand extends Command
     const RETURN_CODE_UNKNOWN_ERROR = -5;
     const RETURN_CODE_TASK_SERVICE_RAISED_EXCEPTION = -6;
 
-    const NAME = 'simplytestable:task:perform';
-
     /**
      * @var LoggerInterface
      */
@@ -76,7 +74,7 @@ class PerformCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(self::NAME)
+            ->setName('simplytestable:task:perform')
             ->setDescription('Start a task')
             ->addArgument('id', InputArgument::REQUIRED, 'id of task to start')
             ->setHelp('Start a task');

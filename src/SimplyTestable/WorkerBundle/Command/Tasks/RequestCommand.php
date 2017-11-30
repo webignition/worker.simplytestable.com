@@ -18,8 +18,6 @@ class RequestCommand extends Command
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = 2;
     const RETURN_CODE_TASK_WORKLOAD_EXCEEDS_REQUEST_THRESHOLD = 3;
 
-    const NAME = 'simplytestable:tasks:request';
-
     /**
      * @var TasksService
      */
@@ -68,7 +66,7 @@ class RequestCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(self::NAME)
+            ->setName('simplytestable:tasks:request')
             ->setDescription('Request tasks to be assigned by the core application')
             ->addArgument('limit', InputArgument::OPTIONAL, 'maximum number of tasks to request')
             ->setHelp('Request tasks to be assigned by the core application');
@@ -99,6 +97,10 @@ class RequestCommand extends Command
         return self::RETURN_CODE_FAILED;
     }
 
+    /**
+     * @throws \CredisException
+     * @throws \Exception
+     */
     private function requeue()
     {
         if ($this->resqueQueueService->isEmpty('tasks-request')) {

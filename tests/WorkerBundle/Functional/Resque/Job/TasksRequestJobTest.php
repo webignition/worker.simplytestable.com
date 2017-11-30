@@ -17,8 +17,7 @@ class TasksRequestJobTest extends AbstractJobTest
 
         $job = $this->createJob(
             [],
-            self::QUEUE,
-            $this->container->get(RequestCommand::class)
+            self::QUEUE
         );
         $this->assertInstanceOf(TasksRequestJob::class, $job);
 
