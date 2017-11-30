@@ -6,3 +6,11 @@ services:
     public: true
 
   SimplyTestable\WorkerBundle\Services\Resque\QueueService:
+
+  SimplyTestable\WorkerBundle\Command\Task\PerformCommand:
+
+  SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand:
+
+  SimplyTestable\WorkerBundle\Command\Tasks\Request:
+
+  SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand:
