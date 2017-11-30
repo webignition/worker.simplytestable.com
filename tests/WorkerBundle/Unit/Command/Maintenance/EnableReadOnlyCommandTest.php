@@ -1,19 +1,31 @@
 <?php
 
-namespace Tests\WorkerBundle\Functional\Command\Maintenance;
+namespace Tests\WorkerBundle\Unit\Command\Maintenance;
 
+use Mockery\Mock;
 use SimplyTestable\WorkerBundle\Command\Maintenance\EnableReadOnlyCommand;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
+/**
+ * @group Command/Maintenance/EnableReadOnlyCommand
+ */
 class EnableReadOnlyCommandTest extends BaseSimplyTestableTestCase
 {
+    /**
+     * @throws \Exception
+     */
     public function testRun()
     {
-        $command = $this->container->get(EnableReadOnlyCommand::class);
+        /* @var WorkerService|Mock $workerService */
+        $workerService = \Mockery::mock(WorkerService::class);
+        $workerService
+            ->shouldReceive('setReadOnly')
+            ->once();
+
+        $command = new EnableReadOnlyCommand($workerService);
 
         $returnCode = $command->run(
             new ArrayInput([]),
@@ -21,9 +33,12 @@ class EnableReadOnlyCommandTest extends BaseSimplyTestableTestCase
         );
 
         $this->assertEquals(0, $returnCode);
-        $this->assertEquals(
-            WorkerService::WORKER_MAINTENANCE_READ_ONLY_STATE,
-            $this->container->get(WorkerService::class)->get()->getState()->getName()
-        );
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        \Mockery::close();
     }
 }
