@@ -110,13 +110,6 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
                 'expectedQueue' => 'task-perform',
                 'expectedArgs' => [
                     'id' => 1,
-                    'serviceIds' => [
-                        'logger',
-                        'SimplyTestable\WorkerBundle\Services\TaskService',
-                        'SimplyTestable\WorkerBundle\Services\WorkerService',
-                        'SimplyTestable\WorkerBundle\Services\Resque\QueueService',
-                        'SimplyTestable\WorkerBundle\Services\Resque\JobFactory',
-                    ],
                 ],
             ],
             'task-report-completion' => [
@@ -128,11 +121,6 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
                 'expectedQueue' => 'task-report-completion',
                 'expectedArgs' => [
                     'id' => 1,
-                    'serviceIds' => [
-                        'logger',
-                        'SimplyTestable\WorkerBundle\Services\TaskService',
-                        'SimplyTestable\WorkerBundle\Services\WorkerService',
-                    ],
                 ],
             ],
             'tasks-request' => [
@@ -144,12 +132,6 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
                 'expectedQueue' => 'tasks-request',
                 'expectedArgs' => [
                     'id' => 1,
-                    'serviceIds' => [
-                        'SimplyTestable\WorkerBundle\Services\TasksService',
-                        'SimplyTestable\WorkerBundle\Services\WorkerService',
-                        'SimplyTestable\WorkerBundle\Services\Resque\QueueService',
-                        'SimplyTestable\WorkerBundle\Services\Resque\JobFactory',
-                    ],
                 ],
             ],
         ];

@@ -3,21 +3,24 @@
 namespace Tests\WorkerBundle\Functional\Resque\Job;
 
 use SimplyTestable\WorkerBundle\Command\Task\PerformCommand;
-use SimplyTestable\WorkerBundle\Resque\Job\Job;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
-class TaskPerformJobTest extends BaseSimplyTestableTestCase
+class TaskPerformJobTest extends AbstractJobTest
 {
     const QUEUE = 'task-perform';
 
     public function testRunWithInvalidTask()
     {
-        $taskPerformJob = $this->createTaskPerformJob(-1);
+        $job = $this->createJob(
+            ['id' => 1],
+            self::QUEUE,
+            $this->container->get(PerformCommand::class)
+        );
+        $this->assertInstanceOf(TaskPerformJob::class, $job);
 
-        $returnCode = $taskPerformJob->run([]);
+        $returnCode = $job->run([]);
 
         $this->assertEquals(PerformCommand::RETURN_CODE_TASK_DOES_NOT_EXIST, $returnCode);
     }
@@ -28,31 +31,14 @@ class TaskPerformJobTest extends BaseSimplyTestableTestCase
         $this->clearRedis();
         $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
-        $taskPerformJob = $this->createTaskPerformJob($task->getId());
+        $job = $this->createJob(
+            ['id' => $task->getId(),],
+            self::QUEUE,
+            $this->container->get(PerformCommand::class)
+        );
 
-        $returnCode = $taskPerformJob->run([]);
+        $returnCode = $job->run([]);
 
         $this->assertEquals(PerformCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE, $returnCode);
-    }
-
-    /**
-     * @param int $taskId
-     *
-     * @return Job
-     */
-    private function createTaskPerformJob($taskId)
-    {
-        $resqueJobFactory = $this->container->get(JobFactory::class);
-
-        $taskPerformJob = $resqueJobFactory->create(self::QUEUE, [
-            'id' => $taskId,
-        ]);
-
-        $taskPerformJob->setKernelOptions([
-            'kernel.root_dir' => $this->container->getParameter('kernel.root_dir'),
-            'kernel.environment' => $this->container->getParameter('kernel.environment'),
-        ]);
-
-        return $taskPerformJob;
     }
 }

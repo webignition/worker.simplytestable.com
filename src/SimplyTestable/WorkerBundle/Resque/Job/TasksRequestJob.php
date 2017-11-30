@@ -3,10 +3,6 @@
 namespace SimplyTestable\WorkerBundle\Resque\Job;
 
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
-use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
-use SimplyTestable\WorkerBundle\Services\TasksService;
-use SimplyTestable\WorkerBundle\Services\WorkerService;
 
 class TasksRequestJob extends CommandJob
 {
@@ -23,26 +19,9 @@ class TasksRequestJob extends CommandJob
     /**
      * {@inheritdoc}
      */
-    protected function getCommand()
+    protected function getCommandName()
     {
-        /* @var TasksService $tasksService */
-        $tasksService = $this->getContainer()->get($this->args['serviceIds'][0]);
-
-        /* @var WorkerService $workerService */
-        $workerService = $this->getContainer()->get($this->args['serviceIds'][1]);
-
-        /* @var ResqueQueueService $resqueQueueService */
-        $resqueQueueService = $this->getContainer()->get($this->args['serviceIds'][2]);
-
-        /* @var ResqueJobFactory $resqueJobFactory */
-        $resqueJobFactory = $this->getContainer()->get($this->args['serviceIds'][3]);
-
-        return new RequestCommand(
-            $tasksService,
-            $workerService,
-            $resqueQueueService,
-            $resqueJobFactory
-        );
+        return RequestCommand::NAME;
     }
 
     /**
@@ -72,9 +51,7 @@ class TasksRequestJob extends CommandJob
      */
     protected function handleNonZeroReturnCode($returnCode, $output)
     {
-        $command = $this->getCommand();
-
-        if ($returnCode == $command::RETURN_CODE_TASK_WORKLOAD_EXCEEDS_REQUEST_THRESHOLD) {
+        if ($returnCode == RequestCommand::RETURN_CODE_TASK_WORKLOAD_EXCEEDS_REQUEST_THRESHOLD) {
             $this->getContainer()->get('logger')
                 ->info(get_class($this) . ': task [' . $this->getIdentifier() . '] returned ' . $returnCode);
             return true;
