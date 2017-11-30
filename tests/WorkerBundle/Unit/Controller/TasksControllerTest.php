@@ -20,6 +20,7 @@ class TasksControllerTest extends \PHPUnit_Framework_TestCase
      * @param ResqueQueueService $resqueQueueService
      * @param ResqueJobFactory $resqueJobFactory
      * @param TasksService $tasksService
+     * @throws \Exception
      */
     public function testNotifyAction(
         ResqueQueueService $resqueQueueService,
