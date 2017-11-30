@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Model\TaskCollection;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskFactory;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -43,15 +43,17 @@ class TaskController extends AbstractController
      * @param CreateRequestCollectionFactory $createRequestCollectionFactory
      * @param TaskFactory $taskFactory
      * @param QueueService $resqueQueueService
-     * @param JobFactory $resqueJobFactory
+     * @param ResqueJobFactory $resqueJobFactory
      *
      * @return JsonResponse|Response
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
      */
     public function createCollectionAction(
         CreateRequestCollectionFactory $createRequestCollectionFactory,
         TaskFactory $taskFactory,
         QueueService $resqueQueueService,
-        JobFactory $resqueJobFactory
+        ResqueJobFactory $resqueJobFactory
     ) {
         if ($this->workerService->isMaintenanceReadOnly()) {
             throw new ServiceUnavailableHttpException();
@@ -71,12 +73,10 @@ class TaskController extends AbstractController
         $this->taskService->getEntityManager()->flush();
 
         foreach ($tasks as $task) {
-            $resqueQueueService->enqueue(
-                $resqueJobFactory->create(
-                    'task-perform',
-                    ['id' => $task->getId()]
-                )
-            );
+            $resqueQueueService->enqueue($resqueJobFactory->create(
+                'task-perform',
+                ['id' => $task->getId()]
+            ));
         }
 
         return new JsonResponse($tasks->jsonSerialize());
@@ -86,6 +86,7 @@ class TaskController extends AbstractController
      * @param CancelRequestFactory $cancelRequestFactory
      *
      * @return Response
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function cancelAction(CancelRequestFactory $cancelRequestFactory)
     {
@@ -110,6 +111,7 @@ class TaskController extends AbstractController
      * @param CancelRequestCollectionFactory $cancelRequestCollectionFactory
      *
      * @return Response
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function cancelCollectionAction(CancelRequestCollectionFactory $cancelRequestCollectionFactory)
     {

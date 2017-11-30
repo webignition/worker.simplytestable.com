@@ -10,7 +10,7 @@ use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\MockFactory;
 use Symfony\Component\Console\Input\ArrayInput;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 
 /**

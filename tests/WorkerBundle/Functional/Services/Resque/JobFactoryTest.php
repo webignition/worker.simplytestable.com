@@ -5,13 +5,13 @@ namespace Tests\WorkerBundle\Functional\Services\Resque;
 use SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob;
 use SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob;
 use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
 class JobFactoryTest extends BaseSimplyTestableTestCase
 {
     /**
-     * @var JobFactory
+     * @var ResqueJobFactory
      */
     private $jobFactory;
 
@@ -22,14 +22,14 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
     {
         parent::setUp();
 
-        $this->jobFactory = $this->container->get(JobFactory::class);
+        $this->jobFactory = $this->container->get(ResqueJobFactory::class);
     }
 
     public function testCreateWithInvalidQueue()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Queue "foo" is not valid');
-        $this->expectExceptionCode(JobFactory::EXCEPTION_CODE_INVALID_QUEUE);
+        $this->expectExceptionCode(ResqueJobFactory::EXCEPTION_CODE_INVALID_QUEUE);
 
         $this->jobFactory->create('foo');
     }
@@ -45,7 +45,7 @@ class JobFactoryTest extends BaseSimplyTestableTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $this->expectExceptionCode(JobFactory::EXCEPTION_CODE_MISSING_REQUIRED_ARG);
+        $this->expectExceptionCode(ResqueJobFactory::EXCEPTION_CODE_MISSING_REQUIRED_ARG);
 
         $this->jobFactory->create($queue, $args);
     }

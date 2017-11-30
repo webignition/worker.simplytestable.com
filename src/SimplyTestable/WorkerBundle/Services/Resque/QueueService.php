@@ -2,7 +2,7 @@
 namespace SimplyTestable\WorkerBundle\Services\Resque;
 
 use ResqueBundle\Resque\Resque;
-use SimplyTestable\WorkerBundle\Resque\Job\Job;
+use ResqueBundle\Resque\Job;
 use Psr\Log\LoggerInterface;
 
 /**

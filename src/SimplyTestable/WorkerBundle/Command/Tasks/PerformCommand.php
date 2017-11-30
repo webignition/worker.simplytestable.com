@@ -3,7 +3,7 @@ namespace SimplyTestable\WorkerBundle\Command\Tasks;
 
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Command\Task\PerformCommand as TaskPerformCommand;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;

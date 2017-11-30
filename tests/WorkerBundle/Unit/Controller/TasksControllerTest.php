@@ -4,7 +4,7 @@ namespace Tests\WorkerBundle\Unit\Controller;
 
 use SimplyTestable\WorkerBundle\Controller\TasksController;
 use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use Tests\WorkerBundle\Factory\MockFactory;

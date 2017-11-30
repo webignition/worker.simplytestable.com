@@ -3,7 +3,7 @@
 namespace Tests\WorkerBundle\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
@@ -12,6 +12,10 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
 {
+    /**
+     * @throws \CredisException
+     * @throws \Exception
+     */
     public function testEnqueueTaskPerformJobs()
     {
         $taskPropertyCollection = [
@@ -39,7 +43,7 @@ class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
         $this->clearRedis();
 
         $resqueQueueService = $this->container->get(QueueService::class);
-        $resqueJobFactory = $this->container->get(JobFactory::class);
+        $resqueJobFactory = $this->container->get(ResqueJobFactory::class);
 
         $resqueQueueService->enqueue(
             $resqueJobFactory->create(

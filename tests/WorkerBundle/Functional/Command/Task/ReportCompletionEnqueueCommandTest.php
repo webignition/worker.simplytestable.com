@@ -3,7 +3,7 @@
 namespace Tests\WorkerBundle\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
@@ -58,6 +58,10 @@ class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
         ));
     }
 
+    /**
+     * @throws \CredisException
+     * @throws \Exception
+     */
     public function testRunWithNonEmptyQueue()
     {
         $this->removeAllTasks();
@@ -74,7 +78,7 @@ class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
         $this->assertTrue($this->clearRedis());
 
         $resqueQueueService = $this->container->get(QueueService::class);
-        $resqueJobFactory = $this->container->get(JobFactory::class);
+        $resqueJobFactory = $this->container->get(ResqueJobFactory::class);
 
         $resqueQueueService->enqueue(
             $resqueJobFactory->create(
