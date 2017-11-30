@@ -70,11 +70,9 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             JsLintFixtureFactory::load('incorrect-path-to-node-jslint.txt')
         ]);
 
-        $this->setExpectedException(
-            NodeJslintOutputException::class,
-            'node-jslint not found at "/home/example/node_modules/jslint/bin/jslint.js"',
-            3
-        );
+        $this->expectException(NodeJslintOutputException::class);
+        $this->expectExceptionMessage('node-jslint not found at "/home/example/node_modules/jslint/bin/jslint.js"');
+        $this->expectExceptionCode(3);
 
         $this->taskDriver->perform($task);
     }
