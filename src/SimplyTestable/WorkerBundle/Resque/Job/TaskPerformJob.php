@@ -19,9 +19,9 @@ class TaskPerformJob extends CommandJob
     /**
      * {@inheritdoc}
      */
-    protected function getCommandName()
+    protected function getCommandClassName()
     {
-        return PerformCommand::NAME;
+        return PerformCommand::class;
     }
 
     /**

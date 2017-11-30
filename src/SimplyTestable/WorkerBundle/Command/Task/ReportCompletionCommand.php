@@ -14,8 +14,6 @@ class ReportCompletionCommand extends Command
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;
 
-    const NAME = 'simplytestable:task:reportcompletion';
-
     /**
      * @var LoggerInterface
      */
@@ -56,7 +54,7 @@ class ReportCompletionCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(self::NAME)
+            ->setName('simplytestable:task:reportcompletion')
             ->setDescription('Report back to the core application the completed status of a task')
             ->addArgument('id', InputArgument::REQUIRED, 'id of task to report')
             ->setHelp('Report back to the core application the completed status of a task');

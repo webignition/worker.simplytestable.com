@@ -19,9 +19,9 @@ class TaskReportCompletionJob extends CommandJob
     /**
      * {@inheritdoc}
      */
-    protected function getCommandName()
+    protected function getCommandClassName()
     {
-        return ReportCompletionCommand::NAME;
+        return ReportCompletionCommand::class;
     }
 
     /**

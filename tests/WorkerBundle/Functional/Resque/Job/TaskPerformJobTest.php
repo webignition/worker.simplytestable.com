@@ -15,8 +15,7 @@ class TaskPerformJobTest extends AbstractJobTest
     {
         $job = $this->createJob(
             ['id' => 1],
-            self::QUEUE,
-            $this->container->get(PerformCommand::class)
+            self::QUEUE
         );
         $this->assertInstanceOf(TaskPerformJob::class, $job);
 
@@ -33,8 +32,7 @@ class TaskPerformJobTest extends AbstractJobTest
 
         $job = $this->createJob(
             ['id' => $task->getId(),],
-            self::QUEUE,
-            $this->container->get(PerformCommand::class)
+            self::QUEUE
         );
 
         $returnCode = $job->run([]);
