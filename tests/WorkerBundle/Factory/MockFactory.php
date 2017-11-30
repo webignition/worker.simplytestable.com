@@ -128,6 +128,14 @@ class MockFactory
                 ->andReturn($callValues['return']);
         }
 
+        if (isset($calls['activate'])) {
+            $callValues = $calls['activate'];
+
+            $workerService
+                ->shouldReceive('activate')
+                ->andReturn($callValues['return']);
+        }
+
         return $workerService;
     }
 
