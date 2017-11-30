@@ -4,6 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\Resque;
 use ResqueBundle\Resque\Resque;
 use ResqueBundle\Resque\Job;
 use Psr\Log\LoggerInterface;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 
 /**
  * Wrapper for \ResqueBundle\Resque\Resque that handles exceptions
@@ -29,19 +30,19 @@ class QueueService
     private $logger;
 
     /**
-     * @var JobFactory
+     * @var ResqueJobFactory
      */
     private $jobFactory;
 
     /**
      * @param Resque $resque
      * @param LoggerInterface $logger
-     * @param JobFactory $jobFactory
+     * @param ResqueJobFactory $jobFactory
      */
     public function __construct(
         Resque $resque,
         LoggerInterface $logger,
-        JobFactory $jobFactory
+        ResqueJobFactory $jobFactory
     ) {
         $this->resque = $resque;
         $this->logger = $logger;
