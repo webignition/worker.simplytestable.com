@@ -89,10 +89,6 @@ abstract class AbstractBaseTestCase extends WebTestCase
      */
     protected function tearDown()
     {
-//        foreach ($this->container->getMockedServices() as $id => $service) {
-//            $this->container->unmock($id);
-//        }
-
         \Mockery::close();
 
         $this->client = null;
