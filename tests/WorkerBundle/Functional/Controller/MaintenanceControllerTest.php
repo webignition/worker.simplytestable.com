@@ -8,9 +8,9 @@ use SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
 use SimplyTestable\WorkerBundle\Controller\MaintenanceController;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
-class MaintenanceControllerTest extends BaseSimplyTestableTestCase
+class MaintenanceControllerTest extends AbstractBaseTestCase
 {
     /**
      * @var MaintenanceController

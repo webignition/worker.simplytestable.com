@@ -6,12 +6,12 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Message\RequestInterface;
 use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use webignition\WebResource\Service\Configuration;
 
-abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
+abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
 {
     /**
      * {@inheritdoc}

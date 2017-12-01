@@ -8,13 +8,13 @@ use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
 /**
  * @group Command/Task/ReportCompletionCommand
  */
-class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
+class ReportCompletionCommandTest extends AbstractBaseTestCase
 {
     /**
      * @var ReportCompletionCommand

@@ -6,9 +6,9 @@ use SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob;
 use SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob;
 use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
 use webignition\ResqueJobFactory\ResqueJobFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
-class JobFactoryTest extends BaseSimplyTestableTestCase
+class JobFactoryTest extends AbstractBaseTestCase
 {
     /**
      * @var ResqueJobFactory

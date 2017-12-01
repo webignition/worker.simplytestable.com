@@ -7,10 +7,10 @@ use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
-class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
+class PerformEnqueueCommandTest extends AbstractBaseTestCase
 {
     /**
      * @throws \CredisException

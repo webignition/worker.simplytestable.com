@@ -8,13 +8,13 @@ use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
 /**
  * @group Command/Task/PerformCommand
  */
-class PerformCommandTest extends BaseSimplyTestableTestCase
+class PerformCommandTest extends AbstractBaseTestCase
 {
     /**
      * @var PerformCommand

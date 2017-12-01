@@ -7,10 +7,10 @@ use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
-class RequeueInProgressTasksCommandTest extends BaseSimplyTestableTestCase
+class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
 {
     /**
      * @dataProvider runDataProvider

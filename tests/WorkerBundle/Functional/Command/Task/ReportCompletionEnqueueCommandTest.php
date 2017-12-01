@@ -7,12 +7,12 @@ use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 
-class ReportCompletionEnqueueCommandTest extends BaseSimplyTestableTestCase
+class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
 {
     /**
      * @var ReportCompletionEnqueueCommand

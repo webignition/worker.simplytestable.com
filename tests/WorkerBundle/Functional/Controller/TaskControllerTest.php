@@ -13,14 +13,14 @@ use SimplyTestable\WorkerBundle\Services\TaskFactory;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @group Controller/TaskController
  */
-class TaskControllerTest extends BaseSimplyTestableTestCase
+class TaskControllerTest extends AbstractBaseTestCase
 {
     /**
      * @var TaskController

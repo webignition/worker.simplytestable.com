@@ -5,12 +5,12 @@ namespace Tests\WorkerBundle\Functional\Command\Tasks;
 use SimplyTestable\WorkerBundle\Command\Tasks\ReportCompletionCommand;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 
-class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
+class ReportCompletionCommandTest extends AbstractBaseTestCase
 {
     /**
      * @throws \Exception

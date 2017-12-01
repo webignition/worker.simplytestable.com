@@ -3,9 +3,9 @@
 namespace Tests\WorkerBundle\Functional\Services;
 
 use SimplyTestable\WorkerBundle\Services\ResourceLocator;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
-class ResourceLocatorTest extends BaseSimplyTestableTestCase
+class ResourceLocatorTest extends AbstractBaseTestCase
 {
     /**
      * @dataProvider locateDataProvider

@@ -7,14 +7,14 @@ use SimplyTestable\WorkerBundle\Entity\State;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @group Controller/VerifyController
  */
-class VerifyControllerTest extends BaseSimplyTestableTestCase
+class VerifyControllerTest extends AbstractBaseTestCase
 {
     /**
      * @var VerifyController

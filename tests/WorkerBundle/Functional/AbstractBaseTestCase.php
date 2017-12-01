@@ -2,7 +2,6 @@
 
 namespace Tests\WorkerBundle\Functional;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpCache;
@@ -11,24 +10,38 @@ use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
+use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use GuzzleHttp\Subscriber\Mock as HttpMockSubscriber;
 
-abstract class BaseSimplyTestableTestCase extends BaseTestCase
+abstract class AbstractBaseTestCase extends WebTestCase
 {
     /**
-     * {@inheritdoc}
+     * @var Client
      */
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->container->get(WorkerService::class)->setActive();
-    }
+    private $client;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
     /**
      * @var TestTaskFactory
      */
     private $taskFactory;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        $this->client = static::createClient();
+        $this->container = $this->client->getKernel()->getContainer();
+        $this->container->get(WorkerService::class)->setActive();
+    }
 
     /**
      * @return TestTaskFactory
@@ -50,9 +63,37 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
         return $this->taskFactory;
     }
 
+    protected function clearRedis()
+    {
+        $output = array();
+        $returnValue = null;
+
+        exec('redis-cli -r 1 flushall', $output, $returnValue);
+
+        if ($output !== array('OK')) {
+            return false;
+        }
+
+        return $returnValue === 0;
+    }
+
     protected function removeAllTasks()
     {
         $this->removeAllForEntity(Task::class);
+    }
+
+    /**
+     * @param array $fixtures
+     */
+    protected function setHttpFixtures($fixtures)
+    {
+        $httpCache = $this->container->get(HttpCache::class);
+        $httpCache->clear();
+
+        $httpClientService = $this->container->get(HttpClientService::class);
+        $httpClientService->get()->getEmitter()->attach(
+            new HttpMockSubscriber($fixtures)
+        );
     }
 
     /**
@@ -73,16 +114,18 @@ abstract class BaseSimplyTestableTestCase extends BaseTestCase
     }
 
     /**
-     * @param array $fixtures
+     * {@inheritdoc}
      */
-    protected function setHttpFixtures($fixtures)
+    protected function tearDown()
     {
-        $httpCache = $this->container->get(HttpCache::class);
-        $httpCache->clear();
+//        foreach ($this->container->getMockedServices() as $id => $service) {
+//            $this->container->unmock($id);
+//        }
 
-        $httpClientService = $this->container->get(HttpClientService::class);
-        $httpClientService->get()->getEmitter()->attach(
-            new HttpMockSubscriber($fixtures)
-        );
+        \Mockery::close();
+
+        $this->client = null;
+
+        parent::tearDown();
     }
 }

@@ -6,10 +6,10 @@ use GuzzleHttp\Exception\ConnectException;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 
-class WorkerServiceTest extends BaseSimplyTestableTestCase
+class WorkerServiceTest extends AbstractBaseTestCase
 {
     /**
      * @var WorkerService

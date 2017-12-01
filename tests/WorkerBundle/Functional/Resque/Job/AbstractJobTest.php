@@ -4,9 +4,9 @@ namespace Tests\WorkerBundle\Functional\Resque\Job;
 
 use SimplyTestable\WorkerBundle\Resque\Job\Job;
 use webignition\ResqueJobFactory\ResqueJobFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
-abstract class AbstractJobTest extends BaseSimplyTestableTestCase
+abstract class AbstractJobTest extends AbstractBaseTestCase
 {
     /**
      * @param array $args
