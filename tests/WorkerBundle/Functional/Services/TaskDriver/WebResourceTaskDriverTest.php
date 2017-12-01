@@ -6,13 +6,18 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Message\RequestInterface;
 use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use webignition\WebResource\Service\Configuration;
 
-abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
+abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
 {
+    /**
+     * @var TestTaskFactory
+     */
+    protected $testTaskFactory;
+
     /**
      * {@inheritdoc}
      */
@@ -20,6 +25,8 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
     {
         parent::setUp();
         $this->removeAllTasks();
+
+        $this->testTaskFactory = new TestTaskFactory($this->container);
     }
 
     /**
@@ -57,7 +64,7 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
             new ConnectException('foo', $request)
         ]);
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
@@ -94,7 +101,7 @@ abstract class WebResourceTaskDriverTest extends BaseSimplyTestableTestCase
 
         $webResourceService->setConfiguration($newWebResourceServiceConfiguration);
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 

@@ -8,12 +8,11 @@ use SimplyTestable\WorkerBundle\Request\VerifyRequest;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Tests\WorkerBundle\Factory\MockFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
 /**
  * @group Controller/VerifyController
  */
-class VerifyControllerTest extends BaseSimplyTestableTestCase
+class VerifyControllerTest extends \PHPUnit_Framework_TestCase
 {
     public function testIndexActionInMaintenanceReadOnlyMode()
     {

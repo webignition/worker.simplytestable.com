@@ -28,7 +28,10 @@ class TaskPerformJobTest extends AbstractJobTest
     {
         $this->container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+
+        $testTaskFactory = new TestTaskFactory($this->container);
+
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $job = $this->createJob(
             ['id' => $task->getId(),],

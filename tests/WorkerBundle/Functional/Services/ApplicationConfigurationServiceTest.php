@@ -3,9 +3,9 @@
 namespace Tests\WorkerBundle\Functional\Services;
 
 use SimplyTestable\WorkerBundle\Services\ApplicationConfigurationService;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
-class ApplicationConfigurationServiceTest extends BaseSimplyTestableTestCase
+class ApplicationConfigurationServiceTest extends AbstractBaseTestCase
 {
     public function testGet()
     {

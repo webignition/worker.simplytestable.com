@@ -8,13 +8,13 @@ use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
 /**
  * @group Command/Task/PerformCommand
  */
-class PerformCommandTest extends BaseSimplyTestableTestCase
+class PerformCommandTest extends AbstractBaseTestCase
 {
     /**
      * @var PerformCommand
@@ -35,7 +35,9 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
     {
         $this->container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+
+        $testTaskFactory = new TestTaskFactory($this->container);
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $returnCode = $this->command->run(
             new ArrayInput([
@@ -58,7 +60,8 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
      */
     public function testTaskServiceRaisesException()
     {
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $testTaskFactory = new TestTaskFactory($this->container);
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $taskService = $this->container->get(TaskService::class);
         $taskService->setPerformException(new \Exception());
@@ -91,7 +94,8 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
         $expectedResqueJobs,
         $expectedEmptyResqueQueues
     ) {
-        $task = $this->getTestTaskFactory()->create($taskValues);
+        $testTaskFactory = new TestTaskFactory($this->container);
+        $task = $testTaskFactory->create($taskValues);
         $this->clearRedis();
 
         $taskService = $this->container->get(TaskService::class);

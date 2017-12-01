@@ -7,13 +7,13 @@ use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
 /**
  * @group Command/Tasks/RequestCommand
  */
-class RequestCommandTest extends BaseSimplyTestableTestCase
+class RequestCommandTest extends AbstractBaseTestCase
 {
     /**
      * @var RequestCommand

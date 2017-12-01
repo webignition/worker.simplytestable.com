@@ -7,10 +7,10 @@ use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
-class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
+class PerformEnqueueCommandTest extends AbstractBaseTestCase
 {
     /**
      * @throws \CredisException
@@ -18,6 +18,8 @@ class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
      */
     public function testEnqueueTaskPerformJobs()
     {
+        $testTaskFactory = new TestTaskFactory($this->container);
+
         $taskPropertyCollection = [
             [
                 'url' => 'http://example.com/1/',
@@ -35,7 +37,7 @@ class PerformEnqueueCommandTest extends BaseSimplyTestableTestCase
 
         $tasks = array();
         foreach ($taskPropertyCollection as $taskProperties) {
-            $tasks[] = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults(
+            $tasks[] = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults(
                 $taskProperties
             ));
         }

@@ -6,9 +6,9 @@ use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Request\Task\CreateRequest;
 use SimplyTestable\WorkerBundle\Services\TaskFactory;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
-class TaskFactoryTest extends BaseSimplyTestableTestCase
+class TaskFactoryTest extends AbstractBaseTestCase
 {
     /**
      * @var TaskFactory

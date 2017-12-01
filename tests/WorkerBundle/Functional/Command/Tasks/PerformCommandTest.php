@@ -5,11 +5,11 @@ namespace Tests\WorkerBundle\Functional\Command\Tasks;
 use SimplyTestable\WorkerBundle\Command\Tasks\PerformCommand;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 
-class PerformCommandTest extends BaseSimplyTestableTestCase
+class PerformCommandTest extends AbstractBaseTestCase
 {
     /**
      * @throws \Exception
@@ -18,7 +18,9 @@ class PerformCommandTest extends BaseSimplyTestableTestCase
     {
         $this->removeAllTasks();
 
-        $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $testTaskFactory = new TestTaskFactory($this->container);
+
+        $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $taskService = $this->container->get(TaskService::class);
         $taskService

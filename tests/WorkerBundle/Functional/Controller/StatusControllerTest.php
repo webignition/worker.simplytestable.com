@@ -5,9 +5,9 @@ namespace Tests\WorkerBundle\Functional\Controller;
 use SimplyTestable\WorkerBundle\Controller\StatusController;
 use SimplyTestable\WorkerBundle\Services\HttpCache;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
-class StatusControllerTest extends BaseSimplyTestableTestCase
+class StatusControllerTest extends AbstractBaseTestCase
 {
     public function testIndexAction()
     {

@@ -53,7 +53,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $content,
         ]);
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
@@ -124,7 +124,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.0 200\nContent-Type:text/html\n\n" . $content,
         ]);
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
@@ -272,7 +272,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -297,7 +297,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
         ]));
@@ -336,7 +336,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 

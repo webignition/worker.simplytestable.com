@@ -5,12 +5,12 @@ namespace Tests\WorkerBundle\Functional\Command\Tasks;
 use SimplyTestable\WorkerBundle\Command\Tasks\ReportCompletionCommand;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 
-class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
+class ReportCompletionCommandTest extends AbstractBaseTestCase
 {
     /**
      * @throws \Exception
@@ -27,7 +27,9 @@ class ReportCompletionCommandTest extends BaseSimplyTestableTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $testTaskFactory = new TestTaskFactory($this->container);
+
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'url' => 'http://example.com/',
             'type' => 'html validation',
         ]));

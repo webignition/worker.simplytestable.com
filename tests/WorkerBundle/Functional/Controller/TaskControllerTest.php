@@ -13,19 +13,24 @@ use SimplyTestable\WorkerBundle\Services\TaskFactory;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @group Controller/TaskController
  */
-class TaskControllerTest extends BaseSimplyTestableTestCase
+class TaskControllerTest extends AbstractBaseTestCase
 {
     /**
      * @var TaskController
      */
     private $taskController;
+
+    /**
+     * @var TestTaskFactory
+     */
+    private $testTaskFactory;
 
     /**
      * {@inheritdoc}
@@ -38,6 +43,8 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
             $this->container->get(WorkerService::class),
             $this->container->get(TaskService::class)
         );
+
+        $this->testTaskFactory = new TestTaskFactory($this->container);
     }
 
     /**
@@ -139,7 +146,7 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
     public function testCancelAction()
     {
         $this->removeAllTasks();
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
         $this->assertEquals('task-queued', $task->getState());
 
         $request = new Request();
@@ -165,10 +172,10 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
 
         $taskIds = [];
         $tasks = [];
-        $tasks[] = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'html validation',
         ]));
-        $tasks[] = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'css validation',
         ]));
 

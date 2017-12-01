@@ -4,9 +4,9 @@ namespace Tests\WorkerBundle\Functional\Guzzle;
 
 use Memcached;
 use SimplyTestable\WorkerBundle\Services\MemcachedService;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
-class MemcachedServiceTest extends BaseSimplyTestableTestCase
+class MemcachedServiceTest extends AbstractBaseTestCase
 {
     /**
      * @var MemcachedService

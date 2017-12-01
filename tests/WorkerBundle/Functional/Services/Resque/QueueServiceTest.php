@@ -4,9 +4,9 @@ namespace Tests\WorkerBundle\Functional\Guzzle;
 
 use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
-class QueueServiceTest extends BaseSimplyTestableTestCase
+class QueueServiceTest extends AbstractBaseTestCase
 {
     const QUEUE_TASK_PERFORM = 'task-perform';
     const QUEUE_TASK_REPORT_COMPLETION = 'task-report-completion';

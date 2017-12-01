@@ -7,11 +7,11 @@ use GuzzleHttp\Post\PostBodyInterface;
 use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Utility\File;
 
-class TasksServiceTest extends BaseSimplyTestableTestCase
+class TasksServiceTest extends AbstractBaseTestCase
 {
     /**
      * @var TasksService

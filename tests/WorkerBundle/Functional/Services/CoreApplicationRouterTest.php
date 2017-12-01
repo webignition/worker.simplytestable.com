@@ -3,9 +3,9 @@
 namespace Tests\WorkerBundle\Functional\Guzzle;
 
 use SimplyTestable\WorkerBundle\Services\CoreApplicationRouter;
-use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
+use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
-class CoreApplicationRouterTest extends BaseSimplyTestableTestCase
+class CoreApplicationRouterTest extends AbstractBaseTestCase
 {
     /**
      * @dataProvider generateDataProvider
