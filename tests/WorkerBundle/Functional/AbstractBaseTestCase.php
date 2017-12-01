@@ -2,14 +2,12 @@
 
 namespace Tests\WorkerBundle\Functional;
 
-use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpCache;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Tests\WorkerBundle\Factory\TestTaskFactory;
 use GuzzleHttp\Subscriber\Mock as HttpMockSubscriber;
 
 abstract class AbstractBaseTestCase extends WebTestCase
@@ -32,6 +30,8 @@ abstract class AbstractBaseTestCase extends WebTestCase
         $this->client = static::createClient();
         $this->container = $this->client->getKernel()->getContainer();
         $this->container->get(WorkerService::class)->setActive();
+
+        $this->container->get('doctrine')->getConnection()->beginTransaction();
     }
 
     protected function clearRedis()
@@ -46,11 +46,6 @@ abstract class AbstractBaseTestCase extends WebTestCase
         }
 
         return $returnValue === 0;
-    }
-
-    protected function removeAllTasks()
-    {
-        $this->removeAllForEntity(Task::class);
     }
 
     /**
@@ -68,27 +63,14 @@ abstract class AbstractBaseTestCase extends WebTestCase
     }
 
     /**
-     * @param string $entityName
-     */
-    private function removeAllForEntity($entityName)
-    {
-        $entityManager = $this->container->get('doctrine')->getManager();
-
-        $entities = $entityManager->getRepository($entityName)->findAll();
-        if (is_array($entities) && count($entities) > 0) {
-            foreach ($entities as $entity) {
-                $entityManager->remove($entity);
-            }
-
-            $entityManager->flush();
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function tearDown()
     {
+        if (!is_null($this->container)) {
+            $this->container->get('doctrine')->getConnection()->close();
+        }
+
         \Mockery::close();
 
         $this->client = null;

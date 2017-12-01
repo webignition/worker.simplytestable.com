@@ -17,8 +17,6 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
      */
     public function testRun()
     {
-        $this->removeAllTasks();
-
         $this->setHttpFixtures([
             "HTTP/1.1 200 OK\nContent-type:text/html;",
             "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",

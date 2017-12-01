@@ -49,8 +49,6 @@ class TasksServiceTest extends AbstractBaseTestCase
      */
     public function testRequestHttpRequestFailure($httpResponseFixture, $expectedLogErrorMessage, $expectedException)
     {
-        $this->removeAllTasks();
-
         $this->setHttpFixtures([
             $httpResponseFixture
         ]);
@@ -111,8 +109,6 @@ class TasksServiceTest extends AbstractBaseTestCase
      */
     public function testRequestSuccess($requestedLimit, $expectedLimit)
     {
-        $this->removeAllTasks();
-
         $this->setHttpFixtures([
             'HTTP/1.1 200 OK'
         ]);

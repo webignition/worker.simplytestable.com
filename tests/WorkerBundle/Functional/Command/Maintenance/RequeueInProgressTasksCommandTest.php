@@ -29,7 +29,6 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
         $expectedInitialInProgressTaskCount,
         $expectedQueuedTaskCount
     ) {
-        $this->removeAllTasks();
         $this->clearRedis();
 
         $taskService = $this->container->get(TaskService::class);
