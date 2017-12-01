@@ -75,8 +75,6 @@ class MaintenanceControllerTest extends AbstractBaseTestCase
 
     public function testLeaveReadOnlyAction()
     {
-        $this->removeAllTasks();
-
         $response = $this->maintenanceController->leaveReadOnlyAction(
             $this->container->get(DisableReadOnlyCommand::class),
             $this->container->get(ReportCompletionEnqueueCommand::class),

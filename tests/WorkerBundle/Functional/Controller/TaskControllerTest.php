@@ -58,8 +58,6 @@ class TaskControllerTest extends AbstractBaseTestCase
      */
     public function testCreateCollectionAction($postData, $expectedResponseTaskCollection)
     {
-        $this->removeAllTasks();
-
         $request = new Request();
         $request->request = $postData;
         $this->container->get('request_stack')->push($request);
@@ -145,7 +143,6 @@ class TaskControllerTest extends AbstractBaseTestCase
      */
     public function testCancelAction()
     {
-        $this->removeAllTasks();
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
         $this->assertEquals('task-queued', $task->getState());
 
@@ -168,8 +165,6 @@ class TaskControllerTest extends AbstractBaseTestCase
      */
     public function testCancelCollectionAction()
     {
-        $this->removeAllTasks();
-
         $taskIds = [];
         $tasks = [];
         $tasks[] = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([

@@ -37,7 +37,6 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
 
     public function testRunWithEmptyQueue()
     {
-        $this->removeAllTasks();
         $this->setHttpFixtures([
             "HTTP/1.1 200 OK\nContent-type:text/html;",
             "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
@@ -70,7 +69,6 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
      */
     public function testRunWithNonEmptyQueue()
     {
-        $this->removeAllTasks();
         $this->setHttpFixtures([
             "HTTP/1.1 200 OK\nContent-type:text/html;",
             "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",

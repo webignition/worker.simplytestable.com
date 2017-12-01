@@ -24,7 +24,6 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->removeAllTasks();
 
         $this->testTaskFactory = new TestTaskFactory($this->container);
     }

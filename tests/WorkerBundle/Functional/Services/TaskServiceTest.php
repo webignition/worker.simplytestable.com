@@ -98,7 +98,6 @@ class TaskServiceTest extends AbstractBaseTestCase
 
     public function testCreateUsesExistingMatchingTask()
     {
-        $this->removeAllTasks();
         $existingTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
             $this->taskTypeService->getHtmlValidationTaskType(),
@@ -342,8 +341,6 @@ class TaskServiceTest extends AbstractBaseTestCase
 
     public function testGetIncompleteCount()
     {
-        $this->removeAllTasks();
-
         $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'state' => TaskService::TASK_STARTING_STATE,
             'type' => TaskTypeService::HTML_VALIDATION_NAME,
