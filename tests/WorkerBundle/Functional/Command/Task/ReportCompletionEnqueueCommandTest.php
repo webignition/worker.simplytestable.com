@@ -20,6 +20,11 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
     private $command;
 
     /**
+     * @var TestTaskFactory
+     */
+    private $testTaskFactory;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -27,6 +32,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->command = $this->container->get(ReportCompletionEnqueueCommand::class);
+        $this->testTaskFactory = new TestTaskFactory($this->container);
     }
 
     public function testRunWithEmptyQueue()
@@ -39,7 +45,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $this->container->get(TaskService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
@@ -72,7 +78,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $this->container->get(TaskService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());

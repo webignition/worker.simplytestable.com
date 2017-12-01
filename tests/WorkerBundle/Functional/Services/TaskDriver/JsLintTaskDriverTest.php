@@ -60,7 +60,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200 OK\nContent-type:application/javascript",
         ]);
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
             ])
@@ -101,7 +101,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
     ) {
         $this->setHttpFixtures($httpFixtures);
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
@@ -437,7 +437,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200 OK\nContent-type:text/html\n\n" . $content,
         ]);
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
@@ -535,7 +535,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200 OK\nContent-type:application/javascript\n\n"
         ]);
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -566,7 +566,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200 OK\nContent-type:application/javascript\n\n"
         ]);
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));

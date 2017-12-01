@@ -28,6 +28,11 @@ class TaskControllerTest extends AbstractBaseTestCase
     private $taskController;
 
     /**
+     * @var TestTaskFactory
+     */
+    private $testTaskFactory;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -38,6 +43,8 @@ class TaskControllerTest extends AbstractBaseTestCase
             $this->container->get(WorkerService::class),
             $this->container->get(TaskService::class)
         );
+
+        $this->testTaskFactory = new TestTaskFactory($this->container);
     }
 
     /**
@@ -139,7 +146,7 @@ class TaskControllerTest extends AbstractBaseTestCase
     public function testCancelAction()
     {
         $this->removeAllTasks();
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
         $this->assertEquals('task-queued', $task->getState());
 
         $request = new Request();
@@ -165,10 +172,10 @@ class TaskControllerTest extends AbstractBaseTestCase
 
         $taskIds = [];
         $tasks = [];
-        $tasks[] = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'html validation',
         ]));
-        $tasks[] = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'css validation',
         ]));
 

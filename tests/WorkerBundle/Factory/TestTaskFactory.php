@@ -2,6 +2,7 @@
 
 namespace Tests\WorkerBundle\Factory;
 
+use Doctrine\ORM\OptimisticLockException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -57,7 +58,6 @@ class TestTaskFactory
      * @param string[] $taskValues
      *
      * @return Task
-     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function create($taskValues)
     {
@@ -94,7 +94,11 @@ class TestTaskFactory
         }
 
         $entityManager->persist($task);
-        $entityManager->flush();
+
+        try {
+            $entityManager->flush();
+        } catch (OptimisticLockException $e) {
+        }
 
         return $task;
     }

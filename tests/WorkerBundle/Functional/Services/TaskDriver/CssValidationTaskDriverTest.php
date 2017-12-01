@@ -71,7 +71,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
     ) {
         $this->setHttpFixtures($httpFixtures);
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
@@ -344,7 +344,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200 OK\nContent-type:text/html\n\n" . $content,
         ]);
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
@@ -436,7 +436,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200 OK\nContent-type:text/css\n\n"
         ]);
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -465,7 +465,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             "HTTP/1.1 200 OK\nContent-type:text-css\n\n"
         ]);
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));

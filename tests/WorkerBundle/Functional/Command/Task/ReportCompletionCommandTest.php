@@ -47,7 +47,9 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $testTaskFactory = new TestTaskFactory($this->container);
+
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'url' => 'http://example.com/',
             'type' => 'html validation',
         ]));

@@ -14,12 +14,19 @@ use webignition\WebResource\Service\Configuration;
 abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
 {
     /**
+     * @var TestTaskFactory
+     */
+    protected $testTaskFactory;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
         parent::setUp();
         $this->removeAllTasks();
+
+        $this->testTaskFactory = new TestTaskFactory($this->container);
     }
 
     /**
@@ -57,7 +64,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
             new ConnectException('foo', $request)
         ]);
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
@@ -94,7 +101,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
 
         $webResourceService->setConfiguration($newWebResourceServiceConfiguration);
 
-        $task = $this->getTestTaskFactory()->create(
+        $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 

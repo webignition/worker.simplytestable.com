@@ -35,7 +35,9 @@ class PerformCommandTest extends AbstractBaseTestCase
     {
         $this->container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+
+        $testTaskFactory = new TestTaskFactory($this->container);
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $returnCode = $this->command->run(
             new ArrayInput([
@@ -58,7 +60,8 @@ class PerformCommandTest extends AbstractBaseTestCase
      */
     public function testTaskServiceRaisesException()
     {
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $testTaskFactory = new TestTaskFactory($this->container);
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $taskService = $this->container->get(TaskService::class);
         $taskService->setPerformException(new \Exception());
@@ -91,7 +94,8 @@ class PerformCommandTest extends AbstractBaseTestCase
         $expectedResqueJobs,
         $expectedEmptyResqueQueues
     ) {
-        $task = $this->getTestTaskFactory()->create($taskValues);
+        $testTaskFactory = new TestTaskFactory($this->container);
+        $task = $testTaskFactory->create($taskValues);
         $this->clearRedis();
 
         $taskService = $this->container->get(TaskService::class);

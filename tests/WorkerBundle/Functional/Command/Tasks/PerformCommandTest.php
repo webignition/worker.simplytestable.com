@@ -18,7 +18,9 @@ class PerformCommandTest extends AbstractBaseTestCase
     {
         $this->removeAllTasks();
 
-        $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $testTaskFactory = new TestTaskFactory($this->container);
+
+        $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $taskService = $this->container->get(TaskService::class);
         $taskService

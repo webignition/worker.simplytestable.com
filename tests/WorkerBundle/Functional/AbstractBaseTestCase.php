@@ -34,14 +34,6 @@ abstract class AbstractBaseTestCase extends WebTestCase
         $this->container->get(WorkerService::class)->setActive();
     }
 
-    /**
-     * @return TestTaskFactory
-     */
-    protected function getTestTaskFactory()
-    {
-        return new TestTaskFactory($this->container);
-    }
-
     protected function clearRedis()
     {
         $output = array();

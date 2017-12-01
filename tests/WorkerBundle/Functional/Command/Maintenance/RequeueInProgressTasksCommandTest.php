@@ -20,6 +20,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
      * @param int $expectedInitialQueuedTaskCount
      * @param int $expectedInitialInProgressTaskCount
      * @param int $expectedQueuedTaskCount
+     * @throws \Exception
      */
     public function testRun(
         $taskValuesCollection,
@@ -32,6 +33,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
         $this->clearRedis();
 
         $taskService = $this->container->get(TaskService::class);
+        $testTaskFactory = new TestTaskFactory($this->container);
 
         /* @var Task[] $tasks */
         $tasks = [];
@@ -40,7 +42,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
         $inProgressState = $taskService->getInProgressState();
 
         foreach ($taskValuesCollection as $taskValues) {
-            $tasks[] = $this->getTestTaskFactory()->create($taskValues);
+            $tasks[] = $testTaskFactory->create($taskValues);
         }
 
         $this->assertCount(

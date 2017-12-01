@@ -18,6 +18,8 @@ class PerformEnqueueCommandTest extends AbstractBaseTestCase
      */
     public function testEnqueueTaskPerformJobs()
     {
+        $testTaskFactory = new TestTaskFactory($this->container);
+
         $taskPropertyCollection = [
             [
                 'url' => 'http://example.com/1/',
@@ -35,7 +37,7 @@ class PerformEnqueueCommandTest extends AbstractBaseTestCase
 
         $tasks = array();
         foreach ($taskPropertyCollection as $taskProperties) {
-            $tasks[] = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults(
+            $tasks[] = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults(
                 $taskProperties
             ));
         }

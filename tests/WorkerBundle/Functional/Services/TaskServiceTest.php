@@ -29,6 +29,11 @@ class TaskServiceTest extends AbstractBaseTestCase
     private $taskTypeService;
 
     /**
+     * @var TestTaskFactory
+     */
+    private $testTaskFactory;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -37,6 +42,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $this->taskService = $this->container->get(TaskService::class);
         $this->taskTypeService = $this->container->get(TaskTypeService::class);
+        $this->testTaskFactory = new TestTaskFactory($this->container);
     }
 
     /**
@@ -172,7 +178,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->setHttpFixtures($httpFixtures);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTestTaskFactory()->create($taskValues);
+        $task = $this->testTaskFactory->create($taskValues);
 
         $this->taskService->perform($task);
 
@@ -217,7 +223,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
     public function testGetById()
     {
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
         $id = $task->getId();
 
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
@@ -228,7 +234,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
     public function testReportCompletionNoOutput()
     {
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $this->taskService->reportCompletion($task);
 
         $lastLogLine = File::tail($this->container->get('kernel')->getLogDir() . '/test.log', 1);
@@ -258,7 +264,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         ]);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $this->taskService->perform($task);
         $initialTaskState = (string)$task->getState();
 
@@ -304,7 +310,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         ]);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $this->assertEquals(0, $this->taskService->perform($task));
         $this->assertInternalType('int', $task->getId());
@@ -338,12 +344,12 @@ class TaskServiceTest extends AbstractBaseTestCase
     {
         $this->removeAllTasks();
 
-        $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'state' => TaskService::TASK_STARTING_STATE,
             'type' => TaskTypeService::HTML_VALIDATION_NAME,
         ]));
 
-        $this->getTestTaskFactory()->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'state' => TaskService::TASK_IN_PROGRESS_STATE,
             'type' => TaskTypeService::CSS_VALIDATION_NAME,
         ]));
