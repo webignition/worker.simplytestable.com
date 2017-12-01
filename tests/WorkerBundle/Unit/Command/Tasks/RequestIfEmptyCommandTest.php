@@ -8,7 +8,7 @@ use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\MockFactory;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 
 /**

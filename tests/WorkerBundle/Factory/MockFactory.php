@@ -8,7 +8,7 @@ use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestColle
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskFactory;
 use SimplyTestable\WorkerBundle\Services\TaskService;

@@ -2,7 +2,7 @@
 
 namespace Tests\WorkerBundle\Functional\Guzzle;
 
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
@@ -13,7 +13,7 @@ class QueueServiceTest extends BaseSimplyTestableTestCase
     const QUEUE_TASKS_REQUEST = 'tasks-request';
 
     /**
-     * @var JobFactory
+     * @var ResqueJobFactory
      */
     private $jobFactory;
 
@@ -29,7 +29,7 @@ class QueueServiceTest extends BaseSimplyTestableTestCase
     {
         parent::setUp();
 
-        $this->jobFactory = $this->container->get(JobFactory::class);
+        $this->jobFactory = $this->container->get(ResqueJobFactory::class);
         $this->queueService = $this->container->get(QueueService::class);
     }
 
@@ -38,13 +38,15 @@ class QueueServiceTest extends BaseSimplyTestableTestCase
      *
      * @param string $queue
      * @param array $jobArgs
+     *
+     * @throws \CredisException
+     * @throws \Exception
      */
     public function testIsEmpty($queue, $jobArgs)
     {
         $this->clearRedis();
 
         $this->assertTrue($this->queueService->isEmpty($queue));
-
 
         $this->queueService->enqueue(
             $this->jobFactory->create($queue, $jobArgs)
@@ -84,6 +86,9 @@ class QueueServiceTest extends BaseSimplyTestableTestCase
      * @param array $args
      * @param array $jobDataCollection
      * @param bool $expectedContains
+     *
+     * @throws \CredisException
+     * @throws \Exception
      */
     public function testContains($queue, $args, $jobDataCollection, $expectedContains)
     {
@@ -205,6 +210,9 @@ class QueueServiceTest extends BaseSimplyTestableTestCase
      * @param string $queue
      * @param array $jobDataCollection
      * @param int $expectedQueueLength
+     *
+     * @throws \CredisException
+     * @throws \Exception
      */
     public function testGetQueueLength($queue, $jobDataCollection, $expectedQueueLength)
     {

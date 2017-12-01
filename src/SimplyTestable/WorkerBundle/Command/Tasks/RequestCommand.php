@@ -1,7 +1,7 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Tasks;
 
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;

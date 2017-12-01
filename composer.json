@@ -44,10 +44,11 @@
         "webignition/cookie-url-matcher":">=0.1,<1",
         "chrisboulton/php-resque": "dev-master",
         "chrisboulton/php-resque-scheduler": "dev-master",
-        "resquebundle/resque": "dev-master#8dac8857e7e95890d5c634bb893551c9b78a27a1",
+        "resquebundle/resque": "1.2.0",
         "guzzlehttp/retry-subscriber":">=2.0.2,<3",
         "guzzlehttp/cache-subscriber": "dev-master",
-        "webignition/guzzle-curl-exception":">=0.1.2,<1"
+        "webignition/guzzle-curl-exception":">=0.1.2,<1",
+        "webignition/resque-job-factory": ">=0.1.1,<1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

@@ -3,7 +3,7 @@
 namespace Tests\WorkerBundle\Functional\Resque\Job;
 
 use SimplyTestable\WorkerBundle\Resque\Job\Job;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory as ResqueJobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 
 abstract class AbstractJobTest extends BaseSimplyTestableTestCase

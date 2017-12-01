@@ -7,13 +7,11 @@ use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestColle
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFactory;
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskFactory;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\BaseSimplyTestableTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -47,6 +45,9 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
      *
      * @param array $postData
      * @param array $expectedResponseTaskCollection
+     *
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
      */
     public function testCreateCollectionAction($postData, $expectedResponseTaskCollection)
     {
@@ -60,7 +61,7 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
             $this->container->get(CreateRequestCollectionFactory::class),
             $this->container->get(TaskFactory::class),
             $this->container->get(QueueService::class),
-            $this->container->get(JobFactory::class)
+            $this->container->get(ResqueJobFactory::class)
         );
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -132,6 +133,9 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         ];
     }
 
+    /**
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
     public function testCancelAction()
     {
         $this->removeAllTasks();
@@ -152,6 +156,9 @@ class TaskControllerTest extends BaseSimplyTestableTestCase
         $this->assertEquals('task-cancelled', $task->getState());
     }
 
+    /**
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
     public function testCancelCollectionAction()
     {
         $this->removeAllTasks();

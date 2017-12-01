@@ -2,7 +2,7 @@
 
 namespace SimplyTestable\WorkerBundle\Controller;
 
-use SimplyTestable\WorkerBundle\Services\Resque\JobFactory;
+use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -12,14 +12,15 @@ class TasksController extends Controller
 {
     /**
      * @param QueueService $resqueQueueService
-     * @param JobFactory $resqueJobFactory
+     * @param ResqueJobFactory $resqueJobFactory
      * @param TasksService $tasksService
      *
      * @return Response
+     * @throws \Exception
      */
     public function notifyAction(
         QueueService $resqueQueueService,
-        JobFactory $resqueJobFactory,
+        ResqueJobFactory $resqueJobFactory,
         TasksService $tasksService
     ) {
         if ($resqueQueueService->isEmpty('tasks-request')) {
