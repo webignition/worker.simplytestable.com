@@ -2,13 +2,9 @@
 
 namespace Tests\WorkerBundle\Functional;
 
-use Doctrine\ORM\EntityManagerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpCache;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
-use SimplyTestable\WorkerBundle\Services\StateService;
-use SimplyTestable\WorkerBundle\Services\TaskService;
-use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -29,11 +25,6 @@ abstract class AbstractBaseTestCase extends WebTestCase
     protected $container;
 
     /**
-     * @var TestTaskFactory
-     */
-    private $taskFactory;
-
-    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -48,19 +39,7 @@ abstract class AbstractBaseTestCase extends WebTestCase
      */
     protected function getTestTaskFactory()
     {
-        if (is_null($this->taskFactory)) {
-            /* @var EntityManagerInterface $entityManager */
-            $entityManager = $this->container->get('doctrine')->getManager();
-
-            $this->taskFactory = new TestTaskFactory(
-                $this->container->get(TaskService::class),
-                $this->container->get(TaskTypeService::class),
-                $this->container->get(StateService::class),
-                $entityManager
-            );
-        }
-
-        return $this->taskFactory;
+        return new TestTaskFactory($this->container);
     }
 
     protected function clearRedis()
