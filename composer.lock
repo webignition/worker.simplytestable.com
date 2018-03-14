@@ -2068,16 +2068,16 @@
         },
         {
             "name": "psr/simple-cache",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/simple-cache.git",
-                "reference": "753fa598e8f3b9966c886fe13f370baa45ef0e24"
+                "reference": "408d5eafb83c57f6365a3ca330ff23aa4a5fa39b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/753fa598e8f3b9966c886fe13f370baa45ef0e24",
-                "reference": "753fa598e8f3b9966c886fe13f370baa45ef0e24",
+                "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/408d5eafb83c57f6365a3ca330ff23aa4a5fa39b",
+                "reference": "408d5eafb83c57f6365a3ca330ff23aa4a5fa39b",
                 "shasum": ""
             },
             "require": {
@@ -2112,7 +2112,7 @@
                 "psr-16",
                 "simple-cache"
             ],
-            "time": "2017-01-02T13:31:39+00:00"
+            "time": "2017-10-23T01:57:42+00:00"
         },
         {
             "name": "querypath/querypath",
@@ -3060,31 +3060,30 @@
         },
         {
             "name": "webignition/absolute-url-deriver",
-            "version": "1.5.1",
+            "version": "1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/absolute-url-deriver.git",
-                "reference": "b7dace7091da38b6a311d44d68a4a2d8c07f3394"
+                "reference": "9c1f23ee5b609b32eefc836904254d0d481caa29"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/absolute-url-deriver/zipball/b7dace7091da38b6a311d44d68a4a2d8c07f3394",
-                "reference": "b7dace7091da38b6a311d44d68a4a2d8c07f3394",
+                "url": "https://api.github.com/repos/webignition/absolute-url-deriver/zipball/9c1f23ee5b609b32eefc836904254d0d481caa29",
+                "reference": "9c1f23ee5b609b32eefc836904254d0d481caa29",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0",
+                "php": ">=5.6.0",
                 "webignition/url": ">=1.9.8"
             },
             "require-dev": {
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "*"
+                "phpunit/phpunit": "~5.0",
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\AbsoluteUrlDeriver\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3103,7 +3102,7 @@
                 "absolute",
                 "url"
             ],
-            "time": "2014-10-20T06:50:04+00:00"
+            "time": "2018-03-12T16:05:22+00:00"
         },
         {
             "name": "webignition/character-set-list",
@@ -3445,28 +3444,26 @@
         },
         {
             "name": "webignition/html-document-type-extractor",
-            "version": "0.1.1",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-type-extractor.git",
-                "reference": "e5c3d3656ddf3377bbd87f723789d41d0006b3f7"
+                "reference": "fe8142e505b5ad68e79ea18510bdf98de00d41df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-extractor/zipball/e5c3d3656ddf3377bbd87f723789d41d0006b3f7",
-                "reference": "e5c3d3656ddf3377bbd87f723789d41d0006b3f7",
+                "url": "https://api.github.com/repos/webignition/html-document-type-extractor/zipball/fe8142e505b5ad68e79ea18510bdf98de00d41df",
+                "reference": "fe8142e505b5ad68e79ea18510bdf98de00d41df",
                 "shasum": ""
             },
             "require-dev": {
-                "icanboogie/inflector": "1.0",
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "*"
+                "phpunit/phpunit": "~5.0",
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\HtmlDocumentType\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3488,79 +3485,30 @@
                 "html"
             ],
             "abandoned": "webignition/html-document-type",
-            "time": "2014-01-23T16:48:52+00:00"
-        },
-        {
-            "name": "webignition/html-document-type-generator",
-            "version": "0.6.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webignition/html-document-type-generator.git",
-                "reference": "f52f5ea8d31f60dfa01b3c79cac995c42996cd54"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-generator/zipball/f52f5ea8d31f60dfa01b3c79cac995c42996cd54",
-                "reference": "f52f5ea8d31f60dfa01b3c79cac995c42996cd54",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jon Cram",
-                    "email": "jon@webignition.net"
-                }
-            ],
-            "description": "Generate a doctype for a given HTML version and variant",
-            "homepage": "https://github.com/webignition/html-document-type-generator",
-            "keywords": [
-                "doctype",
-                "document",
-                "generator",
-                "html"
-            ],
-            "abandoned": "webignition/html-document-type",
-            "time": "2014-01-22T15:42:49+00:00"
+            "time": "2018-03-13T15:57:33+00:00"
         },
         {
             "name": "webignition/html-document-type-parser",
-            "version": "0.1.2",
+            "version": "0.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-type-parser.git",
-                "reference": "8662d14051847bef67c8eee74356bb3818f46e92"
+                "reference": "ef68acda3b26904f26863ca608415812878eff57"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-parser/zipball/8662d14051847bef67c8eee74356bb3818f46e92",
-                "reference": "8662d14051847bef67c8eee74356bb3818f46e92",
+                "url": "https://api.github.com/repos/webignition/html-document-type-parser/zipball/ef68acda3b26904f26863ca608415812878eff57",
+                "reference": "ef68acda3b26904f26863ca608415812878eff57",
                 "shasum": ""
             },
             "require-dev": {
-                "icanboogie/inflector": "1.0",
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "*",
-                "webignition/html-document-type-generator": ">=0.5.4,<1"
+                "phpunit/phpunit": "~5.0",
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\HtmlDocumentType\\Parser\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3582,37 +3530,35 @@
                 "parser"
             ],
             "abandoned": "webignition/html-document-type",
-            "time": "2014-01-21T16:42:38+00:00"
+            "time": "2018-03-13T19:10:45+00:00"
         },
         {
             "name": "webignition/html-document-type-validator",
-            "version": "0.1",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-type-validator.git",
-                "reference": "9ef32f23d8cfbf3699c6680f7491e9bbbf759dd2"
+                "reference": "1318737bfb4785a22200312e4ed6566e5e824cbb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-validator/zipball/9ef32f23d8cfbf3699c6680f7491e9bbbf759dd2",
-                "reference": "9ef32f23d8cfbf3699c6680f7491e9bbbf759dd2",
+                "url": "https://api.github.com/repos/webignition/html-document-type-validator/zipball/1318737bfb4785a22200312e4ed6566e5e824cbb",
+                "reference": "1318737bfb4785a22200312e4ed6566e5e824cbb",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2",
-                "webignition/html-document-type-generator": ">=0.6.1,<1",
+                "php": ">=5.6",
                 "webignition/html-document-type-parser": ">=0.1.2,<1"
             },
             "require-dev": {
                 "icanboogie/inflector": "1.0",
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "*"
+                "phpunit/phpunit": "~5.0",
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\HtmlDocumentType\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3634,35 +3580,34 @@
                 "validator"
             ],
             "abandoned": "webignition/html-document-type",
-            "time": "2014-01-22T18:04:58+00:00"
+            "time": "2018-03-14T07:05:54+00:00"
         },
         {
             "name": "webignition/html-validator-output-parser",
-            "version": "0.7",
+            "version": "0.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-validator-output-parser.git",
-                "reference": "b6bed6cdf107864a4d5382099656d2f168af94c1"
+                "reference": "cf979523df764afbc5baab689381124449ef7e23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-validator-output-parser/zipball/b6bed6cdf107864a4d5382099656d2f168af94c1",
-                "reference": "b6bed6cdf107864a4d5382099656d2f168af94c1",
+                "url": "https://api.github.com/repos/webignition/html-validator-output-parser/zipball/cf979523df764afbc5baab689381124449ef7e23",
+                "reference": "cf979523df764afbc5baab689381124449ef7e23",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2",
+                "php": ">=5.6",
                 "webignition/internet-media-type": ">=0.4.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "*"
+                "phpunit/phpunit": "~5.0",
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\HtmlValidator\\Output\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3677,30 +3622,30 @@
                 "parser",
                 "validator"
             ],
-            "time": "2014-06-23T15:10:03+00:00"
+            "time": "2018-03-13T07:34:02+00:00"
         },
         {
             "name": "webignition/html-validator-wrapper",
-            "version": "0.5",
+            "version": "0.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-validator-wrapper.git",
-                "reference": "a2d3e6d4526bc3bb2772cca470870d87a622cf6b"
+                "reference": "108d744560d031b145791e7807ed979a3bfcdac3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-validator-wrapper/zipball/a2d3e6d4526bc3bb2772cca470870d87a622cf6b",
-                "reference": "a2d3e6d4526bc3bb2772cca470870d87a622cf6b",
+                "url": "https://api.github.com/repos/webignition/html-validator-wrapper/zipball/108d744560d031b145791e7807ed979a3bfcdac3",
+                "reference": "108d744560d031b145791e7807ed979a3bfcdac3",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2",
+                "php": ">=5.6",
                 "webignition/html-validator-output-parser": ">=0.7,<1.0"
             },
             "require-dev": {
                 "mockery/mockery": "~0.9",
                 "php-mock/php-mock-mockery": "1.1.0",
-                "phpunit/phpunit": "~4.0",
+                "phpunit/phpunit": "~5.0",
                 "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
@@ -3719,35 +3664,36 @@
                 "html",
                 "validator"
             ],
-            "time": "2017-06-06T18:10:39+00:00"
+            "time": "2018-03-12T16:55:32+00:00"
         },
         {
             "name": "webignition/internet-media-type",
-            "version": "0.4.7",
+            "version": "0.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/internet-media-type.git",
-                "reference": "968b95796bc682c7f554c2ec671b6a97a9d5a5b0"
+                "reference": "1a5bbe38033b00b23acd5e1dd10489bb07eed77c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/internet-media-type/zipball/968b95796bc682c7f554c2ec671b6a97a9d5a5b0",
-                "reference": "968b95796bc682c7f554c2ec671b6a97a9d5a5b0",
+                "url": "https://api.github.com/repos/webignition/internet-media-type/zipball/1a5bbe38033b00b23acd5e1dd10489bb07eed77c",
+                "reference": "1a5bbe38033b00b23acd5e1dd10489bb07eed77c",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0",
-                "webignition/quoted-string": ">=0.1,<1.0",
-                "webignition/string-parser": ">=0.2.2,<1.0"
+                "php": ">=5.6.0",
+                "webignition/quoted-string": ">=0.2.1,<1.0",
+                "webignition/string-parser": ">=0.2.3,<1.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
+                "phpunit/phpunit": "~5.0",
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\InternetMediaType\\": "src/",
+                    "webignition\\Tests\\InternetMediaType\\": "tests/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3769,7 +3715,7 @@
                 "media type",
                 "media-type"
             ],
-            "time": "2015-02-20T16:52:30+00:00"
+            "time": "2018-03-12T14:54:00+00:00"
         },
         {
             "name": "webignition/node-jslint-output-parser",
@@ -6068,100 +6014,6 @@
             "description": "Symfony PHPUnit Bridge",
             "homepage": "https://symfony.com",
             "time": "2018-02-14T23:24:28+00:00"
-        },
-        {
-            "name": "webignition/cookie-domain-matcher",
-            "version": "0.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webignition/cookie-domain-matcher.git",
-                "reference": "fceaa47ad3bb4f66a6e27d69b78e23dded5e6e84"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webignition/cookie-domain-matcher/zipball/fceaa47ad3bb4f66a6e27d69b78e23dded5e6e84",
-                "reference": "fceaa47ad3bb4f66a6e27d69b78e23dded5e6e84",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jon Cram",
-                    "email": "jon@webignition.net"
-                }
-            ],
-            "description": "Implementation of cookie domain matching specified in RFC6265",
-            "homepage": "https://github.com/webignition/cookie-domain-matcher",
-            "keywords": [
-                "cookie",
-                "domain",
-                "hostname"
-            ],
-            "time": "2014-03-14T13:26:13+00:00"
-        },
-        {
-            "name": "webignition/cookie-path-matcher",
-            "version": "0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webignition/cookie-path-matcher.git",
-                "reference": "f045714ca5c6c7d9603e25d2ae153db696caf52c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webignition/cookie-path-matcher/zipball/f045714ca5c6c7d9603e25d2ae153db696caf52c",
-                "reference": "f045714ca5c6c7d9603e25d2ae153db696caf52c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jon Cram",
-                    "email": "jon@webignition.net"
-                }
-            ],
-            "description": "Implementation of cookie path matching specified in RFC6265",
-            "homepage": "https://github.com/webignition/cookie-path-matcher",
-            "keywords": [
-                "cookie",
-                "matcher",
-                "path"
-            ],
-            "time": "2014-03-14T12:33:11+00:00"
         },
         {
             "name": "webmozart/assert",
