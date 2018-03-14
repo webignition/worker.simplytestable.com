@@ -2995,16 +2995,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.35.1",
+            "version": "v1.35.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "ffda54d85cc3aec3ba499c8c0eda9b2176edfe83"
+                "reference": "9c24f2cd39dc1906b76879e099970b7e53724601"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/ffda54d85cc3aec3ba499c8c0eda9b2176edfe83",
-                "reference": "ffda54d85cc3aec3ba499c8c0eda9b2176edfe83",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/9c24f2cd39dc1906b76879e099970b7e53724601",
+                "reference": "9c24f2cd39dc1906b76879e099970b7e53724601",
                 "shasum": ""
             },
             "require": {
@@ -3056,7 +3056,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2018-03-02T18:06:27+00:00"
+            "time": "2018-03-03T16:21:29+00:00"
         },
         {
             "name": "webignition/absolute-url-deriver",
