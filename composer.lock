@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7d3515f1fddd7721ba77d593f7ee9a49",
+    "content-hash": "e02efa146b5d86977f4a192c391f3fb7",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -3443,115 +3443,23 @@
             "time": "2017-06-27T14:26:10+00:00"
         },
         {
-            "name": "webignition/html-document-type-extractor",
-            "version": "0.1.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webignition/html-document-type-extractor.git",
-                "reference": "fe8142e505b5ad68e79ea18510bdf98de00d41df"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-extractor/zipball/fe8142e505b5ad68e79ea18510bdf98de00d41df",
-                "reference": "fe8142e505b5ad68e79ea18510bdf98de00d41df",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "3.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "webignition\\HtmlDocumentType\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jon Cram",
-                    "email": "jon@webignition.net"
-                }
-            ],
-            "description": "Extract the doctype from a HTML document",
-            "homepage": "https://github.com/webignition/html-document-type-extractor",
-            "keywords": [
-                "doctype",
-                "document",
-                "extractor",
-                "html"
-            ],
-            "abandoned": "webignition/html-document-type",
-            "time": "2018-03-13T15:57:33+00:00"
-        },
-        {
-            "name": "webignition/html-document-type-parser",
-            "version": "0.1.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webignition/html-document-type-parser.git",
-                "reference": "ef68acda3b26904f26863ca608415812878eff57"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-parser/zipball/ef68acda3b26904f26863ca608415812878eff57",
-                "reference": "ef68acda3b26904f26863ca608415812878eff57",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "3.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "webignition\\HtmlDocumentType\\Parser\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jon Cram",
-                    "email": "jon@webignition.net"
-                }
-            ],
-            "description": "Parse a public html document type (so many caveats), extract FPI and URI",
-            "homepage": "https://github.com/webignition/html-document-type-parser",
-            "keywords": [
-                "doctype",
-                "document",
-                "html",
-                "parser"
-            ],
-            "abandoned": "webignition/html-document-type",
-            "time": "2018-03-13T19:10:45+00:00"
-        },
-        {
-            "name": "webignition/html-document-type-validator",
+            "name": "webignition/html-document-type",
             "version": "0.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webignition/html-document-type-validator.git",
-                "reference": "1318737bfb4785a22200312e4ed6566e5e824cbb"
+                "url": "https://github.com/webignition/html-document-type.git",
+                "reference": "1c9e694ba1e43b884f235bff1693e920d6810dec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-type-validator/zipball/1318737bfb4785a22200312e4ed6566e5e824cbb",
-                "reference": "1318737bfb4785a22200312e4ed6566e5e824cbb",
+                "url": "https://api.github.com/repos/webignition/html-document-type/zipball/1c9e694ba1e43b884f235bff1693e920d6810dec",
+                "reference": "1c9e694ba1e43b884f235bff1693e920d6810dec",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.6",
-                "webignition/html-document-type-parser": ">=0.1.2,<1"
+                "php": ">=5.6"
             },
             "require-dev": {
-                "icanboogie/inflector": "1.0",
                 "phpunit/phpunit": "~5.0",
                 "squizlabs/php_codesniffer": "3.*"
             },
@@ -3571,16 +3479,14 @@
                     "email": "jon@webignition.net"
                 }
             ],
-            "description": "Check if a given HTML doctype string is valid",
-            "homepage": "https://github.com/webignition/html-document-type-validator",
+            "description": "For parsing, validating and creating HTML doctype strings",
+            "homepage": "https://github.com/webignition/html-document-type",
             "keywords": [
                 "doctype",
                 "document",
-                "html",
-                "validator"
+                "html"
             ],
-            "abandoned": "webignition/html-document-type",
-            "time": "2018-03-14T07:05:54+00:00"
+            "time": "2018-03-14T15:21:46+00:00"
         },
         {
             "name": "webignition/html-validator-output-parser",
