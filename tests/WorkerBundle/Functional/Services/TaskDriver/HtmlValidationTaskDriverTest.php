@@ -90,10 +90,26 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
                     'type' => 'error',
                 ],
             ],
-            'invalid document type' => [
-                'content' => '<!doctype foo><html>',
+            'unknown document type' => [
+                'content' => '<!DOCTYPE html PUBLIC><html>',
                 'expectedOutputMessage' => [
-                    'message' => '<!doctype foo>',
+                    'message' => '<!DOCTYPE html PUBLIC>',
+                    'messageId' => 'document-type-invalid',
+                    'type' => 'error',
+                ],
+            ],
+            'invalid document type; no uri' => [
+                'content' => '<!DOCTYPE html PUBLIC "foo"><html>',
+                'expectedOutputMessage' => [
+                    'message' => '<!DOCTYPE html PUBLIC "foo">',
+                    'messageId' => 'document-type-invalid',
+                    'type' => 'error',
+                ],
+            ],
+            'invalid document type; fpi and uri' => [
+                'content' => '<!DOCTYPE html PUBLIC "foo" "http://www.w3.org/TR/html4/foo.dtd"><html>',
+                'expectedOutputMessage' => [
+                    'message' => '<!DOCTYPE html PUBLIC "foo" "http://www.w3.org/TR/html4/foo.dtd">',
                     'messageId' => 'document-type-invalid',
                     'type' => 'error',
                 ],
@@ -298,8 +314,8 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
-                'parameters' => json_encode($taskParameters),
+            'type' => $this->getTaskTypeString(),
+            'parameters' => json_encode($taskParameters),
         ]));
 
         $this->taskDriver->perform($task);

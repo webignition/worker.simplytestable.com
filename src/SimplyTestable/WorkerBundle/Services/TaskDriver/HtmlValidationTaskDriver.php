@@ -10,6 +10,7 @@ use webignition\WebResource\Service\Service as WebResourceService;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
 use webignition\HtmlDocumentType\Validator as DoctypeValidator;
+use webignition\HtmlDocumentType\Factory as DoctypeFactory;
 
 class HtmlValidationTaskDriver extends WebResourceTaskDriver
 {
@@ -88,39 +89,44 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
      */
     protected function performValidation()
     {
-        $doctypeExtractor = new DoctypeExtractor();
-        $doctypeExtractor->setHtml($this->getWebPage()->getContent());
+        $webPageContent = $this->getWebPage()->getContent();
+        $docTypeString = DoctypeExtractor::extract($webPageContent);
 
-        if (!$doctypeExtractor->hasDocumentType()) {
+        if (empty($docTypeString)) {
             $this->response->setErrorCount(1);
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
 
-            if ($this->isMarkup($this->getWebPage()->getContent())) {
+            if ($this->isMarkup($webPageContent)) {
                 return json_encode($this->getMissingDocumentTypeOutput());
             } else {
-                return json_encode($this->getIsNotMarkupOutput($this->getWebPage()->getContent()));
+                return json_encode($this->getIsNotMarkupOutput($webPageContent));
             }
         }
 
         $doctypeValidator = new DoctypeValidator();
-        if (!$doctypeValidator->isValid($doctypeExtractor->getDocumentTypeString())) {
-            $this->response->setErrorCount(1);
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
+        $doctypeValidator->setMode(DoctypeValidator::MODE_IGNORE_FPI_URI_VALIDITY);
 
-            return json_encode($this->getInvalidDocumentTypeOutput($doctypeExtractor->getDocumentTypeString()));
+        try {
+            $documentType = DoctypeFactory::createFromDocTypeString($docTypeString);
+
+
+            if (!$doctypeValidator->isValid($documentType)) {
+                return $this->createInvalidDocumentTypeResponse($docTypeString);
+            }
+        } catch (\InvalidArgumentException $invalidArgumentException) {
+            return $this->createInvalidDocumentTypeResponse($docTypeString);
         }
 
         $this->htmlValidatorWrapper->createConfiguration([
             HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_URI =>
-                'file:' . $this->storeTmpFile($this->getWebPage()->getContent()),
+                'file:' . $this->storeTmpFile($webPageContent),
             HtmlValidatorWrapper::CONFIG_KEY_VALIDATOR_PATH =>
                 $this->validatorPath,
             HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_CHARACTER_SET =>
                 (is_null($this->getWebPage()->getCharacterSet()))
-                ? self::DEFAULT_CHARACTER_ENCODING
-                : $this->getWebPage()->getCharacterSet()
+                    ? self::DEFAULT_CHARACTER_ENCODING
+                    : $this->getWebPage()->getCharacterSet()
         ]);
 
         $output = $this->htmlValidatorWrapper->validate();
@@ -139,11 +145,28 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
     }
 
     /**
+     * @param string $docTypeString
+     *
+     * @return string
+     */
+    private function createInvalidDocumentTypeResponse($docTypeString)
+    {
+        $this->response->setErrorCount(1);
+        $this->response->setHasFailed();
+        $this->response->setIsRetryable(false);
+
+        return json_encode($this->getInvalidDocumentTypeOutput($docTypeString));
+    }
+
+    /**
      * @return WebPage
      */
     private function getWebPage()
     {
-        return $this->webResource;
+        /* @var WebPage $webPage */
+        $webPage = $this->webResource;
+
+        return $webPage;
     }
 
     /**
