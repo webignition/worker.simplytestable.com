@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f347e9ea6d3dd8b2242f03a57072e6b1",
+    "content-hash": "7d3515f1fddd7721ba77d593f7ee9a49",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4013,30 +4013,34 @@
         },
         {
             "name": "webignition/url",
-            "version": "1.9.14",
+            "version": "1.9.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/url.git",
-                "reference": "b651aed2781260d8b25a086e766f528d1b9a675e"
+                "reference": "a4e6044bc6786a59b37d2508e87b540b5074b09a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/url/zipball/b651aed2781260d8b25a086e766f528d1b9a675e",
-                "reference": "b651aed2781260d8b25a086e766f528d1b9a675e",
+                "url": "https://api.github.com/repos/webignition/url/zipball/a4e6044bc6786a59b37d2508e87b540b5074b09a",
+                "reference": "a4e6044bc6786a59b37d2508e87b540b5074b09a",
                 "shasum": ""
             },
             "require": {
                 "etechnika/idna-convert": "1.0.*",
-                "php": ">=5.3.0",
+                "php": ">=5.6.0",
                 "xrstf/ip-utils": "v1.0.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
+                "mockery/mockery": "~0.9",
+                "php-mock/php-mock-mockery": "1.1.0",
+                "phpunit/phpunit": "~5.0",
+                "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\Url\\": "src/Url",
+                    "webignition\\NormalisedUrl\\": "src/NormalisedUrl"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -4054,7 +4058,7 @@
             "keywords": [
                 "url"
             ],
-            "time": "2015-02-13T11:52:39+00:00"
+            "time": "2018-03-14T17:25:14+00:00"
         },
         {
             "name": "webignition/url-health-checker",

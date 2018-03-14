@@ -241,8 +241,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver
         $this->response->setErrorCount($errorCount);
 
         foreach ($jsLintOutput as $sourcePath => $sourcePathOutput) {
-            if (preg_match('/^file:\/tmp\/[a-z0-9]{32}:[0-9]+:[0-9]+\.[0-9]+\.js$/', $sourcePath)) {
-                $newSourcePath = preg_replace('/^file:\/tmp\//', '', $sourcePath);
+            if (preg_match('/^file:(\/|\/\/\/)tmp\/[a-z0-9]{32}:[0-9]+:[0-9]+\.[0-9]+\.js$/', $sourcePath)) {
+                $newSourcePath = preg_replace('/^file:(\/|\/\/\/)tmp\//', '', $sourcePath);
                 $firstColonPosition = strpos($newSourcePath, ':');
                 $jsLintOutput[substr($newSourcePath, 0, $firstColonPosition)] = $sourcePathOutput;
                 unset($jsLintOutput[$sourcePath]);
