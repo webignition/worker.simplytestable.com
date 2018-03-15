@@ -3392,27 +3392,27 @@
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "1.5.1",
+            "version": "1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "2643381ea4433588452bf27126994bfe498648f3"
+                "reference": "b5bb57c34b385a4855fcb82c4fbb054493bf898e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/2643381ea4433588452bf27126994bfe498648f3",
-                "reference": "2643381ea4433588452bf27126994bfe498648f3",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/b5bb57c34b385a4855fcb82c4fbb054493bf898e",
+                "reference": "b5bb57c34b385a4855fcb82c4fbb054493bf898e",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0",
+                "php": ">=5.6.0",
                 "webignition/absolute-url-deriver": ">=1.4",
                 "webignition/url": ">=1.9.14,<2.0",
                 "webignition/web-page-model": ">=1.1,<2"
             },
             "require-dev": {
                 "mockery/mockery": "~0.9",
-                "phpunit/phpunit": "~4.0",
+                "phpunit/phpunit": "~5.0",
                 "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
@@ -3440,7 +3440,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2017-06-27T14:26:10+00:00"
+            "time": "2018-03-15T13:45:20+00:00"
         },
         {
             "name": "webignition/html-document-type",
