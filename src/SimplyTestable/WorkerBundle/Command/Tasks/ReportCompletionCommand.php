@@ -1,8 +1,11 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Tasks;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand as TaskReportCompletionCommand;
+use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Repository\TaskRepository;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,12 +29,19 @@ class ReportCompletionCommand extends AbstractTaskCollectionCommand
     private $workerService;
 
     /**
+     * @var TaskRepository
+     */
+    private $taskRepository;
+
+    /**
+     * @param EntityManagerInterface $entityManager
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
      * @param string|null $name
      */
     public function __construct(
+        EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         TaskService $taskService,
         WorkerService $workerService,
@@ -42,6 +52,8 @@ class ReportCompletionCommand extends AbstractTaskCollectionCommand
         $this->logger = $logger;
         $this->taskService = $taskService;
         $this->workerService = $workerService;
+
+        $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
     protected function configure()
@@ -57,7 +69,7 @@ class ReportCompletionCommand extends AbstractTaskCollectionCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $taskIds = $this->taskService->getEntityRepository()->getIdsWithOutput();
+        $taskIds = $this->taskRepository->getIdsWithOutput();
         $output->writeln(count($taskIds).' tasks with output ready to report completion');
 
         $reportCompletionCommand = new TaskReportCompletionCommand(

@@ -1,6 +1,9 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Maintenance;
 
+use Doctrine\ORM\EntityManagerInterface;
+use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Repository\TaskRepository;
 use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -12,6 +15,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 class RequeueInProgressTasksCommand extends Command
 {
     const DEFAULT_AGE_IN_HOURS = 1;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
 
     /**
      * @var TaskService
@@ -29,17 +37,24 @@ class RequeueInProgressTasksCommand extends Command
     private $resqueJobFactory;
 
     /**
+     * @var TaskRepository
+     */
+    private $taskRepository;
+
+    /**
      * @var InputInterface
      */
     private $input;
 
     /**
+     * @param EntityManagerInterface $entityManager
      * @param TaskService $taskService
      * @param ResqueQueueService $resqueQueueService
      * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
+        EntityManagerInterface $entityManager,
         TaskService $taskService,
         ResqueQueueService $resqueQueueService,
         ResqueJobFactory $resqueJobFactory,
@@ -47,9 +62,12 @@ class RequeueInProgressTasksCommand extends Command
     ) {
         parent::__construct($name);
 
+        $this->entityManager = $entityManager;
         $this->taskService = $taskService;
         $this->resqueQueueService = $resqueQueueService;
         $this->resqueJobFactory = $resqueJobFactory;
+
+        $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
     /**
@@ -79,7 +97,7 @@ class RequeueInProgressTasksCommand extends Command
         $output->writeln('Using age-in-hours: <info>'.$this->getAgeInHours().'</info>');
 
         $startDateTime = new \DateTime('-'.$this->getAgeInHours().' hour');
-        $taskIds = $this->taskService->getEntityRepository()->getUnfinishedIdsByMaxStartDate($startDateTime);
+        $taskIds = $this->taskRepository->getUnfinishedIdsByMaxStartDate($startDateTime);
 
         $output->writeln(
             'Tasks started more than '.$this->getAgeInHours().' hours ago: <info>'.count($taskIds).'</info>'
@@ -96,10 +114,10 @@ class RequeueInProgressTasksCommand extends Command
             $inProgressTask->setState($this->taskService->getQueuedState());
 
             if ($this->isDryRun()) {
-                $this->taskService->getEntityManager()->detach($inProgressTask);
+                $this->entityManager->detach($inProgressTask);
             } else {
-                $this->taskService->getEntityManager()->persist($inProgressTask);
-                $this->taskService->getEntityManager()->flush();
+                $this->entityManager->persist($inProgressTask);
+                $this->entityManager->flush();
 
                 $this->resqueQueueService->enqueue(
                     $this->resqueJobFactory->create(

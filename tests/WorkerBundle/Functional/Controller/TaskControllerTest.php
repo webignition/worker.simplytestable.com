@@ -39,10 +39,7 @@ class TaskControllerTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->taskController = new TaskController(
-            $this->container->get(WorkerService::class),
-            $this->container->get(TaskService::class)
-        );
+        $this->taskController = $this->container->get(TaskController::class);
 
         $this->testTaskFactory = new TestTaskFactory($this->container);
     }

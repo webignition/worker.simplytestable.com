@@ -1,8 +1,11 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Tasks;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Command\Task\PerformCommand as TaskPerformCommand;
+use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Repository\TaskRepository;
 use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -38,6 +41,12 @@ class PerformCommand extends AbstractTaskCollectionCommand
     private $resqueJobFactory;
 
     /**
+     * @var TaskRepository
+     */
+    private $taskRepository;
+
+    /**
+     * @param EntityManagerInterface $entityManager
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
@@ -46,6 +55,7 @@ class PerformCommand extends AbstractTaskCollectionCommand
      * @param string|null $name
      */
     public function __construct(
+        EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         TaskService $taskService,
         WorkerService $workerService,
@@ -60,6 +70,8 @@ class PerformCommand extends AbstractTaskCollectionCommand
         $this->workerService = $workerService;
         $this->resqueQueueService = $resqueQueueService;
         $this->resqueJobFactory = $resqueJobFactory;
+
+        $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
     /**
@@ -78,7 +90,7 @@ class PerformCommand extends AbstractTaskCollectionCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $taskIds = $this->taskService->getEntityRepository()->getIdsByState($this->taskService->getQueuedState());
+        $taskIds = $this->taskRepository->getIdsByState($this->taskService->getQueuedState());
         $output->writeln(count($taskIds).' queued tasks ready to be performed');
 
         $performCommand = new TaskPerformCommand(

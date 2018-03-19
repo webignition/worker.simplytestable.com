@@ -98,12 +98,17 @@ class TaskServiceTest extends AbstractBaseTestCase
 
     public function testCreateUsesExistingMatchingTask()
     {
+        $entityManager = $this->container->get('doctrine.orm.entity_manager');
+
         $existingTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
             $this->taskTypeService->getHtmlValidationTaskType(),
             ''
         );
-        $this->taskService->persistAndFlush($existingTask);
+
+        $entityManager->persist($existingTask);
+        $entityManager->flush();
+
         $newTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
             $this->taskTypeService->getHtmlValidationTaskType(),

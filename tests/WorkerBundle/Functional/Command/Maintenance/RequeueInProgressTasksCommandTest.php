@@ -2,6 +2,7 @@
 
 namespace Tests\WorkerBundle\Functional\Command\Maintenance;
 
+use Doctrine\ORM\EntityManagerInterface;
 use SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -31,7 +32,10 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
     ) {
         $this->clearRedis();
 
+        $entityManager = $this->container->get('doctrine.orm.entity_manager');
         $taskService = $this->container->get(TaskService::class);
+        $taskRepository = $entityManager->getRepository(Task::class);
+
         $testTaskFactory = new TestTaskFactory($this->container);
 
         /* @var Task[] $tasks */
@@ -46,12 +50,12 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
 
         $this->assertCount(
             $expectedInitialQueuedTaskCount,
-            $taskService->getEntityRepository()->getIdsByState($queuedState)
+            $taskRepository->getIdsByState($queuedState)
         );
 
         $this->assertCount(
             $expectedInitialInProgressTaskCount,
-            $taskService->getEntityRepository()->getIdsByState($inProgressState)
+            $taskRepository->getIdsByState($inProgressState)
         );
 
         $command = $this->container->get(RequeueInProgressTasksCommand::class);
@@ -65,7 +69,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
 
         $this->assertCount(
             $expectedQueuedTaskCount,
-            $taskService->getEntityRepository()->getIdsByState($queuedState)
+            $taskRepository->getIdsByState($queuedState)
         );
     }
 

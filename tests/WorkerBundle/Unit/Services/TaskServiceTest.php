@@ -3,9 +3,11 @@
 namespace Tests\WorkerBundle\Unit\Services;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Repository\TaskRepository;
 use SimplyTestable\WorkerBundle\Services\CoreApplicationRouter;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
@@ -77,7 +79,14 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
             ->with(TaskService::TASK_CANCELLED_STATE)
             ->andReturn(MockEntityFactory::createState(TaskService::TASK_CANCELLED_STATE));
 
+        $taskRepository = \Mockery::mock(TaskRepository::class);
+
         $entityManager = \Mockery::mock(EntityManager::class);
+        $entityManager
+            ->shouldReceive('getRepository')
+            ->with(Task::class)
+            ->andReturn($taskRepository);
+
         $entityManager
             ->shouldReceive('persist')
             ->with($task);
@@ -118,7 +127,15 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
     private function createTaskService($services = [])
     {
         if (!isset($services['entityManager'])) {
-            $services['entityManager'] = \Mockery::mock(EntityManager::class);
+            $taskRepository = \Mockery::mock(TaskRepository::class);
+
+            $entityManager = \Mockery::mock(EntityManagerInterface::class);
+            $entityManager
+                ->shouldReceive('getRepository')
+                ->with(Task::class)
+                ->andReturn($taskRepository);
+
+            $services['entityManager'] = $entityManager;
         }
 
         if (!isset($services['logger'])) {

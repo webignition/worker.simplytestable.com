@@ -1,7 +1,10 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Repository\TaskRepository;
 use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -32,6 +35,12 @@ class ReportCompletionEnqueueCommand extends Command
     private $resqueJobFactory;
 
     /**
+     * @var TaskRepository
+     */
+    private $taskRepository;
+
+    /**
+     * @param EntityManagerInterface $entityManager
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param ResqueQueueService $resqueQueueService
@@ -39,6 +48,7 @@ class ReportCompletionEnqueueCommand extends Command
      * @param string|null $name
      */
     public function __construct(
+        EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         TaskService $taskService,
         ResqueQueueService $resqueQueueService,
@@ -51,6 +61,8 @@ class ReportCompletionEnqueueCommand extends Command
         $this->taskService = $taskService;
         $this->resqueQueueService = $resqueQueueService;
         $this->resqueJobFactory = $resqueJobFactory;
+
+        $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
     /**
@@ -69,7 +81,7 @@ class ReportCompletionEnqueueCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $taskIds = $this->taskService->getEntityRepository()->getIdsWithOutput();
+        $taskIds = $this->taskRepository->getIdsWithOutput();
 
         $this->logger->info('TaskReportCompletionEnqueueCommand::initialise');
         $this->logger->info(
