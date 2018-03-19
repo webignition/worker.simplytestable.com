@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ae73551e35665ddb24f4c7f4478385dc",
+    "content-hash": "b9ff2e9f7ad0d51f56a44a43c810e418",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -2203,16 +2203,16 @@
         },
         {
             "name": "resquebundle/resque",
-            "version": "1.2.0",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/resquebundle/resque.git",
-                "reference": "f5fef1b60ac111dd674630783e714417a0cc561a"
+                "reference": "a412019efd13db145134d40cae3ae9c9271036ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/resquebundle/resque/zipball/f5fef1b60ac111dd674630783e714417a0cc561a",
-                "reference": "f5fef1b60ac111dd674630783e714417a0cc561a",
+                "url": "https://api.github.com/repos/resquebundle/resque/zipball/a412019efd13db145134d40cae3ae9c9271036ec",
+                "reference": "a412019efd13db145134d40cae3ae9c9271036ec",
                 "shasum": ""
             },
             "require": {
@@ -2268,7 +2268,7 @@
                 "symfony",
                 "symfony3"
             ],
-            "time": "2017-11-21T18:40:42+00:00"
+            "time": "2018-03-13T18:03:40+00:00"
         },
         {
             "name": "sensio/distribution-bundle",
@@ -3769,23 +3769,23 @@
         },
         {
             "name": "webignition/resque-job-factory",
-            "version": "0.1.1",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/resque-job-factory.git",
-                "reference": "73ba4d4390195a48d56fe5508f88f08cbd447f05"
+                "reference": "ee1628c42656ad58a9c09a389e062c4dcf55cee6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/resque-job-factory/zipball/73ba4d4390195a48d56fe5508f88f08cbd447f05",
-                "reference": "73ba4d4390195a48d56fe5508f88f08cbd447f05",
+                "url": "https://api.github.com/repos/webignition/resque-job-factory/zipball/ee1628c42656ad58a9c09a389e062c4dcf55cee6",
+                "reference": "ee1628c42656ad58a9c09a389e062c4dcf55cee6",
                 "shasum": ""
             },
             "require": {
                 "chrisboulton/php-resque": "dev-master#968b7e6a307a2079051dfc571d2fc2be0546209f",
                 "chrisboulton/php-resque-scheduler": "dev-master#5954c989026f1bbc6443c02078a655333e152242",
                 "php": ">=5.6.0",
-                "resquebundle/resque": "1.2.0"
+                "resquebundle/resque": "2.0.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "~5.0",
@@ -3814,7 +3814,7 @@
                 "job",
                 "resque"
             ],
-            "time": "2017-11-30T18:53:32+00:00"
+            "time": "2018-03-19T18:14:18+00:00"
         },
         {
             "name": "webignition/string-parser",

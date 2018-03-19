@@ -40,11 +40,11 @@
         "webignition/node-jslint-wrapper":">=0.5.2,<1",
         "chrisboulton/php-resque": "dev-master",
         "chrisboulton/php-resque-scheduler": "dev-master",
-        "resquebundle/resque": "1.2.0",
+        "resquebundle/resque": "2.0.1",
         "guzzlehttp/retry-subscriber":">=2.0.2,<3",
         "guzzlehttp/cache-subscriber": "dev-master",
         "webignition/guzzle-curl-exception":">=0.1.4,<1",
-        "webignition/resque-job-factory": ">=0.1.1,<1.0",
+        "webignition/resque-job-factory": ">=1.0,<2",
         "webignition/html-document-type":">=0.1.1,<1.0"
     },
     "require-dev": {
