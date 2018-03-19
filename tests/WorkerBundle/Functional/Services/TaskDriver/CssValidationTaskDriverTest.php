@@ -355,7 +355,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         /* @var CssValidatorWrapper|MockInterface $cssValidatorWrapper */
         $cssValidatorWrapper = \Mockery::spy(
-            $this->container->get('simplytestable.services.cssvalidatorwrapper')
+            $this->container->get(CssValidatorWrapper::class)
         );
 
         $this->getTaskDriver()->setCssValidatorWrapper($cssValidatorWrapper);

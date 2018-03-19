@@ -450,7 +450,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
 
         /* @var NodeJslintWrapper|MockInterface $nodeJslintWrapper */
         $nodeJslintWrapper = \Mockery::spy(
-            $this->container->get('simplytestable.services.nodejslintwrapper')
+            $this->container->get(NodeJslintWrapper::class)
         );
 
         $this->getTaskDriver()->setNodeJsLintWrapper($nodeJslintWrapper);

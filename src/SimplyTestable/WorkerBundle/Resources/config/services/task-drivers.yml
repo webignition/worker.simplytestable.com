@@ -3,7 +3,7 @@ services:
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
         - '@webignition\WebResource\Service\Service'
-        - '@simplytestable.services.htmlvalidatorwrapper'
+        - '@webignition\HtmlValidator\Wrapper\Wrapper'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
         - '%html-validator-path%'
 
@@ -12,7 +12,7 @@ services:
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
         - '@webignition\WebResource\Service\Service'
-        - '@simplytestable.services.cssvalidatorwrapper'
+        - '@webignition\CssValidatorWrapper\Wrapper'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
         - '%css-validator-jar-path%'
 
@@ -20,7 +20,7 @@ services:
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
         - '@webignition\WebResource\Service\Service'
-        - '@simplytestable.services.nodejslintwrapper'
+        - '@webignition\NodeJslint\Wrapper\Wrapper'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
         - '@logger'
         - '%node-path%'

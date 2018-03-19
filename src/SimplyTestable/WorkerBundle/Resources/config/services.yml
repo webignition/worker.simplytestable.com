@@ -32,14 +32,11 @@ services:
     calls:
       - [setConfiguration, ['@webignition\WebResource\Service\Configuration']]
 
-  simplytestable.services.htmlvalidatorwrapper:
-    class:  webignition\HtmlValidator\Wrapper\Wrapper
+  webignition\HtmlValidator\Wrapper\Wrapper:
 
-  simplytestable.services.cssvalidatorwrapper:
-    class:  webignition\CssValidatorWrapper\Wrapper
+  webignition\CssValidatorWrapper\Wrapper:
 
-  simplytestable.services.nodejslintwrapper:
-    class:  webignition\NodeJslint\Wrapper\Wrapper
+  webignition\NodeJslint\Wrapper\Wrapper:
 
   SimplyTestable\WorkerBundle\Services\WorkerService:
     public: true
