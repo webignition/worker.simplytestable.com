@@ -27,14 +27,6 @@ abstract class EntityService
     abstract protected function getEntityName();
 
     /**
-     * @param string $entityName
-     */
-    public function setEntityName($entityName)
-    {
-        $this->entityName = $entityName;
-    }
-
-    /**
      * @return EntityManager
      */
     public function getEntityManager()
