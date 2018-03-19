@@ -2,6 +2,7 @@
 
 namespace SimplyTestable\WorkerBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use SimplyTestable\WorkerBundle\Model\TaskCollection;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
@@ -20,6 +21,11 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 class TaskController extends AbstractController
 {
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
      * @var WorkerService
      */
     private $workerService;
@@ -30,11 +36,16 @@ class TaskController extends AbstractController
     private $taskService;
 
     /**
+     * @param EntityManagerInterface $entityManager
      * @param WorkerService $workerService
      * @param TaskService $taskService
      */
-    public function __construct(WorkerService $workerService, TaskService $taskService)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        WorkerService $workerService,
+        TaskService $taskService
+    ) {
+        $this->entityManager = $entityManager;
         $this->workerService = $workerService;
         $this->taskService = $taskService;
     }
@@ -67,10 +78,10 @@ class TaskController extends AbstractController
             $task = $taskFactory->createFromRequest($createRequest);
             $tasks->add($task);
 
-            $this->taskService->getEntityManager()->persist($task);
+            $this->entityManager->persist($task);
         }
 
-        $this->taskService->getEntityManager()->flush();
+        $this->entityManager->flush();
 
         foreach ($tasks as $task) {
             $resqueQueueService->enqueue($resqueJobFactory->create(
@@ -101,8 +112,8 @@ class TaskController extends AbstractController
         }
 
         $this->taskService->cancel($cancelRequest->getTask());
-        $this->taskService->getEntityManager()->remove($cancelRequest->getTask());
-        $this->taskService->getEntityManager()->flush();
+        $this->entityManager->remove($cancelRequest->getTask());
+        $this->entityManager->flush();
 
         return new Response();
     }
@@ -124,12 +135,12 @@ class TaskController extends AbstractController
         $cancelledTaskCount = 0;
         foreach ($cancelCollectionRequest->getCancelRequests() as $cancelRequest) {
             $this->taskService->cancel($cancelRequest->getTask());
-            $this->taskService->getEntityManager()->remove($cancelRequest->getTask());
+            $this->entityManager->remove($cancelRequest->getTask());
             $cancelledTaskCount++;
         }
 
         if ($cancelledTaskCount > 0) {
-            $this->taskService->getEntityManager()->flush();
+            $this->entityManager->flush();
         }
 
         return new Response();

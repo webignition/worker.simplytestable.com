@@ -1,11 +1,13 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Services;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 
-class TaskTypeService extends EntityService
+class TaskTypeService
 {
-    const ENTITY_NAME = TaskType::class;
     const HTML_VALIDATION_NAME = 'HTML Validation';
     const CSS_VALIDATION_NAME = 'CSS Validation';
     const JS_STATIC_ANALYSIS_NAME = 'JS static analysis';
@@ -13,11 +15,22 @@ class TaskTypeService extends EntityService
     const LINK_INTEGRITY_NAME = 'Link integrity';
 
     /**
-     * @return string
+     * @var EntityManagerInterface
      */
-    protected function getEntityName()
+    private $entityManager;
+
+    /**
+     * @var EntityRepository
+     */
+    private $entityRepository;
+
+    /**
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        return self::ENTITY_NAME;
+        $this->entityManager = $entityManager;
+        $this->entityRepository = $entityManager->getRepository(TaskType::class);
     }
 
     /**
@@ -27,13 +40,15 @@ class TaskTypeService extends EntityService
      */
     public function fetch($name)
     {
-        return $this->getEntityRepository()->findOneByName($name);
+        return $this->entityRepository->findOneBy([
+            'name' => $name,
+        ]);
     }
 
     /**
      * @param string $name
      *
-     * @return boolean
+     * @return bool
      */
     public function has($name)
     {

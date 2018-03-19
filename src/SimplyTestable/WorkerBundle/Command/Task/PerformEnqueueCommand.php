@@ -1,6 +1,9 @@
 <?php
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
+use Doctrine\ORM\EntityManagerInterface;
+use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Repository\TaskRepository;
 use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -26,12 +29,19 @@ class PerformEnqueueCommand extends Command
     private $resqueJobFactory;
 
     /**
+     * @var TaskRepository
+     */
+    private $taskRepository;
+
+    /**
+     * @param EntityManagerInterface $entityManager
      * @param TaskService $taskService
      * @param ResqueQueueService $resqueQueueService
      * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
+        EntityManagerInterface $entityManager,
         TaskService $taskService,
         ResqueQueueService $resqueQueueService,
         ResqueJobFactory $resqueJobFactory,
@@ -42,6 +52,8 @@ class PerformEnqueueCommand extends Command
         $this->taskService = $taskService;
         $this->resqueQueueService = $resqueQueueService;
         $this->resqueJobFactory = $resqueJobFactory;
+
+        $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
     /**
@@ -60,7 +72,7 @@ class PerformEnqueueCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $queuedTaskIds = $this->taskService->getEntityRepository()->getIdsByState(
+        $queuedTaskIds = $this->taskRepository->getIdsByState(
             $this->taskService->getQueuedState()
         );
         $output->writeln(count($queuedTaskIds).' queued tasks ready to be enqueued');

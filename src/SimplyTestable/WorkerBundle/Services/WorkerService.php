@@ -1,21 +1,33 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Services;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use Psr\Log\LoggerInterface;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptionFactory;
 
-class WorkerService extends EntityService
+class WorkerService
 {
     const WORKER_NEW_STATE = 'worker-new';
     const WORKER_ACTIVE_STATE = 'worker-active';
     const WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE = 'worker-awaiting-activation-verification';
     const WORKER_ACTIVATE_REMOTE_ENDPOINT_IDENTIFIER = 'worker-activate';
     const WORKER_MAINTENANCE_READ_ONLY_STATE = 'worker-maintenance-read-only';
-    const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\ThisWorker';
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
+     * @var EntityRepository
+     */
+    private $entityRepository;
 
     /**
      * @var LoggerInterface
@@ -72,8 +84,7 @@ class WorkerService extends EntityService
         HttpClientService $httpClientService,
         UrlService $urlService
     ) {
-        parent::__construct($entityManager);
-
+        $this->entityManager = $entityManager;
         $this->logger = $logger;
         $this->salt = $salt;
         $this->hostname = $hostname;
@@ -81,14 +92,8 @@ class WorkerService extends EntityService
         $this->stateService = $stateService;
         $this->httpClientService = $httpClientService;
         $this->urlService = $urlService;
-    }
 
-    /**
-     * @return string
-     */
-    protected function getEntityName()
-    {
-        return self::ENTITY_NAME;
+        $this->entityRepository = $entityManager->getRepository(ThisWorker::class);
     }
 
     /**
@@ -96,10 +101,10 @@ class WorkerService extends EntityService
      */
     public function get()
     {
-        $workers = $this->getEntityRepository()->findAll();
+        $workers = $this->entityRepository->findAll();
         if (empty($workers)) {
             $this->create();
-            $workers = $this->getEntityRepository()->findAll();
+            $workers = $this->entityRepository->findAll();
         }
 
         return $workers[0];
@@ -115,18 +120,8 @@ class WorkerService extends EntityService
         $thisWorker->setState($this->stateService->fetch('worker-new'));
         $thisWorker->setActivationToken(md5($this->salt . $this->hostname));
 
-        return $this->persistAndFlush($thisWorker);
-    }
-
-    /**
-     * @param ThisWorker $thisWorker
-     *
-     * @return ThisWorker
-     */
-    private function persistAndFlush(ThisWorker $thisWorker)
-    {
-        $this->getEntityManager()->persist($thisWorker);
-        $this->getEntityManager()->flush();
+        $this->entityManager->persist($thisWorker);
+        $this->entityManager->flush();
 
         return $thisWorker;
     }
@@ -199,7 +194,8 @@ class WorkerService extends EntityService
         }
 
         $thisWorker->setNextState();
-        $this->persistAndFlush($thisWorker);
+        $this->entityManager->persist($thisWorker);
+        $this->entityManager->flush();
 
         return 0;
     }
@@ -214,13 +210,18 @@ class WorkerService extends EntityService
         $this->setState(self::WORKER_MAINTENANCE_READ_ONLY_STATE);
     }
 
+    /**
+     * @param string $stateName
+     */
     private function setState($stateName)
     {
         $thisWorker = $this->get();
         $thisWorker->setState(
             $this->stateService->fetch($stateName)
         );
-        $this->persistAndFlush($thisWorker);
+
+        $this->entityManager->persist($thisWorker);
+        $this->entityManager->flush();
     }
 
     public function verify()
@@ -233,13 +234,15 @@ class WorkerService extends EntityService
 
         $thisWorker = $this->get();
         $thisWorker->setNextState();
-        $this->persistAndFlush($thisWorker);
+
+        $this->entityManager->persist($thisWorker);
+        $this->entityManager->flush();
 
         return true;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     private function isNew()
     {
@@ -249,7 +252,7 @@ class WorkerService extends EntityService
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     private function isAwaitingActivationVerification()
     {
@@ -259,7 +262,7 @@ class WorkerService extends EntityService
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isActive()
     {
@@ -270,7 +273,7 @@ class WorkerService extends EntityService
 
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isMaintenanceReadOnly()
     {

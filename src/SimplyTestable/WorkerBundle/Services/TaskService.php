@@ -1,7 +1,8 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Services;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\State;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
@@ -14,7 +15,7 @@ use GuzzleHttp\Exception\BadResponseException as HttpBadResponseException;
 use GuzzleHttp\Exception\ConnectException as HttpConnectException;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
-class TaskService extends EntityService
+class TaskService
 {
     const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\Task\Task';
     const TASK_STARTING_STATE = 'task-queued';
@@ -25,6 +26,16 @@ class TaskService extends EntityService
     const TASK_FAILED_RETRY_AVAILABLE_STATE = 'task-failed-retry-available';
     const TASK_FAILED_RETRY_LIMIT_REACHED_STATE = 'task-failed-retry-limit-reached';
     const TASK_SKIPPED_STATE = 'task-skipped';
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
+     * @var TaskRepository
+     */
+    private $taskRepository;
 
     /**
      * @var LoggerInterface
@@ -70,7 +81,7 @@ class TaskService extends EntityService
     }
 
     /**
-     * @param EntityManager $entityManager
+     * @param EntityManagerInterface $entityManager
      * @param LoggerInterface $logger
      * @param StateService $stateService
      * @param UrlService $urlService
@@ -79,7 +90,7 @@ class TaskService extends EntityService
      * @param HttpClientService $httpClientService
      */
     public function __construct(
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         StateService $stateService,
         UrlService $urlService,
@@ -87,14 +98,15 @@ class TaskService extends EntityService
         WorkerService $workerService,
         HttpClientService $httpClientService
     ) {
-        parent::__construct($entityManager);
-
+        $this->entityManager = $entityManager;
         $this->logger = $logger;
         $this->stateService = $stateService;
         $this->urlService = $urlService;
         $this->coreApplicationRouter = $coreApplicationRouter;
         $this->workerService = $workerService;
         $this->httpClientService = $httpClientService;
+
+        $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
     /**
@@ -127,7 +139,7 @@ class TaskService extends EntityService
     private function fetch(Task $task)
     {
         /* @var $task Task */
-        $task = $this->getEntityRepository()->findOneBy(array(
+        $task = $this->taskRepository->findOneBy(array(
             'state' => $task->getState(),
             'type' => $task->getType(),
             'url' => $task->getUrl()
@@ -144,7 +156,7 @@ class TaskService extends EntityService
     public function getById($id)
     {
         /* @var $task Task */
-        $task = $this->getEntityRepository()->find($id);
+        $task = $this->taskRepository->find($id);
 
         return $task;
     }
@@ -157,18 +169,6 @@ class TaskService extends EntityService
     private function has(Task $task)
     {
         return !is_null($this->fetch($task));
-    }
-
-    /**
-     * @param Task $task
-     *
-     * @return Task
-     */
-    public function persistAndFlush(Task $task)
-    {
-        $this->getEntityManager()->persist($task);
-        $this->getEntityManager()->flush();
-        return $task;
     }
 
     /**
@@ -297,7 +297,10 @@ class TaskService extends EntityService
         $task->setTimePeriod($timePeriod);
         $task->setState($this->getInProgressState());
 
-        return $this->persistAndFlush($task);
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
+
+        return $task;
     }
 
     /**
@@ -337,16 +340,6 @@ class TaskService extends EntityService
 
     /**
      * @param Task $task
-     *
-     * @return boolean
-     */
-    private function isQueued(Task $task)
-    {
-        return $task->getState()->equals($this->getStartingState());
-    }
-
-    /**
-     * @param Task $task
      * @param State $state
      *
      * @return Task
@@ -354,7 +347,11 @@ class TaskService extends EntityService
     private function finish(Task $task, State $state)
     {
         $task->setState($state);
-        return $this->persistAndFlush($task);
+
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
+
+        return $task;
     }
 
     /**
@@ -438,23 +435,12 @@ class TaskService extends EntityService
             }
         }
 
-        $this->getEntityManager()->remove($task);
-        $this->getEntityManager()->remove($task->getOutput());
-        $this->getEntityManager()->remove($task->getTimePeriod());
-        $this->getEntityManager()->flush();
+        $this->entityManager->remove($task);
+        $this->entityManager->remove($task->getOutput());
+        $this->entityManager->remove($task->getTimePeriod());
+        $this->entityManager->flush();
 
         return true;
-    }
-
-    /**
-     * @return TaskRepository
-     */
-    public function getEntityRepository()
-    {
-        /* @var $entityRepository TaskRepository */
-        $entityRepository = parent::getEntityRepository();
-
-        return $entityRepository;
     }
 
     /**
@@ -462,7 +448,7 @@ class TaskService extends EntityService
      */
     public function getInCompleteCount()
     {
-        return $this->getEntityRepository()->getCountByStates([
+        return $this->taskRepository->getCountByStates([
             $this->getQueuedState(),
             $this->getInProgressState()
         ]);

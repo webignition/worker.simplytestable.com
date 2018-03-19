@@ -2,6 +2,8 @@
 
 namespace Tests\WorkerBundle\Unit\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Controller\TaskController;
 use SimplyTestable\WorkerBundle\Request\Task\CancelRequest;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -101,7 +103,11 @@ class TaskControllerTest extends \PHPUnit_Framework_TestCase
             $services[TaskService::class] = MockFactory::createTaskService();
         }
 
+        /* @var EntityManagerInterface|MockInterface $entityManager */
+        $entityManager = \Mockery::mock(EntityManagerInterface::class);
+
         return new TaskController(
+            $entityManager,
             $services[WorkerService::class],
             $services[TaskService::class]
         );
