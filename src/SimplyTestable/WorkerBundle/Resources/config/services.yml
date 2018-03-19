@@ -20,27 +20,23 @@ services:
         - '@SimplyTestable\WorkerBundle\Services\HttpCache'
         - '%curl_options%'
 
-  simplytestable.services.webresourceserviceconfiguration:
-    class:  webignition\WebResource\Service\Configuration
+  webignition\WebResource\Service\Configuration:
     arguments:
         $configurationValues:
           allow-unknown-resource-types: false
           retry-with-url-encoding-disabled: true
           content-type-web-resource-map: '%content_type_web_resource_map%'
 
-  simplytestable.services.webresourceservice:
+  webignition\WebResource\Service\Service:
     class:  webignition\WebResource\Service\Service
     calls:
-      - [setConfiguration, ['@simplytestable.services.webresourceserviceconfiguration']]
+      - [setConfiguration, ['@webignition\WebResource\Service\Configuration']]
 
-  simplytestable.services.htmlvalidatorwrapper:
-    class:  webignition\HtmlValidator\Wrapper\Wrapper
+  webignition\HtmlValidator\Wrapper\Wrapper:
 
-  simplytestable.services.cssvalidatorwrapper:
-    class:  webignition\CssValidatorWrapper\Wrapper
+  webignition\CssValidatorWrapper\Wrapper:
 
-  simplytestable.services.nodejslintwrapper:
-    class:  webignition\NodeJslint\Wrapper\Wrapper
+  webignition\NodeJslint\Wrapper\Wrapper:
 
   SimplyTestable\WorkerBundle\Services\WorkerService:
     public: true
