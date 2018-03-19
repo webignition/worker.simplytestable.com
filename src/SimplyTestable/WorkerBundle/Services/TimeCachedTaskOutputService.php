@@ -1,19 +1,32 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Services;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use SimplyTestable\WorkerBundle\Entity\TimeCachedTaskOutput;
 
-class TimeCachedTaskOutputService extends EntityService
+class TimeCachedTaskOutputService
 {
-    const ENTITY_NAME = TimeCachedTaskOutput::class;
     const DEFAULT_MAX_AGE = 180;
 
     /**
-     * @return string
+     * @var EntityManagerInterface
      */
-    protected function getEntityName()
+    private $entityManager;
+
+    /**
+     * @var EntityRepository
+     */
+    private $entityRepository;
+
+    /**
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        return self::ENTITY_NAME;
+        $this->entityManager = $entityManager;
+        $this->entityRepository = $entityManager->getRepository(TimeCachedTaskOutput::class);
     }
 
     /**
@@ -23,15 +36,15 @@ class TimeCachedTaskOutputService extends EntityService
      */
     public function find($hash)
     {
-        return $this->getEntityRepository()->findOneBy(array(
+        return $this->entityRepository->findOneBy([
             'hash' => $hash
-        ));
+        ]);
     }
 
     /**
      * @param string $hash
      *
-     * @return boolean
+     * @return bool
      */
     public function isStale($hash)
     {
@@ -49,7 +62,7 @@ class TimeCachedTaskOutputService extends EntityService
     /**
      * @param string $hash
      *
-     * @return boolean
+     * @return bool
      */
     public function has($hash)
     {
@@ -96,7 +109,10 @@ class TimeCachedTaskOutputService extends EntityService
             'default' => self::DEFAULT_MAX_AGE
         ))));
 
-        return $this->persistAndFlush($timeCachedTaskOutput);
+        $this->entityManager->persist($timeCachedTaskOutput);
+        $this->entityManager->flush();
+
+        return $timeCachedTaskOutput;
     }
 
     /**
@@ -121,17 +137,9 @@ class TimeCachedTaskOutputService extends EntityService
             'default' => self::DEFAULT_MAX_AGE
         ))));
 
-        return $this->persistAndFlush($timeCachedTaskOutput);
-    }
+        $this->entityManager->persist($timeCachedTaskOutput);
+        $this->entityManager->flush();
 
-    /**
-     * @param TimeCachedTaskOutput $output
-     * @return TimeCachedTaskOutput
-     */
-    public function persistAndFlush(TimeCachedTaskOutput $output)
-    {
-        $this->getEntityManager()->persist($output);
-        $this->getEntityManager()->flush();
-        return $output;
+        return $timeCachedTaskOutput;
     }
 }
