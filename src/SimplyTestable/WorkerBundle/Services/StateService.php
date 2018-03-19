@@ -1,18 +1,30 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Services;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use SimplyTestable\WorkerBundle\Entity\State;
 
-class StateService extends EntityService
+class StateService
 {
-    const ENTITY_NAME = State::class;
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
 
     /**
-     * @return string
+     * @var EntityRepository
      */
-    protected function getEntityName()
+    private $entityRepository;
+
+    /**
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        return self::ENTITY_NAME;
+        $this->entityManager = $entityManager;
+        $this->entityRepository = $entityManager->getRepository(State::class);
     }
 
     /**
@@ -36,7 +48,9 @@ class StateService extends EntityService
      */
     public function find($name)
     {
-        return $this->getEntityRepository()->findOneByName($name);
+        return $this->entityRepository->findOneBy([
+            'name' => $name,
+        ]);
     }
 
     /**
@@ -48,7 +62,6 @@ class StateService extends EntityService
         return !is_null($this->find($name));
     }
 
-
     /**
      * @param string $name
      *
@@ -59,20 +72,8 @@ class StateService extends EntityService
         $state = new State();
         $state->setName($name);
 
-        $this->persistAndFlush($state);
-
-        return $state;
-    }
-
-    /**
-     * @param State $state
-     *
-     * @return State
-     */
-    public function persistAndFlush(State $state)
-    {
-        $this->getEntityManager()->persist($state);
-        $this->getEntityManager()->flush();
+        $this->entityManager->persist($state);
+        $this->entityManager->flush();
 
         return $state;
     }
