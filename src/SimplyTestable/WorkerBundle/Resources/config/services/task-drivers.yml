@@ -2,7 +2,7 @@ services:
   SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver:
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@simplytestable.services.webresourceservice'
+        - '@webignition\WebResource\Service\Service'
         - '@simplytestable.services.htmlvalidatorwrapper'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
         - '%html-validator-path%'
@@ -11,7 +11,7 @@ services:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@simplytestable.services.webresourceservice'
+        - '@webignition\WebResource\Service\Service'
         - '@simplytestable.services.cssvalidatorwrapper'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
         - '%css-validator-jar-path%'
@@ -19,7 +19,7 @@ services:
   SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver:
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@simplytestable.services.webresourceservice'
+        - '@webignition\WebResource\Service\Service'
         - '@simplytestable.services.nodejslintwrapper'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
         - '@logger'
@@ -29,12 +29,12 @@ services:
   SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver:
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@simplytestable.services.webresourceservice'
+        - '@webignition\WebResource\Service\Service'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
         - '%link_integrity_user_agents%'
 
   SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver:
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@simplytestable.services.webresourceservice'
+        - '@webignition\WebResource\Service\Service'
         - '@SimplyTestable\WorkerBundle\Services\StateService'

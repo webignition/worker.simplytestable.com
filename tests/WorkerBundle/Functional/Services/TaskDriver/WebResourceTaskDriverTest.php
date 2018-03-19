@@ -10,6 +10,7 @@ use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use webignition\WebResource\Service\Configuration;
+use webignition\WebResource\Service\Service as WebResourceService;
 
 abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
 {
@@ -91,7 +92,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
         $expectedTaskOutput
     ) {
         $this->setHttpFixtures($httpResponseFixtures);
-        $webResourceService = $this->container->get('simplytestable.services.webresourceservice');
+        $webResourceService = $this->container->get(WebResourceService::class);
 
         $webResourceServiceConfiguration = $webResourceService->getConfiguration();
         $newWebResourceServiceConfiguration = $webResourceServiceConfiguration->createFromCurrent([
