@@ -17,5 +17,7 @@ security:
             http_basic:
                 realm: "Simply Testable Core Application"
 
+            logout_on_user_change: true
+
     access_control:
         - { path: ^/maintenance/, role: ROLE_ADMIN }
