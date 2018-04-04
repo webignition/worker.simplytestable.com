@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b05094ff48a8689c9a8fda6c1cc9eec9",
+    "content-hash": "8a391ae3d9b46bfd2003b9dd2d079b2c",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -1327,82 +1327,42 @@
             "time": "2016-10-17T18:31:11+00:00"
         },
         {
-            "name": "guzzlehttp/cache-subscriber",
-            "version": "dev-master",
+            "name": "guzzlehttp/guzzle",
+            "version": "6.3.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/guzzle/cache-subscriber.git",
-                "reference": "aaab195c0951e9324f7bf226578246851f240d53"
+                "url": "https://github.com/guzzle/guzzle.git",
+                "reference": "68d0ea14d5a3f42a20e87632a5f84931e2709c90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/cache-subscriber/zipball/aaab195c0951e9324f7bf226578246851f240d53",
-                "reference": "aaab195c0951e9324f7bf226578246851f240d53",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/68d0ea14d5a3f42a20e87632a5f84931e2709c90",
+                "reference": "68d0ea14d5a3f42a20e87632a5f84931e2709c90",
                 "shasum": ""
             },
             "require": {
-                "doctrine/cache": "~1.3",
-                "guzzlehttp/guzzle": "~5.0",
-                "php": ">=5.4.0"
+                "guzzlehttp/promises": "^1.0",
+                "guzzlehttp/psr7": "^1.4",
+                "php": ">=5.5"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
+                "ext-curl": "*",
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.4",
+                "psr/log": "^1.0"
+            },
+            "suggest": {
+                "psr/log": "Required for using the Log middleware"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.2-dev"
+                    "dev-master": "6.3-dev"
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "GuzzleHttp\\Subscriber\\Cache\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
-                    "homepage": "https://github.com/mtdowling"
-                }
-            ],
-            "description": "Guzzle HTTP cache subscriber",
-            "homepage": "http://guzzlephp.org/",
-            "keywords": [
-                "Guzzle",
-                "cache"
-            ],
-            "time": "2016-03-04T00:44:30+00:00"
-        },
-        {
-            "name": "guzzlehttp/guzzle",
-            "version": "5.3.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "f9acb4761844317e626a32259205bec1f1bc60d2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/f9acb4761844317e626a32259205bec1f1bc60d2",
-                "reference": "f9acb4761844317e626a32259205bec1f1bc60d2",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/ringphp": "^1.1",
-                "php": ">=5.4.0",
-                "react/promise": "^2.2"
-            },
-            "require-dev": {
-                "ext-curl": "*",
-                "phpunit/phpunit": "^4.0"
-            },
-            "type": "library",
-            "autoload": {
+                "files": [
+                    "src/functions_include.php"
+                ],
                 "psr-4": {
                     "GuzzleHttp\\": "src/"
                 }
@@ -1418,7 +1378,7 @@
                     "homepage": "https://github.com/mtdowling"
                 }
             ],
-            "description": "Guzzle is a PHP HTTP client library and framework for building RESTful web service clients",
+            "description": "Guzzle is a PHP HTTP client library",
             "homepage": "http://guzzlephp.org/",
             "keywords": [
                 "client",
@@ -1429,40 +1389,41 @@
                 "rest",
                 "web service"
             ],
-            "time": "2018-01-15T07:18:01+00:00"
+            "time": "2018-03-26T16:33:04+00:00"
         },
         {
-            "name": "guzzlehttp/retry-subscriber",
-            "version": "2.0.2",
+            "name": "guzzlehttp/promises",
+            "version": "v1.3.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/guzzle/retry-subscriber.git",
-                "reference": "f13a4c640b823e9eaf06975d8e8981f9551250e8"
+                "url": "https://github.com/guzzle/promises.git",
+                "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/retry-subscriber/zipball/f13a4c640b823e9eaf06975d8e8981f9551250e8",
-                "reference": "f13a4c640b823e9eaf06975d8e8981f9551250e8",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/a59da6cf61d80060647ff4d3eb2c03a2bc694646",
+                "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "~5.1",
-                "php": ">=5.4.0"
+                "php": ">=5.5.0"
             },
             "require-dev": {
-                "guzzlehttp/log-subscriber": "~1.0",
-                "phpunit/phpunit": "~4.0"
+                "phpunit/phpunit": "^4.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0-dev"
+                    "dev-master": "1.4-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "GuzzleHttp\\Subscriber\\Retry\\": "src/"
-                }
+                    "GuzzleHttp\\Promise\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -1475,51 +1436,49 @@
                     "homepage": "https://github.com/mtdowling"
                 }
             ],
-            "description": "Retries failed HTTP requests using customizable retry strategies (Guzzle 4+)",
-            "homepage": "http://guzzlephp.org/",
+            "description": "Guzzle promises library",
             "keywords": [
-                "Guzzle",
-                "http",
-                "retry"
+                "promise"
             ],
-            "time": "2014-12-19T20:42:37+00:00"
+            "time": "2016-12-20T10:07:11+00:00"
         },
         {
-            "name": "guzzlehttp/ringphp",
-            "version": "1.1.0",
+            "name": "guzzlehttp/psr7",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/guzzle/RingPHP.git",
-                "reference": "dbbb91d7f6c191e5e405e900e3102ac7f261bc0b"
+                "url": "https://github.com/guzzle/psr7.git",
+                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/RingPHP/zipball/dbbb91d7f6c191e5e405e900e3102ac7f261bc0b",
-                "reference": "dbbb91d7f6c191e5e405e900e3102ac7f261bc0b",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
+                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/streams": "~3.0",
                 "php": ">=5.4.0",
-                "react/promise": "~2.0"
+                "psr/http-message": "~1.0"
+            },
+            "provide": {
+                "psr/http-message-implementation": "1.0"
             },
             "require-dev": {
-                "ext-curl": "*",
                 "phpunit/phpunit": "~4.0"
-            },
-            "suggest": {
-                "ext-curl": "Guzzle will use specific adapters if cURL is present"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1-dev"
+                    "dev-master": "1.4-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "GuzzleHttp\\Ring\\": "src/"
-                }
+                    "GuzzleHttp\\Psr7\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -1530,60 +1489,23 @@
                     "name": "Michael Dowling",
                     "email": "mtdowling@gmail.com",
                     "homepage": "https://github.com/mtdowling"
-                }
-            ],
-            "description": "Provides a simple API and specification that abstracts away the details of HTTP into a single PHP function.",
-            "time": "2015-05-20T03:37:09+00:00"
-        },
-        {
-            "name": "guzzlehttp/streams",
-            "version": "3.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/guzzle/streams.git",
-                "reference": "47aaa48e27dae43d39fc1cea0ccf0d84ac1a2ba5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/streams/zipball/47aaa48e27dae43d39fc1cea0ccf0d84ac1a2ba5",
-                "reference": "47aaa48e27dae43d39fc1cea0ccf0d84ac1a2ba5",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "GuzzleHttp\\Stream\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
+                },
                 {
-                    "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
-                    "homepage": "https://github.com/mtdowling"
+                    "name": "Tobias Schultze",
+                    "homepage": "https://github.com/Tobion"
                 }
             ],
-            "description": "Provides a simple abstraction over streams of data",
-            "homepage": "http://guzzlephp.org/",
+            "description": "PSR-7 message implementation that also provides common utility methods",
             "keywords": [
-                "Guzzle",
-                "stream"
+                "http",
+                "message",
+                "request",
+                "response",
+                "stream",
+                "uri",
+                "url"
             ],
-            "time": "2014-10-12T19:18:40+00:00"
+            "time": "2017-03-20T17:10:46+00:00"
         },
         {
             "name": "incenteev/composer-parameter-handler",
@@ -1685,6 +1607,83 @@
                 "sql"
             ],
             "time": "2014-01-12T16:20:24+00:00"
+        },
+        {
+            "name": "kevinrob/guzzle-cache-middleware",
+            "version": "v3.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Kevinrob/guzzle-cache-middleware.git",
+                "reference": "dda34401a68c54f06c9338a2cc30ae0aecd879a1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Kevinrob/guzzle-cache-middleware/zipball/dda34401a68c54f06c9338a2cc30ae0aecd879a1",
+                "reference": "dda34401a68c54f06c9338a2cc30ae0aecd879a1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "cache/array-adapter": "^0.4 || ^0.5 || ^1.0",
+                "cache/simple-cache-bridge": "^0.1 || ^1.0",
+                "doctrine/cache": "^1.0",
+                "guzzlehttp/guzzle": "^6.0",
+                "illuminate/cache": "^5.0",
+                "league/flysystem": "^1.0",
+                "phpunit/phpunit": "^4.0 || ^5.0",
+                "psr/cache": "^1.0"
+            },
+            "suggest": {
+                "doctrine/cache": "This library have a lot of ready-to-use cache storage (to be use with Kevinrob\\GuzzleCache\\Storage\\DoctrineCacheStorage)",
+                "guzzlehttp/guzzle": "For using this library. It was created for Guzzle6. (but you can use it with any PSR-7 HTTP Client)",
+                "laravel/framework": "To be use with Kevinrob\\GuzzleCache\\Storage\\LaravelCacheStorage",
+                "league/flysystem": "To be use with Kevinrob\\GuzzleCache\\Storage\\FlysystemStorage",
+                "psr/cache": "To be use with Kevinrob\\GuzzleCache\\Storage\\Psr6CacheStorage",
+                "psr/simple-cache": "To be use with Kevinrob\\GuzzleCache\\Storage\\Psr16CacheStorage"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kevinrob\\GuzzleCache\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kevin Robatel",
+                    "email": "kevinrob2@gmail.com",
+                    "homepage": "https://github.com/Kevinrob"
+                }
+            ],
+            "description": "A HTTP/1.1 Cache for Guzzle 6. It's a simple Middleware to be added in the HandlerStack. (RFC 7234)",
+            "homepage": "https://github.com/Kevinrob/guzzle-cache-middleware",
+            "keywords": [
+                "Etag",
+                "Flysystem",
+                "Guzzle",
+                "cache",
+                "cache-control",
+                "doctrine",
+                "expiration",
+                "guzzle6",
+                "handler",
+                "http",
+                "http 1.1",
+                "middleware",
+                "performance",
+                "php",
+                "promise",
+                "psr6",
+                "psr7",
+                "rfc7234",
+                "validation"
+            ],
+            "time": "2018-01-10T13:55:22+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -1971,6 +1970,56 @@
             "time": "2017-02-14T16:28:37+00:00"
         },
         {
+            "name": "psr/http-message",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "homepage": "https://github.com/php-fig/http-message",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "time": "2016-08-06T14:39:51+00:00"
+        },
+        {
             "name": "psr/link",
             "version": "1.0.0",
             "source": {
@@ -2154,52 +2203,6 @@
                 "xslt"
             ],
             "time": "2013-05-24T02:50:10+00:00"
-        },
-        {
-            "name": "react/promise",
-            "version": "v2.5.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/reactphp/promise.git",
-                "reference": "62785ae604c8d69725d693eb370e1d67e94c4053"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/62785ae604c8d69725d693eb370e1d67e94c4053",
-                "reference": "62785ae604c8d69725d693eb370e1d67e94c4053",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.8"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "React\\Promise\\": "src/"
-                },
-                "files": [
-                    "src/functions_include.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jan Sorgalla",
-                    "email": "jsorgalla@gmail.com"
-                }
-            ],
-            "description": "A lightweight implementation of CommonJS Promises/A for PHP",
-            "keywords": [
-                "promise",
-                "promises"
-            ],
-            "time": "2017-03-25T12:08:31+00:00"
         },
         {
             "name": "resquebundle/resque",
@@ -3153,31 +3156,31 @@
         },
         {
             "name": "webignition/css-validator-output-parser",
-            "version": "2.2.2",
+            "version": "3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-output-parser.git",
-                "reference": "a7478259f317b92da314bf13fe6434e7a0be64ad"
+                "reference": "a7d879b91b09349532d1d04ae5d9376e88c03187"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/a7478259f317b92da314bf13fe6434e7a0be64ad",
-                "reference": "a7478259f317b92da314bf13fe6434e7a0be64ad",
+                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/a7d879b91b09349532d1d04ae5d9376e88c03187",
+                "reference": "a7d879b91b09349532d1d04ae5d9376e88c03187",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0",
+                "php": ">=5.6.0",
+                "symfony/polyfill-mbstring": "^1.7",
                 "webignition/url": ">=1.0,<2.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0",
-                "symfony/class-loader": "*"
+                "phpunit/phpunit": "^5",
+                "squizlabs/php_codesniffer": "^3"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\CssValidatorOutput\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3197,38 +3200,38 @@
                 "parser",
                 "validator"
             ],
-            "time": "2014-09-17T17:06:21+00:00"
+            "time": "2018-03-30T18:35:39+00:00"
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "1.3.1",
+            "version": "2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "24b11fed98e558b2b02c57bf08e31d01c653fa62"
+                "reference": "c815ea9c1a09b2aa8461c72adad94bccb3d34fd9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/24b11fed98e558b2b02c57bf08e31d01c653fa62",
-                "reference": "24b11fed98e558b2b02c57bf08e31d01c653fa62",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/c815ea9c1a09b2aa8461c72adad94bccb3d34fd9",
+                "reference": "c815ea9c1a09b2aa8461c72adad94bccb3d34fd9",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "~5",
+                "guzzlehttp/guzzle": "^6",
                 "php": ">=5.6",
-                "webignition/css-validator-output-parser": ">=2.2.2",
-                "webignition/guzzle-curl-exception": ">=0.1.4,<1",
-                "webignition/html-document-link-finder": ">=1.5.1,<2.0",
-                "webignition/url": ">=1.9.9",
-                "webignition/web-page-model": ">=1.3,<2.0",
-                "webignition/web-resource-service": ">=1.4.1,<2"
+                "webignition/css-validator-output-parser": ">=3,<4",
+                "webignition/html-document-link-finder": "^3",
+                "webignition/url": "^1.9",
+                "webignition/web-page-model": ">=3.1.1,<4",
+                "webignition/web-resource-retriever": ">=0.6,<1",
+                "webignition/web-resource-storage": ">=0.1,<1"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9",
-                "php-mock/php-mock-mockery": "1.1.0",
-                "phpunit/phpunit": "~5.0",
+                "mockery/mockery": "^1",
+                "php-mock/php-mock-mockery": "^1.2",
+                "phpunit/phpunit": "^5.0",
                 "satooshi/php-coveralls": "~1.0",
-                "squizlabs/php_codesniffer": "3.*"
+                "squizlabs/php_codesniffer": "^3"
             },
             "type": "library",
             "autoload": {
@@ -3246,7 +3249,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2018-03-02T13:30:52+00:00"
+            "time": "2018-04-04T13:04:12+00:00"
         },
         {
             "name": "webignition/disallowed-character-terminated-string",
@@ -3291,21 +3294,21 @@
         },
         {
             "name": "webignition/guzzle-curl-exception",
-            "version": "0.1.4",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/guzzle-curl-exception.git",
-                "reference": "67149eaab8696413ed72d880ad1e06df449115bb"
+                "reference": "7f4ab79beffc2bebf1edfc6f8c17c32b0cc2cd9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/guzzle-curl-exception/zipball/67149eaab8696413ed72d880ad1e06df449115bb",
-                "reference": "67149eaab8696413ed72d880ad1e06df449115bb",
+                "url": "https://api.github.com/repos/webignition/guzzle-curl-exception/zipball/7f4ab79beffc2bebf1edfc6f8c17c32b0cc2cd9b",
+                "reference": "7f4ab79beffc2bebf1edfc6f8c17c32b0cc2cd9b",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "~5",
-                "php": ">=5.4.0"
+                "guzzlehttp/guzzle": "~6",
+                "php": ">=5.6.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "~5.0",
@@ -3334,29 +3337,29 @@
                 "curl",
                 "exception"
             ],
-            "time": "2018-02-14T12:32:06+00:00"
+            "time": "2018-03-20T19:23:50+00:00"
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "1.2.3",
+            "version": "2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "0ebc9318d562633d8358bdc86e9cec8e79124854"
+                "reference": "b47a1d60d42610966fc870631cf6c84cb78eb835"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/0ebc9318d562633d8358bdc86e9cec8e79124854",
-                "reference": "0ebc9318d562633d8358bdc86e9cec8e79124854",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/b47a1d60d42610966fc870631cf6c84cb78eb835",
+                "reference": "b47a1d60d42610966fc870631cf6c84cb78eb835",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "~5",
-                "php": ">=5.5.0",
-                "webignition/html-document-link-finder": ">=1.4.1,<2.0",
+                "guzzlehttp/guzzle": "~6",
+                "php": ">=5.6.0",
+                "webignition/html-document-link-finder": ">=3.0,<4",
                 "webignition/url": ">=1.9.6",
-                "webignition/url-health-checker": ">=0.5.3,<1.0",
-                "webignition/web-page-model": ">=1.3,<2.0"
+                "webignition/url-health-checker": ">=1.0,<2",
+                "webignition/web-page-model": ">=3.1.1,<4"
             },
             "require-dev": {
                 "mockery/mockery": "~0.9",
@@ -3388,32 +3391,32 @@
                 "html",
                 "link"
             ],
-            "time": "2018-03-02T16:08:33+00:00"
+            "time": "2018-04-03T12:57:50+00:00"
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "1.6",
+            "version": "3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "b5bb57c34b385a4855fcb82c4fbb054493bf898e"
+                "reference": "8df3d2fd00dcd2008ff234022c17133de3f99f97"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/b5bb57c34b385a4855fcb82c4fbb054493bf898e",
-                "reference": "b5bb57c34b385a4855fcb82c4fbb054493bf898e",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/8df3d2fd00dcd2008ff234022c17133de3f99f97",
+                "reference": "8df3d2fd00dcd2008ff234022c17133de3f99f97",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.6.0",
-                "webignition/absolute-url-deriver": ">=1.4",
-                "webignition/url": ">=1.9.14,<2.0",
-                "webignition/web-page-model": ">=1.1,<2"
+                "webignition/absolute-url-deriver": "^1.4",
+                "webignition/url": "^1.9",
+                "webignition/web-page-model": "^3"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9",
-                "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "3.*"
+                "mockery/mockery": "^1",
+                "phpunit/phpunit": "^5",
+                "squizlabs/php_codesniffer": "^3"
             },
             "type": "library",
             "autoload": {
@@ -3440,7 +3443,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2018-03-15T13:45:20+00:00"
+            "time": "2018-03-23T14:14:01+00:00"
         },
         {
             "name": "webignition/html-document-type",
@@ -3573,21 +3576,73 @@
             "time": "2018-03-12T16:55:32+00:00"
         },
         {
-            "name": "webignition/internet-media-type",
-            "version": "0.4.8",
+            "name": "webignition/http-history-container",
+            "version": "0.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webignition/internet-media-type.git",
-                "reference": "1a5bbe38033b00b23acd5e1dd10489bb07eed77c"
+                "url": "https://github.com/webignition/http-history-container.git",
+                "reference": "996b72792fef9ae51f7ad6d5441284951c18d0cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/internet-media-type/zipball/1a5bbe38033b00b23acd5e1dd10489bb07eed77c",
-                "reference": "1a5bbe38033b00b23acd5e1dd10489bb07eed77c",
+                "url": "https://api.github.com/repos/webignition/http-history-container/zipball/996b72792fef9ae51f7ad6d5441284951c18d0cd",
+                "reference": "996b72792fef9ae51f7ad6d5441284951c18d0cd",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.6.0",
+                "psr/http-message": "^1"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "phpunit/phpunit": "^5.0",
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\HttpHistoryContainer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "A container for Guzzle history middleware",
+            "homepage": "https://github.com/webignition/http-history-container",
+            "keywords": [
+                "Guzzle",
+                "container",
+                "guzzlehttp",
+                "history",
+                "middleware",
+                "psr-7"
+            ],
+            "time": "2018-04-02T16:42:55+00:00"
+        },
+        {
+            "name": "webignition/internet-media-type",
+            "version": "1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/internet-media-type.git",
+                "reference": "464a7699fc1dca47d7b58573e605d0a247de7c5c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/internet-media-type/zipball/464a7699fc1dca47d7b58573e605d0a247de7c5c",
+                "reference": "464a7699fc1dca47d7b58573e605d0a247de7c5c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0",
+                "webignition/internet-media-type-interface": ">=0.1,<1.0",
                 "webignition/quoted-string": ">=0.2.1,<1.0",
                 "webignition/string-parser": ">=0.2.3,<1.0"
             },
@@ -3598,8 +3653,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "webignition\\InternetMediaType\\": "src/",
-                    "webignition\\Tests\\InternetMediaType\\": "tests/"
+                    "webignition\\InternetMediaType\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3621,34 +3675,79 @@
                 "media type",
                 "media-type"
             ],
-            "time": "2018-03-12T14:54:00+00:00"
+            "time": "2018-03-22T10:51:41+00:00"
         },
         {
-            "name": "webignition/node-jslint-output-parser",
-            "version": "1.0.6",
+            "name": "webignition/internet-media-type-interface",
+            "version": "0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webignition/node-jslint-output-parser.git",
-                "reference": "84ddd7286f7bae6aac29071d051abcde5fcd2d0e"
+                "url": "https://github.com/webignition/internet-media-type-interface.git",
+                "reference": "db57dba3b4dacb78c24cb2a4a88768be47794726"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/84ddd7286f7bae6aac29071d051abcde5fcd2d0e",
-                "reference": "84ddd7286f7bae6aac29071d051abcde5fcd2d0e",
+                "url": "https://api.github.com/repos/webignition/internet-media-type-interface/zipball/db57dba3b4dacb78c24cb2a4a88768be47794726",
+                "reference": "db57dba3b4dacb78c24cb2a4a88768be47794726",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "*"
+                "php": ">=5.6.0"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "webignition\\Tests": "tests/",
-                    "": "src/"
+                "psr-4": {
+                    "webignition\\InternetMediaTypeInterface\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "PHP interfaces for a model of an http://en.wikipedia.org/wiki/Internet_media_type",
+            "homepage": "https://github.com/webignition/internet-media-type-interface",
+            "keywords": [
+                "content type",
+                "content-type",
+                "internet media type",
+                "media type",
+                "media-type"
+            ],
+            "time": "2018-03-21T10:55:33+00:00"
+        },
+        {
+            "name": "webignition/node-jslint-output-parser",
+            "version": "2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/node-jslint-output-parser.git",
+                "reference": "eb546e0922ea3e4d8d37987f54822a447e2e7610"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/eb546e0922ea3e4d8d37987f54822a447e2e7610",
+                "reference": "eb546e0922ea3e4d8d37987f54822a447e2e7610",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1",
+                "phpunit/phpunit": "^5",
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\NodeJslintOutput\\": "src/",
+                    "webignition\\Tests\\HtmlDocumentLinkUrlFinder\\": "tests/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3668,33 +3767,34 @@
                 "output",
                 "parser"
             ],
-            "time": "2014-01-26T17:23:17+00:00"
+            "time": "2018-04-03T18:09:57+00:00"
         },
         {
             "name": "webignition/node-jslint-wrapper",
-            "version": "0.5.2",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/node-jslint-wrapper.git",
-                "reference": "68781ff01c37ba5ceb6b27d76053447b97e1d5c2"
+                "reference": "e25a59e17a1445557c72efa73196982d95d1760d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-wrapper/zipball/68781ff01c37ba5ceb6b27d76053447b97e1d5c2",
-                "reference": "68781ff01c37ba5ceb6b27d76053447b97e1d5c2",
+                "url": "https://api.github.com/repos/webignition/node-jslint-wrapper/zipball/e25a59e17a1445557c72efa73196982d95d1760d",
+                "reference": "e25a59e17a1445557c72efa73196982d95d1760d",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "~5",
+                "guzzlehttp/guzzle": "^6",
                 "php": ">=5.6.0",
-                "webignition/node-jslint-output-parser": ">=1.0.6,<2.0",
-                "webignition/web-resource-service": ">=1.4.1,<2"
+                "webignition/node-jslint-output-parser": ">=2,<3",
+                "webignition/web-resource-retriever": ">=0.6,<1",
+                "webignition/web-resource-storage": ">=0.1,<1"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9",
+                "mockery/mockery": ">=0.9",
                 "php-mock/php-mock-mockery": "1.1.0",
                 "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "3.*"
+                "squizlabs/php_codesniffer": "^3"
             },
             "type": "library",
             "autoload": {
@@ -3718,7 +3818,7 @@
                 "jslint",
                 "wrapper"
             ],
-            "time": "2018-03-02T18:14:34+00:00"
+            "time": "2018-04-04T18:04:32+00:00"
         },
         {
             "name": "webignition/quoted-string",
@@ -3914,27 +4014,28 @@
         },
         {
             "name": "webignition/url-health-checker",
-            "version": "0.5.4",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/url-health-checker.git",
-                "reference": "7039b5e4a51adf5e2d2d193b559e1589c24a37d3"
+                "reference": "aa5f49bcabc258d1b33c1b37f0918756c2597c8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/url-health-checker/zipball/7039b5e4a51adf5e2d2d193b559e1589c24a37d3",
-                "reference": "7039b5e4a51adf5e2d2d193b559e1589c24a37d3",
+                "url": "https://api.github.com/repos/webignition/url-health-checker/zipball/aa5f49bcabc258d1b33c1b37f0918756c2597c8d",
+                "reference": "aa5f49bcabc258d1b33c1b37f0918756c2597c8d",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "~5",
+                "guzzlehttp/guzzle": "~6",
                 "php": ">=5.6.0",
-                "webignition/guzzle-curl-exception": ">=0.1.4,<1"
+                "webignition/guzzle-curl-exception": "^1",
+                "webignition/http-history-container": ">=0.3,<1"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9",
-                "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "3.*"
+                "mockery/mockery": "^1",
+                "phpunit/phpunit": "^5.0",
+                "squizlabs/php_codesniffer": "^3"
             },
             "type": "library",
             "autoload": {
@@ -3960,36 +4061,37 @@
                 "health",
                 "url"
             ],
-            "time": "2018-03-15T10:43:01+00:00"
+            "time": "2018-04-02T17:30:09+00:00"
         },
         {
             "name": "webignition/web-json-model",
-            "version": "1.1.6",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-json-model.git",
-                "reference": "509aa11cf2b549418fbd680cac023bc5a0e197a3"
+                "reference": "c70ba4f8f1250539acb0d71b56ee580c16b8ba75"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-json-model/zipball/509aa11cf2b549418fbd680cac023bc5a0e197a3",
-                "reference": "509aa11cf2b549418fbd680cac023bc5a0e197a3",
+                "url": "https://api.github.com/repos/webignition/web-json-model/zipball/c70ba4f8f1250539acb0d71b56ee580c16b8ba75",
+                "reference": "c70ba4f8f1250539acb0d71b56ee580c16b8ba75",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.6.0",
-                "webignition/web-resource-model": ">=1.3,<2"
+                "webignition/web-resource-interfaces": ">=0.1,<1",
+                "webignition/web-resource-model": ">=3.2.1,<4"
             },
             "require-dev": {
-                "mockery/mockery": "^0.9",
-                "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "3.*"
+                "mockery/mockery": "^1.0",
+                "phpunit/phpunit": "^5",
+                "squizlabs/php_codesniffer": "^3",
+                "webignition/web-resource-testing-tools": "^0.2"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "webignition\\WebResource\\JsonDocument\\": "src/",
-                    "webignition\\Tests\\WebResource\\JsonDocument\\": "tests/"
+                    "webignition\\WebResource\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -4008,39 +4110,41 @@
                 "json",
                 "model"
             ],
-            "time": "2018-03-02T09:23:55+00:00"
+            "time": "2018-03-28T11:35:08+00:00"
         },
         {
             "name": "webignition/web-page-model",
-            "version": "1.4",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-page-model.git",
-                "reference": "7de19678708e24100dec3a6a4275c972dc3fbc18"
+                "reference": "56427d522c81ebdf59572dfc431f6b02610d3d43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/7de19678708e24100dec3a6a4275c972dc3fbc18",
-                "reference": "7de19678708e24100dec3a6a4275c972dc3fbc18",
+                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/56427d522c81ebdf59572dfc431f6b02610d3d43",
+                "reference": "56427d522c81ebdf59572dfc431f6b02610d3d43",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.6.0",
                 "querypath/querypath": ">=3.0.0",
-                "webignition/character-set-list": ">=0.2,<1.0",
-                "webignition/internet-media-type": ">=0.1,<1.0",
-                "webignition/web-resource-model": ">=1.3,<2"
+                "webignition/character-set-list": "^0.2",
+                "webignition/internet-media-type": "^1.2",
+                "webignition/internet-media-type-interface": "^0.1",
+                "webignition/web-resource-interfaces": ">=0.1,<1",
+                "webignition/web-resource-model": ">=3.2.1,<4"
             },
             "require-dev": {
-                "mockery/mockery": "^0.9",
-                "phpunit/phpunit": "~4.0",
-                "squizlabs/php_codesniffer": "3.*"
+                "mockery/mockery": "^1",
+                "phpunit/phpunit": "^5",
+                "squizlabs/php_codesniffer": "^3",
+                "webignition/web-resource-testing-tools": "^0.2"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "webignition\\WebResource\\WebPage\\": "src/",
-                    "webignition\\Tests\\WebResource\\WebPage\\": "tests/"
+                    "webignition\\WebResource\\WebPage\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -4059,38 +4163,85 @@
                 "model",
                 "webpage"
             ],
-            "time": "2018-03-19T12:49:28+00:00"
+            "time": "2018-03-28T11:34:19+00:00"
         },
         {
-            "name": "webignition/web-resource-model",
-            "version": "1.3.1",
+            "name": "webignition/web-resource-interfaces",
+            "version": "0.11",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webignition/web-resource-model.git",
-                "reference": "daf56dcd4044fb20c12202adbbb9c19dd619555c"
+                "url": "https://github.com/webignition/web-resource-interfaces.git",
+                "reference": "7e734ccbfde87ba7dd1b4b0ab3b1a5ad77cf5e3a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-model/zipball/daf56dcd4044fb20c12202adbbb9c19dd619555c",
-                "reference": "daf56dcd4044fb20c12202adbbb9c19dd619555c",
+                "url": "https://api.github.com/repos/webignition/web-resource-interfaces/zipball/7e734ccbfde87ba7dd1b4b0ab3b1a5ad77cf5e3a",
+                "reference": "7e734ccbfde87ba7dd1b4b0ab3b1a5ad77cf5e3a",
                 "shasum": ""
             },
             "require": {
-                "doctrine/collections": "~1.0",
-                "guzzlehttp/guzzle": "~5",
                 "php": ">=5.6.0",
-                "webignition/internet-media-type": ">=0.4.7,<2.0"
-            },
-            "require-dev": {
-                "mockery/mockery": "0.9.*",
-                "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "3.*"
+                "psr/http-message": "~1.0",
+                "webignition/internet-media-type-interface": ">=0.1,<1"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "webignition\\WebResource\\": "src/",
-                    "webignition\\Tests\\WebResource\\": "tests/"
+                    "webignition\\WebResourceInterfaces\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Interfaces for web resource models and services to retrieve and create them",
+            "homepage": "https://github.com/webignition/web-resource-interfaces",
+            "keywords": [
+                "Sitemap",
+                "json-document",
+                "model",
+                "psr-7",
+                "web-page"
+            ],
+            "time": "2018-03-29T17:08:09+00:00"
+        },
+        {
+            "name": "webignition/web-resource-model",
+            "version": "3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/web-resource-model.git",
+                "reference": "2a3f75dac635ef24d80e90c831fa9e7f63432fb1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/web-resource-model/zipball/2a3f75dac635ef24d80e90c831fa9e7f63432fb1",
+                "reference": "2a3f75dac635ef24d80e90c831fa9e7f63432fb1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0",
+                "psr/http-message": "^1",
+                "webignition/internet-media-type": "^1.2",
+                "webignition/internet-media-type-interface": "^0.1",
+                "webignition/web-resource-interfaces": ">=0.11,<1"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1",
+                "phpunit/phpunit": "^5",
+                "squizlabs/php_codesniffer": "^3",
+                "webignition/web-resource-testing-tools": "^0.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\WebResource\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -4107,37 +4258,41 @@
             "homepage": "https://github.com/webignition/web-resource-model",
             "keywords": [
                 "modem",
+                "psr-7",
                 "web"
             ],
-            "time": "2018-03-01T16:50:26+00:00"
+            "time": "2018-03-29T17:26:38+00:00"
         },
         {
-            "name": "webignition/web-resource-service",
-            "version": "1.4.1",
+            "name": "webignition/web-resource-retriever",
+            "version": "0.6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webignition/web-resource-service.git",
-                "reference": "7c5c3cb01bb84d7bac2a87ae3625f5be83b21551"
+                "url": "https://github.com/webignition/web-resource-retriever.git",
+                "reference": "547c199c89162a08c31037dbfcbc0fbde4b2b889"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-service/zipball/7c5c3cb01bb84d7bac2a87ae3625f5be83b21551",
-                "reference": "7c5c3cb01bb84d7bac2a87ae3625f5be83b21551",
+                "url": "https://api.github.com/repos/webignition/web-resource-retriever/zipball/547c199c89162a08c31037dbfcbc0fbde4b2b889",
+                "reference": "547c199c89162a08c31037dbfcbc0fbde4b2b889",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "~5",
+                "guzzlehttp/guzzle": "^6",
                 "php": ">=5.6.0",
-                "webignition/internet-media-type": ">=0.4.4,<2.0",
-                "webignition/url": ">=1.9.14,<2.0",
-                "webignition/web-json-model": ">=1.1.6,<2",
-                "webignition/web-page-model": ">=1.3,<2",
-                "webignition/web-resource-model": ">=1.3,<2"
+                "webignition/guzzle-curl-exception": "^1",
+                "webignition/internet-media-type": "^1.2",
+                "webignition/internet-media-type-interface": "^0.1",
+                "webignition/web-json-model": ">=3.1.1,<4",
+                "webignition/web-page-model": ">=3.1.1,<4",
+                "webignition/web-resource-interfaces": ">=0.11,<1",
+                "webignition/web-resource-model": ">=3.3,<4"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9",
-                "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "3.*"
+                "mockery/mockery": "^1.0",
+                "phpunit/phpunit": "^5.0",
+                "squizlabs/php_codesniffer": "^3",
+                "webignition/web-resource-testing-tools": "^0.2"
             },
             "type": "library",
             "autoload": {
@@ -4149,14 +4304,75 @@
             "license": [
                 "MIT"
             ],
-            "description": "Service to retrieve over HTTP a \\webignition\\WebResource\\WebResource",
-            "homepage": "https://github.com/webignition/web-resource-service",
-            "keywords": [
-                "resource",
-                "service",
-                "web"
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
             ],
-            "time": "2018-03-02T10:00:34+00:00"
+            "description": "Retrieve a WebResourceInterface instance over HTTP",
+            "homepage": "https://github.com/webignition/web-resource-retriever",
+            "keywords": [
+                "json-document",
+                "psr-7",
+                "resource",
+                "retriever",
+                "web",
+                "web-page"
+            ],
+            "time": "2018-03-29T18:06:17+00:00"
+        },
+        {
+            "name": "webignition/web-resource-storage",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/web-resource-storage.git",
+                "reference": "e871fc2622e14dc0fbf8b6461d22352c3a9ed7fb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/web-resource-storage/zipball/e871fc2622e14dc0fbf8b6461d22352c3a9ed7fb",
+                "reference": "e871fc2622e14dc0fbf8b6461d22352c3a9ed7fb",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0",
+                "webignition/internet-media-type-interface": "^0.1",
+                "webignition/web-resource-interfaces": ">=0.11,<1"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "phpunit/phpunit": "^5.0",
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\WebResource\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Local storage for a retrieved web resource",
+            "homepage": "https://github.com/webignition/web-resource-storage",
+            "keywords": [
+                "json-document",
+                "psr-7",
+                "resource",
+                "storage",
+                "web",
+                "web-page"
+            ],
+            "time": "2018-04-04T12:17:12+00:00"
         },
         {
             "name": "xrstf/ip-utils",
@@ -5976,8 +6192,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "chrisboulton/php-resque": 20,
-        "chrisboulton/php-resque-scheduler": 20,
-        "guzzlehttp/cache-subscriber": 20
+        "chrisboulton/php-resque-scheduler": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
