@@ -10,7 +10,7 @@ use webignition\InternetMediaType\InternetMediaType;
 use webignition\NodeJslint\Wrapper\Wrapper as NodeJsLintWrapper;
 use webignition\NodeJslintOutput\NodeJslintOutput;
 use webignition\WebResource\Service\Configuration;
-use webignition\WebResource\Service\Service as WebResourceService;
+use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\Url\Url;
 use webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver;
@@ -63,7 +63,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver
 
     /**
      * @param HttpClientService $httpClientService
-     * @param WebResourceService $webResourceService
+     * @param WebResourceRetriever $webResourceService
      * @param NodeJsLintWrapper $nodeJsLintWrapper
      * @param StateService $stateService
      * @param LoggerInterface $logger
@@ -72,7 +72,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver
      */
     public function __construct(
         HttpClientService $httpClientService,
-        WebResourceService $webResourceService,
+        WebResourceRetriever $webResourceService,
         NodeJsLintWrapper $nodeJsLintWrapper,
         StateService $stateService,
         LoggerInterface $logger,

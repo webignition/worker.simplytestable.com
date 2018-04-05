@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
 use webignition\InternetMediaType\InternetMediaType;
-use webignition\WebResource\Service\Service as WebResourceService;
+use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
 class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
@@ -23,12 +23,12 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
 
     /**
      * @param HttpClientService $httpClientService
-     * @param WebResourceService $webResourceService
+     * @param WebResourceRetriever $webResourceService
      * @param StateService $stateService
      */
     public function __construct(
         HttpClientService $httpClientService,
-        WebResourceService $webResourceService,
+        WebResourceRetriever $webResourceService,
         StateService $stateService
     ) {
         $this->setHttpClientService($httpClientService);

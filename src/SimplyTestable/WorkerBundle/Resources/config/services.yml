@@ -15,22 +15,28 @@ services:
         - '@SimplyTestable\WorkerBundle\Services\ResourceLocator'
         - '@SimplyTestable\WorkerBundle\Services\ApplicationConfigurationService'
 
+  GuzzleHttp\Client:
+    factory: ['SimplyTestable\WorkerBundle\Services\HttpClientFactory', create]
+    arguments: ['%curl_options%']
+
   SimplyTestable\WorkerBundle\Services\HttpClientService:
       arguments:
+        - '@GuzzleHttp\Client'
         - '@SimplyTestable\WorkerBundle\Services\HttpCache'
-        - '%curl_options%'
 
-  webignition\WebResource\Service\Configuration:
-    arguments:
-        $configurationValues:
-          allow-unknown-resource-types: false
-          retry-with-url-encoding-disabled: true
-          content-type-web-resource-map: '%content_type_web_resource_map%'
-
-  webignition\WebResource\Service\Service:
-    class:  webignition\WebResource\Service\Service
-    calls:
-      - [setConfiguration, ['@webignition\WebResource\Service\Configuration']]
+#  webignition\WebResource\Service\Configuration:
+#    arguments:
+#        $configurationValues:
+#          allow-unknown-resource-types: false
+#          retry-with-url-encoding-disabled: true
+#          content-type-web-resource-map: '%content_type_web_resource_map%'
+#
+#  webignition\WebResource\Service\Service:
+#    class:  webignition\WebResource\Service\Service
+#    calls:
+#      - [setConfiguration, ['@webignition\WebResource\Service\Configuration']]
+  webignition\WebResource\Retriever:
+    factory: ['SimplyTestable\WorkerBundle\Services\WebResourceRetrieverFactory', create]
 
   webignition\HtmlValidator\Wrapper\Wrapper:
 

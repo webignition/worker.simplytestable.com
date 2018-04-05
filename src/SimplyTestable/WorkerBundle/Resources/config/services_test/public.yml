@@ -10,15 +10,15 @@ services:
         - "@=service('kernel').getRootDir()"
         - "@=service('kernel').getCacheDir()"
 
-  SimplyTestable\WorkerBundle\Services\HttpClientService:
-      arguments:
-        - '@SimplyTestable\WorkerBundle\Services\HttpCache'
-        - '%curl_options%'
-
-  webignition\WebResource\Service\Service:
-    class:  webignition\WebResource\Service\Service
-    calls:
-      - [setConfiguration, ['@webignition\WebResource\Service\Configuration']]
+#  SimplyTestable\WorkerBundle\Services\HttpClientService:
+#      arguments:
+#        - '@SimplyTestable\WorkerBundle\Services\HttpCache'
+#        - '%curl_options%'
+#
+#  webignition\WebResource\Service\Service:
+#    class:  webignition\WebResource\Service\Service
+#    calls:
+#      - [setConfiguration, ['@webignition\WebResource\Service\Configuration']]
 
   SimplyTestable\WorkerBundle\Services\CoreApplicationRouter:
       arguments:
@@ -29,7 +29,7 @@ services:
   SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver:
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@webignition\WebResource\Service\Service'
+        - '@webignition\WebResource\Retriever'
         - '@webignition\HtmlValidator\Wrapper\Wrapper'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
         - '%html-validator-path%'
@@ -38,7 +38,7 @@ services:
     class:   SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@webignition\WebResource\Service\Service'
+        - '@webignition\WebResource\Retriever'
         - '@webignition\CssValidatorWrapper\Wrapper'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
         - '%css-validator-jar-path%'
@@ -46,7 +46,7 @@ services:
   SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver:
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@webignition\WebResource\Service\Service'
+        - '@webignition\WebResource\Retriever'
         - '@webignition\NodeJslint\Wrapper\Wrapper'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
         - '@logger'
@@ -56,14 +56,14 @@ services:
   SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver:
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@webignition\WebResource\Service\Service'
+        - '@webignition\WebResource\Retriever'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
         - '%link_integrity_user_agents%'
 
   SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver:
     arguments:
         - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@webignition\WebResource\Service\Service'
+        - '@webignition\WebResource\Retriever'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
 
   SimplyTestable\WorkerBundle\Services\ResourceLocator:

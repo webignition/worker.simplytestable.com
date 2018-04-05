@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\UrlHealthChecker\Configuration as UrlHealthCheckerConfiguration;
-use webignition\WebResource\Service\Service as WebResourceService;
+use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
 use webignition\HtmlDocument\LinkChecker\Configuration as LinkCheckerConfiguration;
 
@@ -23,13 +23,13 @@ class LinkIntegrityTaskDriver extends WebResourceTaskDriver
 
     /**
      * @param HttpClientService $httpClientService
-     * @param WebResourceService $webResourceService
+     * @param WebResourceRetriever $webResourceService
      * @param StateService $stateService
      * @param string[] $userAgents
      */
     public function __construct(
         HttpClientService $httpClientService,
-        WebResourceService $webResourceService,
+        WebResourceRetriever $webResourceService,
         StateService $stateService,
         $userAgents
     ) {

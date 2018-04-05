@@ -1,4 +1,5 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Services;
 
 use GuzzleHttp\Client as HttpClient;
@@ -43,33 +44,27 @@ class HttpClientService
     private $retrySubscriber;
 
     /**
+     * @param HttpClient $httpClient
      * @param HttpCache $httpCache
-     * @param array $curlOptions
      */
     public function __construct(
-        HttpCache $httpCache,
-        $curlOptions
+        HttpClient $httpClient,
+        HttpCache $httpCache
     ) {
         $this->httpCache = $httpCache;
-
-        foreach ($curlOptions as $curlOption) {
-            if (defined($curlOption['name'])) {
-                $this->curlOptions[constant($curlOption['name'])] = $curlOption['value'];
-            }
-        }
 
         $this->historySubscriber = new HttpHistorySubscriber();
         $this->cookieSubscriber = new HttpCookieSubscriber();
         $this->retrySubscriber = $this->createRetrySubscriber();
 
-        $this->httpClient = new HttpClient([
-            'config' => [
-                'curl' => $this->curlOptions
-            ],
-            'defaults' => [
-                'verify' => false,
-            ],
-        ]);
+//        $this->httpClient = new HttpClient([
+//            'config' => [
+//                'curl' => $this->curlOptions
+//            ],
+//            'defaults' => [
+//                'verify' => false,
+//            ],
+//        ]);
 
         $cacheSubscriber = $this->createCacheSubscriber();
         if (!is_null($cacheSubscriber)) {

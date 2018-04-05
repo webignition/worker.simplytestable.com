@@ -12,7 +12,7 @@ use webignition\CssValidatorWrapper\Configuration\Configuration as CssValidatorW
 use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\Service\Configuration;
-use webignition\WebResource\Service\Service as WebResourceService;
+use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\CssValidatorWrapper\Configuration\Flags as CssValidatorWrapperConfigurationFlags;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
 
@@ -30,14 +30,14 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
 
     /**
      * @param HttpClientService $httpClientService
-     * @param WebResourceService $webResourceService
+     * @param WebResourceRetriever $webResourceService
      * @param CssValidatorWrapper $cssValidatorWrapper
      * @param StateService $stateService
      * @param string $cssValidatorJarPath
      */
     public function __construct(
         HttpClientService $httpClientService,
-        WebResourceService $webResourceService,
+        WebResourceRetriever $webResourceService,
         CssValidatorWrapper $cssValidatorWrapper,
         StateService $stateService,
         $cssValidatorJarPath

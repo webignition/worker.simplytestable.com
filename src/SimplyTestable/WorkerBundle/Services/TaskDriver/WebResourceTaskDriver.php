@@ -11,7 +11,7 @@ use webignition\WebResource\Exception\InvalidContentTypeException;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\WebResource;
 use webignition\WebResource\Exception\Exception as WebResourceException;
-use webignition\WebResource\Service\Service as WebResourceService;
+use webignition\WebResource\Retriever as WebResourceRetriever;
 
 abstract class WebResourceTaskDriver extends TaskDriver
 {
@@ -45,16 +45,16 @@ abstract class WebResourceTaskDriver extends TaskDriver
     private $tooManyRedirectsException = null;
 
     /**
-     * @var WebResourceService
+     * @var WebResourceRetriever
      */
     protected $webResourceService;
 
     /**
-     * @param WebResourceService $webResourceService
+     * @param WebResourceRetriever $webResourceService
      */
-    protected function setWebResourceService(WebResourceService $webResourceService)
+    protected function setWebResourceService(WebResourceRetriever $webResourceService)
     {
-        $this->webResourceService = $webResourceService;
+        $this->WebResourceRetriever = $webResourceService;
     }
 
     /**
@@ -112,7 +112,7 @@ abstract class WebResourceTaskDriver extends TaskDriver
                 $this->task->getUrl()
             );
 
-            return $this->webResourceService->get($request);
+            return $this->WebResourceRetriever->get($request);
         } catch (InvalidContentTypeException $invalidContentTypeException) {
             $this->isNotCorrectWebResourceTypeHandler();
         } catch (WebResourceException $webResourceException) {
