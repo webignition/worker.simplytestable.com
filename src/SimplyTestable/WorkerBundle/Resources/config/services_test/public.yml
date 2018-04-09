@@ -91,3 +91,5 @@ services:
   webignition\CssValidatorWrapper\Wrapper:
 
   webignition\NodeJslint\Wrapper\Wrapper:
+
+  webignition\HttpHistoryContainer\Container:

@@ -15,14 +15,20 @@ services:
         - '@SimplyTestable\WorkerBundle\Services\ResourceLocator'
         - '@SimplyTestable\WorkerBundle\Services\ApplicationConfigurationService'
 
-  GuzzleHttp\Client:
-    factory: ['SimplyTestable\WorkerBundle\Services\HttpClientFactory', create]
-    arguments: ['%curl_options%']
+  webignition\HttpHistoryContainer\Container:
+
+  SimplyTestable\WorkerBundle\Services\HttpClientFactory:
+    arguments:
+      - '%curl_options%'
+      - '@SimplyTestable\WorkerBundle\Services\HttpCache'
+      - '@webignition\HttpHistoryContainer\Container'
+
+#  GuzzleHttp\Client:
+#    factory: ['SimplyTestable\WorkerBundle\Services\HttpClientFactory:create']
 
   SimplyTestable\WorkerBundle\Services\HttpClientService:
       arguments:
-        - '@GuzzleHttp\Client'
-        - '@SimplyTestable\WorkerBundle\Services\HttpCache'
+        - '@SimplyTestable\WorkerBundle\Services\HttpClientFactory'
 
 #  webignition\WebResource\Service\Configuration:
 #    arguments:
