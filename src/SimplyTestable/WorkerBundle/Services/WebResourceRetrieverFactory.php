@@ -11,11 +11,22 @@ class WebResourceRetrieverFactory
     const ALLOW_UNKNOWN_RESOURCE_TYPES = false;
 
     /**
+     * @var HttpClient
+     */
+    private $httpClient;
+
+    /**
      * @param HttpClient $httpClient
-     *
+     */
+    public function __construct(HttpClient $httpClient)
+    {
+        $this->httpClient = $httpClient;
+    }
+
+    /**
      * @return Retriever
      */
-    public static function create(HttpClient $httpClient)
+    public function create()
     {
         $allowedContentTypes = array_merge(
             WebPage::getModelledContentTypeStrings(),
@@ -26,6 +37,10 @@ class WebResourceRetrieverFactory
             ]
         );
 
-        return new Retriever($httpClient, $allowedContentTypes, self::ALLOW_UNKNOWN_RESOURCE_TYPES);
+        return new Retriever(
+            $this->httpClient,
+            $allowedContentTypes,
+            self::ALLOW_UNKNOWN_RESOURCE_TYPES
+        );
     }
 }
