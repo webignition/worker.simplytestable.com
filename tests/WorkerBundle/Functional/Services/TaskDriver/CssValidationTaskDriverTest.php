@@ -2,8 +2,7 @@
 
 namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 
-use Mockery\MockInterface;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
@@ -11,9 +10,6 @@ use Tests\WorkerBundle\Factory\CssValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\HtmlDocumentFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
-use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
-use webignition\CssValidatorWrapper\Configuration\Configuration as CssValidatorWrapperConfiguration;
-use webignition\CssValidatorWrapper\Configuration\Flags as CssValidatorWrapperConfigurationFlags;
 
 class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
 {
@@ -48,7 +44,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @dataProvider performDataProvider
+     * @dataProvider performSuccessDataProvider
      *
      * @param array $httpFixtures
      * @param array $taskParameters
@@ -59,7 +55,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
      * @param int $expectedWarningCount
      * @param array $expectedDecodedOutput
      */
-    public function testPerform(
+    public function testPerformSuccess(
         $httpFixtures,
         $taskParameters,
         $cssValidatorOutput,
@@ -69,7 +65,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
         $expectedWarningCount,
         $expectedDecodedOutput
     ) {
-        $this->setHttpFixtures($httpFixtures);
+        $this->fooHttpClientService->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
@@ -92,13 +88,17 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
     /**
      * @return array
      */
-    public function performDataProvider()
+    public function performSuccessDataProvider()
     {
+        $notFoundResponse = new Response(404);
+        $internalServerErrorResponse = new Response(500);
+        $curl6ConnectException = ConnectExceptionFactory::create('CURL/6 foo');
+
         return [
             'unknown validator exception' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(200, ['content-type' => 'text/html'], 'foo'),
                 ],
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('unknown-exception'),
@@ -119,8 +119,8 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'no errors, ignore warnings' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(200, ['content-type' => 'text/html'], 'foo'),
                 ],
                 'taskParameters' => [
                     'ignore-warnings' => true,
@@ -134,8 +134,8 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'no errors, ignore vendor extension warnings' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(200, ['content-type' => 'text/html'], 'foo'),
                 ],
                 'taskParameters' => [
                     'vendor-extensions' => VendorExtensionSeverityLevel::LEVEL_IGNORE,
@@ -149,8 +149,8 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'three errors' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    "HTTP/1.1 200 OK\nContent-type:text/html\n\nfoo",
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(200, ['content-type' => 'text/html'], 'foo'),
                 ],
                 'taskParameters' => [
                     'ignore-warnings' => true,
@@ -186,17 +186,14 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'http 404 getting linked resource' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    sprintf(
-                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
+                        200,
+                        ['content-type' => 'text/html'],
                         HtmlDocumentFactory::load('empty-body-single-css-link')
                     ),
-                    "HTTP/1.1 404 Not Found",
-                    "HTTP/1.1 404 Not Found",
-                    "HTTP/1.1 404 Not Found",
-                    "HTTP/1.1 404 Not Found",
-                    "HTTP/1.1 404 Not Found",
-                    "HTTP/1.1 404 Not Found",
+                    $notFoundResponse,
+                    $notFoundResponse,
                 ],
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
@@ -216,47 +213,24 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'http 500 getting linked resource' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    sprintf(
-                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
+                        200,
+                        ['content-type' => 'text/html'],
                         HtmlDocumentFactory::load('empty-body-single-css-link')
                     ),
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
-                    "HTTP/1.1 500 Internal Server Error",
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
                 ],
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
@@ -276,12 +250,24 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'curl 6 getting linked resource' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    sprintf(
-                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
+                        200,
+                        ['content-type' => 'text/html'],
                         HtmlDocumentFactory::load('empty-body-single-css-link')
                     ),
-                    ConnectExceptionFactory::create('CURL/6 foo')
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
                 ],
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
@@ -301,12 +287,13 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'invalid content type getting linked resource' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    sprintf(
-                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
+                        200,
+                        ['content-type' => 'text/html'],
                         HtmlDocumentFactory::load('empty-body-single-css-link')
                     ),
-                    "HTTP/1.1 200 OK\nContent-type:application/pdf"
+                    new Response(200, ['content-type' => 'application/pdf']),
                 ],
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
@@ -328,112 +315,21 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @dataProvider performsSetCssValidatorConfigurationDataProvider
-     *
-     * @param array $taskParameters
-     * @param array $expectedConfigurationValues
-     */
-    public function testPerformSetCssValidatorConfiguration(
-        $taskParameters,
-        $expectedConfigurationValues
-    ) {
-        $content = 'foo';
-
-        $this->setHttpFixtures([
-            "HTTP/1.1 200 OK\nContent-type:text/html",
-            "HTTP/1.1 200 OK\nContent-type:text/html\n\n" . $content,
-        ]);
-
-        $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
-                'parameters' => json_encode($taskParameters),
-            ])
-        );
-
-        CssValidatorFixtureFactory::set(CssValidatorFixtureFactory::load('no-messages'));
-
-        /* @var CssValidatorWrapper|MockInterface $cssValidatorWrapper */
-        $cssValidatorWrapper = \Mockery::spy(
-            $this->container->get(CssValidatorWrapper::class)
-        );
-
-        $this->getTaskDriver()->setCssValidatorWrapper($cssValidatorWrapper);
-
-        $this->taskDriver->perform($task);
-
-        $standardConfigurationValues = [
-            CssValidatorWrapperConfiguration::CONFIG_KEY_CSS_VALIDATOR_JAR_PATH =>
-                $this->container->getParameter('css-validator-jar-path'),
-            CssValidatorWrapperConfiguration::CONFIG_KEY_URL_TO_VALIDATE =>
-                'http://example.com/',
-            CssValidatorWrapperConfiguration::CONFIG_KEY_CONTENT_TO_VALIDATE =>
-                $content,
-            CssValidatorWrapperConfiguration::CONFIG_KEY_HTTP_CLIENT =>
-                $this->container->get(HttpClientService::class)->get(),
-        ];
-
-        $cssValidatorWrapper
-            ->shouldHaveReceived('createConfiguration')
-            ->once()
-            ->with(array_merge($expectedConfigurationValues, $standardConfigurationValues));
-    }
-
-    /**
-     * @return array
-     */
-    public function performsSetCssValidatorConfigurationDataProvider()
-    {
-        return [
-            'default' => [
-                'taskParameters' => [],
-                'expectedConfigurationValues' => [
-                    CssValidatorWrapperConfiguration::CONFIG_KEY_VENDOR_EXTENSION_SEVERITY_LEVEL =>
-                        VendorExtensionSeverityLevel::LEVEL_WARN,
-                    CssValidatorWrapperConfiguration::CONFIG_KEY_DOMAINS_TO_IGNORE => [],
-                    CssValidatorWrapperConfiguration::CONFIG_KEY_FLAGS => [
-                        CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_FALSE_IMAGE_DATA_URL_MESSAGES,
-                    ],
-                ],
-            ],
-            'non-default' => [
-                'taskParameters' => [
-                    'vendor-extensions' => VendorExtensionSeverityLevel::LEVEL_ERROR,
-                    'domains-to-ignore' => [
-                        'foo',
-                        'bar',
-                    ],
-                    'ignore-warnings' => true,
-                ],
-                'expectedConfigurationValues' => [
-                    CssValidatorWrapperConfiguration::CONFIG_KEY_FLAGS => [
-                        CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_FALSE_IMAGE_DATA_URL_MESSAGES,
-                        CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_WARNINGS,
-                    ],
-                    CssValidatorWrapperConfiguration::CONFIG_KEY_VENDOR_EXTENSION_SEVERITY_LEVEL =>
-                        VendorExtensionSeverityLevel::LEVEL_ERROR,
-                    CssValidatorWrapperConfiguration::CONFIG_KEY_DOMAINS_TO_IGNORE => [
-                        'foo',
-                        'bar',
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider cookiesDataProvider
      *
      * {@inheritdoc}
      */
-    public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
+    public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->setHttpFixtures([
-            sprintf(
-                "HTTP/1.1 200\nContent-Type:text/html\n\n%s",
+        $this->fooHttpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(
+                200,
+                ['content-type' => 'text/html'],
                 HtmlDocumentFactory::load('empty-body-single-css-link')
             ),
-            "HTTP/1.1 200 OK\nContent-type:text/css\n\n"
+            new Response(200, ['content-type' => 'text/css']),
+            new Response(200, ['content-type' => 'text/css']),
         ]);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
@@ -445,8 +341,12 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        foreach ($this->container->get(HttpClientService::class)->getHistory()->getRequests(true) as $request) {
-            $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
+        $historicalRequests = $this->fooHttpClientService->getHistory()->getRequests();
+        $this->assertCount(4, $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
+            $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
         }
     }
 
@@ -455,14 +355,17 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
      *
      * {@inheritdoc}
      */
-    public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
+    public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->setHttpFixtures([
-            sprintf(
-                "HTTP/1.1 200\nContent-Type:text/html\n\n%s",
+        $this->fooHttpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(
+                200,
+                ['content-type' => 'text/html'],
                 HtmlDocumentFactory::load('empty-body-single-css-link')
             ),
-            "HTTP/1.1 200 OK\nContent-type:text-css\n\n"
+            new Response(200, ['content-type' => 'text/css']),
+            new Response(200, ['content-type' => 'text/css']),
         ]);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
@@ -474,9 +377,14 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        foreach ($this->container->get(HttpClientService::class)->getHistory()->getRequests(true) as $request) {
+        $historicalRequests = $this->fooHttpClientService->getHistory()->getRequests();
+        $this->assertCount(4, $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $authorizationHeaderLine = $historicalRequest->getHeaderLine('authorization');
+
             $decodedAuthorizationHeaderValue = base64_decode(
-                str_replace('Basic', '', $request->getHeader('authorization'))
+                str_replace('Basic ', '', $authorizationHeaderLine)
             );
 
             $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);

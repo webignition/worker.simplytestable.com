@@ -33,4 +33,12 @@ class TestFooHttpClientService extends FooHttpClientService
             $this->mockHandler->append($fixture);
         }
     }
+
+    /**
+     * @return MockHandler
+     */
+    public function getMockHandler()
+    {
+        return $this->mockHandler;
+    }
 }

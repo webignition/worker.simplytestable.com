@@ -43,16 +43,8 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
     ) {
         parent::__construct($stateService, $fooHttpClientService, $webResourceRetriever);
 
-        $this->setHtmlValidatorWrapper($htmlValidatorWrapper);
+        $this->htmlValidatorWrapper = $htmlValidatorWrapper;
         $this->validatorPath = $validatorPath;
-    }
-
-    /**
-     * @param HtmlValidatorWrapper $wrapper
-     */
-    public function setHtmlValidatorWrapper(HtmlValidatorWrapper $wrapper)
-    {
-        $this->htmlValidatorWrapper = $wrapper;
     }
 
     /**

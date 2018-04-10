@@ -2,16 +2,26 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
+use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\GuzzleHttp\Exception\CurlException\Exception as CurlException;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
+use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
+use webignition\WebResource\Exception\HttpException;
 use webignition\WebResource\Exception\InvalidContentTypeException;
+use webignition\WebResource\Exception\InvalidResponseContentTypeException;
+use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\WebResource;
 use webignition\WebResource\Exception\Exception as WebResourceException;
 use webignition\WebResource\Retriever as WebResourceRetriever;
+use webignition\WebResourceInterfaces\WebResourceInterface;
 
 abstract class WebResourceTaskDriver extends TaskDriver
 {
@@ -19,15 +29,17 @@ abstract class WebResourceTaskDriver extends TaskDriver
     const CURL_CODE_TIMEOUT = 28;
     const CURL_CODE_DNS_LOOKUP_FAILURE = 6;
 
-    /**
-     * @var WebResourceException
-     */
-    private $webResourceException = null;
+    const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
 
     /**
-     * @var CurlException
+     * @var HttpException
      */
-    private $curlException = null;
+    private $httpException;
+
+    /**
+     * @var TransportException
+     */
+    private $transportException;
 
     /**
      * @var WebResource
@@ -40,49 +52,60 @@ abstract class WebResourceTaskDriver extends TaskDriver
     protected $task;
 
     /**
-     * @var TooManyRedirectsException
-     */
-    private $tooManyRedirectsException = null;
-
-    /**
      * @var WebResourceRetriever
      */
-    protected $webResourceService;
+    protected $webResourceRetriever;
 
     /**
-     * @param WebResourceRetriever $webResourceService
+     * @var FooHttpClientService
      */
-    protected function setWebResourceService(WebResourceRetriever $webResourceService)
-    {
-        $this->WebResourceRetriever = $webResourceService;
+    protected $fooHttpClientService;
+
+    /**
+     * @param StateService $stateService
+     * @param FooHttpClientService $fooHttpClientService
+     * @param WebResourceRetriever $webResourceRetriever
+     */
+    public function __construct(
+        StateService $stateService,
+        FooHttpClientService $fooHttpClientService,
+        WebResourceRetriever $webResourceRetriever
+    ) {
+        parent::__construct($stateService);
+
+        $this->fooHttpClientService = $fooHttpClientService;
+        $this->webResourceRetriever = $webResourceRetriever;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws InternetMediaTypeParseException
+     * @throws TransportException
      */
     public function execute(Task $task)
     {
         $this->task = $task;
 
-        $this->getHttpClientService()->setUserAgent('ST Web Resource Task Driver (http://bit.ly/RlhKCL)');
-        $this->getHttpClientService()->setCookies($this->task->getParameter('cookies'));
-        $this->getHttpClientService()->setBasicHttpAuthorization(
+        $this->fooHttpClientService->setCookies($this->task->getParameter('cookies'));
+        $this->fooHttpClientService->setBasicHttpAuthorization(
             $this->task->getParameter('http-auth-username'),
-            $this->task->getParameter('http-auth-password')
+            $this->task->getParameter('http-auth-password'),
+            'example.com'
         );
 
         $this->webResource = $this->getWebResource();
-
-        $this->getHttpClientService()->resetUserAgent();
-        $this->getHttpClientService()->clearCookies();
-        $this->getHttpClientService()->clearBasicHttpAuthorization();
 
         if (!$this->response->hasSucceeded()) {
             return $this->hasNotSucceededHandler();
         }
 
         if (!$this->webResource instanceof WebPage) {
-            return $this->isNotCorrectWebResourceTypeHandler();
+            $this->response->setHasBeenSkipped();
+            $this->response->setIsRetryable(false);
+            $this->response->setErrorCount(0);
+
+            return null;
         }
 
         if (empty($this->webResource->getContent())) {
@@ -97,54 +120,82 @@ abstract class WebResourceTaskDriver extends TaskDriver
      */
     abstract protected function hasNotSucceededHandler();
 
-    abstract protected function isNotCorrectWebResourceTypeHandler();
     abstract protected function isBlankWebResourceHandler();
     abstract protected function performValidation();
 
     /**
-     * @return WebResource
+     * @return WebResourceInterface
+     *
+     * @throws InternetMediaTypeParseException
+     * @throws TransportException
      */
     protected function getWebResource()
     {
-        try {
-            $request = $this->getHttpClientService()->get()->createRequest(
-                'GET',
-                $this->task->getUrl()
-            );
+        $request = new Request('GET', $this->task->getUrl(), [
+            'user-agent' => self::USER_AGENT,
+        ]);
 
-            return $this->WebResourceRetriever->get($request);
-        } catch (InvalidContentTypeException $invalidContentTypeException) {
-            $this->isNotCorrectWebResourceTypeHandler();
-        } catch (WebResourceException $webResourceException) {
+        try {
+            return $this->webResourceRetriever->retrieve($request);
+        } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
+            $this->response->setHasBeenSkipped();
+            $this->response->setIsRetryable(false);
+            $this->response->setErrorCount(0);
+        } catch (HttpException $httpException) {
+            $this->httpException = $httpException;
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
 
-            $this->webResourceException = $webResourceException;
-        } catch (ConnectException $connectException) {
-            $curlExceptionFactory = new CurlExceptionFactory();
-
-            if (!$curlExceptionFactory->isCurlException($connectException)) {
-                throw $connectException;
+            // bad request, bad response, too many redirects, ...
+        } catch (TransportException $transportException) {
+            if (!$transportException->isCurlException() && !$transportException->isTooManyRedirectsException()) {
+                throw $transportException;
             }
 
-            $curlException = $curlExceptionFactory->fromConnectException($connectException);
-
+            $this->transportException = $transportException;
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
-
-            $this->curlException = $curlException;
-        } catch (TooManyRedirectsException $tooManyRedirectsException) {
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
-
-            $this->tooManyRedirectsException = $tooManyRedirectsException;
+            // curl things ...
         }
+        return null;
+
+//        try {
+//            $request = $this->getHttpClientService()->get()->createRequest(
+//                'GET',
+//                $this->task->getUrl()
+//            );
+
+//            return $this->webResourceRetriever->retrieve($request);
+//        } catch (WebResourceException $webResourceException) {
+//            $this->response->setHasFailed();
+//            $this->response->setIsRetryable(false);
+//
+//            $this->webResourceException = $webResourceException;
+//        } catch (ConnectException $connectException) {
+//            $curlExceptionFactory = new CurlExceptionFactory();
+//
+//            if (!$curlExceptionFactory->isCurlException($connectException)) {
+//                throw $connectException;
+//            }
+//
+//            $curlException = $curlExceptionFactory->fromConnectException($connectException);
+//
+//            $this->response->setHasFailed();
+//            $this->response->setIsRetryable(false);
+//
+//            $this->curlException = $curlException;
+//        } catch (TooManyRedirectsException $tooManyRedirectsException) {
+//            $this->response->setHasFailed();
+//            $this->response->setIsRetryable(false);
+//
+//            $this->tooManyRedirectsException = $tooManyRedirectsException;
+//        }
     }
 
     /**
      * @return \stdClass
      */
-    protected function getWebResourceExceptionOutput()
+    protected function getHttpExceptionOutput()
     {
         return (object)[
             'messages' => [
@@ -162,7 +213,7 @@ abstract class WebResourceTaskDriver extends TaskDriver
      */
     private function getOutputMessage()
     {
-        if (!empty($this->tooManyRedirectsException)) {
+        if ($this->hasTooManyRedirectsException()) {
             if ($this->isRedirectLoopException()) {
                 return 'Redirect loop detected';
             }
@@ -170,23 +221,27 @@ abstract class WebResourceTaskDriver extends TaskDriver
             return 'Redirect limit reached';
         }
 
-        if (!empty($this->curlException)) {
-            if (self::CURL_CODE_TIMEOUT == $this->curlException->getCurlCode()) {
-                return 'Timeout reached retrieving resource';
-            }
+        if (!empty($this->transportException)) {
+            if ($this->transportException->isCurlException()) {
+                if (self::CURL_CODE_TIMEOUT == $this->transportException->getCode()) {
+                    return 'Timeout reached retrieving resource';
+                }
 
-            if (self::CURL_CODE_DNS_LOOKUP_FAILURE == $this->curlException->getCurlCode()) {
-                return 'DNS lookup failure resolving resource domain name';
-            }
+                if (self::CURL_CODE_DNS_LOOKUP_FAILURE == $this->transportException->getCode()) {
+                    return 'DNS lookup failure resolving resource domain name';
+                }
 
-            if (self::CURL_CODE_INVALID_URL == $this->curlException->getCurlCode()) {
-                return 'Invalid resource URL';
+                if (self::CURL_CODE_INVALID_URL == $this->transportException->getCode()) {
+                    return 'Invalid resource URL';
+                }
+
+                return '';
             }
 
             return '';
         }
 
-        return $this->webResourceException->getResponse()->getReasonPhrase();
+        return $this->httpException->getMessage();
     }
 
     /**
@@ -194,7 +249,7 @@ abstract class WebResourceTaskDriver extends TaskDriver
      */
     private function getOutputMessageId()
     {
-        if (!empty($this->tooManyRedirectsException)) {
+        if ($this->hasTooManyRedirectsException()) {
             if ($this->isRedirectLoopException()) {
                 return 'redirect-loop';
             }
@@ -202,11 +257,15 @@ abstract class WebResourceTaskDriver extends TaskDriver
             return 'redirect-limit-reached';
         }
 
+        if (!empty($this->transportException)) {
+            return 'curl-code-' . $this->transportException->getCode();
+        }
+
         if (!empty($this->curlException)) {
             return 'curl-code-' . $this->curlException->getCurlCode();
         }
 
-        return $this->webResourceException->getResponse()->getStatusCode();
+        return $this->httpException->getCode();
     }
 
     /**
@@ -214,21 +273,44 @@ abstract class WebResourceTaskDriver extends TaskDriver
      */
     private function isRedirectLoopException()
     {
-        $history = $this->getHttpClientService()->getHistory();
-        $urlHistory = array();
+        $httpHistory = $this->fooHttpClientService->getHistory();
 
-        $history->getRequests();
+        $responses = $httpHistory->getResponses();
+        $responseHistoryContainsOnlyRedirects = true;
 
-        foreach ($history->getRequests(true) as $request) {
-            $urlHistory[] = $request->getUrl();
+        foreach ($responses as $response) {
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 300 || $statusCode >=400) {
+                $responseHistoryContainsOnlyRedirects = false;
+            }
         }
 
-        foreach ($urlHistory as $urlIndex => $url) {
-            if (in_array($url, array_slice($urlHistory, $urlIndex + 1))) {
+        if (!$responseHistoryContainsOnlyRedirects) {
+            return false;
+        }
+
+        $requestUrls = $httpHistory->getRequestUrlsAsStrings();
+        $requestUrls = array_slice($requestUrls, count($requestUrls) / 2);
+
+        foreach ($requestUrls as $urlIndex => $url) {
+            if (in_array($url, array_slice($requestUrls, $urlIndex + 1))) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasTooManyRedirectsException()
+    {
+        if (empty($this->transportException)) {
+            return false;
+        }
+
+        return $this->transportException->isTooManyRedirectsException();
     }
 }

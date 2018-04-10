@@ -7,13 +7,8 @@ services:
       - '@webignition\HtmlValidator\Wrapper\Wrapper'
       - '%html-validator-path%'
 
-  SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver:
-    class:   SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
+  SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidatorWrapperConfigurationFactory:
     arguments:
-      - '@SimplyTestable\WorkerBundle\Services\StateService'
-      - '@SimplyTestable\WorkerBundle\Services\FooHttpClientService'
-      - '@webignition\WebResource\Retriever'
-      - '@webignition\CssValidatorWrapper\Wrapper'
       - '%css-validator-jar-path%'
 
   SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver:

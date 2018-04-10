@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "df5742630eaad9f2c51c85d13e5e3d2d",
+    "content-hash": "75323843661c70d35ead07084bf6772f",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -3156,16 +3156,16 @@
         },
         {
             "name": "webignition/css-validator-output-parser",
-            "version": "3.0",
+            "version": "3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-output-parser.git",
-                "reference": "a7d879b91b09349532d1d04ae5d9376e88c03187"
+                "reference": "a8d1f5adb13ec1097788e7b17df636a2a846804c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/a7d879b91b09349532d1d04ae5d9376e88c03187",
-                "reference": "a7d879b91b09349532d1d04ae5d9376e88c03187",
+                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/a8d1f5adb13ec1097788e7b17df636a2a846804c",
+                "reference": "a8d1f5adb13ec1097788e7b17df636a2a846804c",
                 "shasum": ""
             },
             "require": {
@@ -3200,7 +3200,7 @@
                 "parser",
                 "validator"
             ],
-            "time": "2018-03-30T18:35:39+00:00"
+            "time": "2018-04-10T14:59:49+00:00"
         },
         {
             "name": "webignition/css-validator-wrapper",

@@ -3,6 +3,7 @@
 namespace Tests\WorkerBundle\Functional;
 
 use SimplyTestable\WorkerBundle\Services\HttpCache;
+use SimplyTestable\WorkerBundle\Services\HttpClientFactory;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Client;
@@ -46,20 +47,6 @@ abstract class AbstractBaseTestCase extends WebTestCase
         }
 
         return $returnValue === 0;
-    }
-
-    /**
-     * @param array $fixtures
-     */
-    protected function setHttpFixtures($fixtures)
-    {
-        $httpCache = $this->container->get(HttpCache::class);
-        $httpCache->clear();
-
-        $httpClientService = $this->container->get(HttpClientService::class);
-        $httpClientService->get()->getEmitter()->attach(
-            new HttpMockSubscriber($fixtures)
-        );
     }
 
     /**
