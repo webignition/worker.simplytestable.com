@@ -5,12 +5,13 @@ services:
     autoconfigure: true
     public: true
 
-  SimplyTestable\WorkerBundle\Services\HttpClientFactory:
-    class:   Tests\WorkerBundle\Services\TestHttpClientFactory
+  SimplyTestable\WorkerBundle\Services\FooHttpClientService:
+    class:   Tests\WorkerBundle\Services\TestFooHttpClientService
     arguments:
       - '%curl_options%'
       - '@SimplyTestable\WorkerBundle\Services\HttpCache'
       - '@webignition\HttpHistoryContainer\Container'
+      - '@SimplyTestable\WorkerBundle\Services\GuzzleMiddleware\HttpAuthenticationMiddleware'
 
   SimplyTestable\WorkerBundle\Services\TaskService:
     class:   Tests\WorkerBundle\Services\TestTaskService
@@ -21,7 +22,7 @@ services:
         - '@SimplyTestable\WorkerBundle\Services\UrlService'
         - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
         - '@SimplyTestable\WorkerBundle\Services\WorkerService'
-        - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
+        - '@GuzzleHttp\Client'
     calls:
       - [addTaskDriver, ['html validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver']]
       - [addTaskDriver, ['css validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver']]

@@ -1,4 +1,6 @@
 imports:
+    - { resource: services/http-client.yml }
+    - { resource: services/web-resource-retriever.yml }
     - { resource: services/task-drivers.yml }
     - { resource: services/resque-job-factory.yml }
     - { resource: services/public.yml }
@@ -15,21 +17,6 @@ services:
         - '@SimplyTestable\WorkerBundle\Services\ResourceLocator'
         - '@SimplyTestable\WorkerBundle\Services\ApplicationConfigurationService'
 
-  webignition\HttpHistoryContainer\Container:
-
-  SimplyTestable\WorkerBundle\Services\HttpClientFactory:
-    arguments:
-      - '%curl_options%'
-      - '@SimplyTestable\WorkerBundle\Services\HttpCache'
-      - '@webignition\HttpHistoryContainer\Container'
-
-#  GuzzleHttp\Client:
-#    factory: ['SimplyTestable\WorkerBundle\Services\HttpClientFactory:create']
-
-  SimplyTestable\WorkerBundle\Services\HttpClientService:
-      arguments:
-        - '@SimplyTestable\WorkerBundle\Services\HttpClientFactory'
-
 #  webignition\WebResource\Service\Configuration:
 #    arguments:
 #        $configurationValues:
@@ -41,8 +28,6 @@ services:
 #    class:  webignition\WebResource\Service\Service
 #    calls:
 #      - [setConfiguration, ['@webignition\WebResource\Service\Configuration']]
-  webignition\WebResource\Retriever:
-    factory: ['SimplyTestable\WorkerBundle\Services\WebResourceRetrieverFactory', create]
 
   webignition\HtmlValidator\Wrapper\Wrapper:
 
@@ -71,7 +56,7 @@ services:
         - '@SimplyTestable\WorkerBundle\Services\UrlService'
         - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
         - '@SimplyTestable\WorkerBundle\Services\WorkerService'
-        - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
+        - '@GuzzleHttp\Client'
     calls:
       - [addTaskDriver, ['html validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver']]
       - [addTaskDriver, ['css validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver']]

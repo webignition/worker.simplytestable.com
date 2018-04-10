@@ -1,0 +1,18 @@
+services:
+  webignition\HttpHistoryContainer\Container:
+
+  SimplyTestable\WorkerBundle\Services\GuzzleMiddleware\HttpAuthenticationMiddleware:
+
+  SimplyTestable\WorkerBundle\Services\FooHttpClientService:
+    arguments:
+      - '%curl_options%'
+      - '@SimplyTestable\WorkerBundle\Services\HttpCache'
+      - '@webignition\HttpHistoryContainer\Container'
+      - '@SimplyTestable\WorkerBundle\Services\GuzzleMiddleware\HttpAuthenticationMiddleware'
+      - '@GuzzleHttp\Cookie\CookieJarInterface'
+
+  GuzzleHttp\Cookie\CookieJarInterface:
+    class: GuzzleHttp\Cookie\CookieJar
+
+  GuzzleHttp\Client:
+    factory: 'SimplyTestable\WorkerBundle\Services\FooHttpClientService:getHttpClient'
