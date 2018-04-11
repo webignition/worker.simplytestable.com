@@ -3,46 +3,27 @@
 namespace SimplyTestable\WorkerBundle\Services\GuzzleMiddleware;
 
 use Psr\Http\Message\RequestInterface;
+use SimplyTestable\WorkerBundle\Model\HttpAuthenticationCredentials;
+use SimplyTestable\WorkerBundle\Model\HttpAuthenticationHeader;
 
 class HttpAuthenticationMiddleware
 {
     /**
-     * @var string
+     * @var HttpAuthenticationCredentials
      */
-    private $username;
+    private $httpAuthenticationCredentials;
 
-    /**
-     * @var string
-     */
-    private $password;
-
-    /**
-     * @var string
-     */
-    private $domain;
-
-    /**
-     * @param string $username
-     */
-    public function setUsername($username)
+    public function __construct()
     {
-        $this->username = $username;
+        $this->httpAuthenticationCredentials = new HttpAuthenticationCredentials();
     }
 
     /**
-     * @param string $password
+     * @param HttpAuthenticationCredentials $httpAuthenticationCredentials
      */
-    public function setPassword($password)
+    public function setHttpAuthenticationCredentials(HttpAuthenticationCredentials $httpAuthenticationCredentials)
     {
-        $this->password = $password;
-    }
-
-    /**
-     * @param string $domain
-     */
-    public function setDomain($domain)
-    {
-        $this->domain = strtolower($domain);
+        $this->httpAuthenticationCredentials = $httpAuthenticationCredentials;
     }
 
     /**
@@ -53,43 +34,23 @@ class HttpAuthenticationMiddleware
     public function __invoke(callable $handler)
     {
         return function (RequestInterface $request, array $options) use (&$handler) {
-            if (empty($this->username)) {
+            if ($this->httpAuthenticationCredentials->isEmpty()) {
                 return $handler($request, $options);
             }
 
-            if (!$this->validateDomain($request)) {
+            $httpAuthenicationHeader = new HttpAuthenticationHeader($this->httpAuthenticationCredentials);
+
+            if (!$httpAuthenicationHeader->isValidForRequest($request)) {
                 return $handler($request, $options);
             }
-
-            $usernamePasswordPart = base64_encode(sprintf(
-                '%s:%s',
-                $this->username,
-                $this->password
-            ));
 
             return $handler(
-                $request->withAddedHeader(
-                    'Authorization',
-                    'Basic ' . $usernamePasswordPart
+                $request->withHeader(
+                    $httpAuthenicationHeader->getName(),
+                    $httpAuthenicationHeader->getValue()
                 ),
                 $options
             );
         };
-    }
-
-    /**
-     * @param RequestInterface $request
-     *
-     * @return bool
-     */
-    private function validateDomain(RequestInterface $request)
-    {
-        $requestHost = $request->getHeaderLine('host');
-
-        if ($requestHost === $this->domain) {
-            return true;
-        }
-
-        return preg_match('/' . preg_quote($this->domain, '//') . '$/', $requestHost) > 0;
     }
 }

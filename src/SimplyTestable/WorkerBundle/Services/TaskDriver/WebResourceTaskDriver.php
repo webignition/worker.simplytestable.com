@@ -2,24 +2,17 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
-use GuzzleHttp\Cookie\SetCookie;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\TooManyRedirectsException;
-use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Model\HttpAuthenticationCredentials;
 use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
-use webignition\GuzzleHttp\Exception\CurlException\Exception as CurlException;
-use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebResource\Exception\HttpException;
-use webignition\WebResource\Exception\InvalidContentTypeException;
 use webignition\WebResource\Exception\InvalidResponseContentTypeException;
 use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\WebResource;
-use webignition\WebResource\Exception\Exception as WebResourceException;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResourceInterfaces\WebResourceInterface;
 
@@ -88,11 +81,12 @@ abstract class WebResourceTaskDriver extends TaskDriver
         $this->task = $task;
 
         $this->fooHttpClientService->setCookies($this->task->getParameter('cookies'));
-        $this->fooHttpClientService->setBasicHttpAuthorization(
+        $this->fooHttpClientService->setBasicHttpAuthorization(new HttpAuthenticationCredentials(
             $this->task->getParameter('http-auth-username'),
             $this->task->getParameter('http-auth-password'),
             'example.com'
-        );
+        ));
+        $this->fooHttpClientService->setRequestHeader('User-Agent', self::USER_AGENT);
 
         $this->webResource = $this->getWebResource();
 
@@ -131,9 +125,7 @@ abstract class WebResourceTaskDriver extends TaskDriver
      */
     protected function getWebResource()
     {
-        $request = new Request('GET', $this->task->getUrl(), [
-            'user-agent' => self::USER_AGENT,
-        ]);
+        $request = new Request('GET', $this->task->getUrl());
 
         try {
             return $this->webResourceRetriever->retrieve($request);
