@@ -2,32 +2,24 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
-use GuzzleHttp\Exception\ConnectException;
 use Psr\Log\LoggerInterface;
+use QueryPath\Exception as QueryPathException;
 use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
-use webignition\NodeJslint\Wrapper\Configuration\Configuration as WrapperConfiguration;
 use webignition\NodeJslint\Wrapper\Wrapper as NodeJsLintWrapper;
 use webignition\NodeJslintOutput\Entry\ParserException as OutputEntryParserException;
 use webignition\NodeJslintOutput\NodeJslintOutput;
 use webignition\WebResource\Exception\HttpException;
 use webignition\WebResource\Exception\InvalidResponseContentTypeException;
 use webignition\WebResource\Exception\TransportException;
-use webignition\WebResource\Service\Configuration;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\Url\Url;
 use webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver;
-use webignition\WebResource\Exception\Exception as WebResourceException;
-use webignition\WebResource\Exception\InvalidContentTypeException;
-use webignition\NodeJslint\Wrapper\Configuration\Flag\JsLint as JsLintFlag;
-use webignition\NodeJslint\Wrapper\Configuration\Option\JsLint as JsLintOption;
 use webignition\NodeJslintOutput\Exception as NodeJslintOutputException;
-use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptionFactory;
 use webignition\NodeJslintOutput\Entry\Entry as NodeJslintOutputEntry;
-use webignition\NodeJslint\Wrapper\Configuration\Configuration as NodeJslintWrapperConfiguration;
 
 class JsLintTaskDriver extends WebResourceTaskDriver
 {
@@ -53,16 +45,6 @@ class JsLintTaskDriver extends WebResourceTaskDriver
      * @var NodeJsLintWrapper
      */
     private $nodeJsLintWrapper;
-
-    /**
-     * @var string
-     */
-    private $nodePath;
-
-    /**
-     * @var string
-     */
-    private $nodeJsLintPath;
 
     /**
      * @var LoggerInterface
@@ -92,19 +74,11 @@ class JsLintTaskDriver extends WebResourceTaskDriver
     ) {
         parent::__construct($stateService, $fooHttpClientService, $webResourceRetriever);
 
-        $this->setNodeJsLintWrapper($nodeJsLintWrapper);
+        $this->nodeJsLintWrapper = $nodeJsLintWrapper;
         $this->logger = $logger;
         $this->nodeJsLintWrapperConfigurationFactory = $nodeJsLintWrapperConfigurationFactory;
 
         $this->nodeJsLintWrapper->setHttpClient($this->fooHttpClientService->getHttpClient());
-    }
-
-    /**
-     * @param NodeJsLintWrapper $wrapper
-     */
-    public function setNodeJsLintWrapper(NodeJsLintWrapper $wrapper)
-    {
-        $this->nodeJsLintWrapper = $wrapper;
     }
 
     /**
@@ -145,6 +119,7 @@ class JsLintTaskDriver extends WebResourceTaskDriver
      * @throws NodeJslintOutputException
      * @throws OutputEntryParserException
      * @throws TransportException
+     * @throws QueryPathException
      */
     protected function performValidation()
     {
@@ -238,41 +213,6 @@ class JsLintTaskDriver extends WebResourceTaskDriver
                     throw $transportException;
                 }
             }
-
-//            try {
-//                $nodeJsLintOutput = $this->nodeJsLintWrapper->validate($scriptUrl);
-//                foreach ($nodeJsLintOutput->getEntries() as $entry) {
-//                    /* @var $entry \webignition\NodeJslintOutput\Entry\Entry */
-//                    if (strlen($entry->getEvidence()) > self::MAXIMUM_FRAGMENT_LENGTH) {
-//                        $entry->setEvidence(substr($entry->getEvidence(), 0, self::MAXIMUM_FRAGMENT_LENGTH));
-//                    }
-//                }
-//
-//                $jsLintOutput[(string)$scriptUrl] = $this->nodeJsLintOutputToArray($nodeJsLintOutput);
-//                $errorCount += $this->getNodeJsErrorCount($nodeJsLintOutput);
-//            } catch (WebResourceException $webResourceException) {
-//                $jsLintOutput[(string)$scriptUrl] = array(
-//                    'statusLine' => 'failed',
-//                    'errorReport' => array(
-//                        'reason' => 'webResourceException',
-//                        'statusCode' => $webResourceException->getCode()
-//                    )
-//                );
-//
-//                $errorCount++;
-//            } catch (ConnectException $connectException) {
-//                $curlException = GuzzleCurlExceptionFactory::fromConnectException($connectException);
-//
-//                $jsLintOutput[(string)$scriptUrl] = array(
-//                    'statusLine' => 'failed',
-//                    'errorReport' => array(
-//                        'reason' => 'curlException',
-//                        'statusCode' => $curlException->getCurlCode()
-//                    )
-//                );
-//
-//                $errorCount++;
-//            }
         }
 
         foreach ($scriptValues as $scriptValue) {
@@ -396,6 +336,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver
 
     /**
      * @return array
+     *
+     * @throws QueryPathException
      */
     private function getScriptUrls()
     {
@@ -424,6 +366,8 @@ class JsLintTaskDriver extends WebResourceTaskDriver
 
     /**
      * @return array
+     *
+     * @throws QueryPathException
      */
     private function getScriptValues()
     {
