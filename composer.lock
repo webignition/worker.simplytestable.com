@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "75323843661c70d35ead07084bf6772f",
+    "content-hash": "31f4d2c572291474f113309a53d6c48a",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4265,16 +4265,16 @@
         },
         {
             "name": "webignition/web-resource-retriever",
-            "version": "0.6",
+            "version": "0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-resource-retriever.git",
-                "reference": "547c199c89162a08c31037dbfcbc0fbde4b2b889"
+                "reference": "bfab3b91433d042081b043045af278cbf2457617"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-retriever/zipball/547c199c89162a08c31037dbfcbc0fbde4b2b889",
-                "reference": "547c199c89162a08c31037dbfcbc0fbde4b2b889",
+                "url": "https://api.github.com/repos/webignition/web-resource-retriever/zipball/bfab3b91433d042081b043045af278cbf2457617",
+                "reference": "bfab3b91433d042081b043045af278cbf2457617",
                 "shasum": ""
             },
             "require": {
@@ -4320,7 +4320,7 @@
                 "web",
                 "web-page"
             ],
-            "time": "2018-03-29T18:06:17+00:00"
+            "time": "2018-04-15T21:03:18+00:00"
         },
         {
             "name": "webignition/web-resource-storage",

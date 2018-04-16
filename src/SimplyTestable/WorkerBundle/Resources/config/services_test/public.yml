@@ -33,15 +33,12 @@ services:
 
   SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver:
 
-  SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver:
+  SimplyTestable\WorkerBundle\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory:
     arguments:
-      - '@SimplyTestable\WorkerBundle\Services\StateService'
-      - '@SimplyTestable\WorkerBundle\Services\FooHttpClientService'
-      - '@webignition\WebResource\Retriever'
-      - '@logger'
-      - '@webignition\NodeJslint\Wrapper\Wrapper'
       - '%node-path%'
       - '%node-jslint-path%'
+
+  SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver:
 
   SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver:
     arguments:
