@@ -145,14 +145,6 @@ class TaskService
     /**
      * @return State
      */
-    public function getFailedNoRetryAvailableState()
-    {
-        return $this->stateService->fetch(Task::STATE_FAILED_NO_RETRY_AVAILABLE);
-    }
-
-    /**
-     * @return State
-     */
     public function getFailedRetryAvailableState()
     {
         return $this->stateService->fetch(Task::STATE_FAILED_RETRY_AVAILABLE);
@@ -249,7 +241,7 @@ class TaskService
             return $this->stateService->fetch(Task::STATE_COMPLETED);
         }
 
-        return $this->getFailedNoRetryAvailableState();
+        return $this->stateService->fetch(Task::STATE_FAILED_NO_RETRY_AVAILABLE);
     }
 
     /**
