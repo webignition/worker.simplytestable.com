@@ -6,7 +6,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Model\HttpAuthenticationCredentials;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebResource\Exception\HttpException;
@@ -45,18 +45,18 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
     private $webResourceRetriever;
 
     /**
-     * @var FooHttpClientService
+     * @var HttpClientService
      */
     protected $fooHttpClientService;
 
     /**
      * @param StateService $stateService
-     * @param FooHttpClientService $fooHttpClientService
+     * @param HttpClientService $fooHttpClientService
      * @param WebResourceRetriever $webResourceRetriever
      */
     public function __construct(
         StateService $stateService,
-        FooHttpClientService $fooHttpClientService,
+        HttpClientService $fooHttpClientService,
         WebResourceRetriever $webResourceRetriever
     ) {
         parent::__construct($stateService);

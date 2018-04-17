@@ -6,14 +6,14 @@ use Doctrine\ORM\OptimisticLockException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Services\TestFooHttpClientService;
+use Tests\WorkerBundle\Services\TestHttpClientService;
 use Tests\WorkerBundle\Utility\File;
 
 class TaskServiceTest extends AbstractBaseTestCase
@@ -39,7 +39,7 @@ class TaskServiceTest extends AbstractBaseTestCase
     private $testTaskFactory;
 
     /**
-     * @var TestFooHttpClientService
+     * @var TestHttpClientService
      */
     private $fooHttpClientService;
 
@@ -53,7 +53,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->taskService = $this->container->get(TaskService::class);
         $this->taskTypeService = $this->container->get(TaskTypeService::class);
         $this->testTaskFactory = new TestTaskFactory($this->container);
-        $this->fooHttpClientService = $this->container->get(FooHttpClientService::class);
+        $this->fooHttpClientService = $this->container->get(HttpClientService::class);
     }
 
     /**

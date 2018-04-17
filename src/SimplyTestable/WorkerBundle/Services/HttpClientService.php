@@ -16,12 +16,11 @@ use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use SimplyTestable\WorkerBundle\Model\HttpAuthenticationCredentials;
-use SimplyTestable\WorkerBundle\Model\HttpAuthenticationHeader;
 use SimplyTestable\WorkerBundle\Services\GuzzleMiddleware\HttpAuthenticationMiddleware;
 use SimplyTestable\WorkerBundle\Services\GuzzleMiddleware\RequestHeadersMiddleware;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class FooHttpClientService
+class HttpClientService
 {
     const MIDDLEWARE_CACHE_KEY = 'cache';
     const MIDDLEWARE_RETRY_KEY = 'retry';

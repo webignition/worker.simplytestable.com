@@ -3,7 +3,7 @@
 namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 
 use GuzzleHttp\Psr7\Response;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;

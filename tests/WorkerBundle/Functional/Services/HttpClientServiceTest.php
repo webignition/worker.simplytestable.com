@@ -8,15 +8,15 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use SimplyTestable\WorkerBundle\Model\HttpAuthenticationCredentials;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
-use Tests\WorkerBundle\Services\TestFooHttpClientService;
+use Tests\WorkerBundle\Services\TestHttpClientService;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class FooHttpClientServiceTest extends AbstractBaseTestCase
+class HttpClientServiceTest extends AbstractBaseTestCase
 {
     /**
-     * @var TestFooHttpClientService
+     * @var TestHttpClientService
      */
     private $fooHttpClientService;
 
@@ -37,7 +37,7 @@ class FooHttpClientServiceTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->fooHttpClientService = $this->container->get(FooHttpClientService::class);
+        $this->fooHttpClientService = $this->container->get(HttpClientService::class);
         $this->httpClient = $this->fooHttpClientService->getHttpClient();
         $this->httpHistory = $this->fooHttpClientService->getHistory();
     }

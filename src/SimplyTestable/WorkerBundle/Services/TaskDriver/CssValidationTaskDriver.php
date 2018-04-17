@@ -4,7 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use QueryPath\Exception as QueryPathException;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\CssValidatorOutput\CssValidatorOutput;
 use webignition\CssValidatorOutput\Message\AbstractMessage as CssValidatorOutputMessage;
@@ -32,14 +32,14 @@ class CssValidationTaskDriver extends AbstractWebPageTaskDriver
 
     /**
      * @param StateService $stateService
-     * @param FooHttpClientService $fooHttpClientService
+     * @param HttpClientService $fooHttpClientService
      * @param WebResourceRetriever $webResourceRetriever
      * @param CssValidatorWrapper $cssValidatorWrapper
      * @param CssValidatorWrapperConfigurationFactory $configurationFactory
      */
     public function __construct(
         StateService $stateService,
-        FooHttpClientService $fooHttpClientService,
+        HttpClientService $fooHttpClientService,
         WebResourceRetriever $webResourceRetriever,
         CssValidatorWrapper $cssValidatorWrapper,
         CssValidatorWrapperConfigurationFactory $configurationFactory

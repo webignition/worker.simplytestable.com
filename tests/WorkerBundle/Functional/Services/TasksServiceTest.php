@@ -5,11 +5,11 @@ namespace Tests\WorkerBundle\Functional\Services;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
-use Tests\WorkerBundle\Services\TestFooHttpClientService;
+use Tests\WorkerBundle\Services\TestHttpClientService;
 use Tests\WorkerBundle\Utility\File;
 
 class TasksServiceTest extends AbstractBaseTestCase
@@ -20,7 +20,7 @@ class TasksServiceTest extends AbstractBaseTestCase
     private $tasksService;
 
     /**
-     * @var TestFooHttpClientService
+     * @var TestHttpClientService
      */
     private $fooHttpClientService;
 
@@ -32,7 +32,7 @@ class TasksServiceTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->tasksService = $this->container->get(TasksService::class);
-        $this->fooHttpClientService = $this->container->get(FooHttpClientService::class);
+        $this->fooHttpClientService = $this->container->get(HttpClientService::class);
     }
 
     public function testGetMaxTasksRequestFactor()

@@ -6,7 +6,7 @@ services:
     public: true
 
   GuzzleHttp\Client:
-    factory: 'SimplyTestable\WorkerBundle\Services\FooHttpClientService:getHttpClient'
+    factory: 'SimplyTestable\WorkerBundle\Services\HttpClientService:getHttpClient'
 
   SimplyTestable\WorkerBundle\Services\ApplicationConfigurationService:
       arguments:
@@ -22,7 +22,7 @@ services:
   SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver:
     arguments:
       - '@SimplyTestable\WorkerBundle\Services\StateService'
-      - '@SimplyTestable\WorkerBundle\Services\FooHttpClientService'
+      - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
       - '@webignition\WebResource\Retriever'
       - '@webignition\HtmlValidator\Wrapper\Wrapper'
       - '%html-validator-path%'

@@ -4,7 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use Psr\Log\LoggerInterface;
 use QueryPath\Exception as QueryPathException;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
@@ -58,7 +58,7 @@ class JsLintTaskDriver extends AbstractWebPageTaskDriver
 
     /**
      * @param StateService $stateService
-     * @param FooHttpClientService $fooHttpClientService
+     * @param HttpClientService $fooHttpClientService
      * @param WebResourceRetriever $webResourceRetriever
      * @param LoggerInterface $logger
      * @param NodeJsLintWrapper $nodeJsLintWrapper
@@ -66,7 +66,7 @@ class JsLintTaskDriver extends AbstractWebPageTaskDriver
      */
     public function __construct(
         StateService $stateService,
-        FooHttpClientService $fooHttpClientService,
+        HttpClientService $fooHttpClientService,
         WebResourceRetriever $webResourceRetriever,
         LoggerInterface $logger,
         NodeJsLintWrapper $nodeJsLintWrapper,

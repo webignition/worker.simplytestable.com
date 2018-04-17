@@ -3,9 +3,9 @@
 namespace Tests\WorkerBundle\Services;
 
 use GuzzleHttp\Handler\MockHandler;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 
-class TestFooHttpClientService extends FooHttpClientService
+class TestHttpClientService extends HttpClientService
 {
     /**
      * @var MockHandler

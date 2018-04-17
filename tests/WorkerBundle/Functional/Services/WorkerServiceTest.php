@@ -6,12 +6,12 @@ use Doctrine\ORM\OptimisticLockException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
-use Tests\WorkerBundle\Services\TestFooHttpClientService;
+use Tests\WorkerBundle\Services\TestHttpClientService;
 
 class WorkerServiceTest extends AbstractBaseTestCase
 {
@@ -21,7 +21,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
     private $workerService;
 
     /**
-     * @var TestFooHttpClientService
+     * @var TestHttpClientService
      */
     private $fooHttpClientService;
 
@@ -33,7 +33,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->workerService = $this->container->get(WorkerService::class);
-        $this->fooHttpClientService = $this->container->get(FooHttpClientService::class);
+        $this->fooHttpClientService = $this->container->get(HttpClientService::class);
     }
 
     /**

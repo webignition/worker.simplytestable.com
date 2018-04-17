@@ -3,7 +3,7 @@
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use QueryPath\Exception as QueryPathException;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
@@ -29,14 +29,14 @@ class HtmlValidationTaskDriver extends AbstractWebPageTaskDriver
 
     /**
      * @param StateService $stateService
-     * @param FooHttpClientService $fooHttpClientService
+     * @param HttpClientService $fooHttpClientService
      * @param WebResourceRetriever $webResourceRetriever
      * @param HtmlValidatorWrapper $htmlValidatorWrapper
      * @param $validatorPath
      */
     public function __construct(
         StateService $stateService,
-        FooHttpClientService $fooHttpClientService,
+        HttpClientService $fooHttpClientService,
         WebResourceRetriever $webResourceRetriever,
         HtmlValidatorWrapper $htmlValidatorWrapper,
         $validatorPath

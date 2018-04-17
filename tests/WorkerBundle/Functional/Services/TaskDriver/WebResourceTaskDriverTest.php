@@ -5,12 +5,12 @@ namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Services\TestFooHttpClientService;
+use Tests\WorkerBundle\Services\TestHttpClientService;
 use webignition\WebResource\Exception\TransportException;
 
 abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
@@ -21,7 +21,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
     protected $testTaskFactory;
 
     /**
-     * @var TestFooHttpClientService
+     * @var TestHttpClientService
      */
     protected $fooHttpClientService;
 
@@ -33,7 +33,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->testTaskFactory = new TestTaskFactory($this->container);
-        $this->fooHttpClientService = $this->container->get(FooHttpClientService::class);
+        $this->fooHttpClientService = $this->container->get(HttpClientService::class);
     }
 
     /**
@@ -67,7 +67,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
 
     public function testPerformNonCurlConnectException()
     {
-        $fooHttpClientService = $this->container->get(FooHttpClientService::class);
+        $fooHttpClientService = $this->container->get(HttpClientService::class);
         $connectException = new ConnectException('foo', new Request('GET', 'http://example.com'));
 
         $fooHttpClientService->appendFixtures([
@@ -112,7 +112,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
         $expectedErrorCount,
         $expectedTaskOutput
     ) {
-        $fooHttpClientService = $this->container->get(FooHttpClientService::class);
+        $fooHttpClientService = $this->container->get(HttpClientService::class);
 
         $fooHttpClientService->appendFixtures($httpResponseFixtures);
 

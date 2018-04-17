@@ -5,8 +5,8 @@ services:
     autoconfigure: true
     public: true
 
-  SimplyTestable\WorkerBundle\Services\FooHttpClientService:
-    class:   Tests\WorkerBundle\Services\TestFooHttpClientService
+  SimplyTestable\WorkerBundle\Services\HttpClientService:
+    class:   Tests\WorkerBundle\Services\TestHttpClientService
     arguments:
       - '%curl_options%'
       - '@SimplyTestable\WorkerBundle\Services\HttpCache'

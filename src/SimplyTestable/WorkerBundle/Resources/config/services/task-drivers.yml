@@ -2,7 +2,7 @@ services:
   SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver:
     arguments:
       - '@SimplyTestable\WorkerBundle\Services\StateService'
-      - '@SimplyTestable\WorkerBundle\Services\FooHttpClientService'
+      - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
       - '@webignition\WebResource\Retriever'
       - '@webignition\HtmlValidator\Wrapper\Wrapper'
       - '%html-validator-path%'

@@ -4,7 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use QueryPath\Exception as QueryPathException;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\CssValidatorOutput\CssValidatorOutput;
 use webignition\CssValidatorOutput\Message\AbstractMessage as CssValidatorOutputMessage;

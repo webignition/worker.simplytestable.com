@@ -1,8 +1,8 @@
 services:
-  SimplyTestable\WorkerBundle\Services\FooHttpClientService:
+  SimplyTestable\WorkerBundle\Services\HttpClientService:
     arguments:
       - '%curl_options%'
       - '@SimplyTestable\WorkerBundle\Services\HttpCache'
 
   GuzzleHttp\Client:
-    factory: 'SimplyTestable\WorkerBundle\Services\FooHttpClientService:getHttpClient'
+    factory: 'SimplyTestable\WorkerBundle\Services\HttpClientService:getHttpClient'
