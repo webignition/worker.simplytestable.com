@@ -86,7 +86,8 @@ class TaskService
     public function create($url, TaskType $type, $parameters)
     {
         $task = new Task();
-        $task->setState($this->stateService->fetch(Task::STATE_QUEUED));
+
+        $this->setQueued($task);
         $task->setType($type);
         $task->setUrl($url);
         $task->setParameters($parameters);
@@ -118,11 +119,19 @@ class TaskService
     }
 
     /**
-     * @return State
+     * @return int[]
      */
-    public function getQueuedState()
+    public function getQueuedTaskIds()
     {
-        return $this->stateService->fetch(Task::STATE_QUEUED);
+        return $this->taskRepository->getIdsByState($this->stateService->fetch(Task::STATE_QUEUED));
+    }
+
+    /**
+     * @param Task $task
+     */
+    public function setQueued(Task $task)
+    {
+        $task->setState($this->stateService->fetch(Task::STATE_QUEUED));
     }
 
     /**
@@ -131,6 +140,14 @@ class TaskService
     public function getInProgressState()
     {
         return $this->stateService->fetch(Task::STATE_IN_PROGRESS);
+    }
+
+    /**
+     * @param Task $task
+     */
+    public function setInProgress(Task $task)
+    {
+        $task->setState($this->stateService->fetch(Task::STATE_IN_PROGRESS));
     }
 
     /**
@@ -233,7 +250,7 @@ class TaskService
         $timePeriod = new TimePeriod();
         $timePeriod->setStartDateTime(new \DateTime());
         $task->setTimePeriod($timePeriod);
-        $task->setState($this->getInProgressState());
+        $this->setInProgress($task);
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
@@ -386,8 +403,8 @@ class TaskService
     public function getInCompleteCount()
     {
         return $this->taskRepository->getCountByStates([
-            $this->getQueuedState(),
-            $this->getInProgressState()
+            $this->stateService->fetch(Task::STATE_QUEUED),
+            $this->stateService->fetch(Task::STATE_IN_PROGRESS)
         ]);
     }
 }
