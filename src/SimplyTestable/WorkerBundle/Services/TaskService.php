@@ -86,7 +86,7 @@ class TaskService
     public function create($url, TaskType $type, $parameters)
     {
         $task = new Task();
-        $task->setState($this->getStartingState());
+        $task->setState($this->stateService->fetch(Task::STATE_QUEUED));
         $task->setType($type);
         $task->setUrl($url);
         $task->setParameters($parameters);
@@ -120,17 +120,9 @@ class TaskService
     /**
      * @return State
      */
-    public function getStartingState()
-    {
-        return $this->stateService->fetch(Task::STATE_QUEUED);
-    }
-
-    /**
-     * @return State
-     */
     public function getQueuedState()
     {
-        return $this->getStartingState();
+        return $this->stateService->fetch(Task::STATE_QUEUED);
     }
 
     /**
