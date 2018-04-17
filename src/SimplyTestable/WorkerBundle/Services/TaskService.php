@@ -18,16 +18,6 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFacto
 
 class TaskService
 {
-    const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\Task\Task';
-    const TASK_STARTING_STATE = 'task-queued';
-    const TASK_IN_PROGRESS_STATE = 'task-in-progress';
-    const TASK_COMPLETED_STATE = 'task-completed';
-    const TASK_CANCELLED_STATE = 'task-cancelled';
-    const TASK_FAILED_NO_RETRY_AVAILABLE_STATE = 'task-failed-no-retry-available';
-    const TASK_FAILED_RETRY_AVAILABLE_STATE = 'task-failed-retry-available';
-    const TASK_FAILED_RETRY_LIMIT_REACHED_STATE = 'task-failed-retry-limit-reached';
-    const TASK_SKIPPED_STATE = 'task-skipped';
-
     /**
      * @var EntityManagerInterface
      */
@@ -64,14 +54,6 @@ class TaskService
     private $coreApplicationHttpClient;
 
     /**
-     * @return string
-     */
-    protected function getEntityName()
-    {
-        return self::ENTITY_NAME;
-    }
-
-    /**
      * @param EntityManagerInterface $entityManager
      * @param LoggerInterface $logger
      * @param StateService $stateService
@@ -104,31 +86,21 @@ class TaskService
     public function create($url, TaskType $type, $parameters)
     {
         $task = new Task();
-        $task->setState($this->getStartingState());
+
+        $this->setQueued($task);
         $task->setType($type);
         $task->setUrl($url);
         $task->setParameters($parameters);
 
-        if ($this->has($task)) {
-            return $this->fetch($task);
-        }
-
-        return $task;
-    }
-
-    /**
-     * @param Task $task
-     *
-     * @return Task
-     */
-    private function fetch(Task $task)
-    {
-        /* @var $task Task */
-        $task = $this->taskRepository->findOneBy(array(
+        $existingTask = $this->taskRepository->findOneBy([
             'state' => $task->getState(),
             'type' => $task->getType(),
             'url' => $task->getUrl()
-        ));
+        ]);
+
+        if (!empty($existingTask)) {
+            return $existingTask;
+        }
 
         return $task;
     }
@@ -147,85 +119,27 @@ class TaskService
     }
 
     /**
+     * @return int[]
+     */
+    public function getQueuedTaskIds()
+    {
+        return $this->taskRepository->getIdsByState($this->stateService->fetch(Task::STATE_QUEUED));
+    }
+
+    /**
      * @param Task $task
-     *
-     * @return boolean
      */
-    private function has(Task $task)
+    public function setQueued(Task $task)
     {
-        return !is_null($this->fetch($task));
+        $task->setState($this->stateService->fetch(Task::STATE_QUEUED));
     }
 
     /**
-     * @return State
+     * @param Task $task
      */
-    public function getStartingState()
+    public function setInProgress(Task $task)
     {
-        return $this->stateService->fetch(self::TASK_STARTING_STATE);
-    }
-
-    /**
-     * @return State
-     */
-    public function getQueuedState()
-    {
-        return $this->getStartingState();
-    }
-
-    /**
-     * @return State
-     */
-    public function getInProgressState()
-    {
-        return $this->stateService->fetch(self::TASK_IN_PROGRESS_STATE);
-    }
-
-    /**
-     * @return State
-     */
-    public function getCompletedState()
-    {
-        return $this->stateService->fetch(self::TASK_COMPLETED_STATE);
-    }
-
-    /**
-     * @return State
-     */
-    public function getCancelledState()
-    {
-        return $this->stateService->fetch(self::TASK_CANCELLED_STATE);
-    }
-
-    /**
-     * @return State
-     */
-    public function getFailedNoRetryAvailableState()
-    {
-        return $this->stateService->fetch(self::TASK_FAILED_NO_RETRY_AVAILABLE_STATE);
-    }
-
-    /**
-     * @return State
-     */
-    public function getFailedRetryAvailableState()
-    {
-        return $this->stateService->fetch(self::TASK_FAILED_RETRY_AVAILABLE_STATE);
-    }
-
-    /**
-     * @return State
-     */
-    public function getFailedRetryLimitReachedState()
-    {
-        return $this->stateService->fetch(self::TASK_FAILED_RETRY_LIMIT_REACHED_STATE);
-    }
-
-    /**
-     * @return State
-     */
-    public function getSkippedState()
-    {
-        return $this->stateService->fetch(self::TASK_SKIPPED_STATE);
+        $task->setState($this->stateService->fetch(Task::STATE_IN_PROGRESS));
     }
 
     /**
@@ -280,7 +194,7 @@ class TaskService
         $timePeriod = new TimePeriod();
         $timePeriod->setStartDateTime(new \DateTime());
         $task->setTimePeriod($timePeriod);
-        $task->setState($this->getInProgressState());
+        $this->setInProgress($task);
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
@@ -296,14 +210,14 @@ class TaskService
     private function getCompletionStateFromTaskDriverResponse(TaskDriverResponse $taskDriverResponse)
     {
         if ($taskDriverResponse->hasBeenSkipped()) {
-            return $this->getSkippedState();
+            return $this->stateService->fetch(Task::STATE_SKIPPED);
         }
 
         if ($taskDriverResponse->hasSucceeded()) {
-            return $this->getCompletedState();
+            return $this->stateService->fetch(Task::STATE_COMPLETED);
         }
 
-        return $this->getFailedNoRetryAvailableState();
+        return $this->stateService->fetch(Task::STATE_FAILED_NO_RETRY_AVAILABLE);
     }
 
     /**
@@ -313,14 +227,16 @@ class TaskService
      */
     public function cancel(Task $task)
     {
-        $isCancelled = TaskService::TASK_CANCELLED_STATE == $task->getState()->getName();
-        $isCompleted = TaskService::TASK_COMPLETED_STATE == $task->getState()->getName();
+        $taskStateName = $task->getState()->getName();
+
+        $isCancelled = Task::STATE_CANCELLED === $taskStateName;
+        $isCompleted = Task::STATE_COMPLETED === $taskStateName;
 
         if ($isCancelled || $isCompleted) {
             return $task;
         }
 
-        return $this->finish($task, $this->getCancelledState());
+        return $this->finish($task, $this->stateService->fetch(Task::STATE_CANCELLED));
     }
 
     /**
@@ -431,8 +347,8 @@ class TaskService
     public function getInCompleteCount()
     {
         return $this->taskRepository->getCountByStates([
-            $this->getQueuedState(),
-            $this->getInProgressState()
+            $this->stateService->fetch(Task::STATE_QUEUED),
+            $this->stateService->fetch(Task::STATE_IN_PROGRESS)
         ]);
     }
 }

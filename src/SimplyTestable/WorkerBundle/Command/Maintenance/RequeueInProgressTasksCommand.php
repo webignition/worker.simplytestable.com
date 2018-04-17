@@ -111,7 +111,7 @@ class RequeueInProgressTasksCommand extends Command
             $output->writeln('Processing task '.$taskId.' ('.$processedTaskCount.' of '.count($taskIds).')');
 
             $inProgressTask = $this->taskService->getById($taskId);
-            $inProgressTask->setState($this->taskService->getQueuedState());
+            $this->taskService->setQueued($inProgressTask);
 
             if ($this->isDryRun()) {
                 $this->entityManager->detach($inProgressTask);

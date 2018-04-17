@@ -16,12 +16,15 @@ use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Services\TestHttpClientService;
 use Tests\WorkerBundle\Utility\File;
 
+/**
+ * @group TaskService
+ */
 class TaskServiceTest extends AbstractBaseTestCase
 {
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';
     const DEFAULT_TASK_TYPE = TaskTypeService::HTML_VALIDATION_NAME;
-    const DEFAULT_TASK_STATE = TaskService::TASK_STARTING_STATE;
+    const DEFAULT_TASK_STATE = Task::STATE_QUEUED;
 
     /**
      * @var TaskService
@@ -68,7 +71,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $taskType = $this->taskTypeService->fetch($taskTypeName);
         $task = $this->taskService->create($url, $taskType, $parameters);
         $this->assertInstanceOf(Task::class, $task);
-        $this->assertEquals(TaskService::TASK_STARTING_STATE, $task->getState());
+        $this->assertEquals(Task::STATE_QUEUED, $task->getState());
         $this->assertEquals($url, $task->getUrl());
         $this->assertEquals(strtolower($taskTypeName), strtolower($task->getType()));
         $this->assertEquals($parameters, $task->getParameters());
@@ -132,59 +135,6 @@ class TaskServiceTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider getStateDataProvider
-     *
-     * @param string $method
-     * @param string $expectedStateName
-     */
-    public function testGetState($method, $expectedStateName)
-    {
-        $state = call_user_func(array($this->taskService, $method));
-        $this->assertEquals($expectedStateName, $state->getName());
-    }
-
-    /**
-     * @return array
-     */
-    public function getStateDataProvider()
-    {
-        return [
-            'queued' => [
-                'method' => 'getQueuedState',
-                'expectedStateName' => TaskService::TASK_STARTING_STATE,
-            ],
-            'in progress' => [
-                'method' => 'getInProgressState',
-                'expectedStateName' => TaskService::TASK_IN_PROGRESS_STATE,
-            ],
-            'completed' => [
-                'method' => 'getCompletedState',
-                'expectedStateName' => TaskService::TASK_COMPLETED_STATE,
-            ],
-            'cancelled' => [
-                'method' => 'getCancelledState',
-                'expectedStateName' => TaskService::TASK_CANCELLED_STATE,
-            ],
-            'failed no retry available' => [
-                'method' => 'getFailedNoRetryAvailableState',
-                'expectedStateName' => TaskService::TASK_FAILED_NO_RETRY_AVAILABLE_STATE,
-            ],
-            'failed retry available' => [
-                'method' => 'getFailedRetryAvailableState',
-                'expectedStateName' => TaskService::TASK_FAILED_RETRY_AVAILABLE_STATE,
-            ],
-            'failed retry limit reached' => [
-                'method' => 'getFailedRetryLimitReachedState',
-                'expectedStateName' => TaskService::TASK_FAILED_RETRY_LIMIT_REACHED_STATE,
-            ],
-            'skipped' => [
-                'method' => 'getSkippedState',
-                'expectedStateName' => TaskService::TASK_SKIPPED_STATE,
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider performDataProvider
      *
      * @param array $taskValues
@@ -221,14 +171,14 @@ class TaskServiceTest extends AbstractBaseTestCase
                         '<!doctype html><html><head></head><body></body>'
                     ),
                 ],
-                'expectedFinishedStateName' => TaskService::TASK_COMPLETED_STATE,
+                'expectedFinishedStateName' => Task::STATE_COMPLETED,
             ],
             'skipped' => [
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     new Response(200, ['content-type' => 'application/pdf']),
                 ],
-                'expectedFinishedStateName' => TaskService::TASK_SKIPPED_STATE,
+                'expectedFinishedStateName' => Task::STATE_SKIPPED,
             ],
             'failed, no retry available' => [
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
@@ -236,7 +186,7 @@ class TaskServiceTest extends AbstractBaseTestCase
                     $notFoundResponse,
                     $notFoundResponse,
                 ],
-                'expectedFinishedStateName' => TaskService::TASK_FAILED_NO_RETRY_AVAILABLE_STATE,
+                'expectedFinishedStateName' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
             ],
         ];
     }
@@ -353,7 +303,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->assertInternalType('int', $task->getTimePeriod()->getId());
 
         $this->assertTrue($this->taskService->reportCompletion($task));
-        $this->assertEquals(TaskService::TASK_COMPLETED_STATE, (string)$task->getState());
+        $this->assertEquals(Task::STATE_COMPLETED, (string)$task->getState());
 
         $this->assertNull($task->getId());
         $this->assertNull($task->getOutput()->getId());
@@ -401,12 +351,12 @@ class TaskServiceTest extends AbstractBaseTestCase
     public function testGetIncompleteCount()
     {
         $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'state' => TaskService::TASK_STARTING_STATE,
+            'state' => Task::STATE_QUEUED,
             'type' => TaskTypeService::HTML_VALIDATION_NAME,
         ]));
 
         $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'state' => TaskService::TASK_IN_PROGRESS_STATE,
+            'state' => Task::STATE_IN_PROGRESS,
             'type' => TaskTypeService::CSS_VALIDATION_NAME,
         ]));
 

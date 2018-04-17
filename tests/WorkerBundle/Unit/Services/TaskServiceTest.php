@@ -15,12 +15,15 @@ use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Factory\MockEntityFactory;
 
+/**
+ * @group TaskService
+ */
 class TaskServiceTest extends \PHPUnit_Framework_TestCase
 {
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';
     const DEFAULT_TASK_TYPE = TaskTypeService::HTML_VALIDATION_NAME;
-    const DEFAULT_TASK_STATE = TaskService::TASK_STARTING_STATE;
+    const DEFAULT_TASK_STATE = Task::STATE_QUEUED;
 
     /**
      * @dataProvider cancelNoStageChangeDataProvider
@@ -35,7 +38,7 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
 
         $taskService = $this->createTaskService([
             StateService::class => $this->createStateService([
-                TaskService::TASK_CANCELLED_STATE,
+                Task::STATE_CANCELLED,
             ]),
         ]);
 
@@ -50,12 +53,12 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'state: cancelled' => [
-                'stateName' => TaskService::TASK_CANCELLED_STATE,
-                'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
+                'stateName' => Task::STATE_CANCELLED,
+                'expectedEndState' => Task::STATE_CANCELLED,
             ],
             'state: completed' => [
-                'stateName' => TaskService::TASK_COMPLETED_STATE,
-                'expectedEndState' => TaskService::TASK_COMPLETED_STATE,
+                'stateName' => Task::STATE_COMPLETED,
+                'expectedEndState' => Task::STATE_COMPLETED,
             ],
         ];
     }
@@ -74,8 +77,8 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
         $stateService = \Mockery::mock(StateService::class);
         $stateService
             ->shouldReceive('fetch')
-            ->with(TaskService::TASK_CANCELLED_STATE)
-            ->andReturn(MockEntityFactory::createState(TaskService::TASK_CANCELLED_STATE));
+            ->with(Task::STATE_CANCELLED)
+            ->andReturn(MockEntityFactory::createState(Task::STATE_CANCELLED));
 
         $taskRepository = \Mockery::mock(TaskRepository::class);
 
@@ -107,12 +110,12 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'state: queued' => [
-                'stateName' => TaskService::TASK_STARTING_STATE,
-                'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
+                'stateName' => Task::STATE_QUEUED,
+                'expectedEndState' => Task::STATE_CANCELLED,
             ],
             'state: in-progress' => [
-                'stateName' => TaskService::TASK_IN_PROGRESS_STATE,
-                'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
+                'stateName' => Task::STATE_IN_PROGRESS,
+                'expectedEndState' => Task::STATE_CANCELLED,
             ],
         ];
     }

@@ -17,7 +17,7 @@ class TestTaskFactory
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';
     const DEFAULT_TASK_TYPE = TaskTypeService::HTML_VALIDATION_NAME;
-    const DEFAULT_TASK_STATE = TaskService::TASK_STARTING_STATE;
+    const DEFAULT_TASK_STATE = Task::STATE_QUEUED;
 
     /**
      * @var array

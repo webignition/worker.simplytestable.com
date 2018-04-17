@@ -2,10 +2,9 @@
 
 namespace Tests\WorkerBundle\Functional\Command\Maintenance;
 
-use Doctrine\ORM\EntityManagerInterface;
 use SimplyTestable\WorkerBundle\Command\Maintenance\RequeueInProgressTasksCommand;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Services\TaskService;
+use SimplyTestable\WorkerBundle\Services\StateService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
@@ -33,16 +32,16 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
         $this->clearRedis();
 
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
-        $taskService = $this->container->get(TaskService::class);
         $taskRepository = $entityManager->getRepository(Task::class);
+        $stateService = $this->container->get(StateService::class);
 
         $testTaskFactory = new TestTaskFactory($this->container);
 
         /* @var Task[] $tasks */
         $tasks = [];
 
-        $queuedState = $taskService->getQueuedState();
-        $inProgressState = $taskService->getInProgressState();
+        $queuedState = $stateService->fetch(Task::STATE_QUEUED);
+        $inProgressState = $stateService->fetch(Task::STATE_IN_PROGRESS);
 
         foreach ($taskValuesCollection as $taskValues) {
             $tasks[] = $testTaskFactory->create($taskValues);
@@ -83,7 +82,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [],
@@ -95,12 +94,12 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
-                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'state' => Task::STATE_IN_PROGRESS,
                         'age' => '10 minute',
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [],
@@ -112,12 +111,12 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
-                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'state' => Task::STATE_IN_PROGRESS,
                         'age' => '1 hour',
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [],
@@ -129,12 +128,12 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
-                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'state' => Task::STATE_IN_PROGRESS,
                         'age' => '1 hour',
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [
@@ -148,12 +147,12 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
-                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'state' => Task::STATE_IN_PROGRESS,
                         'age' => '12 hour',
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [
@@ -167,12 +166,12 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
-                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'state' => Task::STATE_IN_PROGRESS,
                         'age' => '12 hour',
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [
@@ -186,12 +185,12 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
-                        'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                        'state' => Task::STATE_IN_PROGRESS,
                         'age' => '12 hour',
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [
