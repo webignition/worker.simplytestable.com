@@ -163,7 +163,7 @@ class TaskServiceTest extends AbstractBaseTestCase
             ],
             'cancelled' => [
                 'method' => 'getCancelledState',
-                'expectedStateName' => TaskService::TASK_CANCELLED_STATE,
+                'expectedStateName' => Task::STATE_CANCELLED,
             ],
             'failed no retry available' => [
                 'method' => 'getFailedNoRetryAvailableState',
