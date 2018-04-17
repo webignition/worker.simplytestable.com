@@ -151,6 +151,8 @@ class TasksServiceTest extends AbstractBaseTestCase
         );
 
         $lastRequest = $this->httpClientService->getHistory()->getLastRequest();
+        $this->assertEquals('application/x-www-form-urlencoded', $lastRequest->getHeaderLine('content-type'));
+
         $postedData = [];
         parse_str(urldecode($lastRequest->getBody()->getContents()), $postedData);
 

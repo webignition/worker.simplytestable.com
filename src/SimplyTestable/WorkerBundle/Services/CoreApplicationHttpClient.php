@@ -4,7 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7;
+use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -35,17 +35,17 @@ class CoreApplicationHttpClient
      * @param array $routeParameters
      * @param array $postData
      *
-     * @return Psr7\Request
+     * @return Request
      */
     public function createPostRequest($routeName, array $routeParameters, array $postData)
     {
         $requestUrl = $this->coreApplicationRouter->generate($routeName, $routeParameters);
 
-        return new Psr7\Request(
+        return new Request(
             'POST',
             $requestUrl,
-            [],
-            Psr7\stream_for(http_build_query($postData, '', '&'))
+            ['content-type' => 'application/x-www-form-urlencoded'],
+            http_build_query($postData, '', '&')
         );
     }
 
