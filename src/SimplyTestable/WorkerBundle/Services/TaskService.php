@@ -143,14 +143,6 @@ class TaskService
     }
 
     /**
-     * @return State
-     */
-    public function getSkippedState()
-    {
-        return $this->stateService->fetch(Task::STATE_SKIPPED);
-    }
-
-    /**
      * @param Task $task
      *
      * @return int
@@ -218,7 +210,7 @@ class TaskService
     private function getCompletionStateFromTaskDriverResponse(TaskDriverResponse $taskDriverResponse)
     {
         if ($taskDriverResponse->hasBeenSkipped()) {
-            return $this->getSkippedState();
+            return $this->stateService->fetch(Task::STATE_SKIPPED);
         }
 
         if ($taskDriverResponse->hasSucceeded()) {
