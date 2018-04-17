@@ -67,6 +67,11 @@ class FooHttpClientService
     private $requestHeadersMiddleware;
 
     /**
+     * @var HandlerStack
+     */
+    private $handlerStack;
+
+    /**
      * @param array $curlOptions
      * @param HttpCache $cache
      */
@@ -78,6 +83,7 @@ class FooHttpClientService
         $this->httpAuthenticationMiddleware = new HttpAuthenticationMiddleware();
         $this->cookieJar = new CookieJar();
         $this->requestHeadersMiddleware = new RequestHeadersMiddleware();
+        $this->handlerStack = HandlerStack::create($this->createInitialHandler());
 
         $this->httpClient = $this->create();
     }
@@ -138,6 +144,10 @@ class FooHttpClientService
         $this->httpAuthenticationMiddleware->setHttpAuthenticationCredentials(new HttpAuthenticationCredentials());
     }
 
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
     public function setRequestHeader($name, $value)
     {
         $this->requestHeadersMiddleware->setHeader($name, $value);
@@ -164,31 +174,34 @@ class FooHttpClientService
      */
     private function create()
     {
-        $initialHandler = $this->createInitialHandler();
-
-        if (is_null($initialHandler)) {
-            $handlerStack = HandlerStack::create();
-        } else {
-            $handlerStack = HandlerStack::create($initialHandler);
-        }
-
         $cacheMiddleware = $this->createCacheMiddleware();
         if ($cacheMiddleware) {
-            $handlerStack->push($cacheMiddleware, self::MIDDLEWARE_CACHE_KEY);
+            $this->handlerStack->push($cacheMiddleware, self::MIDDLEWARE_CACHE_KEY);
         }
 
-        $handlerStack->push($this->httpAuthenticationMiddleware, self::MIDDLEWARE_HTTP_AUTH_KEY);
-        $handlerStack->push($this->requestHeadersMiddleware, self::MIDDLEWARE_REQUEST_HEADERS_KEY);
-        $handlerStack->push(Middleware::retry($this->createRetryDecider()), self::MIDDLEWARE_RETRY_KEY);
-        $handlerStack->push(Middleware::history($this->historyContainer), self::MIDDLEWARE_HISTORY_KEY);
+        $this->handlerStack->push($this->httpAuthenticationMiddleware, self::MIDDLEWARE_HTTP_AUTH_KEY);
+        $this->handlerStack->push($this->requestHeadersMiddleware, self::MIDDLEWARE_REQUEST_HEADERS_KEY);
+        $this->enableRetryMiddleware();
+        $this->handlerStack->push(Middleware::history($this->historyContainer), self::MIDDLEWARE_HISTORY_KEY);
 
         return new HttpClient([
             'curl' => $this->curlOptions,
             'verify' => false,
-            'handler' => $handlerStack,
+            'handler' => $this->handlerStack,
             'max_retries' => self::MAX_RETRIES,
             'cookies' => $this->cookieJar,
         ]);
+    }
+
+    public function disableRetryMiddleware()
+    {
+        $this->handlerStack->remove(self::MIDDLEWARE_RETRY_KEY);
+    }
+
+    public function enableRetryMiddleware()
+    {
+        $this->disableRetryMiddleware();
+        $this->handlerStack->push(Middleware::retry($this->createRetryDecider()), self::MIDDLEWARE_RETRY_KEY);
     }
 
     /**
