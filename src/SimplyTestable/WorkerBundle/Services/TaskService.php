@@ -18,7 +18,6 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFacto
 
 class TaskService
 {
-    const ENTITY_NAME = 'SimplyTestable\WorkerBundle\Entity\Task\Task';
     const TASK_STARTING_STATE = 'task-queued';
     const TASK_IN_PROGRESS_STATE = 'task-in-progress';
     const TASK_COMPLETED_STATE = 'task-completed';
@@ -62,14 +61,6 @@ class TaskService
      * @var CoreApplicationHttpClient
      */
     private $coreApplicationHttpClient;
-
-    /**
-     * @return string
-     */
-    protected function getEntityName()
-    {
-        return self::ENTITY_NAME;
-    }
 
     /**
      * @param EntityManagerInterface $entityManager
