@@ -5,7 +5,6 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 use SimplyTestable\WorkerBundle\Entity\Task\Output as TaskOutput;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\StateService;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use webignition\InternetMediaType\InternetMediaType;
 
@@ -19,12 +18,6 @@ abstract class TaskDriver
     private $stateService;
 
     /**
-     * @var HttpClientService
-     */
-    private $httpClientService;
-
-    /**
-     *
      * @var TaskDriverResponse
      */
     protected $response = null;
@@ -32,11 +25,10 @@ abstract class TaskDriver
     /**
      * @param StateService $stateService
      */
-    protected function setStateService(StateService $stateService)
+    public function __construct(StateService $stateService)
     {
         $this->stateService = $stateService;
     }
-
     /**
      * @param Task $task
      *
@@ -71,21 +63,4 @@ abstract class TaskDriver
      * @return InternetMediaType
      */
     abstract protected function getOutputContentType();
-
-    /**
-     * @param HttpClientService $httpClientService
-     */
-    protected function setHttpClientService(HttpClientService $httpClientService)
-    {
-        $this->httpClientService = $httpClientService;
-    }
-
-    /**
-     *
-     * @return HttpClientService
-     */
-    protected function getHttpClientService()
-    {
-        return $this->httpClientService;
-    }
 }
