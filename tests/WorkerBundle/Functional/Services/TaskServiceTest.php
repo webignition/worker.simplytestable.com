@@ -132,59 +132,6 @@ class TaskServiceTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider getStateDataProvider
-     *
-     * @param string $method
-     * @param string $expectedStateName
-     */
-    public function testGetState($method, $expectedStateName)
-    {
-        $state = call_user_func(array($this->taskService, $method));
-        $this->assertEquals($expectedStateName, $state->getName());
-    }
-
-    /**
-     * @return array
-     */
-    public function getStateDataProvider()
-    {
-        return [
-            'queued' => [
-                'method' => 'getQueuedState',
-                'expectedStateName' => Task::STATE_QUEUED,
-            ],
-            'in progress' => [
-                'method' => 'getInProgressState',
-                'expectedStateName' => Task::STATE_IN_PROGRESS,
-            ],
-            'completed' => [
-                'method' => 'getCompletedState',
-                'expectedStateName' => Task::STATE_COMPLETED,
-            ],
-            'cancelled' => [
-                'method' => 'getCancelledState',
-                'expectedStateName' => Task::STATE_CANCELLED,
-            ],
-            'failed no retry available' => [
-                'method' => 'getFailedNoRetryAvailableState',
-                'expectedStateName' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-            ],
-            'failed retry available' => [
-                'method' => 'getFailedRetryAvailableState',
-                'expectedStateName' => Task::STATE_FAILED_RETRY_AVAILABLE,
-            ],
-            'failed retry limit reached' => [
-                'method' => 'getFailedRetryLimitReachedState',
-                'expectedStateName' => Task::STATE_FAILED_RETRY_LIMIT_REACHED,
-            ],
-            'skipped' => [
-                'method' => 'getSkippedState',
-                'expectedStateName' => Task::STATE_SKIPPED,
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider performDataProvider
      *
      * @param array $taskValues
