@@ -46,6 +46,8 @@ services:
 
   SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver:
 
+  SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver:
+
   SimplyTestable\WorkerBundle\Services\ResourceLocator:
 
   SimplyTestable\WorkerBundle\Services\MemcachedService:

@@ -2,11 +2,9 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
-use SimplyTestable\WorkerBundle\Services\StateService;
+use QueryPath\Exception as QueryPathException;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
 use webignition\InternetMediaType\InternetMediaType;
-use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
 class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
@@ -16,25 +14,10 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
     /**
      * @var string[]
      */
-    private $equivalentSchemes = array(
+    private $equivalentSchemes = [
         'http',
         'https'
-    );
-
-    /**
-     * @param HttpClientService $httpClientService
-     * @param WebResourceRetriever $webResourceService
-     * @param StateService $stateService
-     */
-    public function __construct(
-        HttpClientService $httpClientService,
-        WebResourceRetriever $webResourceService,
-        StateService $stateService
-    ) {
-        $this->setHttpClientService($httpClientService);
-        $this->setWebResourceService($webResourceService);
-        $this->setStateService($stateService);
-    }
+    ];
 
     /**
      * {@inheritdoc}
@@ -43,17 +26,7 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
     {
         $this->response->setErrorCount(1);
 
-        return json_encode($this->getWebResourceExceptionOutput());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function isNotCorrectWebResourceTypeHandler()
-    {
-        $this->response->setHasBeenSkipped();
-        $this->response->setIsRetryable(false);
-        $this->response->setErrorCount(0);
+        return json_encode($this->getHttpExceptionOutput());
     }
 
     /**
@@ -67,12 +40,14 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
 
     /**
      * {@inheritdoc}
+     *
+     * @throws QueryPathException
      */
     protected function performValidation()
     {
         $configuration = new LinkUrlFinderConfiguration([
             LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE => $this->webResource,
-            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE_URL => $this->webResource->getUrl(),
+            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE_URL => (string)$this->webResource->getUri(),
             LinkUrlFinderConfiguration::CONFIG_KEY_ELEMENT_SCOPE => 'a',
             LinkUrlFinderConfiguration::CONFIG_KEY_IGNORE_FRAGMENT_IN_URL_COMPARISON => true,
         ]);
