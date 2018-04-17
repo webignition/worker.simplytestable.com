@@ -2,10 +2,8 @@
 
 namespace SimplyTestable\WorkerBundle\Services;
 
-use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Request;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Exception\RequestException as HttpRequestException;
 use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
@@ -19,24 +17,9 @@ class TasksService
     private $logger;
 
     /**
-     * @var UrlService $urlService
-     */
-    private $urlService;
-
-    /**
-     * @var CoreApplicationRouter
-     */
-    private $coreApplicationRouter;
-
-    /**
      * @var WorkerService $workerService
      */
     private $workerService;
-
-    /**
-     * @var HttpClient
-     */
-    private $httpClient;
 
     /**
      * @var TaskService
@@ -54,27 +37,26 @@ class TasksService
     private $maxTasksRequestFactor = null;
 
     /**
+     * @var CoreApplicationHttpClient
+     */
+    private $coreApplicationHttpClient;
+
+    /**
      * @param LoggerInterface $logger
-     * @param UrlService $urlService
-     * @param CoreApplicationRouter $coreApplicationRouter
      * @param WorkerService $workerService
-     * @param HttpClient $httpClient
      * @param TaskService $taskService
+     * @param CoreApplicationHttpClient $coreApplicationHttpClient
      */
     public function __construct(
         LoggerInterface $logger,
-        UrlService $urlService,
-        CoreApplicationRouter $coreApplicationRouter,
         WorkerService $workerService,
-        HttpClient $httpClient,
-        TaskService $taskService
+        TaskService $taskService,
+        CoreApplicationHttpClient $coreApplicationHttpClient
     ) {
         $this->logger = $logger;
-        $this->urlService = $urlService;
-        $this->coreApplicationRouter = $coreApplicationRouter;
         $this->workerService = $workerService;
-        $this->httpClient = $httpClient;
         $this->taskService = $taskService;
+        $this->coreApplicationHttpClient = $coreApplicationHttpClient;
     }
 
     /**
@@ -123,27 +105,18 @@ class TasksService
             return false;
         }
 
-        $requestUrl = $this->urlService->prepare(
-            $this->coreApplicationRouter->generate(
-                'tasks_request'
-            )
-        );
-
-        $postData = [
-            'worker_hostname' => $this->workerService->get()->getHostname(),
-            'worker_token' => $this->workerService->get()->getActivationToken(),
-            'limit' => $this->getLimit($requestedLimit)
-        ];
-
-        $request = new Request(
-            'POST',
-            $requestUrl,
+        $request = $this->coreApplicationHttpClient->createPostRequest(
+            'tasks_request',
             [],
-            \GuzzleHttp\Psr7\stream_for(http_build_query($postData, '', '&'))
+            [
+                'worker_hostname' => $this->workerService->get()->getHostname(),
+                'worker_token' => $this->workerService->get()->getActivationToken(),
+                'limit' => $this->getLimit($requestedLimit)
+            ]
         );
 
         try {
-            $this->httpClient->send($request);
+            $this->coreApplicationHttpClient->send($request);
         } catch (HttpRequestException $httpRequestException) {
             $requestException = $this->createRequestException($httpRequestException);
             $this->logHttpRequestException($requestException);

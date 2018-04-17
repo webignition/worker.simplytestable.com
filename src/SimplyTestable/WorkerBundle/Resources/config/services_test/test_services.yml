@@ -17,10 +17,8 @@ services:
         - '@doctrine.orm.entity_manager'
         - '@logger'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
-        - '@SimplyTestable\WorkerBundle\Services\UrlService'
-        - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
         - '@SimplyTestable\WorkerBundle\Services\WorkerService'
-        - '@GuzzleHttp\Client'
+        - '@SimplyTestable\WorkerBundle\Services\CoreApplicationHttpClient'
     calls:
       - [addTaskDriver, ['html validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver']]
       - [addTaskDriver, ['css validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver']]
@@ -32,11 +30,9 @@ services:
     class:   Tests\WorkerBundle\Services\TestTasksService
     arguments:
       - '@logger'
-      - '@SimplyTestable\WorkerBundle\Services\UrlService'
-      - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
       - '@SimplyTestable\WorkerBundle\Services\WorkerService'
-      - '@GuzzleHttp\Client'
       - '@SimplyTestable\WorkerBundle\Services\TaskService'
+      - '@SimplyTestable\WorkerBundle\Services\CoreApplicationHttpClient'
     calls:
       - [setWorkerProcessCount, ['%worker_process_count%']]
       - [setMaxTasksRequestFactor, ['%max_tasks_request_factor%']]
