@@ -7,7 +7,7 @@ use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfigur
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
-class UrlDiscoveryTaskDriver extends WebPageTaskDriver
+class UrlDiscoveryTaskDriver extends AbstractWebPageTaskDriver
 {
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
 

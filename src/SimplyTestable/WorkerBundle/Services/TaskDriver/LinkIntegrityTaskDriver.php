@@ -11,7 +11,7 @@ use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
 use webignition\WebResource\WebPage\WebPage;
 
-class LinkIntegrityTaskDriver extends WebPageTaskDriver
+class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
 {
     const COOKIES_PARAMETER_NAME = 'cookies';
 
