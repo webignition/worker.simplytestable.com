@@ -13,7 +13,7 @@ use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
 use webignition\HtmlDocumentType\Validator as DoctypeValidator;
 use webignition\HtmlDocumentType\Factory as DoctypeFactory;
 
-class HtmlValidationTaskDriver extends WebResourceTaskDriver
+class HtmlValidationTaskDriver extends WebPageTaskDriver
 {
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
 

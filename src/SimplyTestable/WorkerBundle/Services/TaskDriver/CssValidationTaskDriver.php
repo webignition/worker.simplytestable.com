@@ -17,7 +17,7 @@ use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 
-class CssValidationTaskDriver extends WebResourceTaskDriver
+class CssValidationTaskDriver extends WebPageTaskDriver
 {
     /**
      * @var CssValidatorWrapper

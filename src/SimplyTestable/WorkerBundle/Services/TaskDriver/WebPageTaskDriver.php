@@ -17,7 +17,7 @@ use webignition\WebResource\WebResource;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResourceInterfaces\WebResourceInterface;
 
-abstract class WebResourceTaskDriver extends TaskDriver
+abstract class WebPageTaskDriver extends TaskDriver
 {
     const CURL_CODE_INVALID_URL = 3;
     const CURL_CODE_TIMEOUT = 28;

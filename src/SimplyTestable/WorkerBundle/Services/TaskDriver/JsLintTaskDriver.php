@@ -21,7 +21,7 @@ use webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver;
 use webignition\NodeJslintOutput\Exception as NodeJslintOutputException;
 use webignition\NodeJslintOutput\Entry\Entry as NodeJslintOutputEntry;
 
-class JsLintTaskDriver extends WebResourceTaskDriver
+class JsLintTaskDriver extends WebPageTaskDriver
 {
     const JSLINT_PARAMETER_NAME_PREFIX = 'jslint-option-';
     const MAXIMUM_FRAGMENT_LENGTH = 256;
