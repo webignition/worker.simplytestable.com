@@ -100,26 +100,15 @@ class TaskService
         $task->setUrl($url);
         $task->setParameters($parameters);
 
-        if ($this->has($task)) {
-            return $this->fetch($task);
-        }
-
-        return $task;
-    }
-
-    /**
-     * @param Task $task
-     *
-     * @return Task
-     */
-    private function fetch(Task $task)
-    {
-        /* @var $task Task */
-        $task = $this->taskRepository->findOneBy(array(
+        $existingTask = $this->taskRepository->findOneBy([
             'state' => $task->getState(),
             'type' => $task->getType(),
             'url' => $task->getUrl()
-        ));
+        ]);
+
+        if (!empty($existingTask)) {
+            return $existingTask;
+        }
 
         return $task;
     }
@@ -135,16 +124,6 @@ class TaskService
         $task = $this->taskRepository->find($id);
 
         return $task;
-    }
-
-    /**
-     * @param Task $task
-     *
-     * @return boolean
-     */
-    private function has(Task $task)
-    {
-        return !is_null($this->fetch($task));
     }
 
     /**
