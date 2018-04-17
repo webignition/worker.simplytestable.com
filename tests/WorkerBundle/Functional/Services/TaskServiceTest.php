@@ -167,7 +167,7 @@ class TaskServiceTest extends AbstractBaseTestCase
             ],
             'failed no retry available' => [
                 'method' => 'getFailedNoRetryAvailableState',
-                'expectedStateName' => TaskService::TASK_FAILED_NO_RETRY_AVAILABLE_STATE,
+                'expectedStateName' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
             ],
             'failed retry available' => [
                 'method' => 'getFailedRetryAvailableState',
@@ -236,7 +236,7 @@ class TaskServiceTest extends AbstractBaseTestCase
                     $notFoundResponse,
                     $notFoundResponse,
                 ],
-                'expectedFinishedStateName' => TaskService::TASK_FAILED_NO_RETRY_AVAILABLE_STATE,
+                'expectedFinishedStateName' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
             ],
         ];
     }

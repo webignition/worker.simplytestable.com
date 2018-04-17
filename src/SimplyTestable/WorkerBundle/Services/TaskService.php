@@ -18,7 +18,6 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFacto
 
 class TaskService
 {
-    const TASK_FAILED_NO_RETRY_AVAILABLE_STATE = 'task-failed-no-retry-available';
     const TASK_FAILED_RETRY_AVAILABLE_STATE = 'task-failed-retry-available';
     const TASK_FAILED_RETRY_LIMIT_REACHED_STATE = 'task-failed-retry-limit-reached';
     const TASK_SKIPPED_STATE = 'task-skipped';
@@ -167,7 +166,7 @@ class TaskService
      */
     public function getFailedNoRetryAvailableState()
     {
-        return $this->stateService->fetch(self::TASK_FAILED_NO_RETRY_AVAILABLE_STATE);
+        return $this->stateService->fetch(Task::STATE_FAILED_NO_RETRY_AVAILABLE);
     }
 
     /**
