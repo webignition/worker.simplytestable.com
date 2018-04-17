@@ -18,7 +18,6 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFacto
 
 class TaskService
 {
-    const TASK_COMPLETED_STATE = 'task-completed';
     const TASK_CANCELLED_STATE = 'task-cancelled';
     const TASK_FAILED_NO_RETRY_AVAILABLE_STATE = 'task-failed-no-retry-available';
     const TASK_FAILED_RETRY_AVAILABLE_STATE = 'task-failed-retry-available';
