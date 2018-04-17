@@ -188,5 +188,4 @@ class TasksServiceTest extends AbstractBaseTestCase
 
         $this->assertEquals(0, $this->fooHttpClientService->getMockHandler()->count());
     }
-
 }

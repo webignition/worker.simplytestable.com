@@ -44,7 +44,5 @@ services:
         - '@logger'
         - '%secret%'
         - '%hostname%'
-        - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
         - '@SimplyTestable\WorkerBundle\Services\StateService'
-        - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@SimplyTestable\WorkerBundle\Services\UrlService'
+        - '@SimplyTestable\WorkerBundle\Services\CoreApplicationHttpClient'

@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use Psr\Log\LoggerInterface;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptionFactory;
@@ -45,53 +46,38 @@ class WorkerService
     private $hostname;
 
     /**
-     * @var CoreApplicationRouter
-     */
-    private $coreApplicationRouter;
-
-    /**
      * @var StateService
      */
     private $stateService;
 
     /**
-     * @var HttpClientService
+     * @var CoreApplicationHttpClient
      */
-    private $httpClientService;
+    private $coreApplicationHttpClient;
 
-    /**
-     * @var UrlService $urlService
-     */
-    private $urlService;
 
     /**
      * @param EntityManager $entityManager
      * @param LoggerInterface $logger
      * @param string $salt
      * @param string $hostname
-     * @param CoreApplicationRouter $coreApplicationRouter
      * @param StateService $stateService
-     * @param HttpClientService $httpClientService
-     * @param UrlService $urlService
+     * @param CoreApplicationHttpClient $coreApplicationHttpClient
      */
     public function __construct(
         EntityManager $entityManager,
         LoggerInterface $logger,
         $salt,
         $hostname,
-        CoreApplicationRouter $coreApplicationRouter,
         StateService $stateService,
-        HttpClientService $httpClientService,
-        UrlService $urlService
+        CoreApplicationHttpClient $coreApplicationHttpClient
     ) {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
         $this->salt = $salt;
         $this->hostname = $hostname;
-        $this->coreApplicationRouter = $coreApplicationRouter;
         $this->stateService = $stateService;
-        $this->httpClientService = $httpClientService;
-        $this->urlService = $urlService;
+        $this->coreApplicationHttpClient = $coreApplicationHttpClient;
 
         $this->entityRepository = $entityManager->getRepository(ThisWorker::class);
     }
@@ -131,6 +117,8 @@ class WorkerService
      * Activation is completed when core application verifies
      *
      * @return int
+     *
+     * @throws GuzzleException
      */
     public function activate()
     {
@@ -143,20 +131,17 @@ class WorkerService
         }
 
         $thisWorker = $this->get();
-        $requestUrl = $this->urlService->prepare(
-            $this->coreApplicationRouter->generate(
-                'worker_activate'
-            )
-        );
 
-        $httpRequest = $this->httpClientService->postRequest($requestUrl, [
-            'body' => [
+        $request = $this->coreApplicationHttpClient->createPostRequest(
+            'worker_activate',
+            [],
+            [
                 'hostname' => $thisWorker->getHostname(),
                 'token' => $thisWorker->getActivationToken()
-            ],
-        ]);
+            ]
+        );
 
-        $this->logger->info("WorkerService::activate: Requesting activation with " . $requestUrl);
+        $this->logger->info("WorkerService::activate: Requesting activation with " . (string)$request->getUri());
 
         $response = null;
         $responseCode = null;
@@ -165,7 +150,7 @@ class WorkerService
         $hasCurlError = false;
 
         try {
-            $response = $this->httpClientService->get()->send($httpRequest);
+            $response = $this->coreApplicationHttpClient->send($request);
             $responseCode = 200;
             $responsePhrase = $response->getReasonPhrase();
         } catch (BadResponseException $badResponseException) {
@@ -182,7 +167,7 @@ class WorkerService
 
         $this->logger->info(sprintf(
             "WorkerService::activate: %s: %s %s",
-            $requestUrl,
+            (string)$request->getUri(),
             $responseCode,
             $responsePhrase
         ));
