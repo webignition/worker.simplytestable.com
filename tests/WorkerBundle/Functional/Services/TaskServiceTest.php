@@ -2,13 +2,18 @@
 
 namespace Tests\WorkerBundle\Functional\Services;
 
+use Doctrine\ORM\OptimisticLockException;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Services\FooHttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
+use Tests\WorkerBundle\Services\TestFooHttpClientService;
 use Tests\WorkerBundle\Utility\File;
 
 class TaskServiceTest extends AbstractBaseTestCase
@@ -34,6 +39,11 @@ class TaskServiceTest extends AbstractBaseTestCase
     private $testTaskFactory;
 
     /**
+     * @var TestFooHttpClientService
+     */
+    private $fooHttpClientService;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -43,6 +53,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->taskService = $this->container->get(TaskService::class);
         $this->taskTypeService = $this->container->get(TaskTypeService::class);
         $this->testTaskFactory = new TestTaskFactory($this->container);
+        $this->fooHttpClientService = $this->container->get(FooHttpClientService::class);
     }
 
     /**
@@ -96,6 +107,9 @@ class TaskServiceTest extends AbstractBaseTestCase
         ];
     }
 
+    /**
+     * @throws OptimisticLockException
+     */
     public function testCreateUsesExistingMatchingTask()
     {
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
@@ -179,7 +193,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testPerform($taskValues, $httpFixtures, $expectedFinishedStateName)
     {
-        $this->setHttpFixtures($httpFixtures);
+        $this->fooHttpClientService->appendFixtures($httpFixtures);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create($taskValues);
@@ -194,31 +208,33 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function performDataProvider()
     {
+        $notFoundResponse = new Response(404);
+
         return [
             'default' => [
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html><head></head><body></body>"
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
+                        200,
+                        ['content-type' => 'text/html'],
+                        '<!doctype html><html><head></head><body></body>'
+                    ),
                 ],
                 'expectedFinishedStateName' => TaskService::TASK_COMPLETED_STATE,
             ],
             'skipped' => [
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:application/pdf"
+                    new Response(200, ['content-type' => 'application/pdf']),
                 ],
                 'expectedFinishedStateName' => TaskService::TASK_SKIPPED_STATE,
             ],
             'failed, no retry available' => [
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
-                    "HTTP/1.1 404",
-                    "HTTP/1.1 404",
-                    "HTTP/1.1 404",
-                    "HTTP/1.1 404",
-                    "HTTP/1.1 404",
-                    "HTTP/1.1 404",
+                    $notFoundResponse,
+                    $notFoundResponse,
                 ],
                 'expectedFinishedStateName' => TaskService::TASK_FAILED_NO_RETRY_AVAILABLE_STATE,
             ],
@@ -236,6 +252,9 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->assertEquals($id, $this->taskService->getById($id)->getId());
     }
 
+    /**
+     * @throws GuzzleException
+     */
     public function testReportCompletionNoOutput()
     {
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
@@ -256,16 +275,20 @@ class TaskServiceTest extends AbstractBaseTestCase
     /**
      * @dataProvider reportCompletionFailureDataProvider
      *
-     * @param $responseFixture
-     * @param $expectedReturnValue
+     * @param array $responseFixtures
+     * @param int $expectedReturnValue
+     *
+     * @throws GuzzleException
      */
-    public function testReportCompletionFailure($responseFixture, $expectedReturnValue)
+    public function testReportCompletionFailure(array $responseFixtures, $expectedReturnValue)
     {
-        $this->setHttpFixtures([
-            "HTTP/1.1 200 OK\nContent-type:text/html",
-            "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html>",
-            $responseFixture,
-        ]);
+        $this->fooHttpClientService->appendFixtures(array_merge([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
+        ], $responseFixtures));
+
+        $this->fooHttpClientService->disableRetryMiddleware();
+
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
@@ -286,30 +309,38 @@ class TaskServiceTest extends AbstractBaseTestCase
     {
         return [
             'http 404' => [
-                'responseFixture' => "HTTP/1.1 404",
+                'responseFixtures' => [
+                    new Response(404),
+                ],
                 'expectedReturnValue' => 404,
             ],
             'http 500' => [
-                'responseFixture' => "HTTP/1.1 500",
+                'responseFixtures' => [
+                    new Response(500),
+                ],
                 'expectedReturnValue' => 500,
             ],
             'curl 28' => [
-                'responseFixture' => ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
+                'responseFixtures' => [
+                    ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
+                ],
                 'expectedReturnValue' => 28,
             ],
         ];
     }
 
     /**
-     * @dataProvider reportCompletionDataProvider
+     * @dataProvider reportCompletionSuccessDataProvider
      *
      * @param string $responseFixture
+     *
+     * @throws GuzzleException
      */
-    public function testReportCompletion($responseFixture)
+    public function testReportCompletionSuccess($responseFixture)
     {
-        $this->setHttpFixtures([
-            "HTTP/1.1 200 OK\nContent-type:text/html",
-            "HTTP/1.1 200 OK\nContent-type:text/html\n\n<!doctype html><html>",
+        $this->fooHttpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
             $responseFixture,
         ]);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
@@ -327,19 +358,41 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->assertNull($task->getId());
         $this->assertNull($task->getOutput()->getId());
         $this->assertNull($task->getTimePeriod()->getId());
+
+        $lastRequest = $this->fooHttpClientService->getHistory()->getLastRequest();
+        $postedData = [];
+        parse_str(urldecode($lastRequest->getBody()->getContents()), $postedData);
+
+        $this->assertRegExp(
+            '/^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2} [\d]{2}:[\d]{2}/',
+            $postedData['end_date_time']
+        );
+
+        $this->assertArraySubset(
+            [
+                'output' => '{"messages":[]}',
+                'contentType' => 'application/json',
+                'state' => 'task-completed',
+                'errorCount' => '0',
+                'warningCount' => '0',
+            ],
+            $postedData
+        );
+
+//        var_dump($postedData);
     }
 
     /**
      * @return array
      */
-    public function reportCompletionDataProvider()
+    public function reportCompletionSuccessDataProvider()
     {
         return [
             '200 OK' => [
-                'responseHttpFixture' => 'HTTP/1.1 200 OK',
+                'responseHttpFixture' => new Response(200),
             ],
             '410 Gone' => [
-                'responseHttpFixture' => 'HTTP/1.1 410 Gone',
+                'responseHttpFixture' => new Response(410),
             ],
         ];
     }
@@ -357,6 +410,13 @@ class TaskServiceTest extends AbstractBaseTestCase
         ]));
 
         $this->assertEquals(2, $this->taskService->getInCompleteCount());
+    }
+
+    protected function assertPostConditions()
+    {
+        parent::assertPostConditions();
+
+        $this->assertEquals(0, $this->fooHttpClientService->getMockHandler()->count());
     }
 
     /**

@@ -3,6 +3,11 @@
 namespace SimplyTestable\WorkerBundle\Services;
 
 use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Request;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\State;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
@@ -11,8 +16,6 @@ use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use SimplyTestable\WorkerBundle\Repository\TaskRepository;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
-use GuzzleHttp\Exception\BadResponseException as HttpBadResponseException;
-use GuzzleHttp\Exception\ConnectException as HttpConnectException;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
 class TaskService
@@ -63,9 +66,9 @@ class TaskService
     private $workerService;
 
     /**
-     * @var HttpClientService
+     * @var HttpClient
      */
-    private $httpClientService;
+    private $httpClient;
 
     /**
      * @var TaskDriver[]
@@ -87,7 +90,7 @@ class TaskService
      * @param UrlService $urlService
      * @param CoreApplicationRouter $coreApplicationRouter
      * @param WorkerService $workerService
-     * @param HttpClientService $httpClientService
+     * @param HttpClient $httpClient
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -96,7 +99,7 @@ class TaskService
         UrlService $urlService,
         CoreApplicationRouter $coreApplicationRouter,
         WorkerService $workerService,
-        HttpClientService $httpClientService
+        HttpClient $httpClient
     ) {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
@@ -104,8 +107,8 @@ class TaskService
         $this->urlService = $urlService;
         $this->coreApplicationRouter = $coreApplicationRouter;
         $this->workerService = $workerService;
-        $this->httpClientService = $httpClientService;
 
+        $this->httpClient = $httpClient;
         $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
@@ -358,6 +361,8 @@ class TaskService
      * @param Task $task
      *
      * @return boolean|int
+     *
+     * @throws GuzzleException
      */
     public function reportCompletion(Task $task)
     {
@@ -385,21 +390,26 @@ class TaskService
             )
         );
 
-        $httpRequest = $this->httpClientService->postRequest($requestUrl, [
-            'body' => [
-                'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
-                'output' => $task->getOutput()->getOutput(),
-                'contentType' => (string)$task->getOutput()->getContentType(),
-                'state' => $task->getState()->getName(),
-                'errorCount' => $task->getOutput()->getErrorCount(),
-                'warningCount' => $task->getOutput()->getWarningCount()
-            ],
-        ]);
+        $postData = [
+            'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
+            'output' => $task->getOutput()->getOutput(),
+            'contentType' => (string)$task->getOutput()->getContentType(),
+            'state' => $task->getState()->getName(),
+            'errorCount' => $task->getOutput()->getErrorCount(),
+            'warningCount' => $task->getOutput()->getWarningCount()
+        ];
+
+        $httpRequest = new Request(
+            'POST',
+            $requestUrl,
+            [],
+            \GuzzleHttp\Psr7\stream_for(http_build_query($postData, '', '&'))
+        );
 
         $this->logger->info("TaskService::reportCompletion: Reporting completion state to " . $requestUrl);
 
         try {
-            $response = $this->httpClientService->get()->send($httpRequest);
+            $response = $this->httpClient->send($httpRequest);
 
             $this->logger->notice(sprintf(
                 'TaskService::reportCompletion: %s: %s %s',
@@ -407,7 +417,15 @@ class TaskService
                 $response->getStatusCode(),
                 $response->getReasonPhrase()
             ));
-        } catch (HttpBadResponseException $badResponseException) {
+        } catch (ConnectException $connectException) {
+            $curlExceptionFactory = new CurlExceptionFactory();
+
+            if ($curlExceptionFactory::isCurlException($connectException)) {
+                return $curlExceptionFactory::fromConnectException($connectException)->getCurlCode();
+            }
+
+            throw $connectException;
+        } catch (BadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
 
             if ($response->getStatusCode() !== 410) {
@@ -426,12 +444,6 @@ class TaskService
                 ));
 
                 return $response->getStatusCode();
-            }
-        } catch (HttpConnectException $connectException) {
-            $curlExceptionFactory = new CurlExceptionFactory();
-
-            if ($curlExceptionFactory::isCurlException($connectException)) {
-                return $curlExceptionFactory::fromConnectException($connectException)->getCurlCode();
             }
         }
 

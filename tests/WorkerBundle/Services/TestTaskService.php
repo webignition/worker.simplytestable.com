@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\WorkerBundle\Services;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
@@ -34,6 +35,8 @@ class TestTaskService extends TaskService
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      */
     public function perform(Task $task)
     {
