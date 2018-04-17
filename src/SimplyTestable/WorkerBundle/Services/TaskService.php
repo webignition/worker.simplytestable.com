@@ -145,14 +145,6 @@ class TaskService
     /**
      * @return State
      */
-    public function getCancelledState()
-    {
-        return $this->stateService->fetch(Task::STATE_CANCELLED);
-    }
-
-    /**
-     * @return State
-     */
     public function getFailedNoRetryAvailableState()
     {
         return $this->stateService->fetch(Task::STATE_FAILED_NO_RETRY_AVAILABLE);
@@ -276,7 +268,7 @@ class TaskService
             return $task;
         }
 
-        return $this->finish($task, $this->getCancelledState());
+        return $this->finish($task, $this->stateService->fetch(Task::STATE_CANCELLED));
     }
 
     /**
