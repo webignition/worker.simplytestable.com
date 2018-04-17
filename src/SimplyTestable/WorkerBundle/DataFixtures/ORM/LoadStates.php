@@ -2,30 +2,16 @@
 
 namespace SimplyTestable\WorkerBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use SimplyTestable\WorkerBundle\Services\StateService;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use SimplyTestable\WorkerBundle\Entity\State;
 
-class LoadStates extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadStates extends Fixture
 {
     /**
-     * @var ContainerInterface
+     * @var array
      */
-    private $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    private $stateDetails = array(
+    private $stateDetails = [
         'worker-active' => null,
         'worker-awaiting-activation-verification' => 'worker-active',
         'worker-new' => 'worker-awaiting-activation-verification',
@@ -41,35 +27,34 @@ class LoadStates extends AbstractFixture implements OrderedFixtureInterface, Con
         'task-failed-retry-limit-reached' => null,
         'task-skipped' => null,
         'worker-maintenance-read-only' => null
-    );
+    ];
 
     /**
      * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
     {
-        $stateService = $this->container->get(StateService::class);
-
         foreach ($this->stateDetails as $name => $nextStateName) {
-            if (!$stateService->has($name)) {
+            $stateRepository = $manager->getRepository(State::class);
+            $state = $stateRepository->findOneBy([
+                'name' => $name,
+            ]);
+
+            if (empty($state)) {
                 $state = new State();
                 $state->setName($name);
 
                 if (!is_null($nextStateName)) {
-                    $state->setNextState($stateService->find($nextStateName));
+                    $nextState = $stateRepository->findOneBy([
+                        'name' => $nextStateName,
+                    ]);
+
+                    $state->setNextState($nextState);
                 }
 
                 $manager->persist($state);
                 $manager->flush();
             }
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOrder()
-    {
-        return 1; // the order in which fixtures will be loaded
     }
 }

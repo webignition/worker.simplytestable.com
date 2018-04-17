@@ -2,18 +2,21 @@
 
 namespace SimplyTestable\WorkerBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass;
 
-class LoadTaskTypeClasses extends AbstractFixture implements OrderedFixtureInterface
+class LoadTaskTypeClasses extends Fixture implements DependentFixtureInterface
 {
-    private $taskTypeClasses = array(
+    /**
+     * @var array
+     */
+    private $taskTypeClasses = [
         'verification' => 'For the verification of quality aspects such as the presence of a robots.txt file',
         'discovery' => 'For the discovery of information, such as collecting all unique URLs within a given page',
         'validation' => 'For the validation of syntactial correctness, such as HTML or CSS validation'
-    );
+    ];
 
     /**
      * {@inheritdoc}
@@ -23,7 +26,11 @@ class LoadTaskTypeClasses extends AbstractFixture implements OrderedFixtureInter
         $repository = $manager->getRepository(TaskTypeClass::class);
 
         foreach ($this->taskTypeClasses as $name => $description) {
-            if (is_null($repository->findOneByName($name))) {
+            $existingTaskTypeClass = $repository->findOneBy([
+                'name' => $name,
+            ]);
+
+            if (empty($existingTaskTypeClass)) {
                 $taskTypeClass = new TaskTypeClass();
                 $taskTypeClass->setName($name);
                 $taskTypeClass->setDescription($description);
@@ -37,8 +44,10 @@ class LoadTaskTypeClasses extends AbstractFixture implements OrderedFixtureInter
     /**
      * {@inheritdoc}
      */
-    public function getOrder()
+    public function getDependencies()
     {
-        return 2; // the order in which fixtures will be loaded
+        return [
+            LoadStates::class,
+        ];
     }
 }
