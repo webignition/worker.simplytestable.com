@@ -2,6 +2,7 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Model\HttpAuthenticationCredentials;
@@ -75,6 +76,7 @@ abstract class WebResourceTaskDriver extends TaskDriver
      *
      * @throws InternetMediaTypeParseException
      * @throws TransportException
+     * @throws GuzzleException
      */
     public function execute(Task $task)
     {
@@ -122,6 +124,7 @@ abstract class WebResourceTaskDriver extends TaskDriver
      *
      * @throws InternetMediaTypeParseException
      * @throws TransportException
+     * @throws GuzzleException
      */
     protected function getWebResource()
     {
@@ -137,8 +140,6 @@ abstract class WebResourceTaskDriver extends TaskDriver
             $this->httpException = $httpException;
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
-
-            // bad request, bad response, too many redirects, ...
         } catch (TransportException $transportException) {
             if (!$transportException->isCurlException() && !$transportException->isTooManyRedirectsException()) {
                 throw $transportException;
@@ -147,41 +148,9 @@ abstract class WebResourceTaskDriver extends TaskDriver
             $this->transportException = $transportException;
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
-            // curl things ...
         }
+
         return null;
-
-//        try {
-//            $request = $this->getHttpClientService()->get()->createRequest(
-//                'GET',
-//                $this->task->getUrl()
-//            );
-
-//            return $this->webResourceRetriever->retrieve($request);
-//        } catch (WebResourceException $webResourceException) {
-//            $this->response->setHasFailed();
-//            $this->response->setIsRetryable(false);
-//
-//            $this->webResourceException = $webResourceException;
-//        } catch (ConnectException $connectException) {
-//            $curlExceptionFactory = new CurlExceptionFactory();
-//
-//            if (!$curlExceptionFactory->isCurlException($connectException)) {
-//                throw $connectException;
-//            }
-//
-//            $curlException = $curlExceptionFactory->fromConnectException($connectException);
-//
-//            $this->response->setHasFailed();
-//            $this->response->setIsRetryable(false);
-//
-//            $this->curlException = $curlException;
-//        } catch (TooManyRedirectsException $tooManyRedirectsException) {
-//            $this->response->setHasFailed();
-//            $this->response->setIsRetryable(false);
-//
-//            $this->tooManyRedirectsException = $tooManyRedirectsException;
-//        }
     }
 
     /**
