@@ -18,7 +18,6 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFacto
 
 class TaskService
 {
-    const TASK_IN_PROGRESS_STATE = 'task-in-progress';
     const TASK_COMPLETED_STATE = 'task-completed';
     const TASK_CANCELLED_STATE = 'task-cancelled';
     const TASK_FAILED_NO_RETRY_AVAILABLE_STATE = 'task-failed-no-retry-available';
@@ -146,7 +145,7 @@ class TaskService
      */
     public function getInProgressState()
     {
-        return $this->stateService->fetch(self::TASK_IN_PROGRESS_STATE);
+        return $this->stateService->fetch(Task::STATE_IN_PROGRESS);
     }
 
     /**

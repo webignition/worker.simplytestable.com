@@ -155,7 +155,7 @@ class TaskServiceTest extends AbstractBaseTestCase
             ],
             'in progress' => [
                 'method' => 'getInProgressState',
-                'expectedStateName' => TaskService::TASK_IN_PROGRESS_STATE,
+                'expectedStateName' => Task::STATE_IN_PROGRESS,
             ],
             'completed' => [
                 'method' => 'getCompletedState',
@@ -406,7 +406,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         ]));
 
         $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'state' => TaskService::TASK_IN_PROGRESS_STATE,
+            'state' => Task::STATE_IN_PROGRESS,
             'type' => TaskTypeService::CSS_VALIDATION_NAME,
         ]));
 

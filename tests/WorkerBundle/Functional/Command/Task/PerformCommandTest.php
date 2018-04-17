@@ -3,6 +3,7 @@
 namespace Tests\WorkerBundle\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\PerformCommand;
+use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
@@ -136,7 +137,7 @@ class PerformCommandTest extends AbstractBaseTestCase
         return [
             'unknown error' => [
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                    'state' => Task::STATE_IN_PROGRESS,
                 ]),
                 'taskServiceReturnValue' => 99,
                 'expectedReturnCode' => PerformCommand::RETURN_CODE_UNKNOWN_ERROR,
@@ -149,7 +150,7 @@ class PerformCommandTest extends AbstractBaseTestCase
             ],
             'success' => [
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
-                    'state' => TaskService::TASK_IN_PROGRESS_STATE,
+                    'state' => Task::STATE_IN_PROGRESS,
                 ]),
                 'taskServiceReturnValue' => 0,
                 'expectedReturnCode' => 0,
