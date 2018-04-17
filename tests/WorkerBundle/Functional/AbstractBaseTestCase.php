@@ -2,14 +2,10 @@
 
 namespace Tests\WorkerBundle\Functional;
 
-use SimplyTestable\WorkerBundle\Services\HttpCache;
-use SimplyTestable\WorkerBundle\Services\HttpClientFactory;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use GuzzleHttp\Subscriber\Mock as HttpMockSubscriber;
 
 abstract class AbstractBaseTestCase extends WebTestCase
 {
