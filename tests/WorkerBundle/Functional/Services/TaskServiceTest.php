@@ -171,7 +171,7 @@ class TaskServiceTest extends AbstractBaseTestCase
             ],
             'failed retry available' => [
                 'method' => 'getFailedRetryAvailableState',
-                'expectedStateName' => TaskService::TASK_FAILED_RETRY_AVAILABLE_STATE,
+                'expectedStateName' => Task::STATE_FAILED_RETRY_AVAILABLE,
             ],
             'failed retry limit reached' => [
                 'method' => 'getFailedRetryLimitReachedState',
