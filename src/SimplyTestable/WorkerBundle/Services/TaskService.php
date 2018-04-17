@@ -135,14 +135,6 @@ class TaskService
     }
 
     /**
-     * @return State
-     */
-    public function getInProgressState()
-    {
-        return $this->stateService->fetch(Task::STATE_IN_PROGRESS);
-    }
-
-    /**
      * @param Task $task
      */
     public function setInProgress(Task $task)
