@@ -18,8 +18,6 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFacto
 
 class TaskService
 {
-    const TASK_SKIPPED_STATE = 'task-skipped';
-
     /**
      * @var EntityManagerInterface
      */
@@ -188,7 +186,7 @@ class TaskService
      */
     public function getSkippedState()
     {
-        return $this->stateService->fetch(self::TASK_SKIPPED_STATE);
+        return $this->stateService->fetch(Task::STATE_SKIPPED);
     }
 
     /**

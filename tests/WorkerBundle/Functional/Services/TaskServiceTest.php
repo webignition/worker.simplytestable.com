@@ -179,7 +179,7 @@ class TaskServiceTest extends AbstractBaseTestCase
             ],
             'skipped' => [
                 'method' => 'getSkippedState',
-                'expectedStateName' => TaskService::TASK_SKIPPED_STATE,
+                'expectedStateName' => Task::STATE_SKIPPED,
             ],
         ];
     }
@@ -228,7 +228,7 @@ class TaskServiceTest extends AbstractBaseTestCase
                 'httpFixtures' => [
                     new Response(200, ['content-type' => 'application/pdf']),
                 ],
-                'expectedFinishedStateName' => TaskService::TASK_SKIPPED_STATE,
+                'expectedFinishedStateName' => Task::STATE_SKIPPED,
             ],
             'failed, no retry available' => [
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
