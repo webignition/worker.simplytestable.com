@@ -1,4 +1,5 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Entity\Task;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -15,6 +16,15 @@ use SimplyTestable\WorkerBundle\Entity\TimePeriod;
  */
 class Task implements \JsonSerializable
 {
+    const STATE_QUEUED = 'task-queued';
+    const STATE_IN_PROGRESS = 'task-in-progress';
+    const STATE_COMPLETED = 'task-completed';
+    const STATE_CANCELLED = 'task-cancelled';
+    const STATE_FAILED_NO_RETRY_AVAILABLE = 'task-failed-no-retry-available';
+    const STATE_FAILED_RETRY_AVAILABLE = 'task-failed-retry-available';
+    const STATE_FAILED_RETRY_LIMIT_REACHED = 'task-failed-retry-limit-reached';
+    const STATE_SKIPPED = 'task-skipped';
+
     /**
      * @var integer
      *
