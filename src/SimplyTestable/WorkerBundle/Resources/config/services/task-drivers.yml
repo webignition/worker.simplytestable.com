@@ -16,9 +16,6 @@ services:
       - '%node-path%'
       - '%node-jslint-path%'
 
-  SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver:
+  SimplyTestable\WorkerBundle\Services\TaskDriver\LinkCheckerConfigurationFactory:
     arguments:
-      - '@SimplyTestable\WorkerBundle\Services\StateService'
-      - '@SimplyTestable\WorkerBundle\Services\FooHttpClientService'
-      - '@webignition\WebResource\Retriever'
       - '%link_integrity_user_agents%'
