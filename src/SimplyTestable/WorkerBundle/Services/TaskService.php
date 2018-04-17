@@ -145,14 +145,6 @@ class TaskService
     /**
      * @return State
      */
-    public function getCompletedState()
-    {
-        return $this->stateService->fetch(Task::STATE_COMPLETED);
-    }
-
-    /**
-     * @return State
-     */
     public function getCancelledState()
     {
         return $this->stateService->fetch(Task::STATE_CANCELLED);
@@ -262,7 +254,7 @@ class TaskService
         }
 
         if ($taskDriverResponse->hasSucceeded()) {
-            return $this->getCompletedState();
+            return $this->stateService->fetch(Task::STATE_COMPLETED);
         }
 
         return $this->getFailedNoRetryAvailableState();
