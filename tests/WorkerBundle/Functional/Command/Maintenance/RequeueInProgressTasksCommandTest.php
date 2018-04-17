@@ -83,7 +83,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [],
@@ -100,7 +100,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [],
@@ -117,7 +117,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [],
@@ -134,7 +134,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [
@@ -153,7 +153,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [
@@ -172,7 +172,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [
@@ -191,7 +191,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
-                        'state' => TaskService::TASK_STARTING_STATE,
+                        'state' => Task::STATE_QUEUED,
                     ]),
                 ],
                 'commandArguments' => [

@@ -21,7 +21,7 @@ class TaskServiceTest extends AbstractBaseTestCase
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';
     const DEFAULT_TASK_TYPE = TaskTypeService::HTML_VALIDATION_NAME;
-    const DEFAULT_TASK_STATE = TaskService::TASK_STARTING_STATE;
+    const DEFAULT_TASK_STATE = Task::STATE_QUEUED;
 
     /**
      * @var TaskService
@@ -68,7 +68,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $taskType = $this->taskTypeService->fetch($taskTypeName);
         $task = $this->taskService->create($url, $taskType, $parameters);
         $this->assertInstanceOf(Task::class, $task);
-        $this->assertEquals(TaskService::TASK_STARTING_STATE, $task->getState());
+        $this->assertEquals(Task::STATE_QUEUED, $task->getState());
         $this->assertEquals($url, $task->getUrl());
         $this->assertEquals(strtolower($taskTypeName), strtolower($task->getType()));
         $this->assertEquals($parameters, $task->getParameters());
@@ -151,7 +151,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         return [
             'queued' => [
                 'method' => 'getQueuedState',
-                'expectedStateName' => TaskService::TASK_STARTING_STATE,
+                'expectedStateName' => Task::STATE_QUEUED,
             ],
             'in progress' => [
                 'method' => 'getInProgressState',
@@ -401,7 +401,7 @@ class TaskServiceTest extends AbstractBaseTestCase
     public function testGetIncompleteCount()
     {
         $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'state' => TaskService::TASK_STARTING_STATE,
+            'state' => Task::STATE_QUEUED,
             'type' => TaskTypeService::HTML_VALIDATION_NAME,
         ]));
 
