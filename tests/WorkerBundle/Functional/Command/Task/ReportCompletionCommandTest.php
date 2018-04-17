@@ -2,7 +2,9 @@
 
 namespace Tests\WorkerBundle\Functional\Command\Task;
 
+use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
@@ -10,6 +12,7 @@ use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
+use Tests\WorkerBundle\Services\TestHttpClientService;
 
 /**
  * @group Command/Task/ReportCompletionCommand
@@ -22,6 +25,11 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
     private $command;
 
     /**
+     * @var TestHttpClientService
+     */
+    private $httpClientService;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -29,6 +37,7 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->command = $this->container->get(ReportCompletionCommand::class);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     /**
@@ -40,9 +49,9 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
      */
     public function testRun($responseFixtures, $expectedCommandReturnCode)
     {
-        $this->setHttpFixtures(array_merge([
-            "HTTP/1.1 200 OK\nContent-type:text/html;",
-            "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
+        $this->httpClientService->appendFixtures(array_merge([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ], $responseFixtures));
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
@@ -73,32 +82,52 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
      */
     public function runDataProvider()
     {
+        $internalServerErrorResponse = new Response(500);
+        $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
+
         return [
             'http 200' => [
                 'responseFixtures' => [
-                    'HTTP/1.1 200',
+                    new Response(200),
                 ],
                 'expectedCommandReturnCode' => 0,
             ],
             'http 404' => [
                 'responseFixtures' => [
-                    'HTTP/1.1 404',
+                    new Response(404),
                 ],
                 'expectedCommandReturnCode' => 404,
             ],
             'http 500' => [
                 'responseFixtures' => [
-                    'HTTP/1.1 500',
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
                 ],
                 'expectedCommandReturnCode' => 500,
             ],
             'curl 28' => [
                 'responseFixtures' => [
-                    ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
                 ],
                 'expectedCommandReturnCode' => 28,
             ],
         ];
+    }
+
+    protected function assertPostConditions()
+    {
+        parent::assertPostConditions();
+
+        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
     }
 
     /**

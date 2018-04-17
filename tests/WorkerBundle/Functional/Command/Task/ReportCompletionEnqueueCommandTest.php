@@ -2,7 +2,10 @@
 
 namespace Tests\WorkerBundle\Functional\Command\Task;
 
+use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use Tests\WorkerBundle\Services\TestHttpClientService;
 use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -25,6 +28,11 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
     private $testTaskFactory;
 
     /**
+     * @var TestHttpClientService
+     */
+    private $httpClientService;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -33,13 +41,14 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
 
         $this->command = $this->container->get(ReportCompletionEnqueueCommand::class);
         $this->testTaskFactory = new TestTaskFactory($this->container);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     public function testRunWithEmptyQueue()
     {
-        $this->setHttpFixtures([
-            "HTTP/1.1 200 OK\nContent-type:text/html;",
-            "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ]);
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
@@ -69,9 +78,9 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
      */
     public function testRunWithNonEmptyQueue()
     {
-        $this->setHttpFixtures([
-            "HTTP/1.1 200 OK\nContent-type:text/html;",
-            "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ]);
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
@@ -101,6 +110,13 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
                 'id' => $task->getId()
             ]
         ));
+    }
+
+    protected function assertPostConditions()
+    {
+        parent::assertPostConditions();
+
+        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
     }
 
     /**
