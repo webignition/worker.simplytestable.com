@@ -16,6 +16,7 @@ use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebResource\Retriever as WebResourceRetriever;
+use webignition\WebResource\WebPage\WebPage;
 
 class CssValidationTaskDriver extends AbstractWebPageTaskDriver
 {
@@ -83,17 +84,16 @@ class CssValidationTaskDriver extends AbstractWebPageTaskDriver
     /**
      * {@inheritdoc}
      *
-     * @return string
      * @throws QueryPathException
      * @throws InvalidValidatorOutputException
      * @throws InternetMediaTypeParseException
      */
-    protected function performValidation()
+    protected function performValidation(WebPage $webPage)
     {
         $cssValidatorWrapperConfiguration = $this->configurationFactory->create(
             $this->task,
-            (string)$this->webResource->getUri(),
-            $this->webResource->getContent()
+            (string)$webPage->getUri(),
+            $webPage->getContent()
         );
 
         $this->cssValidatorWrapper->setHttpClient($this->fooHttpClientService->getHttpClient());

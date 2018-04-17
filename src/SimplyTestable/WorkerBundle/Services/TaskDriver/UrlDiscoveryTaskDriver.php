@@ -6,6 +6,7 @@ use QueryPath\Exception as QueryPathException;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
+use webignition\WebResource\WebPage\WebPage;
 
 class UrlDiscoveryTaskDriver extends AbstractWebPageTaskDriver
 {
@@ -43,11 +44,11 @@ class UrlDiscoveryTaskDriver extends AbstractWebPageTaskDriver
      *
      * @throws QueryPathException
      */
-    protected function performValidation()
+    protected function performValidation(WebPage $webPage)
     {
         $configuration = new LinkUrlFinderConfiguration([
-            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE => $this->webResource,
-            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE_URL => (string)$this->webResource->getUri(),
+            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE => $webPage,
+            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE_URL => (string)$webPage->getUri(),
             LinkUrlFinderConfiguration::CONFIG_KEY_ELEMENT_SCOPE => 'a',
             LinkUrlFinderConfiguration::CONFIG_KEY_IGNORE_FRAGMENT_IN_URL_COMPARISON => true,
         ]);

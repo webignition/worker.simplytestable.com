@@ -62,15 +62,13 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
      * @throws GuzzleException
      * @throws QueryPathException
      */
-    protected function performValidation()
+    protected function performValidation(WebPage $webPage)
     {
         $linkChecker = new LinkChecker(
             $this->linkCheckerConfigurationFactory->create($this->task),
             $this->fooHttpClientService->getHttpClient()
         );
 
-        /* @var WebPage $webPage */
-        $webPage = $this->webResource;
         $linkChecker->setWebPage($webPage);
 
         $this->fooHttpClientService->disableRetryMiddleware();

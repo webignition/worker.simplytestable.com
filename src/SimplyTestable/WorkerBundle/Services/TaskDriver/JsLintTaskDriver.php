@@ -121,14 +121,14 @@ class JsLintTaskDriver extends AbstractWebPageTaskDriver
      * @throws TransportException
      * @throws QueryPathException
      */
-    protected function performValidation()
+    protected function performValidation(WebPage $webPage)
     {
         $wrapperConfiguration = $this->nodeJsLintWrapperConfigurationFactory->create($this->task);
         $this->nodeJsLintWrapper->setConfiguration($wrapperConfiguration);
 
         $jsLintOutput = [];
-        $scriptUrls = $this->getScriptUrls();
-        $scriptValues = $this->getScriptValues();
+        $scriptUrls = $this->getScriptUrls($webPage);
+        $scriptValues = $this->getScriptValues($webPage);
 
         foreach ($scriptValues as $scriptValue) {
             $localPath = $this->getLocalJavaScriptResourcePathFromContent($scriptValue);
@@ -335,15 +335,14 @@ class JsLintTaskDriver extends AbstractWebPageTaskDriver
     }
 
     /**
-     * @return array
+     * @param WebPage $webPage
+     *
+     * @return Url[]
      *
      * @throws QueryPathException
      */
-    private function getScriptUrls()
+    private function getScriptUrls(WebPage $webPage)
     {
-        /* @var WebPage $webPage */
-        $webPage = $this->webResource;
-
         $scriptUrls = array();
         $thisUrl = new Url((string)$webPage->getUri());
 
@@ -365,15 +364,14 @@ class JsLintTaskDriver extends AbstractWebPageTaskDriver
     }
 
     /**
-     * @return array
+     * @param WebPage $webPage
+     *
+     * @return string[]
      *
      * @throws QueryPathException
      */
-    private function getScriptValues()
+    private function getScriptValues(WebPage $webPage)
     {
-        /* @var WebPage $webPage */
-        $webPage = $this->webResource;
-
         $scriptValues = array();
 
         $webPage->find('script')->each(function ($index, \DOMElement $domElement) use (&$scriptValues) {

@@ -71,11 +71,8 @@ class HtmlValidationTaskDriver extends AbstractWebPageTaskDriver
      *
      * @throws QueryPathException
      */
-    protected function performValidation()
+    protected function performValidation(WebPage $webPage)
     {
-        /* @var WebPage $webPage */
-        $webPage = $this->webResource;
-
         $webPageContent = $webPage->getContent();
         $docTypeString = DoctypeExtractor::extract($webPageContent);
 

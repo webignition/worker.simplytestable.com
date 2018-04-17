@@ -13,7 +13,6 @@ use webignition\WebResource\Exception\HttpException;
 use webignition\WebResource\Exception\InvalidResponseContentTypeException;
 use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
-use webignition\WebResource\WebResource;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResourceInterfaces\WebResourceInterface;
 
@@ -36,11 +35,6 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
     private $transportException;
 
     /**
-     * @var WebResource
-     */
-    protected $webResource;
-
-    /**
      * @var Task
      */
     protected $task;
@@ -48,7 +42,7 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
     /**
      * @var WebResourceRetriever
      */
-    protected $webResourceRetriever;
+    private $webResourceRetriever;
 
     /**
      * @var FooHttpClientService
@@ -90,13 +84,13 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
         ));
         $this->fooHttpClientService->setRequestHeader('User-Agent', self::USER_AGENT);
 
-        $this->webResource = $this->getWebResource();
+        $webPage = $this->retrieveWebPage();
 
         if (!$this->response->hasSucceeded()) {
             return $this->hasNotSucceededHandler();
         }
 
-        if (!$this->webResource instanceof WebPage) {
+        if (!$webPage instanceof WebPage) {
             $this->response->setHasBeenSkipped();
             $this->response->setIsRetryable(false);
             $this->response->setErrorCount(0);
@@ -104,11 +98,11 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
             return null;
         }
 
-        if (empty($this->webResource->getContent())) {
+        if (empty($webPage->getContent())) {
             return $this->isBlankWebResourceHandler();
         }
 
-        return $this->performValidation();
+        return $this->performValidation($webPage);
     }
 
     /**
@@ -117,7 +111,13 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
     abstract protected function hasNotSucceededHandler();
 
     abstract protected function isBlankWebResourceHandler();
-    abstract protected function performValidation();
+
+    /**
+     * @param WebPage $webPage
+     *
+     * @return string
+     */
+    abstract protected function performValidation(WebPage $webPage);
 
     /**
      * @return WebResourceInterface
@@ -126,7 +126,7 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
      * @throws TransportException
      * @throws GuzzleException
      */
-    protected function getWebResource()
+    private function retrieveWebPage()
     {
         $request = new Request('GET', $this->task->getUrl());
 
