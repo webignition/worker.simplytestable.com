@@ -25,7 +25,6 @@
         "doctrine/doctrine-migrations-bundle": "~1.2",
         "webignition/url": ">=2,<3",
         "webignition/internet-media-type":">=1,<2.0",
-        "querypath/QueryPath": "3.0.2",
         "webignition/web-page-model":">=3,<4",
         "webignition/web-json-model":">=3,<4",
         "webignition/absolute-url-deriver":">=1.5",
