@@ -2,7 +2,7 @@
 
 namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\HtmlDocumentFactory;
@@ -41,7 +41,7 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @dataProvider performDataProvider
+     * @dataProvider performSuccessDataProvider
      *
      * @param $httpFixtures
      * @param $taskParameters
@@ -49,14 +49,14 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
      * @param $expectedIsRetryable
      * @param $expectedDecodedOutput
      */
-    public function testPerform(
+    public function testPerformSuccess(
         $httpFixtures,
         $taskParameters,
         $expectedHasSucceeded,
         $expectedIsRetryable,
         $expectedDecodedOutput
     ) {
-        $this->setHttpFixtures($httpFixtures);
+        $this->httpClientService->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
@@ -75,16 +75,13 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
     /**
      * @return array
      */
-    public function performDataProvider()
+    public function performSuccessDataProvider()
     {
         return [
             'no urls' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    sprintf(
-                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
-                        HtmlDocumentFactory::load('minimal')
-                    ),
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(200, ['content-type' => 'text/html'], HtmlDocumentFactory::load('minimal')),
                 ],
                 'taskParameters' => [],
                 'expectedHasSucceeded' => true,
@@ -93,9 +90,10 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'no scope' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    sprintf(
-                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
+                        200,
+                        ['content-type' => 'text/html'],
                         HtmlDocumentFactory::load('css-link-js-link-image-anchors')
                     ),
                 ],
@@ -111,9 +109,10 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'has scope' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    sprintf(
-                        "HTTP/1.1 200 OK\nContent-type:text/html\n\n%s",
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
+                        200,
+                        ['content-type' => 'text/html'],
                         HtmlDocumentFactory::load('css-link-js-link-image-anchors')
                     ),
                 ],
@@ -139,11 +138,11 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
      *
      * {@inheritdoc}
      */
-    public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
+    public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->setHttpFixtures([
-            "HTTP/1.0 200\nContent-Type:text/html",
-            "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html><html>",
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
         ]);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
@@ -153,8 +152,13 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $request = $this->container->get(HttpClientService::class)->getHistory()->getLastRequest();
-        $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
+        $this->assertCount(2, $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
+            $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
+        }
     }
 
     /**
@@ -162,11 +166,11 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
      *
      * {@inheritdoc}
      */
-    public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
+    public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->setHttpFixtures([
-            "HTTP/1.0 200\nContent-Type:text/html",
-            "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html><html>"
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
         ]);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
@@ -176,12 +180,17 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $request = $this->container->get(HttpClientService::class)->getHistory()->getLastRequest();
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
+        $this->assertCount(2, $historicalRequests);
 
-        $decodedAuthorizationHeaderValue = base64_decode(
-            str_replace('Basic', '', $request->getHeader('authorization'))
-        );
+        foreach ($historicalRequests as $historicalRequest) {
+            $authorizationHeaderLine = $historicalRequest->getHeaderLine('authorization');
 
-        $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
+            $decodedAuthorizationHeaderValue = base64_decode(
+                str_replace('Basic ', '', $authorizationHeaderLine)
+            );
+
+            $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
+        }
     }
 }

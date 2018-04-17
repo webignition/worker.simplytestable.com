@@ -2,25 +2,49 @@
 
 namespace Tests\WorkerBundle\Functional\Command\Tasks;
 
+use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Command\Tasks\ReportCompletionCommand;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
+use Tests\WorkerBundle\Services\TestHttpClientService;
 
 class ReportCompletionCommandTest extends AbstractBaseTestCase
 {
+    /**
+     * @var ReportCompletionCommand
+     */
+    private $command;
+
+    /**
+     * @var TestHttpClientService
+     */
+    private $httpClientService;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->command = $this->container->get(ReportCompletionCommand::class);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
+    }
+
     /**
      * @throws \Exception
      */
     public function testRun()
     {
-        $this->setHttpFixtures([
-            "HTTP/1.1 200 OK\nContent-type:text/html;",
-            "HTTP/1.1 200 OK\nContent-type:text/html;\n\n<!doctype html>",
-            "HTTP/1.1 200 OK",
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
+            new Response(200),
         ]);
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
@@ -36,9 +60,7 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
         $this->container->get(TaskService::class)->perform($task);
         $this->assertNotNull($task->getOutput()->getId());
 
-        $command = $this->container->get(ReportCompletionCommand::class);
-
-        $returnCode = $command->run(
+        $returnCode = $this->command->run(
             new ArrayInput([]),
             new NullOutput()
         );
@@ -50,5 +72,21 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
 
         $this->assertNull($task->getOutput()->getId());
         $this->assertNull($task->getId());
+    }
+
+    protected function assertPostConditions()
+    {
+        parent::assertPostConditions();
+
+        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
     }
 }

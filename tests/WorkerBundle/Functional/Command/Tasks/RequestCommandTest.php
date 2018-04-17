@@ -2,13 +2,16 @@
 
 namespace Tests\WorkerBundle\Functional\Command\Tasks;
 
+use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
+use Tests\WorkerBundle\Services\TestHttpClientService;
 
 /**
  * @group Command/Tasks/RequestCommand
@@ -21,6 +24,11 @@ class RequestCommandTest extends AbstractBaseTestCase
     private $command;
 
     /**
+     * @var TestHttpClientService
+     */
+    private $httpClientService;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -28,6 +36,7 @@ class RequestCommandTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->command = $this->container->get(RequestCommand::class);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     /**
@@ -88,7 +97,7 @@ class RequestCommandTest extends AbstractBaseTestCase
      */
     public function testExecuteRequestFailure($responseFixtures, $expectedCommandReturnCode)
     {
-        $this->setHttpFixtures($responseFixtures);
+        $this->httpClientService->appendFixtures($responseFixtures);
         $this->clearRedis();
 
         $returnCode = $this->command->run(new ArrayInput([]), new NullOutput());
@@ -106,19 +115,33 @@ class RequestCommandTest extends AbstractBaseTestCase
      */
     public function executeRequestFailureDataProvider()
     {
+        $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
+
         return [
             'http 404' => [
                 'responseFixtures' => [
-                    'HTTP/1.1 404'
+                    new Response(404),
                 ],
                 'expectedCommandReturnCode' => RequestCommand::RETURN_CODE_FAILED,
             ],
             'curl 28' => [
                 'responseFixtures' => [
-                    ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
                 ],
                 'expectedCommandReturnCode' => RequestCommand::RETURN_CODE_FAILED,
             ],
         ];
+    }
+
+    protected function assertPostConditions()
+    {
+        parent::assertPostConditions();
+
+        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
     }
 }

@@ -2,21 +2,23 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
+use QueryPath\Exception as QueryPathException;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\CssValidatorOutput\CssValidatorOutput;
-use webignition\CssValidatorOutput\Message\Message as CssValidatorOutputMessage;
+use webignition\CssValidatorOutput\Message\AbstractMessage as CssValidatorOutputMessage;
+use webignition\CssValidatorOutput\Message\AbstractMessage;
 use webignition\CssValidatorOutput\Message\Error as CssValidatorOutputError;
-use webignition\CssValidatorWrapper\Configuration\Configuration as CssValidatorWrapperConfiguration;
+use webignition\CssValidatorOutput\Message\Factory as CssValidatorOutputMessageFactory;
+use webignition\CssValidatorOutput\Parser\InvalidValidatorOutputException;
 use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
-use webignition\WebResource\Service\Configuration;
-use webignition\WebResource\Service\Service as WebResourceService;
-use webignition\CssValidatorWrapper\Configuration\Flags as CssValidatorWrapperConfigurationFlags;
-use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
+use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
+use webignition\WebResource\Retriever as WebResourceRetriever;
+use webignition\WebResource\WebPage\WebPage;
 
-class CssValidationTaskDriver extends WebResourceTaskDriver
+class CssValidationTaskDriver extends AbstractWebPageTaskDriver
 {
     /**
      * @var CssValidatorWrapper
@@ -24,37 +26,28 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
     private $cssValidatorWrapper;
 
     /**
-     * @var string
+     * @var CssValidatorWrapperConfigurationFactory
      */
-    private $cssValidatorJarPath;
+    private $configurationFactory;
 
     /**
-     * @param HttpClientService $httpClientService
-     * @param WebResourceService $webResourceService
-     * @param CssValidatorWrapper $cssValidatorWrapper
      * @param StateService $stateService
-     * @param string $cssValidatorJarPath
+     * @param HttpClientService $fooHttpClientService
+     * @param WebResourceRetriever $webResourceRetriever
+     * @param CssValidatorWrapper $cssValidatorWrapper
+     * @param CssValidatorWrapperConfigurationFactory $configurationFactory
      */
     public function __construct(
-        HttpClientService $httpClientService,
-        WebResourceService $webResourceService,
-        CssValidatorWrapper $cssValidatorWrapper,
         StateService $stateService,
-        $cssValidatorJarPath
+        HttpClientService $fooHttpClientService,
+        WebResourceRetriever $webResourceRetriever,
+        CssValidatorWrapper $cssValidatorWrapper,
+        CssValidatorWrapperConfigurationFactory $configurationFactory
     ) {
-        $this->setHttpClientService($httpClientService);
-        $this->setWebResourceService($webResourceService);
-        $this->setCssValidatorWrapper($cssValidatorWrapper);
-        $this->setStateService($stateService);
-        $this->cssValidatorJarPath = $cssValidatorJarPath;
-    }
+        parent::__construct($stateService, $fooHttpClientService, $webResourceRetriever);
 
-    /**
-     * @param CssValidatorWrapper $wrapper
-     */
-    public function setCssValidatorWrapper(CssValidatorWrapper $wrapper)
-    {
-        $this->cssValidatorWrapper = $wrapper;
+        $this->cssValidatorWrapper = $cssValidatorWrapper;
+        $this->configurationFactory = $configurationFactory;
     }
 
     /**
@@ -76,7 +69,7 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
     {
         $this->response->setErrorCount(1);
 
-        return json_encode($this->getWebResourceExceptionOutput());
+        return json_encode($this->getHttpExceptionOutput());
     }
 
     /**
@@ -90,71 +83,21 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
 
     /**
      * {@inheritdoc}
+     *
+     * @throws QueryPathException
+     * @throws InvalidValidatorOutputException
+     * @throws InternetMediaTypeParseException
      */
-    protected function isNotCorrectWebResourceTypeHandler()
+    protected function performValidation(WebPage $webPage)
     {
-        $this->response->setHasBeenSkipped();
-        $this->response->setIsRetryable(false);
-        $this->response->setErrorCount(0);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function performValidation()
-    {
-        $vendorExtensionsParameter = $this->task->getParameter('vendor-extensions');
-
-        $vendorExtensionSeverityLevel = VendorExtensionSeverityLevel::isValid($vendorExtensionsParameter)
-            ? $this->task->getParameter('vendor-extensions')
-            : VendorExtensionSeverityLevel::LEVEL_WARN;
-
-        $cssValidatorFlags = [
-            CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_FALSE_IMAGE_DATA_URL_MESSAGES
-        ];
-
-        $domainsToIgnore = $this->task->hasParameter('domains-to-ignore')
-            ? $this->task->getParameter('domains-to-ignore')
-            : [];
-
-        if ($this->task->getParameter('ignore-warnings')) {
-            $cssValidatorFlags[] = CssValidatorWrapperConfigurationFlags::FLAG_IGNORE_WARNINGS;
-        }
-
-        $configurationValues = [
-            CssValidatorWrapperConfiguration::CONFIG_KEY_CSS_VALIDATOR_JAR_PATH =>
-                $this->cssValidatorJarPath,
-            CssValidatorWrapperConfiguration::CONFIG_KEY_VENDOR_EXTENSION_SEVERITY_LEVEL =>
-                $vendorExtensionSeverityLevel,
-            CssValidatorWrapperConfiguration::CONFIG_KEY_URL_TO_VALIDATE => $this->webResource->getUrl(),
-            CssValidatorWrapperConfiguration::CONFIG_KEY_CONTENT_TO_VALIDATE => $this->webResource->getContent(),
-            CssValidatorWrapperConfiguration::CONFIG_KEY_FLAGS => $cssValidatorFlags,
-            CssValidatorWrapperConfiguration::CONFIG_KEY_DOMAINS_TO_IGNORE => $domainsToIgnore,
-            CssValidatorWrapperConfiguration::CONFIG_KEY_HTTP_CLIENT => $this->getHttpClientService()->get(),
-        ];
-
-        $this->cssValidatorWrapper->createConfiguration($configurationValues);
-
-        $cssValidatorWebResourceService = $this->cssValidatorWrapper->getConfiguration()->getWebResourceService();
-        $newCssValidatorWebResourceServiceConfiguration = $cssValidatorWebResourceService
-            ->getConfiguration()
-            ->createFromCurrent([
-                Configuration::CONFIG_RETRY_WITH_URL_ENCODING_DISABLED => true,
-            ]);
-
-        $cssValidatorWebResourceService
-            ->setConfiguration($newCssValidatorWebResourceServiceConfiguration);
-
-        $this->getHttpClientService()->setCookies($this->task->getParameter('cookies'));
-        $this->getHttpClientService()->setBasicHttpAuthorization(
-            $this->task->getParameter('http-auth-username'),
-            $this->task->getParameter('http-auth-password')
+        $cssValidatorWrapperConfiguration = $this->configurationFactory->create(
+            $this->task,
+            (string)$webPage->getUri(),
+            $webPage->getContent()
         );
 
-        $cssValidatorOutput = $this->cssValidatorWrapper->validate();
-
-        $this->getHttpClientService()->clearCookies();
-        $this->getHttpClientService()->clearBasicHttpAuthorization();
+        $this->cssValidatorWrapper->setHttpClient($this->fooHttpClientService->getHttpClient());
+        $cssValidatorOutput = $this->cssValidatorWrapper->validate($cssValidatorWrapperConfiguration);
 
         if ($cssValidatorOutput->hasException()) {
             // Will only get unknown CSS validator exceptions here
@@ -173,32 +116,41 @@ class CssValidationTaskDriver extends WebResourceTaskDriver
         return json_encode($this->prepareCssValidatorOutput($cssValidatorOutput));
     }
 
+    /**
+     * @param CssValidatorOutput $cssValidatorOutput
+     *
+     * @return array
+     */
     private function prepareCssValidatorOutput(CssValidatorOutput $cssValidatorOutput)
     {
         $serializableMessages = [];
         $messages = $cssValidatorOutput->getMessages();
 
         foreach ($messages as $index => $message) {
-            /* @var $message CssValidatorOutputMessage */
+            /* @var CssValidatorOutputMessage $message */
 
             if ($message->isError()) {
                 /* @var $message CssValidatorOutputError */
                 if ($this->isCssValidatorHttpError($message)) {
-                    $message->setMessage('http-retrieval-' . $this->getCssValidatorHttpErrorStatusCode($message));
+                    $modifiedMessageData = array_merge($message->jsonSerialize(), [
+                        AbstractMessage::KEY_MESSAGE =>
+                            'http-retrieval-' . $this->getCssValidatorHttpErrorStatusCode($message),
+                    ]);
+
+                    $message = CssValidatorOutputMessageFactory::createFromArray($modifiedMessageData);
                 }
 
                 if ($this->isCssValidatorCurlError($message)) {
-                    $message->setMessage('http-retrieval-curl-code-' . $this->getCssValidatorCurlErrorCode($message));
+                    $modifiedMessageData = array_merge($message->jsonSerialize(), [
+                        AbstractMessage::KEY_MESSAGE =>
+                            'http-retrieval-curl-code-' . $this->getCssValidatorCurlErrorCode($message)
+                    ]);
+
+                    $message = CssValidatorOutputMessageFactory::createFromArray($modifiedMessageData);
                 }
             }
 
-            $serializableMessages[] = [
-                'message' => $message->getMessage(),
-                'context' => $message->getContext(),
-                'line_number' => $message->getLineNumber(),
-                'type' => $message->getSerializedType(),
-                'ref' => $message->getRef()
-            ];
+            $serializableMessages[] = $message->jsonSerialize();
         }
 
         return $serializableMessages;

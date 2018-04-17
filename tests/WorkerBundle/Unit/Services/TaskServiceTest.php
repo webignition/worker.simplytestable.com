@@ -8,12 +8,10 @@ use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Repository\TaskRepository;
-use SimplyTestable\WorkerBundle\Services\CoreApplicationRouter;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use SimplyTestable\WorkerBundle\Services\CoreApplicationHttpClient;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
-use SimplyTestable\WorkerBundle\Services\UrlService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Factory\MockEntityFactory;
 
@@ -36,7 +34,7 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
         $task->setState(MockEntityFactory::createState($stateName));
 
         $taskService = $this->createTaskService([
-            'stateService' => $this->createStateService([
+            StateService::class => $this->createStateService([
                 TaskService::TASK_CANCELLED_STATE,
             ]),
         ]);
@@ -94,8 +92,8 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
             ->shouldReceive('flush');
 
         $taskService = $this->createTaskService([
-            'entityManager' => $entityManager,
-            'stateService' => $stateService,
+            EntityManagerInterface::class => $entityManager,
+            StateService::class => $stateService,
         ]);
 
         $taskService->cancel($task);
@@ -126,7 +124,7 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
      */
     private function createTaskService($services = [])
     {
-        if (!isset($services['entityManager'])) {
+        if (!isset($services[EntityManagerInterface::class])) {
             $taskRepository = \Mockery::mock(TaskRepository::class);
 
             $entityManager = \Mockery::mock(EntityManagerInterface::class);
@@ -135,41 +133,31 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
                 ->with(Task::class)
                 ->andReturn($taskRepository);
 
-            $services['entityManager'] = $entityManager;
+            $services[EntityManagerInterface::class] = $entityManager;
         }
 
-        if (!isset($services['logger'])) {
-            $services['logger'] = \Mockery::mock(LoggerInterface::class);
+        if (!isset($services[LoggerInterface::class])) {
+            $services[LoggerInterface::class] = \Mockery::mock(LoggerInterface::class);
         }
 
-        if (!isset($services['stateService'])) {
-            $services['stateService'] = \Mockery::mock(StateService::class);
+        if (!isset($services[StateService::class])) {
+            $services[StateService::class] = \Mockery::mock(StateService::class);
         }
 
-        if (!isset($services['urlService'])) {
-            $services['urlService'] = \Mockery::mock(UrlService::class);
+        if (!isset($services[WorkerService::class])) {
+            $services[WorkerService::class] = \Mockery::mock(WorkerService::class);
         }
 
-        if (!isset($services['coreApplicationRouter'])) {
-            $services['coreApplicationRouter'] = \Mockery::mock(CoreApplicationRouter::class);
-        }
-
-        if (!isset($services['workerService'])) {
-            $services['workerService'] = \Mockery::mock(WorkerService::class);
-        }
-
-        if (!isset($services['httpClientService'])) {
-            $services['httpClientService'] = \Mockery::mock(HttpClientService::class);
+        if (!isset($services[CoreApplicationHttpClient::class])) {
+            $services[CoreApplicationHttpClient::class] = \Mockery::mock(CoreApplicationHttpClient::class);
         }
 
         return new TaskService(
-            $services['entityManager'],
-            $services['logger'],
-            $services['stateService'],
-            $services['urlService'],
-            $services['coreApplicationRouter'],
-            $services['workerService'],
-            $services['httpClientService']
+            $services[EntityManagerInterface::class],
+            $services[LoggerInterface::class],
+            $services[StateService::class],
+            $services[WorkerService::class],
+            $services[CoreApplicationHttpClient::class]
         );
     }
 

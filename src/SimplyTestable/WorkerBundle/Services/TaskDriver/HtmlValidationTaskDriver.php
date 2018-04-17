@@ -2,17 +2,18 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
+use QueryPath\Exception as QueryPathException;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
-use webignition\WebResource\Service\Service as WebResourceService;
+use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
 use webignition\HtmlDocumentType\Validator as DoctypeValidator;
 use webignition\HtmlDocumentType\Factory as DoctypeFactory;
 
-class HtmlValidationTaskDriver extends WebResourceTaskDriver
+class HtmlValidationTaskDriver extends AbstractWebPageTaskDriver
 {
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
 
@@ -27,32 +28,23 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
     private $validatorPath;
 
     /**
-     * @param HttpClientService $httpClientService
-     * @param WebResourceService $webResourceService
-     * @param HtmlValidatorWrapper $htmlValidatorWrapper
      * @param StateService $stateService
-     * @param string $validatorPath
+     * @param HttpClientService $fooHttpClientService
+     * @param WebResourceRetriever $webResourceRetriever
+     * @param HtmlValidatorWrapper $htmlValidatorWrapper
+     * @param $validatorPath
      */
     public function __construct(
-        HttpClientService $httpClientService,
-        WebResourceService $webResourceService,
-        HtmlValidatorWrapper $htmlValidatorWrapper,
         StateService $stateService,
+        HttpClientService $fooHttpClientService,
+        WebResourceRetriever $webResourceRetriever,
+        HtmlValidatorWrapper $htmlValidatorWrapper,
         $validatorPath
     ) {
-        $this->setHttpClientService($httpClientService);
-        $this->setWebResourceService($webResourceService);
-        $this->setHtmlValidatorWrapper($htmlValidatorWrapper);
-        $this->setStateService($stateService);
-        $this->validatorPath = $validatorPath;
-    }
+        parent::__construct($stateService, $fooHttpClientService, $webResourceRetriever);
 
-    /**
-     * @param HtmlValidatorWrapper $wrapper
-     */
-    public function setHtmlValidatorWrapper(HtmlValidatorWrapper $wrapper)
-    {
-        $this->htmlValidatorWrapper = $wrapper;
+        $this->htmlValidatorWrapper = $htmlValidatorWrapper;
+        $this->validatorPath = $validatorPath;
     }
 
     /**
@@ -62,17 +54,7 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
     {
         $this->response->setErrorCount(1);
 
-        return json_encode($this->getWebResourceExceptionOutput());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function isNotCorrectWebResourceTypeHandler()
-    {
-        $this->response->setHasBeenSkipped();
-        $this->response->setIsRetryable(false);
-        $this->response->setErrorCount(0);
+        return json_encode($this->getHttpExceptionOutput());
     }
 
     /**
@@ -86,10 +68,12 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
 
     /**
      * {@inheritdoc}
+     *
+     * @throws QueryPathException
      */
-    protected function performValidation()
+    protected function performValidation(WebPage $webPage)
     {
-        $webPageContent = $this->getWebPage()->getContent();
+        $webPageContent = $webPage->getContent();
         $docTypeString = DoctypeExtractor::extract($webPageContent);
 
         if (empty($docTypeString)) {
@@ -110,7 +94,6 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
         try {
             $documentType = DoctypeFactory::createFromDocTypeString($docTypeString);
 
-
             if (!$doctypeValidator->isValid($documentType)) {
                 return $this->createInvalidDocumentTypeResponse($docTypeString);
             }
@@ -118,15 +101,16 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
             return $this->createInvalidDocumentTypeResponse($docTypeString);
         }
 
+        $webPageCharacterSet = $webPage->getCharacterSet();
+
         $this->htmlValidatorWrapper->createConfiguration([
             HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_URI =>
                 'file:' . $this->storeTmpFile($webPageContent),
             HtmlValidatorWrapper::CONFIG_KEY_VALIDATOR_PATH =>
                 $this->validatorPath,
-            HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_CHARACTER_SET =>
-                (is_null($this->getWebPage()->getCharacterSet()))
+            HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_CHARACTER_SET => is_null($webPageCharacterSet)
                     ? self::DEFAULT_CHARACTER_ENCODING
-                    : $this->getWebPage()->getCharacterSet()
+                    : $webPageCharacterSet
         ]);
 
         $output = $this->htmlValidatorWrapper->validate();
@@ -156,17 +140,6 @@ class HtmlValidationTaskDriver extends WebResourceTaskDriver
         $this->response->setIsRetryable(false);
 
         return json_encode($this->getInvalidDocumentTypeOutput($docTypeString));
-    }
-
-    /**
-     * @return WebPage
-     */
-    private function getWebPage()
-    {
-        /* @var WebPage $webPage */
-        $webPage = $this->webResource;
-
-        return $webPage;
     }
 
     /**

@@ -1,40 +1,21 @@
 services:
   SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver:
     arguments:
-        - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@webignition\WebResource\Service\Service'
-        - '@webignition\HtmlValidator\Wrapper\Wrapper'
-        - '@SimplyTestable\WorkerBundle\Services\StateService'
-        - '%html-validator-path%'
+      - '@SimplyTestable\WorkerBundle\Services\StateService'
+      - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
+      - '@webignition\WebResource\Retriever'
+      - '@webignition\HtmlValidator\Wrapper\Wrapper'
+      - '%html-validator-path%'
 
-  SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver:
-    class:   SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver
+  SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidatorWrapperConfigurationFactory:
     arguments:
-        - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@webignition\WebResource\Service\Service'
-        - '@webignition\CssValidatorWrapper\Wrapper'
-        - '@SimplyTestable\WorkerBundle\Services\StateService'
-        - '%css-validator-jar-path%'
+      - '%css-validator-jar-path%'
 
-  SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver:
+  SimplyTestable\WorkerBundle\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory:
     arguments:
-        - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@webignition\WebResource\Service\Service'
-        - '@webignition\NodeJslint\Wrapper\Wrapper'
-        - '@SimplyTestable\WorkerBundle\Services\StateService'
-        - '@logger'
-        - '%node-path%'
-        - '%node-jslint-path%'
+      - '%node-path%'
+      - '%node-jslint-path%'
 
-  SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver:
+  SimplyTestable\WorkerBundle\Services\TaskDriver\LinkCheckerConfigurationFactory:
     arguments:
-        - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@webignition\WebResource\Service\Service'
-        - '@SimplyTestable\WorkerBundle\Services\StateService'
-        - '%link_integrity_user_agents%'
-
-  SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver:
-    arguments:
-        - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
-        - '@webignition\WebResource\Service\Service'
-        - '@SimplyTestable\WorkerBundle\Services\StateService'
+      - '%link_integrity_user_agents%'

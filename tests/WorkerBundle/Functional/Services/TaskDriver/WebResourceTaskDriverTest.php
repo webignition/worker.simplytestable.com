@@ -3,14 +3,15 @@
 namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Message\RequestInterface;
-use Mockery\MockInterface;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use webignition\WebResource\Service\Configuration;
-use webignition\WebResource\Service\Service as WebResourceService;
+use Tests\WorkerBundle\Services\TestHttpClientService;
+use webignition\WebResource\Exception\TransportException;
 
 abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
 {
@@ -20,6 +21,11 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
     protected $testTaskFactory;
 
     /**
+     * @var TestHttpClientService
+     */
+    protected $httpClientService;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -27,6 +33,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->testTaskFactory = new TestTaskFactory($this->container);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     /**
@@ -45,7 +52,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
      * @param array $taskParameters
      * @param string $expectedRequestCookieHeader
      */
-    abstract public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader);
+    abstract public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader);
 
     /**
      * @dataProvider httpAuthDataProvider
@@ -53,22 +60,35 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
      * @param array $taskParameters
      * @param string $expectedRequestAuthorizationHeaderValue
      */
-    abstract public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue);
+    abstract public function testSetHttpAuthenticationOnRequests(
+        $taskParameters,
+        $expectedRequestAuthorizationHeaderValue
+    );
 
     public function testPerformNonCurlConnectException()
     {
-        /* @var $request MockInterface|RequestInterface */
-        $request = \Mockery::mock(RequestInterface::class);
+        $connectException = new ConnectException('foo', new Request('GET', 'http://example.com'));
 
-        $this->setHttpFixtures([
-            new ConnectException('foo', $request)
+        $this->httpClientService->appendFixtures([
+            $connectException,
+            $connectException,
+            $connectException,
+            $connectException,
+            $connectException,
+            $connectException,
+            $connectException,
+            $connectException,
+            $connectException,
+            $connectException,
+            $connectException,
+            $connectException,
         ]);
 
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
-        $this->expectException(ConnectException::class);
+        $this->expectException(TransportException::class);
         $this->expectExceptionMessage('foo');
         $this->expectExceptionCode(0);
 
@@ -91,15 +111,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
         $expectedErrorCount,
         $expectedTaskOutput
     ) {
-        $this->setHttpFixtures($httpResponseFixtures);
-        $webResourceService = $this->container->get(WebResourceService::class);
-
-        $webResourceServiceConfiguration = $webResourceService->getConfiguration();
-        $newWebResourceServiceConfiguration = $webResourceServiceConfiguration->createFromCurrent([
-            Configuration::CONFIG_RETRY_WITH_URL_ENCODING_DISABLED => false,
-        ]);
-
-        $webResourceService->setConfiguration($newWebResourceServiceConfiguration);
+        $this->httpClientService->appendFixtures($httpResponseFixtures);
 
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
@@ -121,15 +133,28 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
 
     public function performBadWebResourceDataProvider()
     {
+        $notFoundResponse = new Response(404);
+        $internalServerErrorResponse = new Response(500);
+        $curl3ConnectException = ConnectExceptionFactory::create('CURL/3: foo');
+        $curl6ConnectException = ConnectExceptionFactory::create('CURL/6: foo');
+        $curl28ConnectException = ConnectExceptionFactory::create('CURL/28: foo');
+        $curl55ConnectException = ConnectExceptionFactory::create('CURL/55: foo');
+
         return [
             'http too many redirects' => [
                 'httpResponseFixtures' => [
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "1",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "2",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "3",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "4",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "5",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "6",
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '4']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '5']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '6']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '4']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '5']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '6']),
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -146,12 +171,19 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
             ],
             'http redirect loop' => [
                 'httpResponseFixtures' => [
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "1",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "2",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "3",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL,
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "1",
-                    "HTTP/1.1 301 Moved Permanently\nLocation: " . TestTaskFactory::DEFAULT_TASK_URL . "2",
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL]),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL]),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
+
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -168,8 +200,8 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
             ],
             'http 404' => [
                 'httpResponseFixtures' => [
-                    'HTTP/1.1 404 Not Found',
-                    'HTTP/1.1 404 Not Found',
+                    $notFoundResponse,
+                    $notFoundResponse,
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -186,18 +218,18 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
             ],
             'http 500' => [
                 'httpResponseFixtures' => [
-                    'HTTP/1.1 500 Internal Server Error',
-                    'HTTP/1.1 500 Internal Server Error',
-                    'HTTP/1.1 500 Internal Server Error',
-                    'HTTP/1.1 500 Internal Server Error',
-                    'HTTP/1.1 500 Internal Server Error',
-                    'HTTP/1.1 500 Internal Server Error',
-                    'HTTP/1.1 500 Internal Server Error',
-                    'HTTP/1.1 500 Internal Server Error',
-                    'HTTP/1.1 500 Internal Server Error',
-                    'HTTP/1.1 500 Internal Server Error',
-                    'HTTP/1.1 500 Internal Server Error',
-                    'HTTP/1.1 500 Internal Server Error',
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
+                    $internalServerErrorResponse,
 
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
@@ -215,7 +247,18 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
             ],
             'curl 3' => [
                 'httpResponseFixtures' => [
-                    ConnectExceptionFactory::create('CURL/3: foo'),
+                    $curl3ConnectException,
+                    $curl3ConnectException,
+                    $curl3ConnectException,
+                    $curl3ConnectException,
+                    $curl3ConnectException,
+                    $curl3ConnectException,
+                    $curl3ConnectException,
+                    $curl3ConnectException,
+                    $curl3ConnectException,
+                    $curl3ConnectException,
+                    $curl3ConnectException,
+                    $curl3ConnectException,
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -232,7 +275,18 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
             ],
             'curl 6' => [
                 'httpResponseFixtures' => [
-                    ConnectExceptionFactory::create('CURL/6: foo'),
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
+                    $curl6ConnectException,
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -249,7 +303,18 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
             ],
             'curl 28' => [
                 'httpResponseFixtures' => [
-                    ConnectExceptionFactory::create('CURL/28: foo'),
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -266,7 +331,18 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
             ],
             'curl unknown' => [
                 'httpResponseFixtures' => [
-                    ConnectExceptionFactory::create('CURL/55: foo'),
+                    $curl55ConnectException,
+                    $curl55ConnectException,
+                    $curl55ConnectException,
+                    $curl55ConnectException,
+                    $curl55ConnectException,
+                    $curl55ConnectException,
+                    $curl55ConnectException,
+                    $curl55ConnectException,
+                    $curl55ConnectException,
+                    $curl55ConnectException,
+                    $curl55ConnectException,
+                    $curl55ConnectException,
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -283,7 +359,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
             ],
             'incorrect resource type' => [
                 'httpResponseFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:application/pdf\n\nfoo",
+                    new Response(200, ['content-type' => 'application/pdf']),
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => true,
                 'expectedIsRetryable' => false,
@@ -293,8 +369,8 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
             ],
             'empty content' => [
                 'httpResponseFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(200, ['content-type' => 'text/html']),
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => true,
                 'expectedIsRetryable' => true,
@@ -370,5 +446,12 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
                 'expectedRequestAuthorizationHeaderValue' => 'foouser:foopassword',
             ],
         ];
+    }
+
+    protected function assertPostConditions()
+    {
+        parent::assertPostConditions();
+
+        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
     }
 }

@@ -2,11 +2,13 @@
 
 namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 
+use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 {
@@ -48,9 +50,9 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testPerformBadDocumentType($content, $expectedOutputMessage)
     {
-        $this->setHttpFixtures([
-            "HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $content,
-            "HTTP/1.0 200 OK\nContent-Type:text/html\n\n" . $content,
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], $content),
         ]);
 
         $task = $this->testTaskFactory->create(
@@ -118,7 +120,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @dataProvider performDataProvider
+     * @dataProvider performSuccessDataProvider
      *
      * @param string $content
      * @param string $htmlValidatorOutput
@@ -127,7 +129,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
      * @param int $expectedErrorCount
      * @param array $expectedDecodedOutput
      */
-    public function testPerform(
+    public function testPerformSuccess(
         $content,
         $htmlValidatorOutput,
         $expectedHasSucceeded,
@@ -135,9 +137,9 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
         $expectedErrorCount,
         $expectedDecodedOutput
     ) {
-        $this->setHttpFixtures([
-            "HTTP/1.0 200\nContent-Type:text/html\n\n" . $content,
-            "HTTP/1.0 200\nContent-Type:text/html\n\n" . $content,
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], $content),
         ]);
 
         $task = $this->testTaskFactory->create(
@@ -161,7 +163,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
     /**
      * @return array
      */
-    public function performDataProvider()
+    public function performSuccessDataProvider()
     {
         return [
             'no errors' => [
@@ -279,11 +281,11 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
      *
      * {@inheritdoc}
      */
-    public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
+    public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->setHttpFixtures([
-            "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html>",
-            "HTTP/1.0 200\nContent-Type:text/html\n\n<!doctype html>",
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ]);
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
@@ -295,8 +297,13 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $request = $this->container->get(HttpClientService::class)->getHistory()->getLastRequest();
-        $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
+        $this->assertCount(2, $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
+            $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
+        }
     }
 
     /**
@@ -304,11 +311,11 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
      *
      * {@inheritdoc}
      */
-    public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
+    public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->setHttpFixtures([
-            "HTTP/1.1 200\nContent-Type:text/html\n\n<!doctype html>",
-            "HTTP/1.1 200\nContent-Type:text/html\n\n<!doctype html>",
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ]);
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
@@ -320,13 +327,18 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $request = $this->container->get(HttpClientService::class)->getHistory()->getLastRequest();
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
+        $this->assertCount(2, $historicalRequests);
 
-        $decodedAuthorizationHeaderValue = base64_decode(
-            str_replace('Basic', '', $request->getHeader('authorization'))
-        );
+        foreach ($historicalRequests as $historicalRequest) {
+            $authorizationHeaderLine = $historicalRequest->getHeaderLine('authorization');
 
-        $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
+            $decodedAuthorizationHeaderValue = base64_decode(
+                str_replace('Basic ', '', $authorizationHeaderLine)
+            );
+
+            $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
+        }
     }
 
     /**
@@ -345,9 +357,9 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             file_put_contents($tmpFilePath, $content);
         }
 
-        $this->setHttpFixtures([
-            "HTTP/1.0 200\nContent-Type:text/html\n\n" . $content,
-            "HTTP/1.0 200\nContent-Type:text/html\n\n" . $content,
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], $content),
         ]);
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));

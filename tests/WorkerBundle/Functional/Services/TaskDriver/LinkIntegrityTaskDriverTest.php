@@ -2,7 +2,8 @@
 
 namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use GuzzleHttp\Psr7\Response;
+use SimplyTestable\WorkerBundle\Services\TaskDriver\LinkCheckerConfigurationFactory;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
@@ -42,7 +43,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
     }
 
     /**
-     * @dataProvider performDataProvider
+     * @dataProvider performSuccessDataProvider
      *
      * @param array $httpFixtures
      * @param array $taskParameters
@@ -52,7 +53,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
      * @param int $expectedWarningCount
      * @param array $expectedDecodedOutput
      */
-    public function testPerform(
+    public function testPerformSuccess(
         $httpFixtures,
         $taskParameters,
         $expectedHasSucceeded,
@@ -61,7 +62,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
         $expectedWarningCount,
         $expectedDecodedOutput
     ) {
-        $this->setHttpFixtures($httpFixtures);
+        $this->httpClientService->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
@@ -80,16 +81,20 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
     /**
      * @return array
      */
-    public function performDataProvider()
+    public function performSuccessDataProvider()
     {
+        $notFoundResponse = new Response(404);
+        $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
+
         return [
             'no links' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    $this->createHtmlDocumentHttpFixture(
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
                         200,
+                        ['content-type' => 'text/html'],
                         '<!doctype html><html><head></head><body></body></html>'
-                    )
+                    ),
                 ],
                 'taskParameters' => [],
                 'expectedHasSucceeded' => true,
@@ -100,12 +105,13 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'single 200 OK link' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    $this->createHtmlDocumentHttpFixture(
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
                         200,
+                        ['content-type' => 'text/html'],
                         '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
                     ),
-                    "HTTP/1.1 200 OK",
+                    new Response(),
                 ],
                 'taskParameters' => [],
                 'expectedHasSucceeded' => true,
@@ -123,15 +129,14 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'single 404 Not Found link' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    $this->createHtmlDocumentHttpFixture(
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
                         200,
+                        ['content-type' => 'text/html'],
                         '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
                     ),
-                    "HTTP/1.1 404 Not Found",
-                    "HTTP/1.1 404 Not Found",
-                    "HTTP/1.1 404 Not Found",
-                    "HTTP/1.1 404 Not Found",
+                    $notFoundResponse,
+                    $notFoundResponse,
                 ],
                 'taskParameters' => [],
                 'expectedHasSucceeded' => true,
@@ -149,12 +154,13 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'single curl 28 link' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    $this->createHtmlDocumentHttpFixture(
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
                         200,
+                        ['content-type' => 'text/html'],
                         '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
                     ),
-                    ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
+                    $curl28ConnectException,
                 ],
                 'taskParameters' => [],
                 'expectedHasSucceeded' => true,
@@ -172,14 +178,15 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'excluded urls' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    $this->createHtmlDocumentHttpFixture(
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
                         200,
+                        ['content-type' => 'text/html'],
                         '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
                     ),
                 ],
                 'taskParameters' => [
-                    LinkIntegrityTaskDriver::EXCLUDED_URLS_PARAMETER_NAME => [
+                    LinkCheckerConfigurationFactory::EXCLUDED_URLS_PARAMETER_NAME => [
                         'http://example.com/foo'
                     ],
                 ],
@@ -191,14 +198,15 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'excluded domains' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    $this->createHtmlDocumentHttpFixture(
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
                         200,
+                        ['content-type' => 'text/html'],
                         '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
                     ),
                 ],
                 'taskParameters' => [
-                    LinkIntegrityTaskDriver::EXCLUDED_DOMAINS_PARAMETER_NAME => [
+                    LinkCheckerConfigurationFactory::EXCLUDED_DOMAINS_PARAMETER_NAME => [
                         'example.com'
                     ],
                 ],
@@ -210,9 +218,10 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
             ],
             'ignored schemes' => [
                 'httpFixtures' => [
-                    "HTTP/1.1 200 OK\nContent-type:text/html",
-                    $this->createHtmlDocumentHttpFixture(
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
                         200,
+                        ['content-type' => 'text/html'],
                         HtmlDocumentFactory::load('ignored-link-integrity-schemes')
                     ),
                 ],
@@ -231,14 +240,16 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
      *
      * {@inheritdoc}
      */
-    public function testSetCookiesOnHttpClient($taskParameters, $expectedRequestCookieHeader)
+    public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->setHttpFixtures([
-            $this->createHtmlDocumentHttpFixture(
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(
                 200,
+                ['content-type' => 'text/html'],
                 '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
             ),
-            "HTTP/1.1 200 OK\nContent-type:text-plain\n\n"
+            new Response(200),
         ]);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
@@ -248,8 +259,12 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        foreach ($this->container->get(HttpClientService::class)->getHistory()->getRequests(true) as $request) {
-            $this->assertEquals($expectedRequestCookieHeader, $request->getHeader('cookie'));
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
+        $this->assertCount(3, $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
+            $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
         }
     }
 
@@ -258,16 +273,17 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
      *
      * {@inheritdoc}
      */
-    public function testSetHttpAuthOnHttpClient($taskParameters, $expectedRequestAuthorizationHeaderValue)
+    public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->setHttpFixtures([
-            $this->createHtmlDocumentHttpFixture(
+        $this->httpClientService->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(
                 200,
+                ['content-type' => 'text/html'],
                 '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
             ),
-            "HTTP/1.1 200 OK\nContent-type:text-plain\n\n"
+            new Response(200),
         ]);
-
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
@@ -276,22 +292,17 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        foreach ($this->container->get(HttpClientService::class)->getHistory()->getRequests(true) as $request) {
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
+        $this->assertCount(3, $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $authorizationHeaderLine = $historicalRequest->getHeaderLine('authorization');
+
             $decodedAuthorizationHeaderValue = base64_decode(
-                str_replace('Basic', '', $request->getHeader('authorization'))
+                str_replace('Basic ', '', $authorizationHeaderLine)
             );
 
             $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
         }
-    }
-
-    /**
-     * @param int $statusCode
-     * @param string $htmlDocument
-     * @return string
-     */
-    private function createHtmlDocumentHttpFixture($statusCode, $htmlDocument)
-    {
-        return sprintf("HTTP/1.1 %s\nContent-Type:text/html\n\n%s", $statusCode, $htmlDocument);
     }
 }

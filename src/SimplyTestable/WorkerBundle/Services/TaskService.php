@@ -3,6 +3,9 @@
 namespace SimplyTestable\WorkerBundle\Services;
 
 use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Entity\State;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
@@ -11,8 +14,6 @@ use SimplyTestable\WorkerBundle\Entity\TimePeriod;
 use SimplyTestable\WorkerBundle\Model\TaskDriver\Response as TaskDriverResponse;
 use SimplyTestable\WorkerBundle\Repository\TaskRepository;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
-use GuzzleHttp\Exception\BadResponseException as HttpBadResponseException;
-use GuzzleHttp\Exception\ConnectException as HttpConnectException;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
 class TaskService
@@ -48,29 +49,19 @@ class TaskService
     private $stateService;
 
     /**
-     * @var UrlService $urlService
-     */
-    private $urlService;
-
-    /**
-     * @var CoreApplicationRouter
-     */
-    private $coreApplicationRouter;
-
-    /**
      * @var WorkerService
      */
     private $workerService;
 
     /**
-     * @var HttpClientService
-     */
-    private $httpClientService;
-
-    /**
      * @var TaskDriver[]
      */
     private $taskDrivers;
+
+    /**
+     * @var CoreApplicationHttpClient
+     */
+    private $coreApplicationHttpClient;
 
     /**
      * @return string
@@ -84,28 +75,22 @@ class TaskService
      * @param EntityManagerInterface $entityManager
      * @param LoggerInterface $logger
      * @param StateService $stateService
-     * @param UrlService $urlService
-     * @param CoreApplicationRouter $coreApplicationRouter
      * @param WorkerService $workerService
-     * @param HttpClientService $httpClientService
+     * @param CoreApplicationHttpClient $coreApplicationHttpClient
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         StateService $stateService,
-        UrlService $urlService,
-        CoreApplicationRouter $coreApplicationRouter,
         WorkerService $workerService,
-        HttpClientService $httpClientService
+        CoreApplicationHttpClient $coreApplicationHttpClient
     ) {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
         $this->stateService = $stateService;
-        $this->urlService = $urlService;
-        $this->coreApplicationRouter = $coreApplicationRouter;
         $this->workerService = $workerService;
-        $this->httpClientService = $httpClientService;
 
+        $this->coreApplicationHttpClient = $coreApplicationHttpClient;
         $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
@@ -358,6 +343,8 @@ class TaskService
      * @param Task $task
      *
      * @return boolean|int
+     *
+     * @throws GuzzleException
      */
     public function reportCompletion(Task $task)
     {
@@ -374,40 +361,41 @@ class TaskService
             return true;
         }
 
-        $requestUrl = $this->urlService->prepare(
-            $this->coreApplicationRouter->generate(
-                'task_complete',
-                [
-                    'url' => $task->getUrl(),
-                    'type' => $task->getType()->getName(),
-                    'parameter_hash' => $task->getParametersHash(),
-                ]
-            )
-        );
-
-        $httpRequest = $this->httpClientService->postRequest($requestUrl, [
-            'body' => [
+        $request = $this->coreApplicationHttpClient->createPostRequest(
+            'task_complete',
+            [
+                'url' => $task->getUrl(),
+                'type' => $task->getType()->getName(),
+                'parameter_hash' => $task->getParametersHash(),
+            ],
+            [
                 'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
                 'output' => $task->getOutput()->getOutput(),
                 'contentType' => (string)$task->getOutput()->getContentType(),
                 'state' => $task->getState()->getName(),
                 'errorCount' => $task->getOutput()->getErrorCount(),
                 'warningCount' => $task->getOutput()->getWarningCount()
-            ],
-        ]);
-
-        $this->logger->info("TaskService::reportCompletion: Reporting completion state to " . $requestUrl);
+            ]
+        );
 
         try {
-            $response = $this->httpClientService->get()->send($httpRequest);
+            $response = $this->coreApplicationHttpClient->send($request);
 
             $this->logger->notice(sprintf(
                 'TaskService::reportCompletion: %s: %s %s',
-                $requestUrl,
+                (string)$request->getUri(),
                 $response->getStatusCode(),
                 $response->getReasonPhrase()
             ));
-        } catch (HttpBadResponseException $badResponseException) {
+        } catch (ConnectException $connectException) {
+            $curlExceptionFactory = new CurlExceptionFactory();
+
+            if ($curlExceptionFactory::isCurlException($connectException)) {
+                return $curlExceptionFactory::fromConnectException($connectException)->getCurlCode();
+            }
+
+            throw $connectException;
+        } catch (BadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
 
             if ($response->getStatusCode() !== 410) {
@@ -420,18 +408,12 @@ class TaskService
                 $this->logger->error(sprintf(
                     'TaskService::reportCompletion: [%i] %s: %s %s',
                     $task->getId(),
-                    $requestUrl,
+                    (string)$request->getUri(),
                     $response->getStatusCode(),
                     $response->getReasonPhrase()
                 ));
 
                 return $response->getStatusCode();
-            }
-        } catch (HttpConnectException $connectException) {
-            $curlExceptionFactory = new CurlExceptionFactory();
-
-            if ($curlExceptionFactory::isCurlException($connectException)) {
-                return $curlExceptionFactory::fromConnectException($connectException)->getCurlCode();
             }
         }
 

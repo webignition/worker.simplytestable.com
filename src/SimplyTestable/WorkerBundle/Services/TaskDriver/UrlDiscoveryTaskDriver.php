@@ -2,39 +2,23 @@
 
 namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
-use SimplyTestable\WorkerBundle\Services\StateService;
+use QueryPath\Exception as QueryPathException;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
 use webignition\InternetMediaType\InternetMediaType;
-use webignition\WebResource\Service\Service as WebResourceService;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
+use webignition\WebResource\WebPage\WebPage;
 
-class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
+class UrlDiscoveryTaskDriver extends AbstractWebPageTaskDriver
 {
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
 
     /**
      * @var string[]
      */
-    private $equivalentSchemes = array(
+    private $equivalentSchemes = [
         'http',
         'https'
-    );
-
-    /**
-     * @param HttpClientService $httpClientService
-     * @param WebResourceService $webResourceService
-     * @param StateService $stateService
-     */
-    public function __construct(
-        HttpClientService $httpClientService,
-        WebResourceService $webResourceService,
-        StateService $stateService
-    ) {
-        $this->setHttpClientService($httpClientService);
-        $this->setWebResourceService($webResourceService);
-        $this->setStateService($stateService);
-    }
+    ];
 
     /**
      * {@inheritdoc}
@@ -43,17 +27,7 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
     {
         $this->response->setErrorCount(1);
 
-        return json_encode($this->getWebResourceExceptionOutput());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function isNotCorrectWebResourceTypeHandler()
-    {
-        $this->response->setHasBeenSkipped();
-        $this->response->setIsRetryable(false);
-        $this->response->setErrorCount(0);
+        return json_encode($this->getHttpExceptionOutput());
     }
 
     /**
@@ -67,12 +41,14 @@ class UrlDiscoveryTaskDriver extends WebResourceTaskDriver
 
     /**
      * {@inheritdoc}
+     *
+     * @throws QueryPathException
      */
-    protected function performValidation()
+    protected function performValidation(WebPage $webPage)
     {
         $configuration = new LinkUrlFinderConfiguration([
-            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE => $this->webResource,
-            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE_URL => $this->webResource->getUrl(),
+            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE => $webPage,
+            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE_URL => (string)$webPage->getUri(),
             LinkUrlFinderConfiguration::CONFIG_KEY_ELEMENT_SCOPE => 'a',
             LinkUrlFinderConfiguration::CONFIG_KEY_IGNORE_FRAGMENT_IN_URL_COMPARISON => true,
         ]);

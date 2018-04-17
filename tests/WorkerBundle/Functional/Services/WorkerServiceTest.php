@@ -2,12 +2,16 @@
 
 namespace Tests\WorkerBundle\Functional\Services;
 
-use GuzzleHttp\Exception\ConnectException;
+use Doctrine\ORM\OptimisticLockException;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
+use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
+use Tests\WorkerBundle\Services\TestHttpClientService;
 
 class WorkerServiceTest extends AbstractBaseTestCase
 {
@@ -17,14 +21,25 @@ class WorkerServiceTest extends AbstractBaseTestCase
     private $workerService;
 
     /**
+     * @var TestHttpClientService
+     */
+    private $httpClientService;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
         parent::setUp();
+
         $this->workerService = $this->container->get(WorkerService::class);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws GuzzleException
+     */
     public function testActivateWhenNotNew()
     {
         $worker = $this->workerService->get();
@@ -33,19 +48,19 @@ class WorkerServiceTest extends AbstractBaseTestCase
         $this->assertEquals(0, $this->workerService->activate());
     }
 
-
     /**
      * @dataProvider activateDataProvider
      *
-     * @param string|ConnectException $responseFixture
+     * @param array $httpFixtures
      * @param int $expectedReturnCode
      * @param string $expectedWorkerState
+     *
+     * @throws GuzzleException
+     * @throws OptimisticLockException
      */
-    public function testActivate($responseFixture, $expectedReturnCode, $expectedWorkerState)
+    public function testActivate(array $httpFixtures, $expectedReturnCode, $expectedWorkerState)
     {
-        $this->setHttpFixtures([
-            $responseFixture,
-        ]);
+        $this->httpClientService->appendFixtures($httpFixtures);
 
         $worker = $this->workerService->get();
         $this->setWorkerState($worker, WorkerService::WORKER_NEW_STATE);
@@ -63,19 +78,32 @@ class WorkerServiceTest extends AbstractBaseTestCase
      */
     public function activateDataProvider()
     {
+        $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
+
         return [
             'success' => [
-                'responseFixture' => 'HTTP/1.1 200 OK',
+                'httpFixtures' => [
+                    new Response(200),
+                ],
                 'expectedReturnCode' => 0,
                 'expectedWorkerState' => 'worker-awaiting-activation-verification',
             ],
             'failure http 404' => [
-                'responseFixture' => 'HTTP/1.1 404 Not Found',
+                'httpFixtures' => [
+                    new Response(404),
+                ],
                 'expectedReturnCode' => 404,
                 'expectedWorkerState' => 'worker-new',
             ],
             'failure curl 28' => [
-                'responseFixture' => ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
+                'httpFixtures' => [
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                    $curl28ConnectException,
+                ],
                 'expectedReturnCode' => 28,
                 'expectedWorkerState' => 'worker-new',
             ],
@@ -86,6 +114,8 @@ class WorkerServiceTest extends AbstractBaseTestCase
      * @dataProvider getDataProvider
      *
      * @param bool $hasWorker
+     *
+     * @throws OptimisticLockException
      */
     public function testGet($hasWorker)
     {
@@ -117,6 +147,8 @@ class WorkerServiceTest extends AbstractBaseTestCase
      * @param string $stateName
      * @param bool $expectedIsActive
      * @param bool $expectedIsMaintenanceReadOnly
+     *
+     * @throws OptimisticLockException
      */
     public function testIsState($stateName, $expectedIsActive, $expectedIsMaintenanceReadOnly)
     {
@@ -185,6 +217,8 @@ class WorkerServiceTest extends AbstractBaseTestCase
      * @dataProvider stateNameDataProvider
      *
      * @param string $stateName
+     *
+     * @throws OptimisticLockException
      */
     public function testSetActive($stateName)
     {
@@ -200,6 +234,8 @@ class WorkerServiceTest extends AbstractBaseTestCase
      * @dataProvider stateNameDataProvider
      *
      * @param string $stateName
+     *
+     * @throws OptimisticLockException
      */
     public function testSetReadOnly($stateName)
     {
@@ -236,6 +272,8 @@ class WorkerServiceTest extends AbstractBaseTestCase
      *
      * @param string $stateName
      * @param string $expectedWorkerState
+     *
+     * @throws OptimisticLockException
      */
     public function testVerify($stateName, $expectedWorkerState)
     {
@@ -274,7 +312,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
     /**
      * @param ThisWorker $worker
      * @param string $stateName
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws OptimisticLockException
      */
     private function setWorkerState(ThisWorker $worker, $stateName)
     {
@@ -287,7 +325,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws OptimisticLockException
      */
     private function removeWorker()
     {
@@ -297,5 +335,12 @@ class WorkerServiceTest extends AbstractBaseTestCase
             $entityManager->remove($entities[0]);
             $entityManager->flush();
         }
+    }
+
+    protected function assertPostConditions()
+    {
+        parent::assertPostConditions();
+
+        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
     }
 }

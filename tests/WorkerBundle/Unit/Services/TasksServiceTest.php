@@ -3,6 +3,7 @@
 namespace Tests\WorkerBundle\Unit\Services;
 
 use Psr\Log\LoggerInterface;
+use SimplyTestable\WorkerBundle\Services\CoreApplicationHttpClient;
 use SimplyTestable\WorkerBundle\Services\CoreApplicationRouter;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -22,7 +23,7 @@ class TasksServiceTest extends \PHPUnit_Framework_TestCase
             ->andReturn($workerProcessCount + 1);
 
         $tasksService = $this->createTasksService([
-            'taskService' => $taskService,
+            TaskService::class => $taskService,
         ]);
 
         $tasksService->setWorkerProcessCount($workerProcessCount);
@@ -37,37 +38,27 @@ class TasksServiceTest extends \PHPUnit_Framework_TestCase
      */
     private function createTasksService($services = [])
     {
-        if (!isset($services['logger'])) {
-            $services['logger'] = \Mockery::mock(LoggerInterface::class);
+        if (!isset($services[LoggerInterface::class])) {
+            $services[LoggerInterface::class] = \Mockery::mock(LoggerInterface::class);
         }
 
-        if (!isset($services['urlService'])) {
-            $services['urlService'] = \Mockery::mock(UrlService::class);
+        if (!isset($services[WorkerService::class])) {
+            $services[WorkerService::class] = \Mockery::mock(WorkerService::class);
         }
 
-        if (!isset($services['coreApplicationRouter'])) {
-            $services['coreApplicationRouter'] = \Mockery::mock(CoreApplicationRouter::class);
+        if (!isset($services[TaskService::class])) {
+            $services[TaskService::class] = \Mockery::mock(TaskService::class);
         }
 
-        if (!isset($services['workerService'])) {
-            $services['workerService'] = \Mockery::mock(WorkerService::class);
-        }
-
-        if (!isset($services['httpClientService'])) {
-            $services['httpClientService'] = \Mockery::mock(HttpClientService::class);
-        }
-
-        if (!isset($services['taskService'])) {
-            $services['taskService'] = \Mockery::mock(TaskService::class);
+        if (!isset($services[CoreApplicationHttpClient::class])) {
+            $services[CoreApplicationHttpClient::class] = \Mockery::mock(CoreApplicationHttpClient::class);
         }
 
         return new TasksService(
-            $services['logger'],
-            $services['urlService'],
-            $services['coreApplicationRouter'],
-            $services['workerService'],
-            $services['httpClientService'],
-            $services['taskService']
+            $services[LoggerInterface::class],
+            $services[WorkerService::class],
+            $services[TaskService::class],
+            $services[CoreApplicationHttpClient::class]
         );
     }
 
