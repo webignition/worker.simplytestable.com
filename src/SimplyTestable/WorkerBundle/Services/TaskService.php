@@ -145,22 +145,6 @@ class TaskService
     /**
      * @return State
      */
-    public function getFailedRetryAvailableState()
-    {
-        return $this->stateService->fetch(Task::STATE_FAILED_RETRY_AVAILABLE);
-    }
-
-    /**
-     * @return State
-     */
-    public function getFailedRetryLimitReachedState()
-    {
-        return $this->stateService->fetch(Task::STATE_FAILED_RETRY_LIMIT_REACHED);
-    }
-
-    /**
-     * @return State
-     */
     public function getSkippedState()
     {
         return $this->stateService->fetch(Task::STATE_SKIPPED);
