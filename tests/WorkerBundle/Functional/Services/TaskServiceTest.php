@@ -16,6 +16,9 @@ use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Services\TestHttpClientService;
 use Tests\WorkerBundle\Utility\File;
 
+/**
+ * @group TaskService
+ */
 class TaskServiceTest extends AbstractBaseTestCase
 {
     const DEFAULT_TASK_URL = 'http://example.com/';
