@@ -153,7 +153,7 @@ class TaskService
      */
     public function getCompletedState()
     {
-        return $this->stateService->fetch(self::TASK_COMPLETED_STATE);
+        return $this->stateService->fetch(Task::STATE_COMPLETED);
     }
 
     /**
@@ -281,8 +281,10 @@ class TaskService
      */
     public function cancel(Task $task)
     {
-        $isCancelled = TaskService::TASK_CANCELLED_STATE == $task->getState()->getName();
-        $isCompleted = TaskService::TASK_COMPLETED_STATE == $task->getState()->getName();
+        $taskStateName = $task->getState()->getName();
+
+        $isCancelled = TaskService::TASK_CANCELLED_STATE === $taskStateName;
+        $isCompleted = Task::STATE_COMPLETED === $taskStateName;
 
         if ($isCancelled || $isCompleted) {
             return $task;

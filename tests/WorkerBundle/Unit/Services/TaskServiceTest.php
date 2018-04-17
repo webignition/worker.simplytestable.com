@@ -54,8 +54,8 @@ class TaskServiceTest extends \PHPUnit_Framework_TestCase
                 'expectedEndState' => TaskService::TASK_CANCELLED_STATE,
             ],
             'state: completed' => [
-                'stateName' => TaskService::TASK_COMPLETED_STATE,
-                'expectedEndState' => TaskService::TASK_COMPLETED_STATE,
+                'stateName' => Task::STATE_COMPLETED,
+                'expectedEndState' => Task::STATE_COMPLETED,
             ],
         ];
     }

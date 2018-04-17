@@ -159,7 +159,7 @@ class TaskServiceTest extends AbstractBaseTestCase
             ],
             'completed' => [
                 'method' => 'getCompletedState',
-                'expectedStateName' => TaskService::TASK_COMPLETED_STATE,
+                'expectedStateName' => Task::STATE_COMPLETED,
             ],
             'cancelled' => [
                 'method' => 'getCancelledState',
@@ -221,7 +221,7 @@ class TaskServiceTest extends AbstractBaseTestCase
                         '<!doctype html><html><head></head><body></body>'
                     ),
                 ],
-                'expectedFinishedStateName' => TaskService::TASK_COMPLETED_STATE,
+                'expectedFinishedStateName' => Task::STATE_COMPLETED,
             ],
             'skipped' => [
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
@@ -353,7 +353,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->assertInternalType('int', $task->getTimePeriod()->getId());
 
         $this->assertTrue($this->taskService->reportCompletion($task));
-        $this->assertEquals(TaskService::TASK_COMPLETED_STATE, (string)$task->getState());
+        $this->assertEquals(Task::STATE_COMPLETED, (string)$task->getState());
 
         $this->assertNull($task->getId());
         $this->assertNull($task->getOutput()->getId());
