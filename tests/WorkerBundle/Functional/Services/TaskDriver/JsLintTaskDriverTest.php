@@ -45,7 +45,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
 
     public function testIncorrectPathToNodeJsLint()
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], HtmlDocumentFactory::load('empty-body-single-js-link')),
             new Response(200, ['content-type' => 'application/javascript']),
@@ -91,7 +91,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
         $expectedWarningCount,
         array $expectedDecodedOutput
     ) {
-        $this->fooHttpClientService->appendFixtures($httpFixtures);
+        $this->httpClientService->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
@@ -569,7 +569,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], HtmlDocumentFactory::load('empty-body-single-js-link')),
             new Response(200, ['content-type' => 'application/javascript']),
@@ -587,7 +587,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $historicalRequests = $this->fooHttpClientService->getHistory()->getRequests();
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
         $this->assertCount(4, $historicalRequests);
 
         foreach ($historicalRequests as $historicalRequest) {
@@ -603,7 +603,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], HtmlDocumentFactory::load('empty-body-single-js-link')),
             new Response(200, ['content-type' => 'application/javascript']),
@@ -621,7 +621,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $historicalRequests = $this->fooHttpClientService->getHistory()->getRequests();
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
         $this->assertCount(4, $historicalRequests);
 
         foreach ($historicalRequests as $historicalRequest) {

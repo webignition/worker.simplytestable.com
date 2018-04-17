@@ -62,7 +62,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
         $expectedWarningCount,
         $expectedDecodedOutput
     ) {
-        $this->fooHttpClientService->appendFixtures($httpFixtures);
+        $this->httpClientService->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
@@ -242,7 +242,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(
                 200,
@@ -259,7 +259,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $historicalRequests = $this->fooHttpClientService->getHistory()->getRequests();
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
         $this->assertCount(3, $historicalRequests);
 
         foreach ($historicalRequests as $historicalRequest) {
@@ -275,7 +275,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(
                 200,
@@ -292,7 +292,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $historicalRequests = $this->fooHttpClientService->getHistory()->getRequests();
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
         $this->assertCount(3, $historicalRequests);
 
         foreach ($historicalRequests as $historicalRequest) {

@@ -50,7 +50,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testPerformBadDocumentType($content, $expectedOutputMessage)
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], $content),
         ]);
@@ -137,7 +137,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
         $expectedErrorCount,
         $expectedDecodedOutput
     ) {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], $content),
         ]);
@@ -283,7 +283,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ]);
@@ -297,7 +297,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $historicalRequests = $this->fooHttpClientService->getHistory()->getRequests();
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
         $this->assertCount(2, $historicalRequests);
 
         foreach ($historicalRequests as $historicalRequest) {
@@ -313,7 +313,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ]);
@@ -327,7 +327,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $historicalRequests = $this->fooHttpClientService->getHistory()->getRequests();
+        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
         $this->assertCount(2, $historicalRequests);
 
         foreach ($historicalRequests as $historicalRequest) {
@@ -357,7 +357,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             file_put_contents($tmpFilePath, $content);
         }
 
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], $content),
         ]);

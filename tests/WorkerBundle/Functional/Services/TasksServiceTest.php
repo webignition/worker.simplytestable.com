@@ -22,7 +22,7 @@ class TasksServiceTest extends AbstractBaseTestCase
     /**
      * @var TestHttpClientService
      */
-    private $fooHttpClientService;
+    private $httpClientService;
 
     /**
      * {@inheritdoc}
@@ -32,7 +32,7 @@ class TasksServiceTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->tasksService = $this->container->get(TasksService::class);
-        $this->fooHttpClientService = $this->container->get(HttpClientService::class);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     public function testGetMaxTasksRequestFactor()
@@ -62,7 +62,7 @@ class TasksServiceTest extends AbstractBaseTestCase
      */
     public function testRequestHttpRequestFailure(array $httpFixtures, $expectedLogErrorMessage, $expectedException)
     {
-        $this->fooHttpClientService->appendFixtures($httpFixtures);
+        $this->httpClientService->appendFixtures($httpFixtures);
 
         try {
             $this->tasksService->request();
@@ -142,7 +142,7 @@ class TasksServiceTest extends AbstractBaseTestCase
      */
     public function testRequestSuccess($requestedLimit, $expectedLimit)
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200),
         ]);
 
@@ -150,7 +150,7 @@ class TasksServiceTest extends AbstractBaseTestCase
             $this->tasksService->request($requestedLimit)
         );
 
-        $lastRequest = $this->fooHttpClientService->getHistory()->getLastRequest();
+        $lastRequest = $this->httpClientService->getHistory()->getLastRequest();
         $postedData = [];
         parse_str(urldecode($lastRequest->getBody()->getContents()), $postedData);
 
@@ -186,6 +186,6 @@ class TasksServiceTest extends AbstractBaseTestCase
     {
         parent::assertPostConditions();
 
-        $this->assertEquals(0, $this->fooHttpClientService->getMockHandler()->count());
+        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
     }
 }

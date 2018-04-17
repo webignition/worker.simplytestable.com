@@ -23,7 +23,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
     /**
      * @var TestHttpClientService
      */
-    protected $fooHttpClientService;
+    protected $httpClientService;
 
     /**
      * {@inheritdoc}
@@ -33,7 +33,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->testTaskFactory = new TestTaskFactory($this->container);
-        $this->fooHttpClientService = $this->container->get(HttpClientService::class);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     /**
@@ -67,10 +67,9 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
 
     public function testPerformNonCurlConnectException()
     {
-        $fooHttpClientService = $this->container->get(HttpClientService::class);
         $connectException = new ConnectException('foo', new Request('GET', 'http://example.com'));
 
-        $fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             $connectException,
             $connectException,
             $connectException,
@@ -112,9 +111,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
         $expectedErrorCount,
         $expectedTaskOutput
     ) {
-        $fooHttpClientService = $this->container->get(HttpClientService::class);
-
-        $fooHttpClientService->appendFixtures($httpResponseFixtures);
+        $this->httpClientService->appendFixtures($httpResponseFixtures);
 
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
@@ -455,6 +452,6 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
     {
         parent::assertPostConditions();
 
-        $this->assertEquals(0, $this->fooHttpClientService->getMockHandler()->count());
+        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
     }
 }

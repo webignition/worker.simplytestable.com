@@ -23,7 +23,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
     /**
      * @var TestHttpClientService
      */
-    private $fooHttpClientService;
+    private $httpClientService;
 
     /**
      * {@inheritdoc}
@@ -33,7 +33,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->workerService = $this->container->get(WorkerService::class);
-        $this->fooHttpClientService = $this->container->get(HttpClientService::class);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     /**
@@ -60,7 +60,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
      */
     public function testActivate(array $httpFixtures, $expectedReturnCode, $expectedWorkerState)
     {
-        $this->fooHttpClientService->appendFixtures($httpFixtures);
+        $this->httpClientService->appendFixtures($httpFixtures);
 
         $worker = $this->workerService->get();
         $this->setWorkerState($worker, WorkerService::WORKER_NEW_STATE);
@@ -341,6 +341,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
     {
         parent::assertPostConditions();
 
-        $this->assertEquals(0, $this->fooHttpClientService->getMockHandler()->count());
+        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
     }
 }

@@ -18,7 +18,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
     /**
      * @var TestHttpClientService
      */
-    private $fooHttpClientService;
+    private $httpClientService;
 
     /**
      * @var HttpClient
@@ -37,9 +37,9 @@ class HttpClientServiceTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->fooHttpClientService = $this->container->get(HttpClientService::class);
-        $this->httpClient = $this->fooHttpClientService->getHttpClient();
-        $this->httpHistory = $this->fooHttpClientService->getHistory();
+        $this->httpClientService = $this->container->get(HttpClientService::class);
+        $this->httpClient = $this->httpClientService->getHttpClient();
+        $this->httpHistory = $this->httpClientService->getHistory();
     }
 
     /**
@@ -52,13 +52,13 @@ class HttpClientServiceTest extends AbstractBaseTestCase
      */
     public function testSetHeader($name, $value)
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(),
             new Response(),
             new Response(),
         ]);
 
-        $this->fooHttpClientService->setRequestHeader($name, $value);
+        $this->httpClientService->setRequestHeader($name, $value);
 
         $request = new Request('GET', 'http://example.com');
 
@@ -99,20 +99,20 @@ class HttpClientServiceTest extends AbstractBaseTestCase
      */
     public function testClearHeader()
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(),
             new Response(),
         ]);
 
         $request = new Request('GET', 'http://example.com');
 
-        $this->fooHttpClientService->setRequestHeader('foo', 'bar');
+        $this->httpClientService->setRequestHeader('foo', 'bar');
         $this->httpClient->send($request);
 
         $lastRequest = $this->httpHistory->getLastRequest();
         $this->assertEquals('bar', $lastRequest->getHeaderLine('foo'));
 
-        $this->fooHttpClientService->setRequestHeader('foo', null);
+        $this->httpClientService->setRequestHeader('foo', null);
         $this->httpClient->send($request);
 
         $lastRequest = $this->httpHistory->getLastRequest();
@@ -133,13 +133,13 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         HttpAuthenticationCredentials $httpAuthenticationCredentials,
         $expectedAuthorizationHeader
     ) {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(),
             new Response(),
             new Response(),
         ]);
 
-        $this->fooHttpClientService->setBasicHttpAuthorization($httpAuthenticationCredentials);
+        $this->httpClientService->setBasicHttpAuthorization($httpAuthenticationCredentials);
 
         $this->httpClient->send($request);
         $this->httpClient->send($request);

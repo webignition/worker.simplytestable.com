@@ -41,7 +41,7 @@ class TaskServiceTest extends AbstractBaseTestCase
     /**
      * @var TestHttpClientService
      */
-    private $fooHttpClientService;
+    private $httpClientService;
 
     /**
      * {@inheritdoc}
@@ -53,7 +53,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->taskService = $this->container->get(TaskService::class);
         $this->taskTypeService = $this->container->get(TaskTypeService::class);
         $this->testTaskFactory = new TestTaskFactory($this->container);
-        $this->fooHttpClientService = $this->container->get(HttpClientService::class);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     /**
@@ -193,7 +193,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testPerform($taskValues, $httpFixtures, $expectedFinishedStateName)
     {
-        $this->fooHttpClientService->appendFixtures($httpFixtures);
+        $this->httpClientService->appendFixtures($httpFixtures);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create($taskValues);
@@ -282,12 +282,12 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testReportCompletionFailure(array $responseFixtures, $expectedReturnValue)
     {
-        $this->fooHttpClientService->appendFixtures(array_merge([
+        $this->httpClientService->appendFixtures(array_merge([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
         ], $responseFixtures));
 
-        $this->fooHttpClientService->disableRetryMiddleware();
+        $this->httpClientService->disableRetryMiddleware();
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
@@ -338,7 +338,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testReportCompletionSuccess($responseFixture)
     {
-        $this->fooHttpClientService->appendFixtures([
+        $this->httpClientService->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
             $responseFixture,
@@ -359,7 +359,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->assertNull($task->getOutput()->getId());
         $this->assertNull($task->getTimePeriod()->getId());
 
-        $lastRequest = $this->fooHttpClientService->getHistory()->getLastRequest();
+        $lastRequest = $this->httpClientService->getHistory()->getLastRequest();
         $postedData = [];
         parse_str(urldecode($lastRequest->getBody()->getContents()), $postedData);
 
@@ -414,7 +414,7 @@ class TaskServiceTest extends AbstractBaseTestCase
     {
         parent::assertPostConditions();
 
-        $this->assertEquals(0, $this->fooHttpClientService->getMockHandler()->count());
+        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
     }
 
     /**
