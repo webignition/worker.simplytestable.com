@@ -1,7 +1,11 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Services;
 
+use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Request;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Exception\RequestException as HttpRequestException;
 use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
@@ -30,9 +34,9 @@ class TasksService
     private $workerService;
 
     /**
-     * @var HttpClientService
+     * @var HttpClient
      */
-    private $httpClientService;
+    private $httpClient;
 
     /**
      * @var TaskService
@@ -54,7 +58,7 @@ class TasksService
      * @param UrlService $urlService
      * @param CoreApplicationRouter $coreApplicationRouter
      * @param WorkerService $workerService
-     * @param HttpClientService $httpClientService
+     * @param HttpClient $httpClient
      * @param TaskService $taskService
      */
     public function __construct(
@@ -62,14 +66,14 @@ class TasksService
         UrlService $urlService,
         CoreApplicationRouter $coreApplicationRouter,
         WorkerService $workerService,
-        HttpClientService $httpClientService,
+        HttpClient $httpClient,
         TaskService $taskService
     ) {
         $this->logger = $logger;
         $this->urlService = $urlService;
         $this->coreApplicationRouter = $coreApplicationRouter;
         $this->workerService = $workerService;
-        $this->httpClientService = $httpClientService;
+        $this->httpClient = $httpClient;
         $this->taskService = $taskService;
     }
 
@@ -108,9 +112,10 @@ class TasksService
     /**
      * @param null|int $requestedLimit
      *
-     * @throws RequestException
-     *
      * @return bool
+     *
+     * @throws RequestException
+     * @throws GuzzleException
      */
     public function request($requestedLimit = null)
     {
@@ -124,16 +129,21 @@ class TasksService
             )
         );
 
-        $request = $this->httpClientService->postRequest($requestUrl, [
-            'body' => [
-                'worker_hostname' => $this->workerService->get()->getHostname(),
-                'worker_token' => $this->workerService->get()->getActivationToken(),
-                'limit' => $this->getLimit($requestedLimit)
-            ],
-        ]);
+        $postData = [
+            'worker_hostname' => $this->workerService->get()->getHostname(),
+            'worker_token' => $this->workerService->get()->getActivationToken(),
+            'limit' => $this->getLimit($requestedLimit)
+        ];
+
+        $request = new Request(
+            'POST',
+            $requestUrl,
+            [],
+            \GuzzleHttp\Psr7\stream_for(http_build_query($postData, '', '&'))
+        );
 
         try {
-            $this->httpClientService->get()->send($request);
+            $this->httpClient->send($request);
         } catch (HttpRequestException $httpRequestException) {
             $requestException = $this->createRequestException($httpRequestException);
             $this->logHttpRequestException($requestException);

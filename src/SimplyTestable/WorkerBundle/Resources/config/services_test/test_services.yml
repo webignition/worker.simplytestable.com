@@ -35,7 +35,7 @@ services:
       - '@SimplyTestable\WorkerBundle\Services\UrlService'
       - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
       - '@SimplyTestable\WorkerBundle\Services\WorkerService'
-      - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
+      - '@GuzzleHttp\Client'
       - '@SimplyTestable\WorkerBundle\Services\TaskService'
     calls:
       - [setWorkerProcessCount, ['%worker_process_count%']]

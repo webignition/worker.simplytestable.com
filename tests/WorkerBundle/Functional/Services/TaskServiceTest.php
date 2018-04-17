@@ -378,8 +378,6 @@ class TaskServiceTest extends AbstractBaseTestCase
             ],
             $postedData
         );
-
-//        var_dump($postedData);
     }
 
     /**
