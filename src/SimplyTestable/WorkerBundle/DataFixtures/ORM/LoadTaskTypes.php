@@ -2,41 +2,44 @@
 
 namespace SimplyTestable\WorkerBundle\DataFixtures\ORM;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\TaskTypeClass;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 
-class LoadTaskTypes extends AbstractFixture implements OrderedFixtureInterface
+class LoadTaskTypes extends Fixture implements DependentFixtureInterface
 {
-    private $taskTypes = array(
-        'HTML validation' => array(
+    /**
+     * @var array
+     */
+    private $taskTypes = [
+        'HTML validation' => [
             'description' => 'Validates the HTML markup for a given URL',
             'class' => 'verification',
             'selectable' => true
-        ),
-        'CSS validation' => array(
+        ],
+        'CSS validation' => [
             'description' => 'Validates the CSS related to a given web document URL',
             'class' => 'verification',
             'selectable' => true
-        ),
-        'JS static analysis' => array(
+        ],
+        'JS static analysis' => [
             'description' => 'JavaScript static code analysis (via jslint)',
             'class' => 'verification',
             'selectable' => true
-        ),
-        'URL discovery' => array(
+        ],
+        'URL discovery' => [
             'description' => 'Discover in-scope URLs from the anchors within a given URL',
             'class' => 'discovery',
             'selectable' => false
-        ),
-        'Link integrity' => array(
+        ],
+        'Link integrity' => [
             'description' => 'Check links in a HTML document and determine those that don\'t work',
             'class' => 'verification',
             'selectable' => true
-        ),
-    );
+        ],
+    ];
 
     /**
      * {@inheritdoc}
@@ -47,13 +50,17 @@ class LoadTaskTypes extends AbstractFixture implements OrderedFixtureInterface
         $taskTypeRepository = $manager->getRepository('SimplyTestable\WorkerBundle\Entity\Task\Type\Type');
 
         foreach ($this->taskTypes as $name => $properties) {
-            $taskType = $taskTypeRepository->findOneByName($name);
+            $taskType = $taskTypeRepository->findOneBy([
+                'name' => $name,
+            ]);
 
             if (is_null($taskType)) {
                 $taskType = new TaskType();
             }
 
-            $taskTypeClass = $taskTypeClassRepository->findOneByName($properties['class']);
+            $taskTypeClass = $taskTypeClassRepository->findOneBy([
+                'name' => $properties['class'],
+            ]);
 
             $taskType->setClass($taskTypeClass);
             $taskType->setDescription($properties['description']);
@@ -68,8 +75,10 @@ class LoadTaskTypes extends AbstractFixture implements OrderedFixtureInterface
     /**
      * {@inheritdoc}
      */
-    public function getOrder()
+    public function getDependencies()
     {
-        return 3; // the order in which fixtures will be loaded
+        return [
+            LoadTaskTypeClasses::class,
+        ];
     }
 }
