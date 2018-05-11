@@ -7,10 +7,10 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
-use SimplyTestable\WorkerBundle\Model\HttpAuthenticationCredentials;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Services\TestHttpClientService;
+use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class HttpClientServiceTest extends AbstractBaseTestCase
