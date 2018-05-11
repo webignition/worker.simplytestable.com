@@ -66,16 +66,16 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
     {
         $linkChecker = new LinkChecker(
             $this->linkCheckerConfigurationFactory->create($this->task),
-            $this->fooHttpClientService->getHttpClient()
+            $this->httpClientService->getHttpClient()
         );
 
         $linkChecker->setWebPage($webPage);
 
-        $this->fooHttpClientService->disableRetryMiddleware();
+        $this->httpClientService->disableRetryMiddleware();
 
         $linkCheckResults = $linkChecker->getAll();
 
-        $this->fooHttpClientService->enableRetryMiddleware();
+        $this->httpClientService->enableRetryMiddleware();
 
         $this->response->setErrorCount(count($linkChecker->getErrored()));
 

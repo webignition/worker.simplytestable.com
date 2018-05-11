@@ -96,7 +96,7 @@ class CssValidationTaskDriver extends AbstractWebPageTaskDriver
             $webPage->getContent()
         );
 
-        $this->cssValidatorWrapper->setHttpClient($this->fooHttpClientService->getHttpClient());
+        $this->cssValidatorWrapper->setHttpClient($this->httpClientService->getHttpClient());
         $cssValidatorOutput = $this->cssValidatorWrapper->validate($cssValidatorWrapperConfiguration);
 
         if ($cssValidatorOutput->hasException()) {

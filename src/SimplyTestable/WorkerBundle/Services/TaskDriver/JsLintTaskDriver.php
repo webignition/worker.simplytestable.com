@@ -78,7 +78,7 @@ class JsLintTaskDriver extends AbstractWebPageTaskDriver
         $this->logger = $logger;
         $this->nodeJsLintWrapperConfigurationFactory = $nodeJsLintWrapperConfigurationFactory;
 
-        $this->nodeJsLintWrapper->setHttpClient($this->fooHttpClientService->getHttpClient());
+        $this->nodeJsLintWrapper->setHttpClient($this->httpClientService->getHttpClient());
     }
 
     /**

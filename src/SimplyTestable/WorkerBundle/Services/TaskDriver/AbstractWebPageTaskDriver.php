@@ -5,9 +5,9 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Model\HttpAuthenticationCredentials;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
+use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebResource\Exception\HttpException;
 use webignition\WebResource\Exception\InvalidResponseContentTypeException;
@@ -47,7 +47,7 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
     /**
      * @var HttpClientService
      */
-    protected $fooHttpClientService;
+    protected $httpClientService;
 
     /**
      * @param StateService $stateService
@@ -61,7 +61,7 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
     ) {
         parent::__construct($stateService);
 
-        $this->fooHttpClientService = $fooHttpClientService;
+        $this->httpClientService = $fooHttpClientService;
         $this->webResourceRetriever = $webResourceRetriever;
     }
 
@@ -76,13 +76,13 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
     {
         $this->task = $task;
 
-        $this->fooHttpClientService->setCookies($this->task->getParameter('cookies'));
-        $this->fooHttpClientService->setBasicHttpAuthorization(new HttpAuthenticationCredentials(
+        $this->httpClientService->setCookies($this->task->getParameter('cookies'));
+        $this->httpClientService->setBasicHttpAuthorization(new HttpAuthenticationCredentials(
             $this->task->getParameter('http-auth-username'),
             $this->task->getParameter('http-auth-password'),
             'example.com'
         ));
-        $this->fooHttpClientService->setRequestHeader('User-Agent', self::USER_AGENT);
+        $this->httpClientService->setRequestHeader('User-Agent', self::USER_AGENT);
 
         $webPage = $this->retrieveWebPage();
 
@@ -234,7 +234,7 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
      */
     private function isRedirectLoopException()
     {
-        $httpHistory = $this->fooHttpClientService->getHistory();
+        $httpHistory = $this->httpClientService->getHistory();
 
         $responses = $httpHistory->getResponses();
         $responseHistoryContainsOnlyRedirects = true;
