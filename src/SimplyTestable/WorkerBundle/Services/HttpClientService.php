@@ -109,7 +109,7 @@ class HttpClientService
         }
 
         foreach ($cookies as $cookie) {
-            $this->cookieJar->setCookie(new SetCookie($cookie));
+            $this->cookieJar->setCookie($cookie);
         }
     }
 
