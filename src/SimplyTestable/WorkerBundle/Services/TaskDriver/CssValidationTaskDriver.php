@@ -4,6 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use QueryPath\Exception as QueryPathException;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Services\HttpClientConfigurationService;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\CssValidatorOutput\CssValidatorOutput;
@@ -32,19 +33,21 @@ class CssValidationTaskDriver extends AbstractWebPageTaskDriver
 
     /**
      * @param StateService $stateService
-     * @param HttpClientService $fooHttpClientService
+     * @param HttpClientService $httpClientService
+     * @param HttpClientConfigurationService $httpClientConfigurationService
      * @param WebResourceRetriever $webResourceRetriever
      * @param CssValidatorWrapper $cssValidatorWrapper
      * @param CssValidatorWrapperConfigurationFactory $configurationFactory
      */
     public function __construct(
         StateService $stateService,
-        HttpClientService $fooHttpClientService,
+        HttpClientService $httpClientService,
+        HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
         CssValidatorWrapper $cssValidatorWrapper,
         CssValidatorWrapperConfigurationFactory $configurationFactory
     ) {
-        parent::__construct($stateService, $fooHttpClientService, $webResourceRetriever);
+        parent::__construct($stateService, $httpClientService, $httpClientConfigurationService, $webResourceRetriever);
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
         $this->configurationFactory = $configurationFactory;

@@ -4,6 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use GuzzleHttp\Exception\GuzzleException;
 use QueryPath\Exception as QueryPathException;
+use SimplyTestable\WorkerBundle\Services\HttpClientConfigurationService;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\InternetMediaType\InternetMediaType;
@@ -22,17 +23,19 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
 
     /**
      * @param StateService $stateService
-     * @param HttpClientService $fooHttpClientService
+     * @param HttpClientService $httpClientService
+     * @param HttpClientConfigurationService $httpClientConfigurationService
      * @param WebResourceRetriever $webResourceRetriever
      * @param LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory
      */
     public function __construct(
         StateService $stateService,
-        HttpClientService $fooHttpClientService,
+        HttpClientService $httpClientService,
+        HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
         LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory
     ) {
-        parent::__construct($stateService, $fooHttpClientService, $webResourceRetriever);
+        parent::__construct($stateService, $httpClientService, $httpClientConfigurationService, $webResourceRetriever);
 
         $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
     }

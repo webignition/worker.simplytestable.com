@@ -3,6 +3,7 @@ services:
     arguments:
       - '@SimplyTestable\WorkerBundle\Services\StateService'
       - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
+      - '@SimplyTestable\WorkerBundle\Services\HttpClientConfigurationService'
       - '@webignition\WebResource\Retriever'
       - '@webignition\HtmlValidator\Wrapper\Wrapper'
       - '%html-validator-path%'

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\WorkerBundle\Unit\Request;
+namespace Tests\WorkerBundle\Unit\Model;
 
 use SimplyTestable\WorkerBundle\Model\HttpCacheStats;
 
