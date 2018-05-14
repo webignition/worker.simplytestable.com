@@ -98,9 +98,9 @@ class HttpClientService
     /**
      * Set cookies to be sent on all requests (dependent on cookie domain/secure matching rules)
      *
-     * @param array $cookies
+     * @param SetCookie[] $cookies
      */
-    public function setCookies($cookies = [])
+    public function setCookies(array $cookies = [])
     {
         $this->clearCookies();
 
@@ -109,11 +109,7 @@ class HttpClientService
         }
 
         foreach ($cookies as $cookie) {
-            foreach ($cookie as $key => $value) {
-                $cookie[ucfirst($key)] = $value;
-            }
-
-            $this->cookieJar->setCookie(new SetCookie($cookie));
+            $this->cookieJar->setCookie($cookie);
         }
     }
 

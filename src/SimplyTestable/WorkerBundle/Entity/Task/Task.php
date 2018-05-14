@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use SimplyTestable\WorkerBundle\Entity\State;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use SimplyTestable\WorkerBundle\Entity\TimePeriod;
+use SimplyTestable\WorkerBundle\Model\Task\Parameters;
 
 /**
  * @ORM\Entity
@@ -77,6 +78,11 @@ class Task implements \JsonSerializable
      * @ORM\Column(type="text", nullable=true)
      */
     protected $parameters;
+
+    /**
+     * @var Parameters
+     */
+    private $parametersObject;
 
     /**
      * @return integer
@@ -243,12 +249,29 @@ class Task implements \JsonSerializable
     }
 
     /**
-     *
      * @return array
      */
     public function getParametersArray()
     {
-        return json_decode($this->getParameters(), true);
+        $decodedParameters = json_decode($this->getParameters(), true);
+
+        if (!is_array($decodedParameters)) {
+            $decodedParameters = [];
+        }
+
+        return $decodedParameters;
+    }
+
+    /**
+     * @return Parameters
+     */
+    public function getParametersObject()
+    {
+        if (empty($this->parametersObject)) {
+            $this->parametersObject = new Parameters($this);
+        }
+
+        return $this->parametersObject;
     }
 
     /**
@@ -259,6 +282,7 @@ class Task implements \JsonSerializable
     public function hasParameter($name)
     {
         $parameters = $this->getParametersArray();
+
         return isset($parameters[$name]);
     }
 

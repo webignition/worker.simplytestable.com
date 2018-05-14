@@ -5,9 +5,9 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use SimplyTestable\WorkerBundle\Services\HttpClientConfigurationService;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
-use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebResource\Exception\HttpException;
 use webignition\WebResource\Exception\InvalidResponseContentTypeException;
@@ -50,18 +50,26 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
     protected $httpClientService;
 
     /**
+     * @var HttpClientConfigurationService
+     */
+    private $httpClientConfigurationService;
+
+    /**
      * @param StateService $stateService
-     * @param HttpClientService $fooHttpClientService
+     * @param HttpClientService $httpClientService
+     * @param HttpClientConfigurationService $httpClientConfigurationService
      * @param WebResourceRetriever $webResourceRetriever
      */
     public function __construct(
         StateService $stateService,
-        HttpClientService $fooHttpClientService,
+        HttpClientService $httpClientService,
+        HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever
     ) {
         parent::__construct($stateService);
 
-        $this->httpClientService = $fooHttpClientService;
+        $this->httpClientService = $httpClientService;
+        $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->webResourceRetriever = $webResourceRetriever;
     }
 
@@ -72,17 +80,10 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
      * @throws TransportException
      * @throws GuzzleException
      */
-    public function execute(Task $task)
+    protected function execute(Task $task)
     {
         $this->task = $task;
-
-        $this->httpClientService->setCookies($this->task->getParameter('cookies'));
-        $this->httpClientService->setBasicHttpAuthorization(new HttpAuthenticationCredentials(
-            $this->task->getParameter('http-auth-username'),
-            $this->task->getParameter('http-auth-password'),
-            'example.com'
-        ));
-        $this->httpClientService->setRequestHeader('User-Agent', self::USER_AGENT);
+        $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
         $webPage = $this->retrieveWebPage();
 

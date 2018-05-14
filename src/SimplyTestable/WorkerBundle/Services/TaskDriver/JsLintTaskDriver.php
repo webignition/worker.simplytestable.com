@@ -4,6 +4,7 @@ namespace SimplyTestable\WorkerBundle\Services\TaskDriver;
 
 use Psr\Log\LoggerInterface;
 use QueryPath\Exception as QueryPathException;
+use SimplyTestable\WorkerBundle\Services\HttpClientConfigurationService;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\InternetMediaType\InternetMediaType;
@@ -58,7 +59,8 @@ class JsLintTaskDriver extends AbstractWebPageTaskDriver
 
     /**
      * @param StateService $stateService
-     * @param HttpClientService $fooHttpClientService
+     * @param HttpClientService $httpClientService
+     * @param HttpClientConfigurationService $httpClientConfigurationService
      * @param WebResourceRetriever $webResourceRetriever
      * @param LoggerInterface $logger
      * @param NodeJsLintWrapper $nodeJsLintWrapper
@@ -66,13 +68,14 @@ class JsLintTaskDriver extends AbstractWebPageTaskDriver
      */
     public function __construct(
         StateService $stateService,
-        HttpClientService $fooHttpClientService,
+        HttpClientService $httpClientService,
+        HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
         LoggerInterface $logger,
         NodeJsLintWrapper $nodeJsLintWrapper,
         NodeJsLintWrapperConfigurationFactory $nodeJsLintWrapperConfigurationFactory
     ) {
-        parent::__construct($stateService, $fooHttpClientService, $webResourceRetriever);
+        parent::__construct($stateService, $httpClientService, $httpClientConfigurationService, $webResourceRetriever);
 
         $this->nodeJsLintWrapper = $nodeJsLintWrapper;
         $this->logger = $logger;
