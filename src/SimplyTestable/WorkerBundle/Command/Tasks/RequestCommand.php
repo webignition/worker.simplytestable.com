@@ -1,7 +1,8 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Command\Tasks;
 
-use webignition\ResqueJobFactory\ResqueJobFactory;
+use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
@@ -34,22 +35,15 @@ class RequestCommand extends Command
     private $resqueQueueService;
 
     /**
-     * @var ResqueJobFactory
-     */
-    private $resqueJobFactory;
-
-    /**
      * @param TasksService $tasksService
      * @param WorkerService $workerService
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
         TasksService $tasksService,
         WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
-        ResqueJobFactory $resqueJobFactory,
         $name = null
     ) {
         parent::__construct($name);
@@ -57,7 +51,6 @@ class RequestCommand extends Command
         $this->tasksService = $tasksService;
         $this->workerService = $workerService;
         $this->resqueQueueService = $resqueQueueService;
-        $this->resqueJobFactory = $resqueJobFactory;
     }
 
     /**
@@ -97,18 +90,10 @@ class RequestCommand extends Command
         return self::RETURN_CODE_FAILED;
     }
 
-    /**
-     * @throws \CredisException
-     * @throws \Exception
-     */
     private function requeue()
     {
         if ($this->resqueQueueService->isEmpty('tasks-request')) {
-            $this->resqueQueueService->enqueue(
-                $this->resqueJobFactory->create(
-                    'tasks-request'
-                )
-            );
+            $this->resqueQueueService->enqueue(new TasksRequestJob());
         }
     }
 }

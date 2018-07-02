@@ -2,7 +2,7 @@
 
 namespace Tests\WorkerBundle\Unit\Command\Tasks;
 
-use Mockery\Mock;
+use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
 use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
 use SimplyTestable\WorkerBundle\Services\TasksService;
@@ -10,7 +10,6 @@ use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\MockFactory;
 use Symfony\Component\Console\Input\ArrayInput;
-use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 
 /**
@@ -22,14 +21,11 @@ class RequestCommandTest extends \PHPUnit_Framework_TestCase
      * @dataProvider maintenanceModeDataProvider
      *
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactory $resqueJobFactory
      *
      * @throws \Exception
      */
-    public function testMaintenanceMode(
-        ResqueQueueService $resqueQueueService,
-        ResqueJobFactory $resqueJobFactory
-    ) {
+    public function testMaintenanceMode(ResqueQueueService $resqueQueueService)
+    {
         $command = $this->createRequestCommand([
             WorkerService::class => MockFactory::createWorkerService([
                 'isMaintenanceReadOnly' => [
@@ -37,7 +33,6 @@ class RequestCommandTest extends \PHPUnit_Framework_TestCase
                 ],
             ]),
             ResqueQueueService::class => $resqueQueueService,
-            ResqueJobFactory::class => $resqueJobFactory,
         ]);
 
         $returnCode = $command->run(new ArrayInput([]), new NullOutput());
@@ -48,39 +43,53 @@ class RequestCommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function maintenanceModeDataProvider()
     {
-        /* @var Mock|TasksRequestJob $tasksRequestJob */
-        $tasksRequestJob = \Mockery::mock(TasksRequestJob::class);
-
         return [
             'tasks-request queue is empty' => [
-                'resqueQueueService' => MockFactory::createResqueQueueService([
-                    'isEmpty' => [
-                        'with' => 'tasks-request',
-                        'return' => true,
-                    ],
-                    'enqueue' => [
-                        'with' => $tasksRequestJob,
-                    ],
-                ]),
-                'resqueJobFactory' => MockFactory::createResqueJobFactory([
-                    'create' => [
-                        'withArgs' => ['tasks-request'],
-                        'return' => $tasksRequestJob,
-                    ],
-                ]),
+                'resqueQueueService' => $this->createResqueQueueServiceWithEnqueueCall(),
             ],
             'tasks-request queue is not empty' => [
-                'resqueQueueService' => MockFactory::createResqueQueueService([
-                    'isEmpty' => [
-                        'with' => 'tasks-request',
-                        'return' => false,
-                    ],
-                ]),
-                'resqueJobFactory' => MockFactory::createResqueJobFactory(),
+                'resqueQueueService' => $this->createResqueQueueService(false)
             ],
         ];
+    }
+
+    /**
+     * @return MockInterface|ResqueQueueService
+     */
+    private function createResqueQueueServiceWithEnqueueCall()
+    {
+        $resqueQueueService = $this->createResqueQueueService(true);
+
+        $resqueQueueService
+            ->shouldReceive('enqueue')
+            ->withArgs(function (TasksRequestJob $tasksRequestJob) {
+                $this->assertInstanceOf(TasksRequestJob::class, $tasksRequestJob);
+                return true;
+            });
+
+        return $resqueQueueService;
+    }
+
+    /**
+     * @param bool $isEmpty
+     *
+     * @return MockInterface|ResqueQueueService
+     */
+    private function createResqueQueueService($isEmpty)
+    {
+        $resqueQueueService = \Mockery::mock(ResqueQueueService::class);
+
+        $resqueQueueService
+            ->shouldReceive('isEmpty')
+            ->with('tasks-request')
+            ->andReturn($isEmpty);
+
+        return $resqueQueueService;
     }
 
     /**
@@ -102,15 +111,10 @@ class RequestCommandTest extends \PHPUnit_Framework_TestCase
             $services[ResqueQueueService::class] = MockFactory::createResqueQueueService();
         }
 
-        if (!isset($services[ResqueJobFactory::class])) {
-            $services[ResqueJobFactory::class] = MockFactory::createResqueJobFactory();
-        }
-
         return new RequestCommand(
             $services[TasksService::class],
             $services[WorkerService::class],
-            $services[ResqueQueueService::class],
-            $services[ResqueJobFactory::class]
+            $services[ResqueQueueService::class]
         );
     }
 
