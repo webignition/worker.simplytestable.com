@@ -42,7 +42,6 @@
         "resquebundle/resque": "2.0.1",
         "kevinrob/guzzle-cache-middleware": "^3",
         "webignition/guzzle-curl-exception":">=1,<2",
-        "webignition/resque-job-factory": ">=1.0,<2",
         "webignition/html-document-type":">=0.1.1,<1.0",
         "webignition/http-history-container": ">=0.3,<1",
         "webignition/css-validator-output-parser": ">=3.2,<4",
