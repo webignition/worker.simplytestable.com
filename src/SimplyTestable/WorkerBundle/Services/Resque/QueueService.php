@@ -1,10 +1,10 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Services\Resque;
 
 use ResqueBundle\Resque\Resque;
 use ResqueBundle\Resque\Job;
 use Psr\Log\LoggerInterface;
-use webignition\ResqueJobFactory\ResqueJobFactory;
 
 /**
  * Wrapper for \ResqueBundle\Resque\Resque that handles exceptions
@@ -30,113 +30,35 @@ class QueueService
     private $logger;
 
     /**
-     * @var ResqueJobFactory
-     */
-    private $jobFactory;
-
-    /**
      * @param Resque $resque
      * @param LoggerInterface $logger
-     * @param ResqueJobFactory $jobFactory
      */
     public function __construct(
         Resque $resque,
-        LoggerInterface $logger,
-        ResqueJobFactory $jobFactory
+        LoggerInterface $logger
     ) {
         $this->resque = $resque;
         $this->logger = $logger;
-        $this->jobFactory = $jobFactory;
     }
 
     /**
-     * @param string $queue_name
+     * @param string $queue
      * @param array $args
      *
      * @return boolean
      */
-    public function contains($queue_name, $args = [])
+    public function contains($queue, $args = [])
     {
         try {
-            return !is_null($this->findRedisValue($queue_name, $args));
+            return !is_null($this->findJobInQueue($queue, $args));
         } catch (\CredisException $credisException) {
             $this->logger->warning(
-                'ResqueQueueService::enqueue: Redis error ['.$credisException->getMessage().']'
+                'ResqueQueueService::contains: Redis error ['.$credisException->getMessage().']'
             );
         }
 
         return false;
     }
-
-    /**
-     * @param string $queue
-     * @param array $args
-     *
-     * @return string
-     */
-    private function findRedisValue($queue, $args)
-    {
-        $queueLength = $this->getQueueLength($queue);
-
-        for ($queueIndex = 0; $queueIndex < $queueLength; $queueIndex++) {
-            $jobDetails = json_decode(\Resque::redis()->lindex(self::QUEUE_KEY . ':' . $queue, $queueIndex));
-
-            if ($this->match($jobDetails, $queue, $args)) {
-                return json_encode($jobDetails);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param string $jobDetails
-     * @param string $queue
-     * @param array $args
-     *
-     * @return boolean
-     */
-    private function match($jobDetails, $queue, $args)
-    {
-        if (!isset($jobDetails->class)) {
-            return false;
-        }
-
-        if ($jobDetails->class != $this->jobFactory->getJobClassName($queue)) {
-            return false;
-        }
-
-        if (!isset($jobDetails->args)) {
-            return false;
-        }
-
-        if (!isset($jobDetails->args[0])) {
-            return false;
-        }
-
-        foreach ($args as $key => $value) {
-            if (!isset($jobDetails->args[0]->$key)) {
-                return false;
-            }
-
-            if ($jobDetails->args[0]->$key != $value) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $queue
-     *
-     * @return int
-     */
-    public function getQueueLength($queue)
-    {
-        return \Resque::redis()->llen(self::QUEUE_KEY . ':' . $queue);
-    }
-
 
     /**
      * @param Job $job
@@ -155,8 +77,60 @@ class QueueService
 
     /**
      * @param string $queue
+     * @param array $args
      *
-     * @return boolean
+     * @return Job|null
+     */
+    private function findJobInQueue($queue, $args)
+    {
+        $jobs = $this->resque->getQueue($queue)->getJobs();
+
+        foreach ($jobs as $job) {
+            /* @var $job Job */
+
+            if ($this->match($job, $args)) {
+                return $job;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param Job $job
+     * @param array $args
+     *
+     * @return bool
+     */
+    private function match(Job $job, $args)
+    {
+        foreach ($args as $key => $value) {
+            if (!isset($job->args[$key])) {
+                return false;
+            }
+
+            if ($job->args[$key] != $value) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $queue
+     *
+     * @return int
+     */
+    public function getQueueLength($queue)
+    {
+        return \Resque::redis()->llen(self::QUEUE_KEY . ':' . $queue);
+    }
+
+    /**
+     * @param string $queue
+     *
+     * @return bool
      */
     public function isEmpty($queue)
     {
