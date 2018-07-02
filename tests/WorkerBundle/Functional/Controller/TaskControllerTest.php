@@ -7,11 +7,8 @@ use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestColle
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFactory;
-use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskFactory;
-use SimplyTestable\WorkerBundle\Services\TaskService;
-use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -62,8 +59,7 @@ class TaskControllerTest extends AbstractBaseTestCase
         $response = $this->taskController->createCollectionAction(
             $this->container->get(CreateRequestCollectionFactory::class),
             $this->container->get(TaskFactory::class),
-            $this->container->get(QueueService::class),
-            $this->container->get(ResqueJobFactory::class)
+            $this->container->get(QueueService::class)
         );
 
         $this->assertEquals(200, $response->getStatusCode());
