@@ -3,7 +3,7 @@
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
 use Doctrine\ORM\EntityManagerInterface;
-use webignition\ResqueJobFactory\ResqueJobFactory;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,29 +23,21 @@ class PerformEnqueueCommand extends Command
     private $resqueQueueService;
 
     /**
-     * @var ResqueJobFactory
-     */
-    private $resqueJobFactory;
-
-    /**
      * @param EntityManagerInterface $entityManager
      * @param TaskService $taskService
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         TaskService $taskService,
         ResqueQueueService $resqueQueueService,
-        ResqueJobFactory $resqueJobFactory,
         $name = null
     ) {
         parent::__construct($name);
 
         $this->taskService = $taskService;
         $this->resqueQueueService = $resqueQueueService;
-        $this->resqueJobFactory = $resqueJobFactory;
     }
 
     /**
@@ -77,13 +69,7 @@ class PerformEnqueueCommand extends Command
                 $output->writeln('Task ['.$taskId.'] is already enqueued');
             } else {
                 $output->writeln('Enqueuing task ['.$taskId.']');
-
-                $this->resqueQueueService->enqueue(
-                    $this->resqueJobFactory->create(
-                        'task-perform',
-                        ['id' => $taskId]
-                    )
-                );
+                $this->resqueQueueService->enqueue(new TaskPerformJob(['id' => $taskId]));
             }
         }
 
