@@ -4,10 +4,10 @@ namespace SimplyTestable\WorkerBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
 use SimplyTestable\WorkerBundle\Model\TaskCollection;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
-use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskFactory;
 use SimplyTestable\WorkerBundle\Services\TaskService;
@@ -54,7 +54,6 @@ class TaskController extends AbstractController
      * @param CreateRequestCollectionFactory $createRequestCollectionFactory
      * @param TaskFactory $taskFactory
      * @param QueueService $resqueQueueService
-     * @param ResqueJobFactory $resqueJobFactory
      *
      * @return JsonResponse|Response
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -63,8 +62,7 @@ class TaskController extends AbstractController
     public function createCollectionAction(
         CreateRequestCollectionFactory $createRequestCollectionFactory,
         TaskFactory $taskFactory,
-        QueueService $resqueQueueService,
-        ResqueJobFactory $resqueJobFactory
+        QueueService $resqueQueueService
     ) {
         if ($this->workerService->isMaintenanceReadOnly()) {
             throw new ServiceUnavailableHttpException();
@@ -84,10 +82,7 @@ class TaskController extends AbstractController
         $this->entityManager->flush();
 
         foreach ($tasks as $task) {
-            $resqueQueueService->enqueue($resqueJobFactory->create(
-                'task-perform',
-                ['id' => $task->getId()]
-            ));
+            $resqueQueueService->enqueue(new TaskPerformJob(['id' => $task->getId()]));
         }
 
         return new JsonResponse($tasks->jsonSerialize());
