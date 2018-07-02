@@ -1,8 +1,11 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
 use Psr\Log\LoggerInterface;
-use webignition\ResqueJobFactory\ResqueJobFactory;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob;
+use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
@@ -39,16 +42,10 @@ class PerformCommand extends Command
     private $resqueQueueService;
 
     /**
-     * @var ResqueJobFactory
-     */
-    private $resqueJobFactory;
-
-    /**
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
@@ -56,7 +53,6 @@ class PerformCommand extends Command
         TaskService $taskService,
         WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
-        ResqueJobFactory $resqueJobFactory,
         $name = null
     ) {
         parent::__construct($name);
@@ -65,7 +61,6 @@ class PerformCommand extends Command
         $this->taskService = $taskService;
         $this->workerService = $workerService;
         $this->resqueQueueService = $resqueQueueService;
-        $this->resqueJobFactory = $resqueJobFactory;
     }
 
     /**
@@ -103,9 +98,7 @@ class PerformCommand extends Command
 
         if ($this->workerService->isMaintenanceReadOnly()) {
             if (!$this->resqueQueueService->contains('task-perform', ['id' => $task->getId()])) {
-                $this->resqueQueueService->enqueue(
-                    $this->resqueJobFactory->create('task-perform', ['id' => $task->getId()])
-                );
+                $this->resqueQueueService->enqueue(new TaskPerformJob(['id' => $task->getId()]));
             }
 
             $output->writeln('Unable to perform task, worker application is in maintenance read-only mode');
@@ -125,20 +118,11 @@ class PerformCommand extends Command
         }
 
         if ($this->resqueQueueService->isEmpty('tasks-request')) {
-            $this->resqueQueueService->enqueue(
-                $this->resqueJobFactory->create(
-                    'tasks-request'
-                )
-            );
+            $this->resqueQueueService->enqueue(new TasksRequestJob());
         }
 
         if ($performResult === 0) {
-            $this->resqueQueueService->enqueue(
-                $this->resqueJobFactory->create(
-                    'task-report-completion',
-                    ['id' => $task->getId()]
-                )
-            );
+            $this->resqueQueueService->enqueue(new TaskReportCompletionJob(['id' => $task->getId()]));
 
             $output->writeln('Performed ['.$task->getId().']');
             $this->logger->info(sprintf(
