@@ -4,9 +4,9 @@ namespace Tests\WorkerBundle\Functional\Command\Task;
 
 use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use Tests\WorkerBundle\Services\TestHttpClientService;
-use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
@@ -91,14 +91,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
         $this->assertTrue($this->clearRedis());
 
         $resqueQueueService = $this->container->get(QueueService::class);
-        $resqueJobFactory = $this->container->get(ResqueJobFactory::class);
-
-        $resqueQueueService->enqueue(
-            $resqueJobFactory->create(
-                'task-report-completion',
-                ['id' => $task->getId()]
-            )
-        );
+        $resqueQueueService->enqueue(new TaskReportCompletionJob(['id' => $task->getId()]));
 
         $returnCode = $this->command->execute(new ArrayInput([]), new NullOutput());
 

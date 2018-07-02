@@ -3,7 +3,7 @@
 namespace Tests\WorkerBundle\Functional\Command\Task;
 
 use SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand;
-use webignition\ResqueJobFactory\ResqueJobFactory;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
@@ -45,14 +45,7 @@ class PerformEnqueueCommandTest extends AbstractBaseTestCase
         $this->clearRedis();
 
         $resqueQueueService = $this->container->get(QueueService::class);
-        $resqueJobFactory = $this->container->get(ResqueJobFactory::class);
-
-        $resqueQueueService->enqueue(
-            $resqueJobFactory->create(
-                'task-perform',
-                ['id' => $tasks[0]->getId()]
-            )
-        );
+        $resqueQueueService->enqueue(new TaskPerformJob(['id' => $tasks[0]->getId()]));
 
         $command = $this->container->get(PerformEnqueueCommand::class);
 
