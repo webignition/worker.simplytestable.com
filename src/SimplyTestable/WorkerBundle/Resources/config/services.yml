@@ -2,7 +2,6 @@ imports:
     - { resource: services/http-client.yml }
     - { resource: services/web-resource-retriever.yml }
     - { resource: services/task-drivers.yml }
-    - { resource: services/resque-job-factory.yml }
     - { resource: services/public.yml }
 
 services:
@@ -16,18 +15,6 @@ services:
         - '%core_url%'
         - '@SimplyTestable\WorkerBundle\Services\ResourceLocator'
         - '@SimplyTestable\WorkerBundle\Services\ApplicationConfigurationService'
-
-#  webignition\WebResource\Service\Configuration:
-#    arguments:
-#        $configurationValues:
-#          allow-unknown-resource-types: false
-#          retry-with-url-encoding-disabled: true
-#          content-type-web-resource-map: '%content_type_web_resource_map%'
-#
-#  webignition\WebResource\Service\Service:
-#    class:  webignition\WebResource\Service\Service
-#    calls:
-#      - [setConfiguration, ['@webignition\WebResource\Service\Configuration']]
 
   webignition\HtmlValidator\Wrapper\Wrapper:
 
