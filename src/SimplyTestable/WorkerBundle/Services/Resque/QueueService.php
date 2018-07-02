@@ -141,8 +141,6 @@ class QueueService
     /**
      * @param Job $job
      * @param bool $trackStatus
-     * @throws \CredisException
-     * @throws \Exception
      *
      * @return null|\Resque_Job_Status
      */

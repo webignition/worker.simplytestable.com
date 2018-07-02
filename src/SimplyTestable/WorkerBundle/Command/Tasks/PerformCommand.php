@@ -5,7 +5,6 @@ namespace SimplyTestable\WorkerBundle\Command\Tasks;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Command\Task\PerformCommand as TaskPerformCommand;
-use webignition\ResqueJobFactory\ResqueJobFactory;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
@@ -35,17 +34,11 @@ class PerformCommand extends AbstractTaskCollectionCommand
     private $resqueQueueService;
 
     /**
-     * @var ResqueJobFactory
-     */
-    private $resqueJobFactory;
-
-    /**
      * @param EntityManagerInterface $entityManager
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
@@ -54,7 +47,6 @@ class PerformCommand extends AbstractTaskCollectionCommand
         TaskService $taskService,
         WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
-        ResqueJobFactory $resqueJobFactory,
         $name = null
     ) {
         parent::__construct($name);
@@ -63,7 +55,6 @@ class PerformCommand extends AbstractTaskCollectionCommand
         $this->taskService = $taskService;
         $this->workerService = $workerService;
         $this->resqueQueueService = $resqueQueueService;
-        $this->resqueJobFactory = $resqueJobFactory;
     }
 
     /**
@@ -90,8 +81,7 @@ class PerformCommand extends AbstractTaskCollectionCommand
             $this->logger,
             $this->taskService,
             $this->workerService,
-            $this->resqueQueueService,
-            $this->resqueJobFactory
+            $this->resqueQueueService
         );
 
         $this->executeForCollection($taskIds, $performCommand, $output);
