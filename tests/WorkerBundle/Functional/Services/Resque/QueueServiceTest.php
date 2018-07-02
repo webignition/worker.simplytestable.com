@@ -1,8 +1,11 @@
 <?php
 
-namespace Tests\WorkerBundle\Functional\Guzzle;
+namespace Tests\WorkerBundle\Functional\Services\Resque;
 
-use webignition\ResqueJobFactory\ResqueJobFactory;
+use SimplyTestable\WorkerBundle\Resque\Job\Job;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob;
+use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
@@ -11,11 +14,6 @@ class QueueServiceTest extends AbstractBaseTestCase
     const QUEUE_TASK_PERFORM = 'task-perform';
     const QUEUE_TASK_REPORT_COMPLETION = 'task-report-completion';
     const QUEUE_TASKS_REQUEST = 'tasks-request';
-
-    /**
-     * @var ResqueJobFactory
-     */
-    private $jobFactory;
 
     /**
      * @var QueueService
@@ -29,29 +27,22 @@ class QueueServiceTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->jobFactory = $this->container->get(ResqueJobFactory::class);
         $this->queueService = $this->container->get(QueueService::class);
     }
 
     /**
      * @dataProvider testIsEmptyDataProvider
      *
-     * @param string $queue
-     * @param array $jobArgs
-     *
-     * @throws \CredisException
-     * @throws \Exception
+     * @param Job $job
      */
-    public function testIsEmpty($queue, $jobArgs)
+    public function testIsEmpty(Job $job)
     {
         $this->clearRedis();
 
-        $this->assertTrue($this->queueService->isEmpty($queue));
+        $this->assertTrue($this->queueService->isEmpty($job->queue));
 
-        $this->queueService->enqueue(
-            $this->jobFactory->create($queue, $jobArgs)
-        );
-        $this->assertFalse($this->queueService->isEmpty($queue));
+        $this->queueService->enqueue($job);
+        $this->assertFalse($this->queueService->isEmpty($job->queue));
     }
 
     /**
@@ -60,21 +51,14 @@ class QueueServiceTest extends AbstractBaseTestCase
     public function testIsEmptyDataProvider()
     {
         return [
-            [
-                'queue' => self::QUEUE_TASK_PERFORM,
-                'jobArgs' => [
-                    'id' => 1,
-                ],
+            'task-perform' => [
+                'job' => new TaskPerformJob(['id' => 1]),
             ],
-            [
-                'queue' => self::QUEUE_TASK_REPORT_COMPLETION,
-                'jobArgs' => [
-                    'id' => 1,
-                ],
+            'task-report-completion' => [
+                'job' => new TaskReportCompletionJob(['id' => 1]),
             ],
-            [
-                'queue' => self::QUEUE_TASKS_REQUEST,
-                'jobArgs' => [],
+            'tasks-request' => [
+                'job' => new TasksRequestJob(),
             ],
         ];
     }
@@ -84,20 +68,17 @@ class QueueServiceTest extends AbstractBaseTestCase
      *
      * @param string $queue
      * @param array $args
-     * @param array $jobDataCollection
+     * @param Job[] $jobCollection
      * @param bool $expectedContains
      *
-     * @throws \CredisException
      * @throws \Exception
      */
-    public function testContains($queue, $args, $jobDataCollection, $expectedContains)
+    public function testContains($queue, array $args, array $jobCollection, $expectedContains)
     {
         $this->clearRedis();
 
-        foreach ($jobDataCollection as $jobData) {
-            $this->queueService->enqueue(
-                $this->jobFactory->create($jobData['queue'], $jobData['args'])
-            );
+        foreach ($jobCollection as $job) {
+            $this->queueService->enqueue($job);
         }
 
         $this->assertEquals(
@@ -135,13 +116,8 @@ class QueueServiceTest extends AbstractBaseTestCase
                 'args' => [
                     'id' => 2,
                 ],
-                'jobDataCollection' => [
-                    [
-                        'queue' => self::QUEUE_TASK_PERFORM,
-                        'args' => [
-                            'id' => 1,
-                        ],
-                    ],
+                'jobCollection' => [
+                    new TaskPerformJob(['id' => 1]),
                 ],
                 'expectedContains' => false,
             ],
@@ -150,13 +126,8 @@ class QueueServiceTest extends AbstractBaseTestCase
                 'args' => [
                     'id' => 1,
                 ],
-                'jobDataCollection' => [
-                    [
-                        'queue' => self::QUEUE_TASK_PERFORM,
-                        'args' => [
-                            'id' => 1,
-                        ],
-                    ],
+                'jobCollection' => [
+                    new TaskPerformJob(['id' => 1]),
                 ],
                 'expectedContains' => true,
             ],
@@ -165,13 +136,8 @@ class QueueServiceTest extends AbstractBaseTestCase
                 'args' => [
                     'id' => 2,
                 ],
-                'jobDataCollection' => [
-                    [
-                        'queue' => self::QUEUE_TASK_REPORT_COMPLETION,
-                        'args' => [
-                            'id' => 1,
-                        ],
-                    ],
+                'jobCollection' => [
+                    new TaskReportCompletionJob(['id' => 1]),
                 ],
                 'expectedContains' => false,
             ],
@@ -180,24 +146,16 @@ class QueueServiceTest extends AbstractBaseTestCase
                 'args' => [
                     'id' => 1,
                 ],
-                'jobDataCollection' => [
-                    [
-                        'queue' => self::QUEUE_TASK_REPORT_COMPLETION,
-                        'args' => [
-                            'id' => 1,
-                        ],
-                    ],
+                'jobCollection' => [
+                    new TaskReportCompletionJob(['id' => 1]),
                 ],
                 'expectedContains' => true,
             ],
             'non-empty queue, tasks request, contains' => [
                 'queue' => self::QUEUE_TASKS_REQUEST,
                 'args' => [],
-                'jobDataCollection' => [
-                    [
-                        'queue' => self::QUEUE_TASKS_REQUEST,
-                        'args' => [],
-                    ],
+                'jobCollection' => [
+                    new TasksRequestJob(),
                 ],
                 'expectedContains' => true,
             ],
@@ -208,20 +166,17 @@ class QueueServiceTest extends AbstractBaseTestCase
      * @dataProvider getQueueLengthDataProvider
      *
      * @param string $queue
-     * @param array $jobDataCollection
+     * @param Job[] $jobCollection
      * @param int $expectedQueueLength
      *
-     * @throws \CredisException
      * @throws \Exception
      */
-    public function testGetQueueLength($queue, $jobDataCollection, $expectedQueueLength)
+    public function testGetQueueLength($queue, array $jobCollection, $expectedQueueLength)
     {
         $this->clearRedis();
 
-        foreach ($jobDataCollection as $jobData) {
-            $this->queueService->enqueue(
-                $this->jobFactory->create($jobData['queue'], $jobData['args'])
-            );
+        foreach ($jobCollection as $job) {
+            $this->queueService->enqueue($job);
         }
 
         $this->assertEquals(
@@ -253,37 +208,17 @@ class QueueServiceTest extends AbstractBaseTestCase
             ],
             'one task-perform job' => [
                 'queue' => self::QUEUE_TASK_PERFORM,
-                'jobDataCollection' => [
-                    [
-                        'queue' => self::QUEUE_TASK_PERFORM,
-                        'args' => [
-                            'id' => 1,
-                        ],
-                    ],
+                'jobCollection' => [
+                    new TaskPerformJob(['id' => 1]),
                 ],
                 'expectedQueueLength' => 1,
             ],
             'three task-perform jobs' => [
                 'queue' => self::QUEUE_TASK_PERFORM,
-                'jobDataCollection' => [
-                    [
-                        'queue' => self::QUEUE_TASK_PERFORM,
-                        'args' => [
-                            'id' => 1,
-                        ],
-                    ],
-                    [
-                        'queue' => self::QUEUE_TASK_PERFORM,
-                        'args' => [
-                            'id' => 2,
-                        ],
-                    ],
-                    [
-                        'queue' => self::QUEUE_TASK_PERFORM,
-                        'args' => [
-                            'id' => 3,
-                        ],
-                    ],
+                'jobCollection' => [
+                    new TaskPerformJob(['id' => 1]),
+                    new TaskPerformJob(['id' => 2]),
+                    new TaskPerformJob(['id' => 3]),
                 ],
                 'expectedQueueLength' => 3,
             ],
