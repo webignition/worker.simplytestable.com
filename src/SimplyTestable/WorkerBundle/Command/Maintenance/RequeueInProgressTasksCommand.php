@@ -1,10 +1,11 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Command\Maintenance;
 
 use Doctrine\ORM\EntityManagerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Repository\TaskRepository;
-use webignition\ResqueJobFactory\ResqueJobFactory;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskPerformJob;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Command\Command;
@@ -32,11 +33,6 @@ class RequeueInProgressTasksCommand extends Command
     private $resqueQueueService;
 
     /**
-     * @var ResqueJobFactory
-     */
-    private $resqueJobFactory;
-
-    /**
      * @var TaskRepository
      */
     private $taskRepository;
@@ -50,14 +46,12 @@ class RequeueInProgressTasksCommand extends Command
      * @param EntityManagerInterface $entityManager
      * @param TaskService $taskService
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         TaskService $taskService,
         ResqueQueueService $resqueQueueService,
-        ResqueJobFactory $resqueJobFactory,
         $name = null
     ) {
         parent::__construct($name);
@@ -65,7 +59,6 @@ class RequeueInProgressTasksCommand extends Command
         $this->entityManager = $entityManager;
         $this->taskService = $taskService;
         $this->resqueQueueService = $resqueQueueService;
-        $this->resqueJobFactory = $resqueJobFactory;
 
         $this->taskRepository = $entityManager->getRepository(Task::class);
     }
@@ -119,12 +112,7 @@ class RequeueInProgressTasksCommand extends Command
                 $this->entityManager->persist($inProgressTask);
                 $this->entityManager->flush();
 
-                $this->resqueQueueService->enqueue(
-                    $this->resqueJobFactory->create(
-                        'task-perform',
-                        ['id' => $inProgressTask->getId()]
-                    )
-                );
+                $this->resqueQueueService->enqueue(new TaskPerformJob(['id' => $inProgressTask->getId()]));
             }
         }
 
