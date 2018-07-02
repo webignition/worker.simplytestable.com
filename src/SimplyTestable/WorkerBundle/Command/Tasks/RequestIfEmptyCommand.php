@@ -1,7 +1,8 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Command\Tasks;
 
-use webignition\ResqueJobFactory\ResqueJobFactory;
+use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,24 +19,16 @@ class RequestIfEmptyCommand extends Command
     private $resqueQueueService;
 
     /**
-     * @var ResqueJobFactory
-     */
-    private $resqueJobFactory;
-
-    /**
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
         ResqueQueueService $resqueQueueService,
-        ResqueJobFactory $resqueJobFactory,
         $name = null
     ) {
         parent::__construct($name);
 
         $this->resqueQueueService = $resqueQueueService;
-        $this->resqueJobFactory = $resqueJobFactory;
     }
 
     /**
@@ -55,11 +48,7 @@ class RequestIfEmptyCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if ($this->resqueQueueService->isEmpty(self::QUEUE_NAME)) {
-            $this->resqueQueueService->enqueue(
-                $this->resqueJobFactory->create(
-                    self::QUEUE_NAME
-                )
-            );
+            $this->resqueQueueService->enqueue(new TasksRequestJob());
         }
 
         return self::RETURN_CODE_OK;
