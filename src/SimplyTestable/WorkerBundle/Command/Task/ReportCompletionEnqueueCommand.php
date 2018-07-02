@@ -1,11 +1,12 @@
 <?php
+
 namespace SimplyTestable\WorkerBundle\Command\Task;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Repository\TaskRepository;
-use webignition\ResqueJobFactory\ResqueJobFactory;
+use SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,11 +31,6 @@ class ReportCompletionEnqueueCommand extends Command
     private $resqueQueueService;
 
     /**
-     * @var ResqueJobFactory
-     */
-    private $resqueJobFactory;
-
-    /**
      * @var TaskRepository
      */
     private $taskRepository;
@@ -44,7 +40,6 @@ class ReportCompletionEnqueueCommand extends Command
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param ResqueQueueService $resqueQueueService
-     * @param ResqueJobFactory $resqueJobFactory
      * @param string|null $name
      */
     public function __construct(
@@ -52,7 +47,6 @@ class ReportCompletionEnqueueCommand extends Command
         LoggerInterface $logger,
         TaskService $taskService,
         ResqueQueueService $resqueQueueService,
-        ResqueJobFactory $resqueJobFactory,
         $name = null
     ) {
         parent::__construct($name);
@@ -60,7 +54,6 @@ class ReportCompletionEnqueueCommand extends Command
         $this->logger = $logger;
         $this->taskService = $taskService;
         $this->resqueQueueService = $resqueQueueService;
-        $this->resqueJobFactory = $resqueJobFactory;
 
         $this->taskRepository = $entityManager->getRepository(Task::class);
     }
@@ -97,12 +90,7 @@ class ReportCompletionEnqueueCommand extends Command
                 $output->writeln('Enqueuing task ['.$taskId.']');
                 $this->logger->info('TaskReportCompletionEnqueueCommand::Enqueuing task ['.$taskId.']');
 
-                $this->resqueQueueService->enqueue(
-                    $this->resqueJobFactory->create(
-                        'task-report-completion',
-                        ['id' => $taskId]
-                    )
-                );
+                $this->resqueQueueService->enqueue(new TaskReportCompletionJob(['id' => $taskId]));
             }
         }
 
