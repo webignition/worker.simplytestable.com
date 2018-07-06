@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CreateRequestFactoryTest extends \PHPUnit_Framework_TestCase
+class CreateRequestFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider

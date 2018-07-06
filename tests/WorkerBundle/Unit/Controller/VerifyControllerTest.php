@@ -12,7 +12,7 @@ use Tests\WorkerBundle\Factory\MockFactory;
 /**
  * @group Controller/VerifyController
  */
-class VerifyControllerTest extends \PHPUnit_Framework_TestCase
+class VerifyControllerTest extends \PHPUnit\Framework\TestCase
 {
     public function testIndexActionInMaintenanceReadOnlyMode()
     {

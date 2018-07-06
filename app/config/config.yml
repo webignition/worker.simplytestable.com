@@ -20,6 +20,10 @@ framework:
     #trust_proxy_headers: false # Should Request object should trust proxy headers (X_FORWARDED_FOR/HTTP_CLIENT_IP)
     session:         ~
 
+sensio_framework_extra:
+  router:
+    annotations: false
+
 # Twig Configuration
 twig:
     debug:            '%kernel.debug%'

@@ -15,7 +15,7 @@ use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueServi
 /**
  * @group Command/Task/PerformCommand
  */
-class PerformCommandTest extends \PHPUnit_Framework_TestCase
+class PerformCommandTest extends \PHPUnit\Framework\TestCase
 {
     const TASK_ID = 1;
 

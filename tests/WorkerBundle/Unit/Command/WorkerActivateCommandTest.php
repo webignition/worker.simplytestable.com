@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 /**
  * @group Command/WorkerActivateCommand
  */
-class WorkerActivateCommandTest extends \PHPUnit_Framework_TestCase
+class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @throws \Exception

@@ -13,7 +13,7 @@ use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueServi
 /**
  * @group Command/Tasks/RequestIfEmptyCommand
  */
-class RequestIfEmptyCommandTest extends \PHPUnit_Framework_TestCase
+class RequestIfEmptyCommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider runDataProvider

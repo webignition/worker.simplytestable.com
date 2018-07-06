@@ -4,7 +4,7 @@ namespace Tests\WorkerBundle\Unit\Entity\Task;
 
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 
-class TaskTest extends \PHPUnit_Framework_TestCase
+class TaskTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsTrue()
     {

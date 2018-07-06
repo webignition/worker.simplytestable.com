@@ -4,7 +4,7 @@ namespace Tests\WorkerBundle\Unit\Model;
 
 use SimplyTestable\WorkerBundle\Model\HttpCacheStats;
 
-class HttpCacheStatsTest extends \PHPUnit_Framework_TestCase
+class HttpCacheStatsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider calculateHitsToMissesRatioDataProvider

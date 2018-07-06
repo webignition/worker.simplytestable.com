@@ -31,7 +31,7 @@ class QueueServiceTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider testIsEmptyDataProvider
+     * @dataProvider isEmptyDataProvider
      *
      * @param Job $job
      */
@@ -48,7 +48,7 @@ class QueueServiceTest extends AbstractBaseTestCase
     /**
      * @return array
      */
-    public function testIsEmptyDataProvider()
+    public function isEmptyDataProvider()
     {
         return [
             'task-perform' => [

@@ -7,7 +7,7 @@ use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Model\Task\Parameters;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 
-class ParametersTest extends \PHPUnit_Framework_TestCase
+class ParametersTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getCookiesDataProvider

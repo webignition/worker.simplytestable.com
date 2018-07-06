@@ -10,7 +10,7 @@ use ResqueBundle\Resque\ContainerAwareJob;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-abstract class AbstractJobTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractJobTest extends \PHPUnit\Framework\TestCase
 {
     protected function createJob(
         ContainerAwareJob $job,
