@@ -7,7 +7,7 @@ use Memcached;
 use SimplyTestable\WorkerBundle\Services\HttpCache;
 use SimplyTestable\WorkerBundle\Services\MemcachedService;
 
-class HttpCacheTest extends \PHPUnit_Framework_TestCase
+class HttpCacheTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getDataProvider

@@ -11,7 +11,7 @@ use SimplyTestable\WorkerBundle\Services\TasksService;
 use SimplyTestable\WorkerBundle\Services\UrlService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 
-class TasksServiceTest extends \PHPUnit_Framework_TestCase
+class TasksServiceTest extends \PHPUnit\Framework\TestCase
 {
     public function testRequestNotWithinThreshold()
     {

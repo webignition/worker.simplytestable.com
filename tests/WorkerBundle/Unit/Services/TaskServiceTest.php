@@ -18,7 +18,7 @@ use Tests\WorkerBundle\Factory\MockEntityFactory;
 /**
  * @group TaskService
  */
-class TaskServiceTest extends \PHPUnit_Framework_TestCase
+class TaskServiceTest extends \PHPUnit\Framework\TestCase
 {
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';

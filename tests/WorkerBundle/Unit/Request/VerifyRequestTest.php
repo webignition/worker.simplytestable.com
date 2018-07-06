@@ -4,7 +4,7 @@ namespace Tests\WorkerBundle\Unit\Request;
 
 use SimplyTestable\WorkerBundle\Request\VerifyRequest;
 
-class VerifyRequestTest extends \PHPUnit_Framework_TestCase
+class VerifyRequestTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider

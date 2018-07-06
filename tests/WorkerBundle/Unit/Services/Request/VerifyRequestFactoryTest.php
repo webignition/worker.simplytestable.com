@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class VerifyRequestFactoryTest extends \PHPUnit_Framework_TestCase
+class VerifyRequestFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider

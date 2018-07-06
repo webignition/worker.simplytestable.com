@@ -4,7 +4,7 @@ namespace Tests\WorkerBundle\Unit\Services;
 
 use Memcached;
 
-class MemcacheServiceTest extends \PHPUnit_Framework_TestCase
+class MemcacheServiceTest extends \PHPUnit\Framework\TestCase
 {
     public function testHasMemcached()
     {

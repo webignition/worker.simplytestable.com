@@ -3,6 +3,7 @@
 namespace Tests\WorkerBundle\Unit\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\OptimisticLockException;
 use Mockery\MockInterface;
 use SimplyTestable\WorkerBundle\Controller\TaskController;
 use SimplyTestable\WorkerBundle\Request\Task\CancelRequest;
@@ -15,8 +16,11 @@ use Tests\WorkerBundle\Factory\MockFactory;
 /**
  * @group Controller/TaskController
  */
-class TaskControllerTest extends \PHPUnit_Framework_TestCase
+class TaskControllerTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @throws OptimisticLockException
+     */
     public function testCreateCollectionActionInMaintenanceReadOnlyMode()
     {
         $taskController = $this->createTaskController([
@@ -32,11 +36,13 @@ class TaskControllerTest extends \PHPUnit_Framework_TestCase
         $taskController->createCollectionAction(
             MockFactory::createCreateRequestCollectionFactory(),
             MockFactory::createTaskFactory(),
-            MockFactory::createResqueQueueService(),
-            MockFactory::createResqueJobFactory()
+            MockFactory::createResqueQueueService()
         );
     }
 
+    /**
+     * @throws OptimisticLockException
+     */
     public function testCancelCollectionActionInMaintenanceReadOnlyMode()
     {
         $this->expectException(ServiceUnavailableHttpException::class);
@@ -52,6 +58,9 @@ class TaskControllerTest extends \PHPUnit_Framework_TestCase
         $taskController->cancelAction(MockFactory::createCancelRequestFactory());
     }
 
+    /**
+     * @throws OptimisticLockException
+     */
     public function testCancelActionWithInvalidRequest()
     {
         $this->expectException(BadRequestHttpException::class);
@@ -73,6 +82,9 @@ class TaskControllerTest extends \PHPUnit_Framework_TestCase
         ]));
     }
 
+    /**
+     * @throws OptimisticLockException
+     */
     public function testCancelCollectionActionWithInvalidRequest()
     {
         $this->expectException(ServiceUnavailableHttpException::class);

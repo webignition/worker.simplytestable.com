@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 /**
  * @group Command/HttpCache/ClearCommand
  */
-class ClearCommandTest extends \PHPUnit_Framework_TestCase
+class ClearCommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider runDataProvider

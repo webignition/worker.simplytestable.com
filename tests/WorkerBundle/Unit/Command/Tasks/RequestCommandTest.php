@@ -15,7 +15,7 @@ use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueServi
 /**
  * @group Command/Tasks/RequestCommand
  */
-class RequestCommandTest extends \PHPUnit_Framework_TestCase
+class RequestCommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider maintenanceModeDataProvider

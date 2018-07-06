@@ -7,12 +7,13 @@ use SimplyTestable\WorkerBundle\Controller\TasksController;
 use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService as ResqueQueueService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\WorkerBundle\Factory\MockFactory;
 
 /**
  * @group Controller/TasksController
  */
-class TasksControllerTest extends \PHPUnit_Framework_TestCase
+class TasksControllerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider notifyActionDataProvider
@@ -27,7 +28,9 @@ class TasksControllerTest extends \PHPUnit_Framework_TestCase
     ) {
         $tasksController = new TasksController();
 
-        $tasksController->notifyAction($resqueQueueService, $tasksService);
+        $response = $tasksController->notifyAction($resqueQueueService, $tasksService);
+
+        $this->assertInstanceOf(Response::class, $response);
     }
 
     /**

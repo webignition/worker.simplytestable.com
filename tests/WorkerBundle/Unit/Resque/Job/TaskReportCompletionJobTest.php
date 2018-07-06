@@ -49,6 +49,6 @@ class TaskReportCompletionJobTest extends AbstractJobTest
             $logger
         );
 
-        $job->run($jobArgs);
+        $this->assertSame(ReportCompletionCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE, $job->run($jobArgs));
     }
 }

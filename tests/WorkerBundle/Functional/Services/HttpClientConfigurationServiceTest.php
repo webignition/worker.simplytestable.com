@@ -35,6 +35,8 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
         $httpClientConfigurationService = new HttpClientConfigurationService($httpClientService);
 
         $httpClientConfigurationService->configureForTask($task, $userAgentString);
+
+        $this->addToAssertionCount(1);
     }
 
     /**

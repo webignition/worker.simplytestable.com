@@ -5,7 +5,7 @@ namespace Tests\WorkerBundle\Unit\Request\Task;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Request\Task\CancelRequest;
 
-class CancelRequestTest extends \PHPUnit_Framework_TestCase
+class CancelRequestTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider

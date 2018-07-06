@@ -5,7 +5,7 @@ namespace Tests\WorkerBundle\Unit\Request\Task;
 use SimplyTestable\WorkerBundle\Entity\Task\Type\Type as TaskType;
 use SimplyTestable\WorkerBundle\Request\Task\CreateRequest;
 
-class CreateRequestTest extends \PHPUnit_Framework_TestCase
+class CreateRequestTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider

@@ -44,6 +44,6 @@ class TasksRequestJobTest extends AbstractJobTest
             $logger
         );
 
-        $job->run($jobArgs);
+        $this->assertSame(RequestCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE, $job->run($jobArgs));
     }
 }

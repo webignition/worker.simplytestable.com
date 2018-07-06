@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 /**
  * @group Command/Task/ReportCompletionCommand
  */
-class ReportCompletionCommandTest extends \PHPUnit_Framework_TestCase
+class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
 {
     const TASK_ID = 1;
 

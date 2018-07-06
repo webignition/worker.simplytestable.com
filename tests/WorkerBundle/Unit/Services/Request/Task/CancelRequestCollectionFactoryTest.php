@@ -10,7 +10,7 @@ use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CancelRequestCollectionFactoryTest extends \PHPUnit_Framework_TestCase
+class CancelRequestCollectionFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider

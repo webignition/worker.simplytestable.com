@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 /**
  * @group Command/Maintenance/DisableReadOnlyCommand
  */
-class DisableReadOnlyCommandTest extends \PHPUnit_Framework_TestCase
+class DisableReadOnlyCommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @throws \Exception
