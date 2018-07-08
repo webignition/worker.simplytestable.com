@@ -24,7 +24,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = $this->container->get(CssValidationTaskDriver::class);
+        $this->taskDriver = self::$container->get(CssValidationTaskDriver::class);
     }
 
     /**

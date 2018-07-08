@@ -23,7 +23,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = $this->container->get(LinkIntegrityTaskDriver::class);
+        $this->taskDriver = self::$container->get(LinkIntegrityTaskDriver::class);
     }
 
     /**

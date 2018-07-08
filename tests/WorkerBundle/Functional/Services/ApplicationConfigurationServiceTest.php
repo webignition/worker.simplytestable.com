@@ -13,7 +13,7 @@ class ApplicationConfigurationServiceTest extends AbstractBaseTestCase
         $expectedRootDir = $projectRoot . '/app';
         $expectedWebDir = $projectRoot . '/web';
 
-        $applicationConfigurationService = $this->container->get(ApplicationConfigurationService::class);
+        $applicationConfigurationService = self::$container->get(ApplicationConfigurationService::class);
 
         $this->assertEquals($expectedRootDir, $applicationConfigurationService->getRootDir());
         $this->assertRegExp('/\/var\/cache\/test$/', $applicationConfigurationService->getCacheDir());

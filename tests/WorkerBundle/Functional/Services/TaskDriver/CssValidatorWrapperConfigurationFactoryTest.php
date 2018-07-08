@@ -24,7 +24,7 @@ class CssValidatorWrapperConfigurationFactoryTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->configurationFactory = $this->container->get(CssValidatorWrapperConfigurationFactory::class);
+        $this->configurationFactory = self::$container->get(CssValidatorWrapperConfigurationFactory::class);
     }
 
     /**
@@ -49,7 +49,7 @@ class CssValidatorWrapperConfigurationFactoryTest extends AbstractBaseTestCase
         $expectedOutputParserIgnoreVendorExtensionIssues,
         $expectedOutputParserReportVendorExtensionIssuesAsWarnings
     ) {
-        $testTaskFactory = new TestTaskFactory($this->container);
+        $testTaskFactory = new TestTaskFactory(self::$container);
 
         $task = $testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
