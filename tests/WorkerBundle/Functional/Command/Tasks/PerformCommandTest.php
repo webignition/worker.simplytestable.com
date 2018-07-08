@@ -16,15 +16,15 @@ class PerformCommandTest extends AbstractBaseTestCase
      */
     public function testRun()
     {
-        $testTaskFactory = new TestTaskFactory($this->container);
+        $testTaskFactory = new TestTaskFactory(self::$container);
 
         $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
-        $taskService = $this->container->get(TaskService::class);
+        $taskService = self::$container->get(TaskService::class);
         $taskService
             ->setPerformResult(0);
 
-        $command = $this->container->get(PerformCommand::class);
+        $command = self::$container->get(PerformCommand::class);
 
         $returnCode = $command->run(
             new ArrayInput([]),

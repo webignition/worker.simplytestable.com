@@ -32,8 +32,8 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->command = $this->container->get(ReportCompletionCommand::class);
-        $this->httpClientService = $this->container->get(HttpClientService::class);
+        $this->command = self::$container->get(ReportCompletionCommand::class);
+        $this->httpClientService = self::$container->get(HttpClientService::class);
     }
 
     /**
@@ -49,7 +49,7 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $testTaskFactory = new TestTaskFactory($this->container);
+        $testTaskFactory = new TestTaskFactory(self::$container);
 
         $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'url' => 'http://example.com/',
@@ -57,7 +57,7 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
         ]));
         $this->assertNotNull($task->getId());
 
-        $this->container->get(TaskService::class)->perform($task);
+        self::$container->get(TaskService::class)->perform($task);
         $this->assertNotNull($task->getOutput()->getId());
 
         $returnCode = $this->command->run(
