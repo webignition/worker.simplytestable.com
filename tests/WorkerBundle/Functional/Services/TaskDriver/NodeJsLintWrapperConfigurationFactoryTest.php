@@ -24,7 +24,7 @@ class NodeJsLintWrapperConfigurationFactoryTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->configurationFactory = self::$container->get(NodeJsLintWrapperConfigurationFactory::class);
+        $this->configurationFactory = $this->container->get(NodeJsLintWrapperConfigurationFactory::class);
     }
 
     /**
@@ -36,7 +36,7 @@ class NodeJsLintWrapperConfigurationFactoryTest extends AbstractBaseTestCase
      */
     public function testCreate(array $taskParameters, array $expectedFlags, array $expectedOptions)
     {
-        $testTaskFactory = new TestTaskFactory(self::$container);
+        $testTaskFactory = new TestTaskFactory($this->container);
 
         $task = $testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([

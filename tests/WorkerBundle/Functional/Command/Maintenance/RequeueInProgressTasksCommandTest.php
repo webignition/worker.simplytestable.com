@@ -31,11 +31,11 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
     ) {
         $this->clearRedis();
 
-        $entityManager = self::$container->get('doctrine.orm.entity_manager');
+        $entityManager = $this->container->get('doctrine.orm.entity_manager');
         $taskRepository = $entityManager->getRepository(Task::class);
-        $stateService = self::$container->get(StateService::class);
+        $stateService = $this->container->get(StateService::class);
 
-        $testTaskFactory = new TestTaskFactory(self::$container);
+        $testTaskFactory = new TestTaskFactory($this->container);
 
         /* @var Task[] $tasks */
         $tasks = [];
@@ -57,7 +57,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
             $taskRepository->getIdsByState($inProgressState)
         );
 
-        $command = self::$container->get(RequeueInProgressTasksCommand::class);
+        $command = $this->container->get(RequeueInProgressTasksCommand::class);
 
         $returnCode = $command->run(
             new ArrayInput($commandArguments),

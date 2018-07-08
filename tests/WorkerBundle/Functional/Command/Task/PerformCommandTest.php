@@ -26,7 +26,7 @@ class PerformCommandTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->command = self::$container->get(PerformCommand::class);
+        $this->command = $this->container->get(PerformCommand::class);
     }
 
     /**
@@ -34,10 +34,10 @@ class PerformCommandTest extends AbstractBaseTestCase
      */
     public function testRunInMaintenanceReadOnlyMode()
     {
-        self::$container->get(WorkerService::class)->setReadOnly();
+        $this->container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
 
-        $testTaskFactory = new TestTaskFactory(self::$container);
+        $testTaskFactory = new TestTaskFactory($this->container);
         $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $returnCode = $this->command->run(
@@ -48,7 +48,7 @@ class PerformCommandTest extends AbstractBaseTestCase
         );
 
         $this->assertEquals(PerformCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE, $returnCode);
-        $this->assertTrue(self::$container->get(QueueService::class)->contains(
+        $this->assertTrue($this->container->get(QueueService::class)->contains(
             'task-perform',
             [
                 'id' => $task->getId()
@@ -61,10 +61,10 @@ class PerformCommandTest extends AbstractBaseTestCase
      */
     public function testTaskServiceRaisesException()
     {
-        $testTaskFactory = new TestTaskFactory(self::$container);
+        $testTaskFactory = new TestTaskFactory($this->container);
         $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
-        $taskService = self::$container->get(TaskService::class);
+        $taskService = $this->container->get(TaskService::class);
         $taskService->setPerformException(new \Exception());
 
         $returnCode = $this->command->run(
@@ -95,11 +95,11 @@ class PerformCommandTest extends AbstractBaseTestCase
         $expectedResqueJobs,
         $expectedEmptyResqueQueues
     ) {
-        $testTaskFactory = new TestTaskFactory(self::$container);
+        $testTaskFactory = new TestTaskFactory($this->container);
         $task = $testTaskFactory->create($taskValues);
         $this->clearRedis();
 
-        $taskService = self::$container->get(TaskService::class);
+        $taskService = $this->container->get(TaskService::class);
         $taskService->setPerformResult($taskServiceReturnValue);
 
         $returnCode = $this->command->run(
@@ -111,7 +111,7 @@ class PerformCommandTest extends AbstractBaseTestCase
 
         $this->assertEquals($expectedReturnCode, $returnCode);
 
-        $resqueQueueService = self::$container->get(QueueService::class);
+        $resqueQueueService = $this->container->get(QueueService::class);
 
         foreach ($expectedResqueJobs as $queueName => $data) {
             foreach ($data as $key => $value) {

@@ -19,7 +19,7 @@ class MemcachedServiceTest extends AbstractBaseTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->memcachedService = self::$container->get(MemcachedService::class);
+        $this->memcachedService = $this->container->get(MemcachedService::class);
     }
 
     public function testGetMemcachedService()
