@@ -24,7 +24,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = $this->container->get(JsLintTaskDriver::class);
+        $this->taskDriver = self::$container->get(JsLintTaskDriver::class);
     }
 
     /**

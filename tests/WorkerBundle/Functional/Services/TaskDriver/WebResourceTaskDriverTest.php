@@ -32,8 +32,8 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->testTaskFactory = new TestTaskFactory($this->container);
-        $this->httpClientService = $this->container->get(HttpClientService::class);
+        $this->testTaskFactory = new TestTaskFactory(self::$container);
+        $this->httpClientService = self::$container->get(HttpClientService::class);
     }
 
     /**

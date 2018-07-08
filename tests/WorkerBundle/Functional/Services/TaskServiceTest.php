@@ -53,10 +53,10 @@ class TaskServiceTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->taskService = $this->container->get(TaskService::class);
-        $this->taskTypeService = $this->container->get(TaskTypeService::class);
-        $this->testTaskFactory = new TestTaskFactory($this->container);
-        $this->httpClientService = $this->container->get(HttpClientService::class);
+        $this->taskService = self::$container->get(TaskService::class);
+        $this->taskTypeService = self::$container->get(TaskTypeService::class);
+        $this->testTaskFactory = new TestTaskFactory(self::$container);
+        $this->httpClientService = self::$container->get(HttpClientService::class);
     }
 
     /**
@@ -115,7 +115,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testCreateUsesExistingMatchingTask()
     {
-        $entityManager = $this->container->get('doctrine.orm.entity_manager');
+        $entityManager = self::$container->get('doctrine.orm.entity_manager');
 
         $existingTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
@@ -196,7 +196,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
         $id = $task->getId();
 
-        $entityManager = $this->container->get('doctrine.orm.entity_manager');
+        $entityManager = self::$container->get('doctrine.orm.entity_manager');
         $entityManager->detach($task);
 
         $this->assertEquals($id, $this->taskService->getById($id)->getId());
@@ -210,7 +210,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $this->taskService->reportCompletion($task);
 
-        $lastLogLine = File::tail($this->container->get('kernel')->getLogDir() . '/test.log', 1);
+        $lastLogLine = File::tail(self::$container->get('kernel')->getLogDir() . '/test.log', 1);
         $this->assertRegExp(
             sprintf(
                 '/%s/',

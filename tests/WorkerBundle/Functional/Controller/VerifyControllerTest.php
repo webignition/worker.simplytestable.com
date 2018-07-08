@@ -48,16 +48,16 @@ class VerifyControllerTest extends AbstractBaseTestCase
         $worker->setActivationToken($workerToken);
         $worker->setState($workerActiveState);
 
-        $workerService = $this->container->get(WorkerService::class);
+        $workerService = self::$container->get(WorkerService::class);
         $workerService->setGetResult($worker);
 
         $request = new Request();
         $request->request = $postData;
-        $this->container->get('request_stack')->push($request);
+        self::$container->get('request_stack')->push($request);
 
         $response = $this->verifyController->indexAction(
             $workerService,
-            $this->container->get(VerifyRequestFactory::class)
+            self::$container->get(VerifyRequestFactory::class)
         );
         $this->assertEquals(200, $response->getStatusCode());
     }
