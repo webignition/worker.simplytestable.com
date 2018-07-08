@@ -30,13 +30,13 @@ class MaintenanceControllerTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->maintenanceController = new MaintenanceController();
-        $this->workerService = self::$container->get(WorkerService::class);
+        $this->workerService = $this->container->get(WorkerService::class);
     }
 
     public function testEnableReadOnlyAction()
     {
         $response = $this->maintenanceController->enableReadOnlyAction(
-            self::$container->get(EnableReadOnlyCommand::class)
+            $this->container->get(EnableReadOnlyCommand::class)
         );
 
         $this->assertEquals(
@@ -50,7 +50,7 @@ class MaintenanceControllerTest extends AbstractBaseTestCase
     public function testDisableReadOnlyAction()
     {
         $response = $this->maintenanceController->disableReadOnlyAction(
-            self::$container->get(DisableReadOnlyCommand::class)
+            $this->container->get(DisableReadOnlyCommand::class)
         );
 
         $this->assertEquals(
@@ -64,7 +64,7 @@ class MaintenanceControllerTest extends AbstractBaseTestCase
     public function testTaskPerformEnqueueAction()
     {
         $response = $this->maintenanceController->taskPerformEnqueueAction(
-            self::$container->get(PerformEnqueueCommand::class)
+            $this->container->get(PerformEnqueueCommand::class)
         );
 
         $this->assertEquals(
@@ -76,9 +76,9 @@ class MaintenanceControllerTest extends AbstractBaseTestCase
     public function testLeaveReadOnlyAction()
     {
         $response = $this->maintenanceController->leaveReadOnlyAction(
-            self::$container->get(DisableReadOnlyCommand::class),
-            self::$container->get(ReportCompletionEnqueueCommand::class),
-            self::$container->get(PerformEnqueueCommand::class)
+            $this->container->get(DisableReadOnlyCommand::class),
+            $this->container->get(ReportCompletionEnqueueCommand::class),
+            $this->container->get(PerformEnqueueCommand::class)
         );
 
         $this->assertEquals(

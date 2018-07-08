@@ -32,8 +32,8 @@ class WorkerServiceTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->workerService = self::$container->get(WorkerService::class);
-        $this->httpClientService = self::$container->get(HttpClientService::class);
+        $this->workerService = $this->container->get(WorkerService::class);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     /**
@@ -316,8 +316,8 @@ class WorkerServiceTest extends AbstractBaseTestCase
      */
     private function setWorkerState(ThisWorker $worker, $stateName)
     {
-        $stateService = self::$container->get(StateService::class);
-        $entityManager = self::$container->get('doctrine.orm.entity_manager');
+        $stateService = $this->container->get(StateService::class);
+        $entityManager = $this->container->get('doctrine.orm.entity_manager');
 
         $worker->setState($stateService->fetch($stateName));
         $entityManager->persist($worker);
@@ -329,7 +329,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
      */
     private function removeWorker()
     {
-        $entityManager = self::$container->get('doctrine.orm.entity_manager');
+        $entityManager = $this->container->get('doctrine.orm.entity_manager');
         $entities = $entityManager->getRepository(ThisWorker::class)->findAll();
         if (!empty($entities)) {
             $entityManager->remove($entities[0]);

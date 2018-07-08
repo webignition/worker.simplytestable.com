@@ -27,7 +27,7 @@ class QueueServiceTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->queueService = self::$container->get(QueueService::class);
+        $this->queueService = $this->container->get(QueueService::class);
     }
 
     /**

@@ -39,9 +39,9 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->command = self::$container->get(ReportCompletionEnqueueCommand::class);
-        $this->testTaskFactory = new TestTaskFactory(self::$container);
-        $this->httpClientService = self::$container->get(HttpClientService::class);
+        $this->command = $this->container->get(ReportCompletionEnqueueCommand::class);
+        $this->testTaskFactory = new TestTaskFactory($this->container);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     public function testRunWithEmptyQueue()
@@ -54,7 +54,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
-        self::$container->get(TaskService::class)->perform($task);
+        $this->container->get(TaskService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
 
@@ -62,7 +62,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
 
         $this->assertEquals(0, $returnCode);
 
-        $resqueQueueService = self::$container->get(QueueService::class);
+        $resqueQueueService = $this->container->get(QueueService::class);
 
         $this->assertTrue($resqueQueueService->contains(
             'task-report-completion',
@@ -86,11 +86,11 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
-        self::$container->get(TaskService::class)->perform($task);
+        $this->container->get(TaskService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
 
-        $resqueQueueService = self::$container->get(QueueService::class);
+        $resqueQueueService = $this->container->get(QueueService::class);
         $resqueQueueService->enqueue(new TaskReportCompletionJob(['id' => $task->getId()]));
 
         $returnCode = $this->command->execute(new ArrayInput([]), new NullOutput());

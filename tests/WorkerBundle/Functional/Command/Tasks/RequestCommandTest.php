@@ -35,8 +35,8 @@ class RequestCommandTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->command = self::$container->get(RequestCommand::class);
-        $this->httpClientService = self::$container->get(HttpClientService::class);
+        $this->command = $this->container->get(RequestCommand::class);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     /**
@@ -51,7 +51,7 @@ class RequestCommandTest extends AbstractBaseTestCase
     {
         $this->clearRedis();
 
-        $tasksService = self::$container->get(TasksService::class);
+        $tasksService = $this->container->get(TasksService::class);
         $tasksService
             ->setRequestResult($tasksServiceRequestReturnValue);
 
@@ -64,7 +64,7 @@ class RequestCommandTest extends AbstractBaseTestCase
 
         $this->assertEquals(
             $expectedQueueIsEmpty,
-            self::$container->get(QueueService::class)->isEmpty('tasks-request')
+            $this->container->get(QueueService::class)->isEmpty('tasks-request')
         );
     }
 
@@ -107,7 +107,7 @@ class RequestCommandTest extends AbstractBaseTestCase
             $returnCode
         );
 
-        $this->assertFalse(self::$container->get(QueueService::class)->isEmpty('tasks-request'));
+        $this->assertFalse($this->container->get(QueueService::class)->isEmpty('tasks-request'));
     }
 
     /**

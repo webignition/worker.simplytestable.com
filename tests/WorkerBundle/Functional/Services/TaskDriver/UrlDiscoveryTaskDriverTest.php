@@ -21,7 +21,7 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = self::$container->get(UrlDiscoveryTaskDriver::class);
+        $this->taskDriver = $this->container->get(UrlDiscoveryTaskDriver::class);
     }
 
     /**

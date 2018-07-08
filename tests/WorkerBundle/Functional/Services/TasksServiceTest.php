@@ -31,14 +31,14 @@ class TasksServiceTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->tasksService = self::$container->get(TasksService::class);
-        $this->httpClientService = self::$container->get(HttpClientService::class);
+        $this->tasksService = $this->container->get(TasksService::class);
+        $this->httpClientService = $this->container->get(HttpClientService::class);
     }
 
     public function testGetMaxTasksRequestFactor()
     {
         $this->assertEquals(
-            self::$container->getParameter('max_tasks_request_factor'),
+            $this->container->getParameter('max_tasks_request_factor'),
             $this->tasksService->getMaxTasksRequestFactor()
         );
     }
@@ -46,7 +46,7 @@ class TasksServiceTest extends AbstractBaseTestCase
     public function testGetWorkerProcessCount()
     {
         $this->assertEquals(
-            self::$container->getParameter('worker_process_count'),
+            $this->container->getParameter('worker_process_count'),
             $this->tasksService->getWorkerProcessCount()
         );
     }
@@ -72,7 +72,7 @@ class TasksServiceTest extends AbstractBaseTestCase
             $this->assertEquals($expectedException['code'], $requestException->getCode());
         }
 
-        $lastLogLine = File::tail(self::$container->get('kernel')->getLogDir() . '/test.log');
+        $lastLogLine = File::tail($this->container->get('kernel')->getLogDir() . '/test.log');
         $this->assertRegExp('/' . preg_quote($expectedLogErrorMessage) .'/', $lastLogLine);
     }
 

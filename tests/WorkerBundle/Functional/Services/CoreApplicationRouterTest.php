@@ -16,7 +16,7 @@ class CoreApplicationRouterTest extends AbstractBaseTestCase
      */
     public function testGenerate($name, $parameters, $expectedUrl)
     {
-        $coreApplicationRouter = self::$container->get(CoreApplicationRouter::class);
+        $coreApplicationRouter = $this->container->get(CoreApplicationRouter::class);
         $this->assertEquals($expectedUrl, $coreApplicationRouter->generate($name, $parameters));
     }
 

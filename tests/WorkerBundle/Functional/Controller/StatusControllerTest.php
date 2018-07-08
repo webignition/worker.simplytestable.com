@@ -14,8 +14,8 @@ class StatusControllerTest extends AbstractBaseTestCase
         $statusController = new StatusController();
 
         $response = $statusController->indexAction(
-            self::$container->get(WorkerService::class),
-            self::$container->get(HttpCache::class)
+            $this->container->get(WorkerService::class),
+            $this->container->get(HttpCache::class)
         );
         $this->assertEquals(200, $response->getStatusCode());
     }

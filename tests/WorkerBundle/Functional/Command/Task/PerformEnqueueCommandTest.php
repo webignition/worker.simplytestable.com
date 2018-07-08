@@ -18,7 +18,7 @@ class PerformEnqueueCommandTest extends AbstractBaseTestCase
      */
     public function testEnqueueTaskPerformJobs()
     {
-        $testTaskFactory = new TestTaskFactory(self::$container);
+        $testTaskFactory = new TestTaskFactory($this->container);
 
         $taskPropertyCollection = [
             [
@@ -44,10 +44,10 @@ class PerformEnqueueCommandTest extends AbstractBaseTestCase
 
         $this->clearRedis();
 
-        $resqueQueueService = self::$container->get(QueueService::class);
+        $resqueQueueService = $this->container->get(QueueService::class);
         $resqueQueueService->enqueue(new TaskPerformJob(['id' => $tasks[0]->getId()]));
 
-        $command = self::$container->get(PerformEnqueueCommand::class);
+        $command = $this->container->get(PerformEnqueueCommand::class);
 
         $returnCode = $command->execute(
             new ArrayInput([]),
