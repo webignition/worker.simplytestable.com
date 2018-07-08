@@ -36,9 +36,9 @@ class TaskControllerTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->taskController = $this->container->get(TaskController::class);
+        $this->taskController = self::$container->get(TaskController::class);
 
-        $this->testTaskFactory = new TestTaskFactory($this->container);
+        $this->testTaskFactory = new TestTaskFactory(self::$container);
     }
 
     /**
@@ -54,12 +54,12 @@ class TaskControllerTest extends AbstractBaseTestCase
     {
         $request = new Request();
         $request->request = $postData;
-        $this->container->get('request_stack')->push($request);
+        self::$container->get('request_stack')->push($request);
 
         $response = $this->taskController->createCollectionAction(
-            $this->container->get(CreateRequestCollectionFactory::class),
-            $this->container->get(TaskFactory::class),
-            $this->container->get(QueueService::class)
+            self::$container->get(CreateRequestCollectionFactory::class),
+            self::$container->get(TaskFactory::class),
+            self::$container->get(QueueService::class)
         );
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -143,10 +143,10 @@ class TaskControllerTest extends AbstractBaseTestCase
         $request->request = new ParameterBag([
             CancelRequestFactory::PARAMETER_ID => $task->getId(),
         ]);
-        $this->container->get('request_stack')->push($request);
+        self::$container->get('request_stack')->push($request);
 
         $response = $this->taskController->cancelAction(
-            $this->container->get(CancelRequestFactory::class)
+            self::$container->get(CancelRequestFactory::class)
         );
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -176,10 +176,10 @@ class TaskControllerTest extends AbstractBaseTestCase
         $request->request = new ParameterBag([
             CancelRequestCollectionFactory::PARAMETER_IDS => $taskIds,
         ]);
-        $this->container->get('request_stack')->push($request);
+        self::$container->get('request_stack')->push($request);
 
         $response = $this->taskController->cancelCollectionAction(
-            $this->container->get(CancelRequestCollectionFactory::class)
+            self::$container->get(CancelRequestCollectionFactory::class)
         );
 
         $this->assertEquals(200, $response->getStatusCode());
