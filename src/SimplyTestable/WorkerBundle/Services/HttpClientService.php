@@ -8,7 +8,6 @@ use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
-use Kevinrob\GuzzleCache\CacheMiddleware;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
 use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
@@ -31,11 +30,6 @@ class HttpClientService
      * @var array
      */
     private $curlOptions;
-
-    /**
-     * @var CacheMiddleware
-     */
-    private $cacheMiddleware;
 
     /**
      * @var HttpHistoryContainer
@@ -74,7 +68,6 @@ class HttpClientService
      * @param HttpRetryMiddleware $httpRetryMiddleware
      * @param HttpAuthenticationMiddleware $httpAuthenticationMiddleware
      * @param RequestHeadersMiddleware $requestHeadersMiddleware
-     * @param CacheMiddleware|null $cacheMiddleware
      */
     public function __construct(
         array $curlOptions,
@@ -82,14 +75,12 @@ class HttpClientService
         HttpHistoryContainer $historyContainer,
         HttpRetryMiddleware $httpRetryMiddleware,
         HttpAuthenticationMiddleware $httpAuthenticationMiddleware,
-        RequestHeadersMiddleware $requestHeadersMiddleware,
-        CacheMiddleware $cacheMiddleware = null
+        RequestHeadersMiddleware $requestHeadersMiddleware
     ) {
         $this->setCurlOptions($curlOptions);
 
         $this->historyContainer = $historyContainer;
         $this->httpRetryMiddleware = $httpRetryMiddleware;
-        $this->cacheMiddleware = $cacheMiddleware;
         $this->httpAuthenticationMiddleware = $httpAuthenticationMiddleware;
         $this->cookieJar = new CookieJar();
         $this->requestHeadersMiddleware = $requestHeadersMiddleware;
@@ -172,10 +163,6 @@ class HttpClientService
      */
     private function create()
     {
-        if ($this->cacheMiddleware) {
-            $this->handlerStack->push($this->cacheMiddleware, self::MIDDLEWARE_CACHE_KEY);
-        }
-
         $this->handlerStack->push($this->httpAuthenticationMiddleware, self::MIDDLEWARE_HTTP_AUTH_KEY);
         $this->handlerStack->push($this->requestHeadersMiddleware, self::MIDDLEWARE_REQUEST_HEADERS_KEY);
         $this->handlerStack->push(Middleware::history($this->historyContainer), self::MIDDLEWARE_HISTORY_KEY);

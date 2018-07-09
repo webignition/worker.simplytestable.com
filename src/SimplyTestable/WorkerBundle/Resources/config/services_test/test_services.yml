@@ -10,6 +10,7 @@ services:
 
   SimplyTestable\WorkerBundle\Services\HttpHandlerStackFactory:
     arguments:
+      - '@Kevinrob\GuzzleCache\CacheMiddleware'
       - '@Tests\WorkerBundle\Services\HttpMockHandler'
 
   SimplyTestable\WorkerBundle\Services\TaskService:

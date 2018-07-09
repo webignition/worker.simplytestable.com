@@ -19,7 +19,6 @@ services:
       - '@SimplyTestable\WorkerBundle\Services\HttpRetryMiddleware'
       - '@webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware'
       - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'
-      - '@Kevinrob\GuzzleCache\CacheMiddleware'
 
   GuzzleHttp\Client:
     factory: 'SimplyTestable\WorkerBundle\Services\HttpClientService:getHttpClient'
