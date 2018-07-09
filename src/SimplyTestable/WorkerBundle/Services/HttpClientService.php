@@ -11,8 +11,6 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Kevinrob\GuzzleCache\CacheMiddleware;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
-use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
@@ -41,9 +39,9 @@ class HttpClientService
     private $curlOptions;
 
     /**
-     * @var HttpCache
+     * @var CacheMiddleware
      */
-    private $cache;
+    private $cacheMiddleware;
 
     /**
      * @var HttpHistoryContainer
@@ -73,18 +71,19 @@ class HttpClientService
     /**
      * @param array $curlOptions
      * @param HandlerStack $handlerStack
-     * @param HttpCache $cache
      * @param HttpHistoryContainer $historyContainer
+     * @param CacheMiddleware|null $cacheMiddleware
      */
     public function __construct(
         array $curlOptions,
         HandlerStack $handlerStack,
-        HttpCache $cache,
-        HttpHistoryContainer $historyContainer
+        HttpHistoryContainer $historyContainer,
+        CacheMiddleware $cacheMiddleware = null
     ) {
         $this->setCurlOptions($curlOptions);
-        $this->cache = $cache;
+
         $this->historyContainer = $historyContainer;
+        $this->cacheMiddleware = $cacheMiddleware;
         $this->httpAuthenticationMiddleware = new HttpAuthenticationMiddleware();
         $this->cookieJar = new CookieJar();
         $this->requestHeadersMiddleware = new RequestHeadersMiddleware();
@@ -167,9 +166,8 @@ class HttpClientService
      */
     private function create()
     {
-        $cacheMiddleware = $this->createCacheMiddleware();
-        if ($cacheMiddleware) {
-            $this->handlerStack->push($cacheMiddleware, self::MIDDLEWARE_CACHE_KEY);
+        if ($this->cacheMiddleware) {
+            $this->handlerStack->push($this->cacheMiddleware, self::MIDDLEWARE_CACHE_KEY);
         }
 
         $this->handlerStack->push($this->httpAuthenticationMiddleware, self::MIDDLEWARE_HTTP_AUTH_KEY);
@@ -195,24 +193,6 @@ class HttpClientService
     {
         $this->disableRetryMiddleware();
         $this->handlerStack->push(Middleware::retry($this->createRetryDecider()), self::MIDDLEWARE_RETRY_KEY);
-    }
-
-    /**
-     * @return CacheMiddleware|null
-     */
-    private function createCacheMiddleware()
-    {
-        if (!$this->cache->has()) {
-            return null;
-        }
-
-        return new CacheMiddleware(
-            new PrivateCacheStrategy(
-                new DoctrineCacheStorage(
-                    $this->cache->get()
-                )
-            )
-        );
     }
 
     /**
