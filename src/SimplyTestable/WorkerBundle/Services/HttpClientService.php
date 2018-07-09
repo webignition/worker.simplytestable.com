@@ -7,11 +7,9 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
 use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
-use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class HttpClientService
 {
@@ -29,11 +27,6 @@ class HttpClientService
      * @var array
      */
     private $curlOptions;
-
-    /**
-     * @var HttpHistoryContainer
-     */
-    private $historyContainer;
 
     /**
      * @var HttpAuthenticationMiddleware
@@ -63,7 +56,6 @@ class HttpClientService
     /**
      * @param array $curlOptions
      * @param HandlerStack $handlerStack
-     * @param HttpHistoryContainer $historyContainer
      * @param HttpRetryMiddleware $httpRetryMiddleware
      * @param HttpAuthenticationMiddleware $httpAuthenticationMiddleware
      * @param RequestHeadersMiddleware $requestHeadersMiddleware
@@ -71,14 +63,12 @@ class HttpClientService
     public function __construct(
         array $curlOptions,
         HandlerStack $handlerStack,
-        HttpHistoryContainer $historyContainer,
         HttpRetryMiddleware $httpRetryMiddleware,
         HttpAuthenticationMiddleware $httpAuthenticationMiddleware,
         RequestHeadersMiddleware $requestHeadersMiddleware
     ) {
         $this->setCurlOptions($curlOptions);
 
-        $this->historyContainer = $historyContainer;
         $this->httpRetryMiddleware = $httpRetryMiddleware;
         $this->httpAuthenticationMiddleware = $httpAuthenticationMiddleware;
         $this->cookieJar = new CookieJar();
@@ -162,7 +152,6 @@ class HttpClientService
      */
     private function create()
     {
-        $this->handlerStack->push(Middleware::history($this->historyContainer), self::MIDDLEWARE_HISTORY_KEY);
         $this->httpRetryMiddleware->enable();
 
         return new HttpClient([

@@ -15,7 +15,6 @@ services:
     arguments:
       - '%curl_options%'
       - '@GuzzleHttp\HandlerStack'
-      - '@webignition\HttpHistoryContainer\Container'
       - '@SimplyTestable\WorkerBundle\Services\HttpRetryMiddleware'
       - '@webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware'
       - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'

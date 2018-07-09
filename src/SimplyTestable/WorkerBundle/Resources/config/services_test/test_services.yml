@@ -12,6 +12,7 @@ services:
     arguments:
       - '@webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware'
       - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'
+      - '@webignition\HttpHistoryContainer\Container'
       - '@Kevinrob\GuzzleCache\CacheMiddleware'
       - '@Tests\WorkerBundle\Services\HttpMockHandler'
 
