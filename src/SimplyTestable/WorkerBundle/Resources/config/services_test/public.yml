@@ -16,8 +16,8 @@ services:
   SimplyTestable\WorkerBundle\Services\CoreApplicationRouter:
       arguments:
         - '%core_url%'
+        - '%kernel.cache_dir%'
         - '@SimplyTestable\WorkerBundle\Services\ResourceLocator'
-        - '@SimplyTestable\WorkerBundle\Services\ApplicationConfigurationService'
 
   SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver:
     arguments:
