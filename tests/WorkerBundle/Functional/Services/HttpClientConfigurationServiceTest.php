@@ -16,7 +16,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
     {
         $this->assertInstanceOf(
             HttpClientConfigurationService::class,
-            $this->container->get(HttpClientConfigurationService::class)
+            self::$container->get(HttpClientConfigurationService::class)
         );
     }
 
