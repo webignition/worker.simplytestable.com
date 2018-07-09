@@ -73,12 +73,16 @@ class HttpClientService
     /**
      * @param array $curlOptions
      * @param HttpCache $cache
+     * @param HttpHistoryContainer $historyContainer
      */
-    public function __construct(array $curlOptions, HttpCache $cache)
-    {
+    public function __construct(
+        array $curlOptions,
+        HttpCache $cache,
+        HttpHistoryContainer $historyContainer
+    ) {
         $this->setCurlOptions($curlOptions);
         $this->cache = $cache;
-        $this->historyContainer = new HttpHistoryContainer();
+        $this->historyContainer = $historyContainer;
         $this->httpAuthenticationMiddleware = new HttpAuthenticationMiddleware();
         $this->cookieJar = new CookieJar();
         $this->requestHeadersMiddleware = new RequestHeadersMiddleware();

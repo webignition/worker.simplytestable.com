@@ -5,6 +5,7 @@ namespace Tests\WorkerBundle\Services;
 use GuzzleHttp\Handler\MockHandler;
 use SimplyTestable\WorkerBundle\Services\HttpCache;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class TestHttpClientService extends HttpClientService
 {
@@ -16,13 +17,18 @@ class TestHttpClientService extends HttpClientService
     /**
      * @param array $curlOptions
      * @param HttpCache $cache
+     * @param HttpHistoryContainer $httpHistory
      * @param HttpMockHandler $httpMockHandler
      */
-    public function __construct(array $curlOptions, HttpCache $cache, HttpMockHandler $httpMockHandler)
-    {
+    public function __construct(
+        array $curlOptions,
+        HttpCache $cache,
+        HttpHistoryContainer $httpHistory,
+        HttpMockHandler $httpMockHandler
+    ) {
         $this->mockHandler = $httpMockHandler;
 
-        parent::__construct($curlOptions, $cache);
+        parent::__construct($curlOptions, $cache, $httpHistory);
     }
 
     /**

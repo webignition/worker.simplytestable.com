@@ -71,3 +71,5 @@ services:
   webignition\NodeJslint\Wrapper\Wrapper:
 
   SimplyTestable\WorkerBundle\Services\HttpClientConfigurationService:
+
+  webignition\HttpHistoryContainer\Container:

@@ -13,6 +13,7 @@ services:
     arguments:
       - '%curl_options%'
       - '@SimplyTestable\WorkerBundle\Services\HttpCache'
+      - '@webignition\HttpHistoryContainer\Container'
       - '@Tests\WorkerBundle\Services\HttpMockHandler'
 
   SimplyTestable\WorkerBundle\Services\TaskService:
