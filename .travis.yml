@@ -15,6 +15,7 @@ before_install:
   - cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mysql -e 'CREATE DATABASE myapp_test;'
+  - chmod +x ./bin/console
 
 install:
   - composer install
