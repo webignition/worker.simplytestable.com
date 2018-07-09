@@ -27,14 +27,14 @@ class HttpClientServiceTest extends AbstractBaseTestCase
     private $httpClient;
 
     /**
-     * @var HttpHistoryContainer
-     */
-    private $httpHistory;
-
-    /**
      * @var HttpMockHandler
      */
     private $httpMockHandler;
+
+    /**
+     * @var HttpHistoryContainer
+     */
+    private $httpHistoryContainer;
 
     /**
      * {@inheritdoc}
@@ -45,8 +45,8 @@ class HttpClientServiceTest extends AbstractBaseTestCase
 
         $this->httpClientService = self::$container->get(HttpClientService::class);
         $this->httpClient = $this->httpClientService->getHttpClient();
-        $this->httpHistory = $this->httpClientService->getHistory();
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
+        $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
 
     /**
@@ -73,7 +73,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         $this->httpClient->send($request);
         $this->httpClient->send($request);
 
-        $historicalRequests = $this->httpHistory->getRequests();
+        $historicalRequests = $this->httpHistoryContainer->getRequests();
 
         foreach ($historicalRequests as $historicalRequest) {
             $this->assertEquals($value, $historicalRequest->getHeaderLine($name));
@@ -116,13 +116,13 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         $this->httpClientService->setRequestHeader('foo', 'bar');
         $this->httpClient->send($request);
 
-        $lastRequest = $this->httpHistory->getLastRequest();
+        $lastRequest = $this->httpHistoryContainer->getLastRequest();
         $this->assertEquals('bar', $lastRequest->getHeaderLine('foo'));
 
         $this->httpClientService->setRequestHeader('foo', null);
         $this->httpClient->send($request);
 
-        $lastRequest = $this->httpHistory->getLastRequest();
+        $lastRequest = $this->httpHistoryContainer->getLastRequest();
         $this->assertArrayNotHasKey('foo', $lastRequest->getHeaders());
     }
 
@@ -152,7 +152,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         $this->httpClient->send($request);
         $this->httpClient->send($request);
 
-        $historicalRequests = $this->httpHistory->getRequests();
+        $historicalRequests = $this->httpHistoryContainer->getRequests();
 
         foreach ($historicalRequests as $historicalRequest) {
             $this->assertEquals($expectedAuthorizationHeader, $historicalRequest->getHeaderLine('authorization'));

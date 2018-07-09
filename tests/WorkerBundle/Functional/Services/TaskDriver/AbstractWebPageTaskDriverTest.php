@@ -5,14 +5,13 @@ namespace Tests\WorkerBundle\Functional\Services\TaskDriver;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Services\HttpMockHandler;
-use Tests\WorkerBundle\Services\TestHttpClientService;
 use webignition\WebResource\Exception\TransportException;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 abstract class AbstractWebPageTaskDriverTest extends AbstractBaseTestCase
 {
@@ -22,14 +21,14 @@ abstract class AbstractWebPageTaskDriverTest extends AbstractBaseTestCase
     protected $testTaskFactory;
 
     /**
-     * @var TestHttpClientService
-     */
-    protected $httpClientService;
-
-    /**
      * @var HttpMockHandler
      */
     protected $httpMockHandler;
+
+    /**
+     * @var HttpHistoryContainer
+     */
+    protected $httpHistoryContainer;
 
     /**
      * {@inheritdoc}
@@ -39,8 +38,8 @@ abstract class AbstractWebPageTaskDriverTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->testTaskFactory = new TestTaskFactory(self::$container);
-        $this->httpClientService = self::$container->get(HttpClientService::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
+        $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
 
     /**
