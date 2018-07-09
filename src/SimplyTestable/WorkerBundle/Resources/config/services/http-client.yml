@@ -12,6 +12,7 @@ services:
       - '%curl_options%'
       - '@GuzzleHttp\HandlerStack'
       - '@webignition\HttpHistoryContainer\Container'
+      - '@SimplyTestable\WorkerBundle\Services\HttpRetryMiddleware'
       - '@Kevinrob\GuzzleCache\CacheMiddleware'
 
   GuzzleHttp\Client:

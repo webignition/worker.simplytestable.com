@@ -6,6 +6,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use QueryPath\Exception as QueryPathException;
 use SimplyTestable\WorkerBundle\Services\HttpClientConfigurationService;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpRetryMiddleware;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\Retriever as WebResourceRetriever;
@@ -23,12 +24,18 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
     private $linkCheckerConfigurationFactory;
 
     /**
+     * @var HttpRetryMiddleware
+     */
+    private $httpRetryMiddleware;
+
+    /**
      * @param StateService $stateService
      * @param HttpClientService $httpClientService
      * @param HttpClientConfigurationService $httpClientConfigurationService
      * @param WebResourceRetriever $webResourceRetriever
      * @param HttpHistoryContainer $httpHistoryContainer
      * @param LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory
+     * @param HttpRetryMiddleware $httpRetryMiddleware
      */
     public function __construct(
         StateService $stateService,
@@ -36,7 +43,8 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
         HttpHistoryContainer $httpHistoryContainer,
-        LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory
+        LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory,
+        HttpRetryMiddleware $httpRetryMiddleware
     ) {
         parent::__construct(
             $stateService,
@@ -47,6 +55,7 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
         );
 
         $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
+        $this->httpRetryMiddleware = $httpRetryMiddleware;
     }
 
     /**
@@ -83,11 +92,11 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
 
         $linkChecker->setWebPage($webPage);
 
-        $this->httpClientService->disableRetryMiddleware();
+        $this->httpRetryMiddleware->disable();
 
         $linkCheckResults = $linkChecker->getAll();
 
-        $this->httpClientService->enableRetryMiddleware();
+        $this->httpRetryMiddleware->enable();
 
         $this->response->setErrorCount(count($linkChecker->getErrored()));
 

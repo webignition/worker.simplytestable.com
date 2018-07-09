@@ -6,7 +6,7 @@ use Doctrine\ORM\OptimisticLockException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
+use SimplyTestable\WorkerBundle\Services\HttpRetryMiddleware;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
@@ -43,11 +43,6 @@ class TaskServiceTest extends AbstractBaseTestCase
     private $testTaskFactory;
 
     /**
-     * @var HttpClientService
-     */
-    private $httpClientService;
-
-    /**
      * @var HttpMockHandler
      */
     private $httpMockHandler;
@@ -56,6 +51,11 @@ class TaskServiceTest extends AbstractBaseTestCase
      * @var HttpHistoryContainer
      */
     private $httpHistoryContainer;
+
+    /**
+     * @var HttpRetryMiddleware
+     */
+    private $httpRetryMiddleware;
 
     /**
      * {@inheritdoc}
@@ -67,9 +67,9 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->taskService = self::$container->get(TaskService::class);
         $this->taskTypeService = self::$container->get(TaskTypeService::class);
         $this->testTaskFactory = new TestTaskFactory(self::$container);
-        $this->httpClientService = self::$container->get(HttpClientService::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
+        $this->httpRetryMiddleware = self::$container->get(HttpRetryMiddleware::class);
     }
 
     /**
@@ -251,7 +251,7 @@ class TaskServiceTest extends AbstractBaseTestCase
             new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
         ], $responseFixtures));
 
-        $this->httpClientService->disableRetryMiddleware();
+        $this->httpRetryMiddleware->disable();
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 

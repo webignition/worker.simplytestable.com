@@ -6,13 +6,9 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\Cookie\SetCookie;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Kevinrob\GuzzleCache\CacheMiddleware;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
 use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
@@ -25,8 +21,6 @@ class HttpClientService
     const MIDDLEWARE_HISTORY_KEY = 'history';
     const MIDDLEWARE_HTTP_AUTH_KEY = 'http-auth';
     const MIDDLEWARE_REQUEST_HEADERS_KEY = 'request-headers';
-
-    const MAX_RETRIES = 5;
 
     /**
      * @var HttpClient
@@ -69,20 +63,28 @@ class HttpClientService
     private $handlerStack;
 
     /**
+     * @var HttpRetryMiddleware
+     */
+    private $httpRetryMiddleware;
+
+    /**
      * @param array $curlOptions
      * @param HandlerStack $handlerStack
      * @param HttpHistoryContainer $historyContainer
+     * @param HttpRetryMiddleware $httpRetryMiddleware
      * @param CacheMiddleware|null $cacheMiddleware
      */
     public function __construct(
         array $curlOptions,
         HandlerStack $handlerStack,
         HttpHistoryContainer $historyContainer,
+        HttpRetryMiddleware $httpRetryMiddleware,
         CacheMiddleware $cacheMiddleware = null
     ) {
         $this->setCurlOptions($curlOptions);
 
         $this->historyContainer = $historyContainer;
+        $this->httpRetryMiddleware = $httpRetryMiddleware;
         $this->cacheMiddleware = $cacheMiddleware;
         $this->httpAuthenticationMiddleware = new HttpAuthenticationMiddleware();
         $this->cookieJar = new CookieJar();
@@ -172,53 +174,15 @@ class HttpClientService
 
         $this->handlerStack->push($this->httpAuthenticationMiddleware, self::MIDDLEWARE_HTTP_AUTH_KEY);
         $this->handlerStack->push($this->requestHeadersMiddleware, self::MIDDLEWARE_REQUEST_HEADERS_KEY);
-        $this->enableRetryMiddleware();
         $this->handlerStack->push(Middleware::history($this->historyContainer), self::MIDDLEWARE_HISTORY_KEY);
+        $this->httpRetryMiddleware->enable();
 
         return new HttpClient([
             'curl' => $this->curlOptions,
             'verify' => false,
             'handler' => $this->handlerStack,
-            'max_retries' => self::MAX_RETRIES,
+            'max_retries' => HttpRetryMiddlewareFactory::MAX_RETRIES,
             'cookies' => $this->cookieJar,
         ]);
-    }
-
-    public function disableRetryMiddleware()
-    {
-        $this->handlerStack->remove(self::MIDDLEWARE_RETRY_KEY);
-    }
-
-    public function enableRetryMiddleware()
-    {
-        $this->disableRetryMiddleware();
-        $this->handlerStack->push(Middleware::retry($this->createRetryDecider()), self::MIDDLEWARE_RETRY_KEY);
-    }
-
-    /**
-     * @return \Closure
-     */
-    private function createRetryDecider()
-    {
-        return function (
-            $retries,
-            RequestInterface $request,
-            ResponseInterface $response = null,
-            GuzzleException $exception = null
-        ) {
-            if ($retries >= self::MAX_RETRIES) {
-                return false;
-            }
-
-            if ($exception instanceof ConnectException) {
-                return true;
-            }
-
-            if ($response instanceof ResponseInterface && $response->getStatusCode() >= 500) {
-                return true;
-            }
-
-            return false;
-        };
     }
 }
