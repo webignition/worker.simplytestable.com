@@ -10,6 +10,8 @@ services:
 
   SimplyTestable\WorkerBundle\Services\HttpHandlerStackFactory:
     arguments:
+      - '@webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware'
+      - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'
       - '@Kevinrob\GuzzleCache\CacheMiddleware'
       - '@Tests\WorkerBundle\Services\HttpMockHandler'
 

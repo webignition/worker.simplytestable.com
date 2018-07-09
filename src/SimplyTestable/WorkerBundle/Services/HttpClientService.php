@@ -18,7 +18,6 @@ class HttpClientService
     const MIDDLEWARE_CACHE_KEY = 'cache';
     const MIDDLEWARE_RETRY_KEY = 'retry';
     const MIDDLEWARE_HISTORY_KEY = 'history';
-    const MIDDLEWARE_HTTP_AUTH_KEY = 'http-auth';
     const MIDDLEWARE_REQUEST_HEADERS_KEY = 'request-headers';
 
     /**
@@ -163,8 +162,6 @@ class HttpClientService
      */
     private function create()
     {
-        $this->handlerStack->push($this->httpAuthenticationMiddleware, self::MIDDLEWARE_HTTP_AUTH_KEY);
-        $this->handlerStack->push($this->requestHeadersMiddleware, self::MIDDLEWARE_REQUEST_HEADERS_KEY);
         $this->handlerStack->push(Middleware::history($this->historyContainer), self::MIDDLEWARE_HISTORY_KEY);
         $this->httpRetryMiddleware->enable();
 
