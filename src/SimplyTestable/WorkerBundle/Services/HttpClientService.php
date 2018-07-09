@@ -3,13 +3,8 @@
 namespace SimplyTestable\WorkerBundle\Services;
 
 use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\CookieJarInterface;
-use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\HandlerStack;
-use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
-use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
-use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
 
 class HttpClientService
 {
@@ -29,19 +24,9 @@ class HttpClientService
     private $curlOptions;
 
     /**
-     * @var HttpAuthenticationMiddleware
-     */
-    private $httpAuthenticationMiddleware;
-
-    /**
      * @var CookieJarInterface
      */
     private $cookieJar;
-
-    /**
-     * @var RequestHeadersMiddleware
-     */
-    private $requestHeadersMiddleware;
 
     /**
      * @var HandlerStack
@@ -56,23 +41,19 @@ class HttpClientService
     /**
      * @param array $curlOptions
      * @param HandlerStack $handlerStack
+     * @param CookieJarInterface $cookieJar
      * @param HttpRetryMiddleware $httpRetryMiddleware
-     * @param HttpAuthenticationMiddleware $httpAuthenticationMiddleware
-     * @param RequestHeadersMiddleware $requestHeadersMiddleware
      */
     public function __construct(
         array $curlOptions,
         HandlerStack $handlerStack,
-        HttpRetryMiddleware $httpRetryMiddleware,
-        HttpAuthenticationMiddleware $httpAuthenticationMiddleware,
-        RequestHeadersMiddleware $requestHeadersMiddleware
+        CookieJarInterface $cookieJar,
+        HttpRetryMiddleware $httpRetryMiddleware
     ) {
         $this->setCurlOptions($curlOptions);
 
         $this->httpRetryMiddleware = $httpRetryMiddleware;
-        $this->httpAuthenticationMiddleware = $httpAuthenticationMiddleware;
-        $this->cookieJar = new CookieJar();
-        $this->requestHeadersMiddleware = $requestHeadersMiddleware;
+        $this->cookieJar = $cookieJar;
         $this->handlerStack = $handlerStack;
 
         $this->httpClient = $this->create();
@@ -84,51 +65,6 @@ class HttpClientService
     public function getHttpClient()
     {
         return $this->httpClient;
-    }
-
-    /**
-     * Set cookies to be sent on all requests (dependent on cookie domain/secure matching rules)
-     *
-     * @param SetCookie[] $cookies
-     */
-    public function setCookies(array $cookies = [])
-    {
-        $this->clearCookies();
-
-        if (empty($cookies)) {
-            return;
-        }
-
-        foreach ($cookies as $cookie) {
-            $this->cookieJar->setCookie($cookie);
-        }
-    }
-
-    public function clearCookies()
-    {
-        $this->cookieJar->clear();
-    }
-
-    /**
-     * @param HttpAuthenticationCredentials $httpAuthenticationCredentials
-     */
-    public function setBasicHttpAuthorization(HttpAuthenticationCredentials $httpAuthenticationCredentials)
-    {
-        $this->httpAuthenticationMiddleware->setHttpAuthenticationCredentials($httpAuthenticationCredentials);
-    }
-
-    public function clearBasicHttpAuthorization()
-    {
-        $this->httpAuthenticationMiddleware->setHttpAuthenticationCredentials(new HttpAuthenticationCredentials());
-    }
-
-    /**
-     * @param string $name
-     * @param mixed $value
-     */
-    public function setRequestHeader($name, $value)
-    {
-        $this->requestHeadersMiddleware->setHeader($name, $value);
     }
 
     /**
