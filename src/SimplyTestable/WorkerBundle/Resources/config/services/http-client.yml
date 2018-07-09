@@ -1,4 +1,7 @@
 services:
+  GuzzleHttp\Cookie\CookieJarInterface:
+    class: GuzzleHttp\Cookie\CookieJar
+
   webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
 
   webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware:
@@ -15,11 +18,8 @@ services:
     arguments:
       - '%curl_options%'
       - '@GuzzleHttp\HandlerStack'
-      - '@webignition\HttpHistoryContainer\Container'
+      - '@GuzzleHttp\Cookie\CookieJarInterface'
       - '@SimplyTestable\WorkerBundle\Services\HttpRetryMiddleware'
-      - '@webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware'
-      - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'
-      - '@Kevinrob\GuzzleCache\CacheMiddleware'
 
   GuzzleHttp\Client:
     factory: 'SimplyTestable\WorkerBundle\Services\HttpClientService:getHttpClient'

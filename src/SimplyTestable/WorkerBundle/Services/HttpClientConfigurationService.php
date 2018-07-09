@@ -2,21 +2,41 @@
 
 namespace SimplyTestable\WorkerBundle\Services;
 
+use GuzzleHttp\Cookie\CookieJarInterface;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
+use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
+use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
 
 class HttpClientConfigurationService
 {
     /**
-     * @var HttpClientService
+     * @var HttpAuthenticationMiddleware
      */
-    private $httpClientService;
+    private $httpAuthenticationMiddleware;
 
     /**
-     * @param HttpClientService $httpClientService
+     * @var RequestHeadersMiddleware
      */
-    public function __construct(HttpClientService $httpClientService)
-    {
-        $this->httpClientService = $httpClientService;
+    private $requestHeadersMiddleware;
+
+    /**
+     * @var CookieJarInterface
+     */
+    private $cookieJar;
+
+    /**
+     * @param HttpAuthenticationMiddleware $httpAuthenticationMiddleware
+     * @param RequestHeadersMiddleware $requestHeadersMiddleware
+     * @param CookieJarInterface $cookieJar
+     */
+    public function __construct(
+        HttpAuthenticationMiddleware $httpAuthenticationMiddleware,
+        RequestHeadersMiddleware $requestHeadersMiddleware,
+        CookieJarInterface $cookieJar
+    ) {
+        $this->httpAuthenticationMiddleware = $httpAuthenticationMiddleware;
+        $this->requestHeadersMiddleware = $requestHeadersMiddleware;
+        $this->cookieJar = $cookieJar;
     }
 
     /**
@@ -29,14 +49,18 @@ class HttpClientConfigurationService
 
         $cookies = $parametersObject->getCookies();
         if (!empty($cookies)) {
-            $this->httpClientService->setCookies($parametersObject->getCookies());
+            $this->cookieJar->clear();
+
+            foreach ($cookies as $cookie) {
+                $this->cookieJar->setCookie($cookie);
+            }
         }
 
         $httpAuthenticationCredentials = $parametersObject->getHttpAuthenticationCredentials();
         if (!$httpAuthenticationCredentials->isEmpty()) {
-            $this->httpClientService->setBasicHttpAuthorization($httpAuthenticationCredentials);
+            $this->httpAuthenticationMiddleware->setHttpAuthenticationCredentials($httpAuthenticationCredentials);
         }
 
-        $this->httpClientService->setRequestHeader('User-Agent', $userAgentString);
+        $this->requestHeadersMiddleware->setHeader('User-Agent', $userAgentString);
     }
 }

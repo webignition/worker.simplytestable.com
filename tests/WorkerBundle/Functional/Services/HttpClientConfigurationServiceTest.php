@@ -2,13 +2,14 @@
 
 namespace Tests\WorkerBundle\Functional\Services;
 
-use GuzzleHttp\Cookie\SetCookie;
+use GuzzleHttp\Cookie\CookieJarInterface;
 use Mockery\Mock;
 use SimplyTestable\WorkerBundle\Entity\Task\Task;
 use SimplyTestable\WorkerBundle\Services\HttpClientConfigurationService;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
+use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
+use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
 
 class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
 {
@@ -25,18 +26,34 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
         $task = $this->createTask([], 'http://example.com/');
         $userAgentString = 'Foo User Agent';
 
-        /* @var HttpClientService|Mock $httpClientService */
-        $httpClientService = \Mockery::mock(HttpClientService::class);
+        /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
+        $httpAuthenticationMiddleware = \Mockery::mock(HttpAuthenticationMiddleware::class);
+        $httpAuthenticationMiddleware
+            ->shouldNotReceive('setHttpAuthenticationCredentials');
 
-        $httpClientService
-            ->shouldReceive('setRequestHeader')
-            ->with('User-Agent', $userAgentString);
+        /* @var RequestHeadersMiddleware|Mock $requestHeadersMiddleware */
+        $requestHeadersMiddleware = \Mockery::mock(RequestHeadersMiddleware::class);
+        $requestHeadersMiddleware
+            ->shouldReceive('setHeader')
+            ->with('User-Agent', $userAgentString)
+            ->once();
 
-        $httpClientConfigurationService = new HttpClientConfigurationService($httpClientService);
+        /* @var CookieJarInterface|Mock $cookieJar */
+        $cookieJar = \Mockery::mock(CookieJarInterface::class);
+        $cookieJar
+            ->shouldNotReceive('clear');
+        $cookieJar
+            ->shouldNotReceive('setCookie');
+
+        $httpClientConfigurationService = new HttpClientConfigurationService(
+            $httpAuthenticationMiddleware,
+            $requestHeadersMiddleware,
+            $cookieJar
+        );
 
         $httpClientConfigurationService->configureForTask($task, $userAgentString);
 
-        $this->addToAssertionCount(1);
+        $this->addToAssertionCount(\Mockery::getContainer()->mockery_getExpectationCount());
     }
 
     /**
@@ -50,29 +67,35 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
         $task = $this->createTask($taskParameters, 'http://example.com/');
         $userAgentString = 'Foo User Agent';
 
-        /* @var HttpClientService|Mock $httpClientService */
-        $httpClientService = \Mockery::mock(HttpClientService::class);
+        /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
+        $httpAuthenticationMiddleware = \Mockery::mock(HttpAuthenticationMiddleware::class);
+        $httpAuthenticationMiddleware
+            ->shouldNotReceive('setHttpAuthenticationCredentials');
 
-        $httpClientService
-            ->shouldReceive('setCookies')
-            ->withArgs(function (array $cookies) use ($expectedCookieStrings) {
-                $cookieStrings = [];
+        /* @var RequestHeadersMiddleware|Mock $requestHeadersMiddleware */
+        $requestHeadersMiddleware = \Mockery::mock(RequestHeadersMiddleware::class);
+        $requestHeadersMiddleware
+            ->shouldReceive('setHeader')
+            ->with('User-Agent', $userAgentString)
+            ->once();
 
-                /* @var SetCookie $cookie */
-                foreach ($cookies as $cookie) {
-                    $cookieStrings[] = (string)$cookie;
-                }
+        /* @var CookieJarInterface|Mock $cookieJar */
+        $cookieJar = \Mockery::mock(CookieJarInterface::class);
+        $cookieJar
+            ->shouldReceive('clear')
+            ->once();
 
-                $this->assertEquals($expectedCookieStrings, $cookieStrings);
+        $cookieJar
+            ->shouldReceive('setCookie')
+            ->times(count($expectedCookieStrings));
 
-                return true;
-            });
+        $httpClientConfigurationService = new HttpClientConfigurationService(
+            $httpAuthenticationMiddleware,
+            $requestHeadersMiddleware,
+            $cookieJar
+        );
 
-        $httpClientService
-            ->shouldReceive('setRequestHeader')
-            ->with('User-Agent', $userAgentString);
-
-        $httpClientConfigurationService = new HttpClientConfigurationService($httpClientService);
+        $this->addToAssertionCount(\Mockery::getContainer()->mockery_getExpectationCount());
 
         $httpClientConfigurationService->configureForTask($task, $userAgentString);
     }
@@ -133,11 +156,11 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
         $task = $this->createTask($taskParameters, 'http://example.com/');
         $userAgentString = 'Foo User Agent';
 
-        /* @var HttpClientService|Mock $httpClientService */
-        $httpClientService = \Mockery::mock(HttpClientService::class);
-
-        $httpClientService
-            ->shouldReceive('setBasicHttpAuthorization')
+        /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
+        $httpAuthenticationMiddleware = \Mockery::mock(HttpAuthenticationMiddleware::class);
+        $httpAuthenticationMiddleware
+            ->shouldReceive('setHttpAuthenticationCredentials')
+            ->once()
             ->withArgs(function (
                 HttpAuthenticationCredentials $httpAuthenticationCredentials
             ) use ($expectedHttpAuthenticationCredentials) {
@@ -151,18 +174,37 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
                     $httpAuthenticationCredentials->getPassword()
                 );
 
-                $this->assertEquals('example.com', $httpAuthenticationCredentials->getDomain());
+                $this->assertEquals(
+                    $expectedHttpAuthenticationCredentials['domain'],
+                    $httpAuthenticationCredentials->getDomain()
+                );
 
                 return true;
             });
 
-        $httpClientService
-            ->shouldReceive('setRequestHeader')
-            ->with('User-Agent', $userAgentString);
+        /* @var RequestHeadersMiddleware|Mock $requestHeadersMiddleware */
+        $requestHeadersMiddleware = \Mockery::mock(RequestHeadersMiddleware::class);
+        $requestHeadersMiddleware
+            ->shouldReceive('setHeader')
+            ->with('User-Agent', $userAgentString)
+            ->once();
 
-        $httpClientConfigurationService = new HttpClientConfigurationService($httpClientService);
+        /* @var CookieJarInterface|Mock $cookieJar */
+        $cookieJar = \Mockery::mock(CookieJarInterface::class);
+        $cookieJar
+            ->shouldNotReceive('clear');
+        $cookieJar
+            ->shouldNotReceive('setCookie');
+
+        $httpClientConfigurationService = new HttpClientConfigurationService(
+            $httpAuthenticationMiddleware,
+            $requestHeadersMiddleware,
+            $cookieJar
+        );
 
         $httpClientConfigurationService->configureForTask($task, $userAgentString);
+
+        $this->addToAssertionCount(\Mockery::getContainer()->mockery_getExpectationCount());
     }
 
     /**

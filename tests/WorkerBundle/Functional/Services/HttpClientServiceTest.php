@@ -11,6 +11,8 @@ use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Services\HttpMockHandler;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
+use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
+use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class HttpClientServiceTest extends AbstractBaseTestCase
@@ -58,13 +60,15 @@ class HttpClientServiceTest extends AbstractBaseTestCase
      */
     public function testSetHeader($name, $value)
     {
+        $requestHeadersMiddleware = self::$container->get(RequestHeadersMiddleware::class);
+
         $this->httpMockHandler->appendFixtures([
             new Response(),
             new Response(),
             new Response(),
         ]);
 
-        $this->httpClientService->setRequestHeader($name, $value);
+        $requestHeadersMiddleware->setHeader($name, $value);
 
         $request = new Request('GET', 'http://example.com');
 
@@ -105,6 +109,8 @@ class HttpClientServiceTest extends AbstractBaseTestCase
      */
     public function testClearHeader()
     {
+        $requestHeadersMiddleware = self::$container->get(RequestHeadersMiddleware::class);
+
         $this->httpMockHandler->appendFixtures([
             new Response(),
             new Response(),
@@ -112,13 +118,13 @@ class HttpClientServiceTest extends AbstractBaseTestCase
 
         $request = new Request('GET', 'http://example.com');
 
-        $this->httpClientService->setRequestHeader('foo', 'bar');
+        $requestHeadersMiddleware->setHeader('foo', 'bar');
         $this->httpClient->send($request);
 
         $lastRequest = $this->httpHistoryContainer->getLastRequest();
         $this->assertEquals('bar', $lastRequest->getHeaderLine('foo'));
 
-        $this->httpClientService->setRequestHeader('foo', null);
+        $requestHeadersMiddleware->setHeader('foo', null);
         $this->httpClient->send($request);
 
         $lastRequest = $this->httpHistoryContainer->getLastRequest();
@@ -139,13 +145,15 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         HttpAuthenticationCredentials $httpAuthenticationCredentials,
         $expectedAuthorizationHeader
     ) {
+        $httpAuthenticationMiddleware = self::$container->get(HttpAuthenticationMiddleware::class);
+
         $this->httpMockHandler->appendFixtures([
             new Response(),
             new Response(),
             new Response(),
         ]);
 
-        $this->httpClientService->setBasicHttpAuthorization($httpAuthenticationCredentials);
+        $httpAuthenticationMiddleware->setHttpAuthenticationCredentials($httpAuthenticationCredentials);
 
         $this->httpClient->send($request);
         $this->httpClient->send($request);
