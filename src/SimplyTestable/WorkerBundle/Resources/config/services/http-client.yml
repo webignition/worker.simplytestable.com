@@ -1,8 +1,11 @@
 services:
+  webignition\HttpHistoryContainer\Container:
+
   SimplyTestable\WorkerBundle\Services\HttpClientService:
     arguments:
       - '%curl_options%'
       - '@SimplyTestable\WorkerBundle\Services\HttpCache'
+      - '@webignition\HttpHistoryContainer\Container'
 
   GuzzleHttp\Client:
     factory: 'SimplyTestable\WorkerBundle\Services\HttpClientService:getHttpClient'

@@ -5,6 +5,7 @@ services:
       - '@SimplyTestable\WorkerBundle\Services\HttpClientService'
       - '@SimplyTestable\WorkerBundle\Services\HttpClientConfigurationService'
       - '@webignition\WebResource\Retriever'
+      - '@webignition\HttpHistoryContainer\Container'
       - '@webignition\HtmlValidator\Wrapper\Wrapper'
       - '%html-validator-path%'
 

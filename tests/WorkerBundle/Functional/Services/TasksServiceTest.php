@@ -5,13 +5,12 @@ namespace Tests\WorkerBundle\Functional\Services;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Exception\Services\TasksService\RequestException;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Services\HttpMockHandler;
-use Tests\WorkerBundle\Services\TestHttpClientService;
 use Tests\WorkerBundle\Utility\File;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class TasksServiceTest extends AbstractBaseTestCase
 {
@@ -21,14 +20,14 @@ class TasksServiceTest extends AbstractBaseTestCase
     private $tasksService;
 
     /**
-     * @var TestHttpClientService
-     */
-    private $httpClientService;
-
-    /**
      * @var HttpMockHandler
      */
     private $httpMockHandler;
+
+    /**
+     * @var HttpHistoryContainer
+     */
+    private $httpHistoryContainer;
 
     /**
      * {@inheritdoc}
@@ -38,8 +37,8 @@ class TasksServiceTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->tasksService = self::$container->get(TasksService::class);
-        $this->httpClientService = self::$container->get(HttpClientService::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
+        $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
 
     public function testGetMaxTasksRequestFactor()
@@ -157,7 +156,7 @@ class TasksServiceTest extends AbstractBaseTestCase
             $this->tasksService->request($requestedLimit)
         );
 
-        $lastRequest = $this->httpClientService->getHistory()->getLastRequest();
+        $lastRequest = $this->httpHistoryContainer->getLastRequest();
         $this->assertEquals('application/x-www-form-urlencoded', $lastRequest->getHeaderLine('content-type'));
 
         $postedData = [];

@@ -16,6 +16,7 @@ use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Services\HttpMockHandler;
 use Tests\WorkerBundle\Services\TestHttpClientService;
 use Tests\WorkerBundle\Utility\File;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 /**
  * @group TaskService
@@ -53,6 +54,11 @@ class TaskServiceTest extends AbstractBaseTestCase
     private $httpMockHandler;
 
     /**
+     * @var HttpHistoryContainer
+     */
+    private $httpHistoryContainer;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -64,6 +70,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->testTaskFactory = new TestTaskFactory(self::$container);
         $this->httpClientService = self::$container->get(HttpClientService::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
+        $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
 
     /**
@@ -317,7 +324,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->assertNull($task->getOutput()->getId());
         $this->assertNull($task->getTimePeriod()->getId());
 
-        $lastRequest = $this->httpClientService->getHistory()->getLastRequest();
+        $lastRequest = $this->httpHistoryContainer->getLastRequest();
 
         $this->assertEquals('application/x-www-form-urlencoded', $lastRequest->getHeaderLine('content-type'));
 

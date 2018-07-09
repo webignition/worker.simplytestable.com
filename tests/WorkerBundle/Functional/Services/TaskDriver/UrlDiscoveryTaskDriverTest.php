@@ -152,7 +152,7 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
+        $historicalRequests = $this->httpHistoryContainer->getRequests();
         $this->assertCount(2, $historicalRequests);
 
         foreach ($historicalRequests as $historicalRequest) {
@@ -180,7 +180,7 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         $this->taskDriver->perform($task);
 
-        $historicalRequests = $this->httpClientService->getHistory()->getRequests();
+        $historicalRequests = $this->httpHistoryContainer->getRequests();
         $this->assertCount(2, $historicalRequests);
 
         foreach ($historicalRequests as $historicalRequest) {

@@ -13,6 +13,7 @@ use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
 use webignition\HtmlDocumentType\Validator as DoctypeValidator;
 use webignition\HtmlDocumentType\Factory as DoctypeFactory;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class HtmlValidationTaskDriver extends AbstractWebPageTaskDriver
 {
@@ -33,6 +34,7 @@ class HtmlValidationTaskDriver extends AbstractWebPageTaskDriver
      * @param HttpClientService $httpClientService
      * @param HttpClientConfigurationService $httpClientConfigurationService
      * @param WebResourceRetriever $webResourceRetriever
+     * @param HttpHistoryContainer $httpHistoryContainer
      * @param HtmlValidatorWrapper $htmlValidatorWrapper
      * @param $validatorPath
      */
@@ -41,10 +43,17 @@ class HtmlValidationTaskDriver extends AbstractWebPageTaskDriver
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
+        HttpHistoryContainer $httpHistoryContainer,
         HtmlValidatorWrapper $htmlValidatorWrapper,
         $validatorPath
     ) {
-        parent::__construct($stateService, $httpClientService, $httpClientConfigurationService, $webResourceRetriever);
+        parent::__construct(
+            $stateService,
+            $httpClientService,
+            $httpClientConfigurationService,
+            $webResourceRetriever,
+            $httpHistoryContainer
+        );
 
         $this->htmlValidatorWrapper = $htmlValidatorWrapper;
         $this->validatorPath = $validatorPath;
