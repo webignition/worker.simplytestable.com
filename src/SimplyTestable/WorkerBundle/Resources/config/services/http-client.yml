@@ -1,9 +1,13 @@
 services:
+  GuzzleHttp\HandlerStack:
+    factory: 'SimplyTestable\WorkerBundle\Services\HttpHandlerStackFactory:create'
+
   webignition\HttpHistoryContainer\Container:
 
   SimplyTestable\WorkerBundle\Services\HttpClientService:
     arguments:
       - '%curl_options%'
+      - '@GuzzleHttp\HandlerStack'
       - '@SimplyTestable\WorkerBundle\Services\HttpCache'
       - '@webignition\HttpHistoryContainer\Container'
 
