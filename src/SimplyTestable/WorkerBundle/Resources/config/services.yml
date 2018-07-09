@@ -5,11 +5,6 @@ imports:
     - { resource: services/public.yml }
 
 services:
-  SimplyTestable\WorkerBundle\Services\ApplicationConfigurationService:
-      arguments:
-        - "@=service('kernel').getRootDir()"
-        - "@=service('kernel').getCacheDir()"
-
   SimplyTestable\WorkerBundle\Services\CoreApplicationRouter:
       arguments:
         - '%core_url%'

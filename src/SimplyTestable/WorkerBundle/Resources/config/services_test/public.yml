@@ -8,11 +8,6 @@ services:
   GuzzleHttp\Client:
     factory: 'SimplyTestable\WorkerBundle\Services\HttpClientService:getHttpClient'
 
-  SimplyTestable\WorkerBundle\Services\ApplicationConfigurationService:
-      arguments:
-        - "@=service('kernel').getRootDir()"
-        - "@=service('kernel').getCacheDir()"
-
   SimplyTestable\WorkerBundle\Services\CoreApplicationRouter:
       arguments:
         - '%core_url%'
