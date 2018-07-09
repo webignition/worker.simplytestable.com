@@ -144,8 +144,6 @@ class TaskService
 
     /**
      * @param Task $task
-     *
-     * @return int
      */
     public function perform(Task $task)
     {
@@ -171,8 +169,6 @@ class TaskService
             $task,
             $this->getCompletionStateFromTaskDriverResponse($taskDriverResponse)
         );
-
-        return 0;
     }
 
     /**
