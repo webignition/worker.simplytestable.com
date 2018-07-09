@@ -22,7 +22,7 @@ class TaskFactoryTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->taskFactory = $this->container->get(TaskFactory::class);
+        $this->taskFactory = self::$container->get(TaskFactory::class);
     }
 
     /**
@@ -71,7 +71,7 @@ class TaskFactoryTest extends AbstractBaseTestCase
      */
     private function createCreateRequest($taskTypeName, $url, $parameters)
     {
-        $taskTypeService = $this->container->get(TaskTypeService::class);
+        $taskTypeService = self::$container->get(TaskTypeService::class);
         $taskType = $taskTypeService->fetch($taskTypeName);
 
         return new CreateRequest($taskType, $url, $parameters);

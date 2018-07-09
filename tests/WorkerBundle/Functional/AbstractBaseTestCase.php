@@ -5,7 +5,6 @@ namespace Tests\WorkerBundle\Functional;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractBaseTestCase extends WebTestCase
 {
@@ -15,20 +14,14 @@ abstract class AbstractBaseTestCase extends WebTestCase
     private $client;
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
         $this->client = static::createClient();
-        $this->container = $this->client->getKernel()->getContainer();
-        $this->container->get(WorkerService::class)->setActive();
 
-        $this->container->get('doctrine')->getConnection()->beginTransaction();
+        self::$container->get(WorkerService::class)->setActive();
+        self::$container->get('doctrine')->getConnection()->beginTransaction();
     }
 
     protected function clearRedis()
@@ -50,9 +43,7 @@ abstract class AbstractBaseTestCase extends WebTestCase
      */
     protected function tearDown()
     {
-        if (!is_null($this->container)) {
-            $this->container->get('doctrine')->getConnection()->close();
-        }
+        self::$container->get('doctrine')->getConnection()->close();
 
         \Mockery::close();
 
