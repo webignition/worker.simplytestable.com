@@ -14,7 +14,6 @@ use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Services\HttpMockHandler;
-use Tests\WorkerBundle\Services\TestHttpClientService;
 use Tests\WorkerBundle\Utility\File;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
@@ -44,7 +43,7 @@ class TaskServiceTest extends AbstractBaseTestCase
     private $testTaskFactory;
 
     /**
-     * @var TestHttpClientService
+     * @var HttpClientService
      */
     private $httpClientService;
 

@@ -12,15 +12,6 @@ services:
     arguments:
       - '@Tests\WorkerBundle\Services\HttpMockHandler'
 
-  SimplyTestable\WorkerBundle\Services\HttpClientService:
-    class:   Tests\WorkerBundle\Services\TestHttpClientService
-    arguments:
-      - '%curl_options%'
-      - '@GuzzleHttp\HandlerStack'
-      - '@SimplyTestable\WorkerBundle\Services\HttpCache'
-      - '@webignition\HttpHistoryContainer\Container'
-      - '@Tests\WorkerBundle\Services\HttpMockHandler'
-
   SimplyTestable\WorkerBundle\Services\TaskService:
     class:   Tests\WorkerBundle\Services\TestTaskService
     arguments:

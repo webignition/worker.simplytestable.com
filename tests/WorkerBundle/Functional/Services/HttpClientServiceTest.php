@@ -10,14 +10,13 @@ use Psr\Http\Message\RequestInterface;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Services\HttpMockHandler;
-use Tests\WorkerBundle\Services\TestHttpClientService;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class HttpClientServiceTest extends AbstractBaseTestCase
 {
     /**
-     * @var TestHttpClientService
+     * @var HttpClientService
      */
     private $httpClientService;
 
