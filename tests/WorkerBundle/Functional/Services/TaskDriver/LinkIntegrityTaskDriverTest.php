@@ -10,7 +10,7 @@ use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlDocumentFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 
-class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
+class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
 {
     /**
      * @var LinkIntegrityTaskDriver
@@ -62,7 +62,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
         $expectedWarningCount,
         $expectedDecodedOutput
     ) {
-        $this->httpClientService->appendFixtures($httpFixtures);
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
@@ -242,7 +242,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(
                 200,
@@ -275,7 +275,7 @@ class LinkIntegrityTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(
                 200,

@@ -13,6 +13,7 @@ use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
+use Tests\WorkerBundle\Services\HttpMockHandler;
 use Tests\WorkerBundle\Services\TestHttpClientService;
 use Tests\WorkerBundle\Utility\File;
 
@@ -47,6 +48,11 @@ class TaskServiceTest extends AbstractBaseTestCase
     private $httpClientService;
 
     /**
+     * @var HttpMockHandler
+     */
+    private $httpMockHandler;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -57,6 +63,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->taskTypeService = self::$container->get(TaskTypeService::class);
         $this->testTaskFactory = new TestTaskFactory(self::$container);
         $this->httpClientService = self::$container->get(HttpClientService::class);
+        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
 
     /**
@@ -112,6 +119,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
     /**
      * @throws OptimisticLockException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function testCreateUsesExistingMatchingTask()
     {
@@ -143,7 +151,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testPerform($taskValues, $httpFixtures, $expectedFinishedStateName)
     {
-        $this->httpClientService->appendFixtures($httpFixtures);
+        $this->httpMockHandler->appendFixtures($httpFixtures);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create($taskValues);
@@ -232,7 +240,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testReportCompletionFailure(array $responseFixtures, $expectedReturnValue)
     {
-        $this->httpClientService->appendFixtures(array_merge([
+        $this->httpMockHandler->appendFixtures(array_merge([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
         ], $responseFixtures));
@@ -288,7 +296,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testReportCompletionSuccess($responseFixture)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
             $responseFixture,
@@ -367,7 +375,7 @@ class TaskServiceTest extends AbstractBaseTestCase
     {
         parent::assertPostConditions();
 
-        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
+        $this->assertEquals(0, $this->httpMockHandler->count());
     }
 
     /**

@@ -8,7 +8,7 @@ use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use Tests\WorkerBundle\Factory\HtmlDocumentFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 
-class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
+class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
 {
     /**
      * @var UrlDiscoveryTaskDriver
@@ -56,7 +56,7 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
         $expectedIsRetryable,
         $expectedDecodedOutput
     ) {
-        $this->httpClientService->appendFixtures($httpFixtures);
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
@@ -140,7 +140,7 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
         ]);
@@ -168,7 +168,7 @@ class UrlDiscoveryTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
         ]);

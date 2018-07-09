@@ -2,16 +2,15 @@
 
 namespace Tests\WorkerBundle\Functional\Services;
 
-use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\StateService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
-use Tests\WorkerBundle\Services\TestHttpClientService;
+use Tests\WorkerBundle\Services\HttpMockHandler;
 
 class WorkerServiceTest extends AbstractBaseTestCase
 {
@@ -21,9 +20,9 @@ class WorkerServiceTest extends AbstractBaseTestCase
     private $workerService;
 
     /**
-     * @var TestHttpClientService
+     * @var HttpMockHandler
      */
-    private $httpClientService;
+    private $httpMockHandler;
 
     /**
      * {@inheritdoc}
@@ -33,12 +32,12 @@ class WorkerServiceTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->workerService = self::$container->get(WorkerService::class);
-        $this->httpClientService = self::$container->get(HttpClientService::class);
+        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
 
     /**
-     * @throws OptimisticLockException
      * @throws GuzzleException
+     * @throws ORMException
      */
     public function testActivateWhenNotNew()
     {
@@ -56,11 +55,11 @@ class WorkerServiceTest extends AbstractBaseTestCase
      * @param string $expectedWorkerState
      *
      * @throws GuzzleException
-     * @throws OptimisticLockException
+     * @throws ORMException
      */
     public function testActivate(array $httpFixtures, $expectedReturnCode, $expectedWorkerState)
     {
-        $this->httpClientService->appendFixtures($httpFixtures);
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $worker = $this->workerService->get();
         $this->setWorkerState($worker, WorkerService::WORKER_NEW_STATE);
@@ -115,7 +114,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
      *
      * @param bool $hasWorker
      *
-     * @throws OptimisticLockException
+     * @throws ORMException
      */
     public function testGet($hasWorker)
     {
@@ -148,7 +147,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
      * @param bool $expectedIsActive
      * @param bool $expectedIsMaintenanceReadOnly
      *
-     * @throws OptimisticLockException
+     * @throws ORMException
      */
     public function testIsState($stateName, $expectedIsActive, $expectedIsMaintenanceReadOnly)
     {
@@ -218,7 +217,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
      *
      * @param string $stateName
      *
-     * @throws OptimisticLockException
+     * @throws ORMException
      */
     public function testSetActive($stateName)
     {
@@ -235,7 +234,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
      *
      * @param string $stateName
      *
-     * @throws OptimisticLockException
+     * @throws ORMException
      */
     public function testSetReadOnly($stateName)
     {
@@ -273,7 +272,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
      * @param string $stateName
      * @param string $expectedWorkerState
      *
-     * @throws OptimisticLockException
+     * @throws ORMException
      */
     public function testVerify($stateName, $expectedWorkerState)
     {
@@ -312,7 +311,8 @@ class WorkerServiceTest extends AbstractBaseTestCase
     /**
      * @param ThisWorker $worker
      * @param string $stateName
-     * @throws OptimisticLockException
+     *
+     * @throws ORMException
      */
     private function setWorkerState(ThisWorker $worker, $stateName)
     {
@@ -325,7 +325,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
     }
 
     /**
-     * @throws OptimisticLockException
+     * @throws ORMException
      */
     private function removeWorker()
     {
@@ -341,6 +341,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
     {
         parent::assertPostConditions();
 
-        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
+        $this->assertEquals(0, $this->httpMockHandler->count());
     }
 }

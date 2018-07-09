@@ -10,7 +10,7 @@ use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
+class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
 {
     /**
      * @var HtmlValidationTaskDriver
@@ -50,7 +50,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testPerformBadDocumentType($content, $expectedOutputMessage)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], $content),
         ]);
@@ -137,7 +137,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
         $expectedErrorCount,
         $expectedDecodedOutput
     ) {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], $content),
         ]);
@@ -283,7 +283,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ]);
@@ -313,7 +313,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ]);
@@ -357,7 +357,7 @@ class HtmlValidationTaskDriverTest extends WebResourceTaskDriverTest
             file_put_contents($tmpFilePath, $content);
         }
 
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], $content),
         ]);

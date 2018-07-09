@@ -5,8 +5,7 @@ namespace Tests\WorkerBundle\Functional\Command\Task;
 use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
 use SimplyTestable\WorkerBundle\Resque\Job\TaskReportCompletionJob;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
-use Tests\WorkerBundle\Services\TestHttpClientService;
+use Tests\WorkerBundle\Services\HttpMockHandler;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
@@ -28,9 +27,9 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
     private $testTaskFactory;
 
     /**
-     * @var TestHttpClientService
+     * @var HttpMockHandler
      */
-    private $httpClientService;
+    private $httpMockHandler;
 
     /**
      * {@inheritdoc}
@@ -41,12 +40,12 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
 
         $this->command = self::$container->get(ReportCompletionEnqueueCommand::class);
         $this->testTaskFactory = new TestTaskFactory(self::$container);
-        $this->httpClientService = self::$container->get(HttpClientService::class);
+        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
 
     public function testRunWithEmptyQueue()
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ]);
@@ -78,7 +77,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
      */
     public function testRunWithNonEmptyQueue()
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ]);
@@ -109,7 +108,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
     {
         parent::assertPostConditions();
 
-        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
+        $this->assertEquals(0, $this->httpMockHandler->count());
     }
 
     /**

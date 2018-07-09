@@ -5,11 +5,15 @@ services:
     autoconfigure: true
     public: true
 
+  Tests\WorkerBundle\Services\HttpMockHandler:
+    public: true
+
   SimplyTestable\WorkerBundle\Services\HttpClientService:
     class:   Tests\WorkerBundle\Services\TestHttpClientService
     arguments:
       - '%curl_options%'
       - '@SimplyTestable\WorkerBundle\Services\HttpCache'
+      - '@Tests\WorkerBundle\Services\HttpMockHandler'
 
   SimplyTestable\WorkerBundle\Services\TaskService:
     class:   Tests\WorkerBundle\Services\TestTaskService

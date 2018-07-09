@@ -11,7 +11,7 @@ use Tests\WorkerBundle\Factory\JsLintFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use webignition\NodeJslintOutput\Exception as NodeJslintOutputException;
 
-class JsLintTaskDriverTest extends WebResourceTaskDriverTest
+class JsLintTaskDriverTest extends AbstractWebPageTaskDriverTest
 {
     /**
      * @var JsLintTaskDriver
@@ -45,7 +45,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
 
     public function testIncorrectPathToNodeJsLint()
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], HtmlDocumentFactory::load('empty-body-single-js-link')),
             new Response(200, ['content-type' => 'application/javascript']),
@@ -91,7 +91,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
         $expectedWarningCount,
         array $expectedDecodedOutput
     ) {
-        $this->httpClientService->appendFixtures($httpFixtures);
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
@@ -569,7 +569,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], HtmlDocumentFactory::load('empty-body-single-js-link')),
             new Response(200, ['content-type' => 'application/javascript']),
@@ -603,7 +603,7 @@ class JsLintTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], HtmlDocumentFactory::load('empty-body-single-js-link')),
             new Response(200, ['content-type' => 'application/javascript']),
