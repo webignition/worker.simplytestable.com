@@ -8,19 +8,6 @@ use SimplyTestable\WorkerBundle\Services\TaskService;
 class TestTaskService extends TaskService
 {
     /**
-     * @var \Exception
-     */
-    private $performException;
-
-    /**
-     * @param \Exception $performException
-     */
-    public function setPerformException(\Exception $performException)
-    {
-        $this->performException = $performException;
-    }
-
-    /**
      * {@inheritdoc}
      *
      * @throws \Exception

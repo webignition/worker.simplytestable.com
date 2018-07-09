@@ -5,9 +5,10 @@ namespace Tests\WorkerBundle\Functional\Command\Task;
 use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Command\Task\PerformCommand;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
-use SimplyTestable\WorkerBundle\Services\TaskService;
+use SimplyTestable\WorkerBundle\Services\TaskTypeService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
+use Tests\WorkerBundle\Factory\CssValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
@@ -64,10 +65,18 @@ class PerformCommandTest extends AbstractBaseTestCase
     public function testTaskServiceRaisesException()
     {
         $testTaskFactory = new TestTaskFactory(self::$container);
-        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $httpMockHandler = self::$container->get(HttpMockHandler::class);
 
-        $taskService = self::$container->get(TaskService::class);
-        $taskService->setPerformException(new \Exception());
+        $httpMockHandler->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
+        ]);
+
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TaskTypeService::CSS_VALIDATION_NAME,
+        ]));
+
+        CssValidatorFixtureFactory::set(CssValidatorFixtureFactory::load('invalid-validator-output'));
 
         $returnCode = $this->command->run(
             new ArrayInput([
