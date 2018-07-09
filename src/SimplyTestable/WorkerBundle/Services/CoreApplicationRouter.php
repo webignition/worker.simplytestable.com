@@ -4,13 +4,14 @@ namespace SimplyTestable\WorkerBundle\Services;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
 
-class CoreApplicationRouter
+class CoreApplicationRouter implements WarmableInterface
 {
     const BUNDLE_CONFIG_PATH = '@SimplyTestableWorkerBundle/Resources/config';
     const ROUTING_RESOURCE = 'coreapplicationrouting.yml';
@@ -71,5 +72,19 @@ class CoreApplicationRouter
         }
 
         return $url;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function warmUp($cacheDir)
+    {
+        $currentDir = $this->router->getOption('cache_dir');
+
+        $this->router->setOption('cache_dir', $cacheDir);
+        $this->router->getMatcher();
+        $this->router->getGenerator();
+
+        $this->router->setOption('cache_dir', $currentDir);
     }
 }

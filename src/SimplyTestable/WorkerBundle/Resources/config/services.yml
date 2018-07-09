@@ -52,3 +52,9 @@ services:
     calls:
       - [setWorkerProcessCount, ['%worker_process_count%']]
       - [setMaxTasksRequestFactor, ['%max_tasks_request_factor%']]
+
+  SimplyTestable\WorkerBundle\Cache\CoreApplicationRouterCacheWarmer:
+    arguments:
+      - '@SimplyTestable\WorkerBundle\Services\CoreApplicationRouter'
+    tags:
+      - { name: kernel.cache_warmer, priority: 0 }
