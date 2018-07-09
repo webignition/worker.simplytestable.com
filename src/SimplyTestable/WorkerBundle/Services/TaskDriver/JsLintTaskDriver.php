@@ -21,6 +21,7 @@ use webignition\Url\Url;
 use webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver;
 use webignition\NodeJslintOutput\Exception as NodeJslintOutputException;
 use webignition\NodeJslintOutput\Entry\Entry as NodeJslintOutputEntry;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class JsLintTaskDriver extends AbstractWebPageTaskDriver
 {
@@ -62,6 +63,7 @@ class JsLintTaskDriver extends AbstractWebPageTaskDriver
      * @param HttpClientService $httpClientService
      * @param HttpClientConfigurationService $httpClientConfigurationService
      * @param WebResourceRetriever $webResourceRetriever
+     * @param HttpHistoryContainer $httpHistoryContainer
      * @param LoggerInterface $logger
      * @param NodeJsLintWrapper $nodeJsLintWrapper
      * @param NodeJsLintWrapperConfigurationFactory $nodeJsLintWrapperConfigurationFactory
@@ -71,11 +73,18 @@ class JsLintTaskDriver extends AbstractWebPageTaskDriver
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
+        HttpHistoryContainer $httpHistoryContainer,
         LoggerInterface $logger,
         NodeJsLintWrapper $nodeJsLintWrapper,
         NodeJsLintWrapperConfigurationFactory $nodeJsLintWrapperConfigurationFactory
     ) {
-        parent::__construct($stateService, $httpClientService, $httpClientConfigurationService, $webResourceRetriever);
+        parent::__construct(
+            $stateService,
+            $httpClientService,
+            $httpClientConfigurationService,
+            $webResourceRetriever,
+            $httpHistoryContainer
+        );
 
         $this->nodeJsLintWrapper = $nodeJsLintWrapper;
         $this->logger = $logger;

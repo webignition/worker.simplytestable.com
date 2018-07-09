@@ -11,6 +11,7 @@ use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
 use webignition\WebResource\WebPage\WebPage;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
 {
@@ -26,6 +27,7 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
      * @param HttpClientService $httpClientService
      * @param HttpClientConfigurationService $httpClientConfigurationService
      * @param WebResourceRetriever $webResourceRetriever
+     * @param HttpHistoryContainer $httpHistoryContainer
      * @param LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory
      */
     public function __construct(
@@ -33,9 +35,16 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
+        HttpHistoryContainer $httpHistoryContainer,
         LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory
     ) {
-        parent::__construct($stateService, $httpClientService, $httpClientConfigurationService, $webResourceRetriever);
+        parent::__construct(
+            $stateService,
+            $httpClientService,
+            $httpClientConfigurationService,
+            $webResourceRetriever,
+            $httpHistoryContainer
+        );
 
         $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
     }

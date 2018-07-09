@@ -18,6 +18,7 @@ use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResource\WebPage\WebPage;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class CssValidationTaskDriver extends AbstractWebPageTaskDriver
 {
@@ -36,6 +37,7 @@ class CssValidationTaskDriver extends AbstractWebPageTaskDriver
      * @param HttpClientService $httpClientService
      * @param HttpClientConfigurationService $httpClientConfigurationService
      * @param WebResourceRetriever $webResourceRetriever
+     * @param HttpHistoryContainer $httpHistoryContainer
      * @param CssValidatorWrapper $cssValidatorWrapper
      * @param CssValidatorWrapperConfigurationFactory $configurationFactory
      */
@@ -44,10 +46,17 @@ class CssValidationTaskDriver extends AbstractWebPageTaskDriver
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
+        HttpHistoryContainer $httpHistoryContainer,
         CssValidatorWrapper $cssValidatorWrapper,
         CssValidatorWrapperConfigurationFactory $configurationFactory
     ) {
-        parent::__construct($stateService, $httpClientService, $httpClientConfigurationService, $webResourceRetriever);
+        parent::__construct(
+            $stateService,
+            $httpClientService,
+            $httpClientConfigurationService,
+            $webResourceRetriever,
+            $httpHistoryContainer
+        );
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
         $this->configurationFactory = $configurationFactory;

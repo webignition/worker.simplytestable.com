@@ -15,6 +15,7 @@ use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResourceInterfaces\WebResourceInterface;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 abstract class AbstractWebPageTaskDriver extends TaskDriver
 {
@@ -55,22 +56,30 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
     private $httpClientConfigurationService;
 
     /**
+     * @var HttpHistoryContainer
+     */
+    private $httpHistoryContainer;
+
+    /**
      * @param StateService $stateService
      * @param HttpClientService $httpClientService
      * @param HttpClientConfigurationService $httpClientConfigurationService
      * @param WebResourceRetriever $webResourceRetriever
+     * @param HttpHistoryContainer $httpHistoryContainer
      */
     public function __construct(
         StateService $stateService,
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
-        WebResourceRetriever $webResourceRetriever
+        WebResourceRetriever $webResourceRetriever,
+        HttpHistoryContainer $httpHistoryContainer
     ) {
         parent::__construct($stateService);
 
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->webResourceRetriever = $webResourceRetriever;
+        $this->httpHistoryContainer = $httpHistoryContainer;
     }
 
     /**
@@ -235,9 +244,7 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
      */
     private function isRedirectLoopException()
     {
-        $httpHistory = $this->httpClientService->getHistory();
-
-        $responses = $httpHistory->getResponses();
+        $responses = $this->httpHistoryContainer->getResponses();
         $responseHistoryContainsOnlyRedirects = true;
 
         foreach ($responses as $response) {
@@ -252,7 +259,7 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
             return false;
         }
 
-        $requestUrls = $httpHistory->getRequestUrlsAsStrings();
+        $requestUrls = $this->httpHistoryContainer->getRequestUrlsAsStrings();
         $requestUrls = array_slice($requestUrls, count($requestUrls) / 2);
 
         foreach ($requestUrls as $urlIndex => $url) {

@@ -123,14 +123,6 @@ class HttpClientService
     }
 
     /**
-     * @return HttpHistoryContainer
-     */
-    public function getHistory()
-    {
-        return $this->historyContainer;
-    }
-
-    /**
      * @param HttpAuthenticationCredentials $httpAuthenticationCredentials
      */
     public function setBasicHttpAuthorization(HttpAuthenticationCredentials $httpAuthenticationCredentials)
