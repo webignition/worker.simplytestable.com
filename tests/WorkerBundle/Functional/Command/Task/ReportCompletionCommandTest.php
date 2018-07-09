@@ -4,7 +4,6 @@ namespace Tests\WorkerBundle\Functional\Command\Task;
 
 use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
@@ -12,7 +11,7 @@ use Tests\WorkerBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
-use Tests\WorkerBundle\Services\TestHttpClientService;
+use Tests\WorkerBundle\Services\HttpMockHandler;
 
 /**
  * @group Command/Task/ReportCompletionCommand
@@ -25,9 +24,9 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
     private $command;
 
     /**
-     * @var TestHttpClientService
+     * @var HttpMockHandler
      */
-    private $httpClientService;
+    private $httpMockHandler;
 
     /**
      * {@inheritdoc}
@@ -37,7 +36,7 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->command = self::$container->get(ReportCompletionCommand::class);
-        $this->httpClientService = self::$container->get(HttpClientService::class);
+        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
 
     /**
@@ -49,7 +48,7 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
      */
     public function testRun($responseFixtures, $expectedCommandReturnCode)
     {
-        $this->httpClientService->appendFixtures(array_merge([
+        $this->httpMockHandler->appendFixtures(array_merge([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ], $responseFixtures));
@@ -127,7 +126,7 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
     {
         parent::assertPostConditions();
 
-        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
+        $this->assertEquals(0, $this->httpMockHandler->count());
     }
 
     /**

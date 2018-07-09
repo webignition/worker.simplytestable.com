@@ -34,22 +34,4 @@ class TestHttpClientService extends HttpClientService
 
         return $this->mockHandler;
     }
-
-    /**
-     * @param array $fixtures
-     */
-    public function appendFixtures(array $fixtures)
-    {
-        foreach ($fixtures as $fixture) {
-            $this->mockHandler->append($fixture);
-        }
-    }
-
-    /**
-     * @return MockHandler
-     */
-    public function getMockHandler()
-    {
-        return $this->mockHandler;
-    }
 }

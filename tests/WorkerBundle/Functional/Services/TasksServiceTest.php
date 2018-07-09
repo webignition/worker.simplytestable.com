@@ -9,6 +9,7 @@ use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
+use Tests\WorkerBundle\Services\HttpMockHandler;
 use Tests\WorkerBundle\Services\TestHttpClientService;
 use Tests\WorkerBundle\Utility\File;
 
@@ -25,6 +26,11 @@ class TasksServiceTest extends AbstractBaseTestCase
     private $httpClientService;
 
     /**
+     * @var HttpMockHandler
+     */
+    private $httpMockHandler;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -33,6 +39,7 @@ class TasksServiceTest extends AbstractBaseTestCase
 
         $this->tasksService = self::$container->get(TasksService::class);
         $this->httpClientService = self::$container->get(HttpClientService::class);
+        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
 
     public function testGetMaxTasksRequestFactor()
@@ -62,7 +69,7 @@ class TasksServiceTest extends AbstractBaseTestCase
      */
     public function testRequestHttpRequestFailure(array $httpFixtures, $expectedLogErrorMessage, $expectedException)
     {
-        $this->httpClientService->appendFixtures($httpFixtures);
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         try {
             $this->tasksService->request();
@@ -142,7 +149,7 @@ class TasksServiceTest extends AbstractBaseTestCase
      */
     public function testRequestSuccess($requestedLimit, $expectedLimit)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200),
         ]);
 
@@ -188,6 +195,6 @@ class TasksServiceTest extends AbstractBaseTestCase
     {
         parent::assertPostConditions();
 
-        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
+        $this->assertEquals(0, $this->httpMockHandler->count());
     }
 }

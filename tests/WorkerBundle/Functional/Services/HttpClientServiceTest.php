@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
+use Tests\WorkerBundle\Services\HttpMockHandler;
 use Tests\WorkerBundle\Services\TestHttpClientService;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
@@ -31,6 +32,11 @@ class HttpClientServiceTest extends AbstractBaseTestCase
     private $httpHistory;
 
     /**
+     * @var HttpMockHandler
+     */
+    private $httpMockHandler;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -40,6 +46,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         $this->httpClientService = self::$container->get(HttpClientService::class);
         $this->httpClient = $this->httpClientService->getHttpClient();
         $this->httpHistory = $this->httpClientService->getHistory();
+        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
 
     /**
@@ -52,7 +59,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
      */
     public function testSetHeader($name, $value)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(),
             new Response(),
             new Response(),
@@ -99,7 +106,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
      */
     public function testClearHeader()
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(),
             new Response(),
         ]);
@@ -133,7 +140,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         HttpAuthenticationCredentials $httpAuthenticationCredentials,
         $expectedAuthorizationHeader
     ) {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(),
             new Response(),
             new Response(),

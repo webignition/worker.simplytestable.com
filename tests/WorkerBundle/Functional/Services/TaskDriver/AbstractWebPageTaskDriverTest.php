@@ -10,10 +10,11 @@ use SimplyTestable\WorkerBundle\Services\TaskDriver\TaskDriver;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
+use Tests\WorkerBundle\Services\HttpMockHandler;
 use Tests\WorkerBundle\Services\TestHttpClientService;
 use webignition\WebResource\Exception\TransportException;
 
-abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
+abstract class AbstractWebPageTaskDriverTest extends AbstractBaseTestCase
 {
     /**
      * @var TestTaskFactory
@@ -26,6 +27,11 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
     protected $httpClientService;
 
     /**
+     * @var HttpMockHandler
+     */
+    protected $httpMockHandler;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -34,6 +40,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
 
         $this->testTaskFactory = new TestTaskFactory(self::$container);
         $this->httpClientService = self::$container->get(HttpClientService::class);
+        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
 
     /**
@@ -69,7 +76,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
     {
         $connectException = new ConnectException('foo', new Request('GET', 'http://example.com'));
 
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             $connectException,
             $connectException,
             $connectException,
@@ -111,7 +118,7 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
         $expectedErrorCount,
         $expectedTaskOutput
     ) {
-        $this->httpClientService->appendFixtures($httpResponseFixtures);
+        $this->httpMockHandler->appendFixtures($httpResponseFixtures);
 
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
@@ -452,6 +459,6 @@ abstract class WebResourceTaskDriverTest extends AbstractBaseTestCase
     {
         parent::assertPostConditions();
 
-        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
+        $this->assertEquals(0, $this->httpMockHandler->count());
     }
 }

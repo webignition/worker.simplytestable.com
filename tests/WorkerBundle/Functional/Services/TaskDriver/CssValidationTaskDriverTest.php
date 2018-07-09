@@ -11,7 +11,7 @@ use Tests\WorkerBundle\Factory\HtmlDocumentFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
 
-class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
+class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
 {
     /**
      * @var CssValidationTaskDriver
@@ -65,7 +65,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
         $expectedWarningCount,
         $expectedDecodedOutput
     ) {
-        $this->httpClientService->appendFixtures($httpFixtures);
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
@@ -321,7 +321,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(
                 200,
@@ -357,7 +357,7 @@ class CssValidationTaskDriverTest extends WebResourceTaskDriverTest
      */
     public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
     {
-        $this->httpClientService->appendFixtures([
+        $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(
                 200,

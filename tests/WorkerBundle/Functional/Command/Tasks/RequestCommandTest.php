@@ -4,14 +4,13 @@ namespace Tests\WorkerBundle\Functional\Command\Tasks;
 
 use GuzzleHttp\Psr7\Response;
 use SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand;
-use SimplyTestable\WorkerBundle\Services\HttpClientService;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\WorkerBundle\Factory\ConnectExceptionFactory;
 use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
-use Tests\WorkerBundle\Services\TestHttpClientService;
+use Tests\WorkerBundle\Services\HttpMockHandler;
 
 /**
  * @group Command/Tasks/RequestCommand
@@ -24,9 +23,9 @@ class RequestCommandTest extends AbstractBaseTestCase
     private $command;
 
     /**
-     * @var TestHttpClientService
+     * @var HttpMockHandler
      */
-    private $httpClientService;
+    private $httpMockHandler;
 
     /**
      * {@inheritdoc}
@@ -36,7 +35,7 @@ class RequestCommandTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->command = self::$container->get(RequestCommand::class);
-        $this->httpClientService = self::$container->get(HttpClientService::class);
+        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
 
     /**
@@ -44,6 +43,7 @@ class RequestCommandTest extends AbstractBaseTestCase
      *
      * @param bool $tasksServiceRequestReturnValue
      * @param int $expectedCommandReturnCode
+     * @param bool $expectedQueueIsEmpty
      *
      * @throws \Exception
      */
@@ -97,7 +97,7 @@ class RequestCommandTest extends AbstractBaseTestCase
      */
     public function testExecuteRequestFailure($responseFixtures, $expectedCommandReturnCode)
     {
-        $this->httpClientService->appendFixtures($responseFixtures);
+        $this->httpMockHandler->appendFixtures($responseFixtures);
         $this->clearRedis();
 
         $returnCode = $this->command->run(new ArrayInput([]), new NullOutput());
@@ -142,6 +142,6 @@ class RequestCommandTest extends AbstractBaseTestCase
     {
         parent::assertPostConditions();
 
-        $this->assertEquals(0, $this->httpClientService->getMockHandler()->count());
+        $this->assertEquals(0, $this->httpMockHandler->count());
     }
 }
