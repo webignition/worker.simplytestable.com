@@ -72,6 +72,8 @@ class HttpClientService
      * @param HandlerStack $handlerStack
      * @param HttpHistoryContainer $historyContainer
      * @param HttpRetryMiddleware $httpRetryMiddleware
+     * @param HttpAuthenticationMiddleware $httpAuthenticationMiddleware
+     * @param RequestHeadersMiddleware $requestHeadersMiddleware
      * @param CacheMiddleware|null $cacheMiddleware
      */
     public function __construct(
@@ -79,6 +81,8 @@ class HttpClientService
         HandlerStack $handlerStack,
         HttpHistoryContainer $historyContainer,
         HttpRetryMiddleware $httpRetryMiddleware,
+        HttpAuthenticationMiddleware $httpAuthenticationMiddleware,
+        RequestHeadersMiddleware $requestHeadersMiddleware,
         CacheMiddleware $cacheMiddleware = null
     ) {
         $this->setCurlOptions($curlOptions);
@@ -86,9 +90,9 @@ class HttpClientService
         $this->historyContainer = $historyContainer;
         $this->httpRetryMiddleware = $httpRetryMiddleware;
         $this->cacheMiddleware = $cacheMiddleware;
-        $this->httpAuthenticationMiddleware = new HttpAuthenticationMiddleware();
+        $this->httpAuthenticationMiddleware = $httpAuthenticationMiddleware;
         $this->cookieJar = new CookieJar();
-        $this->requestHeadersMiddleware = new RequestHeadersMiddleware();
+        $this->requestHeadersMiddleware = $requestHeadersMiddleware;
         $this->handlerStack = $handlerStack;
 
         $this->httpClient = $this->create();

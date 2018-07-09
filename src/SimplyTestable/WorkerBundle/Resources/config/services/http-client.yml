@@ -1,4 +1,8 @@
 services:
+  webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
+
+  webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware:
+
   GuzzleHttp\HandlerStack:
     factory: 'SimplyTestable\WorkerBundle\Services\HttpHandlerStackFactory:create'
 
@@ -13,6 +17,8 @@ services:
       - '@GuzzleHttp\HandlerStack'
       - '@webignition\HttpHistoryContainer\Container'
       - '@SimplyTestable\WorkerBundle\Services\HttpRetryMiddleware'
+      - '@webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware'
+      - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'
       - '@Kevinrob\GuzzleCache\CacheMiddleware'
 
   GuzzleHttp\Client:
