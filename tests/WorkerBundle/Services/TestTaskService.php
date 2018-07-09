@@ -8,22 +8,9 @@ use SimplyTestable\WorkerBundle\Services\TaskService;
 class TestTaskService extends TaskService
 {
     /**
-     * @var mixed
-     */
-    private $performResult;
-
-    /**
      * @var \Exception
      */
     private $performException;
-
-    /**
-     * @param mixed $performResult
-     */
-    public function setPerformResult($performResult)
-    {
-        $this->performResult = $performResult;
-    }
 
     /**
      * @param \Exception $performException
@@ -40,17 +27,10 @@ class TestTaskService extends TaskService
      */
     public function perform(Task $task)
     {
-        if (!is_null($this->performResult)) {
-            $performResult = $this->performResult;
-            $this->performResult = null;
-
-            return $performResult;
-        }
-
         if (!empty($this->performException)) {
             throw $this->performException;
         }
 
-        return parent::perform($task);
+        parent::perform($task);
     }
 }

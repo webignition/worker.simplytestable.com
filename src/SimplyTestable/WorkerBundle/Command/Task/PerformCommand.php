@@ -18,7 +18,6 @@ class PerformCommand extends Command
 {
     const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;
-    const RETURN_CODE_UNKNOWN_ERROR = -5;
     const RETURN_CODE_TASK_SERVICE_RAISED_EXCEPTION = -6;
 
     /**
@@ -107,7 +106,7 @@ class PerformCommand extends Command
         }
 
         try {
-            $performResult = $this->taskService->perform($task);
+            $this->taskService->perform($task);
         } catch (\Exception $e) {
             $this->logger->error('TaskPerformCommand: Exception: taskId: [' . $task->getId() . ']');
             $this->logger->error('TaskPerformCommand: Exception: exception class: [' . get_class($e) . ']');
@@ -121,22 +120,16 @@ class PerformCommand extends Command
             $this->resqueQueueService->enqueue(new TasksRequestJob());
         }
 
-        if ($performResult === 0) {
-            $this->resqueQueueService->enqueue(new TaskReportCompletionJob(['id' => $task->getId()]));
+        $this->resqueQueueService->enqueue(new TaskReportCompletionJob(['id' => $task->getId()]));
 
-            $output->writeln('Performed ['.$task->getId().']');
-            $this->logger->info(sprintf(
-                'TaskPerformCommand::Performed [%d] [%s] [%s]',
-                $task->getId(),
-                $task->getState(),
-                ($task->hasOutput() ? 'has output' : 'no output')
-            ));
+        $output->writeln('Performed ['.$task->getId().']');
+        $this->logger->info(sprintf(
+            'TaskPerformCommand::Performed [%d] [%s] [%s]',
+            $task->getId(),
+            $task->getState(),
+            ($task->hasOutput() ? 'has output' : 'no output')
+        ));
 
-            return 0;
-        }
-
-        $output->writeln('Task perform failed, unknown error');
-
-        return self::RETURN_CODE_UNKNOWN_ERROR;
+        return 0;
     }
 }

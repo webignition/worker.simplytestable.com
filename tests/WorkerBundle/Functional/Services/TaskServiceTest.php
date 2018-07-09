@@ -311,7 +311,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
-        $this->assertEquals(0, $this->taskService->perform($task));
+        $this->taskService->perform($task);
         $this->assertInternalType('int', $task->getId());
         $this->assertInternalType('int', $task->getOutput()->getId());
         $this->assertInternalType('int', $task->getTimePeriod()->getId());
