@@ -1,7 +1,7 @@
 imports:
     - { resource: config_dev.yml }
+    - { resource: services_test.yml }
     - { resource: "@SimplyTestableWorkerBundle/Resources/config/parameters_test.yml" }
-    - { resource: "@SimplyTestableWorkerBundle/Resources/config/services_test.yml" }
 
 framework:
     test: ~

@@ -2,7 +2,6 @@
 
 namespace SimplyTestable\WorkerBundle\Services;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use GuzzleHttp\Exception\BadResponseException;
@@ -55,20 +54,19 @@ class WorkerService
      */
     private $coreApplicationHttpClient;
 
-
     /**
-     * @param EntityManager $entityManager
-     * @param LoggerInterface $logger
      * @param string $salt
      * @param string $hostname
+     * @param EntityManagerInterface $entityManager
+     * @param LoggerInterface $logger
      * @param StateService $stateService
      * @param CoreApplicationHttpClient $coreApplicationHttpClient
      */
     public function __construct(
-        EntityManager $entityManager,
-        LoggerInterface $logger,
         $salt,
         $hostname,
+        EntityManagerInterface $entityManager,
+        LoggerInterface $logger,
         StateService $stateService,
         CoreApplicationHttpClient $coreApplicationHttpClient
     ) {
