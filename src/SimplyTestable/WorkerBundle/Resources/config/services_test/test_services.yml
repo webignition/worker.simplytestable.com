@@ -8,12 +8,8 @@ services:
   Tests\WorkerBundle\Services\HttpMockHandler:
     public: true
 
-  SimplyTestable\WorkerBundle\Services\HttpClientService:
-    class:   Tests\WorkerBundle\Services\TestHttpClientService
+  SimplyTestable\WorkerBundle\Services\HttpHandlerStackFactory:
     arguments:
-      - '%curl_options%'
-      - '@SimplyTestable\WorkerBundle\Services\HttpCache'
-      - '@webignition\HttpHistoryContainer\Container'
       - '@Tests\WorkerBundle\Services\HttpMockHandler'
 
   SimplyTestable\WorkerBundle\Services\TaskService:
