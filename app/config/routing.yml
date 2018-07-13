@@ -20,7 +20,7 @@ task_cancel_collection:
 
 disable_readonly:
     path: /maintenance/disable-read-only/
-    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\MaintenanceController::disableReadOnlyActio, _format: json n }
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\MaintenanceController::disableReadOnlyAction, _format: json n }
 
 enable_readonly:
     path: /maintenance/enable-read-only/
