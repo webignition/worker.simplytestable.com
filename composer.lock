@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cd22d034465c5b02af1c1400fe8831fc",
+    "content-hash": "35b004e51580e02cf87747813b95e3eb",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -7258,9 +7258,9 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "symfony/lts": 20,
         "chrisboulton/php-resque": 20,
-        "chrisboulton/php-resque-scheduler": 20
+        "chrisboulton/php-resque-scheduler": 20,
+        "symfony/lts": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
