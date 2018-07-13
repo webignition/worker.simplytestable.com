@@ -15,7 +15,6 @@ before_install:
   - cp .travis.composer.config.json ~/.composer/config.json
   - mv app/config/parameters.yml.travis app/config/parameters.yml
   - mv --force app/config/config_travis.yml app/config/config_test.yml
-  - cp src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml.dist src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mysql -e 'CREATE DATABASE myapp_test;'
   - chmod +x ./bin/console
