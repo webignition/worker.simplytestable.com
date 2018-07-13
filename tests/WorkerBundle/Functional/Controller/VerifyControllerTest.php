@@ -7,14 +7,11 @@ use SimplyTestable\WorkerBundle\Entity\State;
 use SimplyTestable\WorkerBundle\Entity\ThisWorker;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
-use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @group Controller/VerifyController
  */
-class VerifyControllerTest extends AbstractBaseTestCase
+class VerifyControllerTest extends AbstractControllerTest
 {
     /**
      * @var VerifyController
@@ -34,11 +31,11 @@ class VerifyControllerTest extends AbstractBaseTestCase
     /**
      * @dataProvider indexActionDataProvider
      *
-     * @param ParameterBag $postData
+     * @param array $postData
      * @param string $workerHostname
      * @param string $workerToken
      */
-    public function testIndexAction(ParameterBag $postData, $workerHostname, $workerToken)
+    public function testIndexAction(array $postData, $workerHostname, $workerToken)
     {
         $workerActiveState = new State();
         $workerActiveState->setName(WorkerService::WORKER_ACTIVE_STATE);
@@ -51,14 +48,10 @@ class VerifyControllerTest extends AbstractBaseTestCase
         $workerService = self::$container->get(WorkerService::class);
         $workerService->setGetResult($worker);
 
-        $request = new Request();
-        $request->request = $postData;
-        self::$container->get('request_stack')->push($request);
+        $this->client->request('POST', $this->router->generate('SimplyTestableWorkerBundle_verify'), $postData);
 
-        $response = $this->verifyController->indexAction(
-            $workerService,
-            self::$container->get(VerifyRequestFactory::class)
-        );
+        $response = $this->client->getResponse();
+
         $this->assertEquals(200, $response->getStatusCode());
     }
 
@@ -69,10 +62,10 @@ class VerifyControllerTest extends AbstractBaseTestCase
     {
         return [
             'valid' => [
-                'postData' => new ParameterBag([
+                'postData' => [
                     VerifyRequestFactory::PARAMETER_HOSTNAME => 'foo',
                     VerifyRequestFactory::PARAMETER_TOKEN => 'bar',
-                ]),
+                ],
                 'workerHostname' => 'foo',
                 'workerToken' => 'bar',
             ],

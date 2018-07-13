@@ -2,21 +2,13 @@
 
 namespace Tests\WorkerBundle\Functional\Controller;
 
-use SimplyTestable\WorkerBundle\Controller\StatusController;
-use SimplyTestable\WorkerBundle\Services\HttpCache;
-use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
-
-class StatusControllerTest extends AbstractBaseTestCase
+class StatusControllerTest extends AbstractControllerTest
 {
     public function testIndexAction()
     {
-        $statusController = new StatusController();
+        $this->client->request('GET', $this->router->generate('SimplyTestableWorkerBundle_status'));
+        $response = $this->client->getResponse();
 
-        $response = $statusController->indexAction(
-            self::$container->get(WorkerService::class),
-            self::$container->get(HttpCache::class)
-        );
         $this->assertEquals(200, $response->getStatusCode());
     }
 }

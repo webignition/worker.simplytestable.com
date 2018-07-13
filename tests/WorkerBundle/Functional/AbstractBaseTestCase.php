@@ -11,7 +11,7 @@ abstract class AbstractBaseTestCase extends WebTestCase
     /**
      * @var Client
      */
-    private $client;
+    protected $client;
 
     /**
      * {@inheritdoc}
