@@ -48,7 +48,7 @@ class VerifyControllerTest extends AbstractControllerTest
         $workerService = self::$container->get(WorkerService::class);
         $workerService->setGetResult($worker);
 
-        $this->client->request('POST', $this->router->generate('SimplyTestableWorkerBundle_verify'), $postData);
+        $this->client->request('POST', $this->router->generate('verify'), $postData);
 
         $response = $this->client->getResponse();
 

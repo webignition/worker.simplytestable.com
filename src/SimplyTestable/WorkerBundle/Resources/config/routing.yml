@@ -1,45 +1,38 @@
-SimplyTestableWorkerBundle_verify:
+status:
+    path:  /
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\StatusController::indexAction }
+
+verify:
     path:  /verify/
     defaults: { _controller: SimplyTestable\WorkerBundle\Controller\VerifyController::indexAction }
 
-SimplyTestableWorkerBundle_task_create_collection:
+task_create_collection:
     path:  /task/create/collection/
     defaults: { _controller: SimplyTestable\WorkerBundle\Controller\TaskController::createCollectionAction }
 
-SimplyTestableWorkerBundle_task_cancel:
+task_cancel:
     path:  /task/cancel/
     defaults: { _controller: SimplyTestable\WorkerBundle\Controller\TaskController::cancelAction }
 
-SimplyTestableWorkerBundle_task_cancel_collection:
+task_cancel_collection:
     path:  /task/cancel/collection/
     defaults: { _controller: SimplyTestable\WorkerBundle\Controller\TaskController::cancelCollectionAction }
 
-SimplyTestableWorkerBundle_status:
-    path:  /status/
-    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\StatusController::indexAction }
-
-SimplyTestableWorkerBundle_default:
-    path:  /
-    defaults:
-        _controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
-        route: SimplyTestableWorkerBundle_status
-        permanent: true
-
-SimplyTestableWorkerBundle_disable_readonly:
+disable_readonly:
     path: /maintenance/disable-read-only/
     defaults: { _controller: SimplyTestable\WorkerBundle\Controller\MaintenanceController::disableReadOnlyAction }
 
-SimplyTestableWorkerBundle_enable_readonly:
+enable_readonly:
     path: /maintenance/enable-read-only/
     defaults: { _controller: SimplyTestable\WorkerBundle\Controller\MaintenanceController::enableReadOnlyAction }
 
-SimplyTestableWorkerBundle_task_perform_enqueue:
-    path: /maintenance/task-perform-enqueue/
-    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\MaintenanceController::taskPerformEnqueueAction }
-
-SimplyTestableWorkerBundle_leave_readonly:
+leave_readonly:
     path: /maintenance/leave-read-only/
     defaults: { _controller: SimplyTestable\WorkerBundle\Controller\MaintenanceController::leaveReadOnlyAction }
+
+task_perform_enqueue:
+    path: /maintenance/task-perform-enqueue/
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\MaintenanceController::taskPerformEnqueueAction }
 
 tasks_notify:
     path: /tasks/notify/

@@ -22,7 +22,7 @@ class TaskControllerTest extends AbstractControllerTest
     {
         $this->client->request(
             'POST',
-            $this->router->generate('SimplyTestableWorkerBundle_task_create_collection'),
+            $this->router->generate('task_create_collection'),
             $postData
         );
 
@@ -106,7 +106,7 @@ class TaskControllerTest extends AbstractControllerTest
 
         $this->client->request(
             'POST',
-            $this->router->generate('SimplyTestableWorkerBundle_task_cancel'),
+            $this->router->generate('task_cancel'),
             [
                 CancelRequestFactory::PARAMETER_ID => $task->getId(),
             ]
@@ -138,7 +138,7 @@ class TaskControllerTest extends AbstractControllerTest
 
         $this->client->request(
             'POST',
-            $this->router->generate('SimplyTestableWorkerBundle_task_cancel_collection'),
+            $this->router->generate('task_cancel_collection'),
             [
                 CancelRequestCollectionFactory::PARAMETER_IDS => $taskIds,
             ]
