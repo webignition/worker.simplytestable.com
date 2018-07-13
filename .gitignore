@@ -29,3 +29,10 @@ app/config/security_credentials.yml
 .phpunit
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+###> symfony/framework-bundle ###
+/.env
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
