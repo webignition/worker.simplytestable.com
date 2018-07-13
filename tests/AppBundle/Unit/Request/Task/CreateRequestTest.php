@@ -2,8 +2,8 @@
 
 namespace Tests\AppBundle\Unit\Request\Task;
 
-use SimplyTestable\AppBundle\Entity\Task\Type\Type as TaskType;
-use SimplyTestable\AppBundle\Request\Task\CreateRequest;
+use AppBundle\Entity\Task\Type\Type as TaskType;
+use AppBundle\Request\Task\CreateRequest;
 
 class CreateRequestTest extends \PHPUnit\Framework\TestCase
 {

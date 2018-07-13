@@ -3,10 +3,10 @@
 namespace Tests\AppBundle\Unit\Request\Task;
 
 use Mockery\MockInterface;
-use SimplyTestable\AppBundle\Entity\Task\Task;
-use SimplyTestable\AppBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
-use SimplyTestable\AppBundle\Services\Request\Factory\Task\CancelRequestFactory;
-use SimplyTestable\AppBundle\Services\TaskService;
+use AppBundle\Entity\Task\Task;
+use AppBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
+use AppBundle\Services\Request\Factory\Task\CancelRequestFactory;
+use AppBundle\Services\TaskService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

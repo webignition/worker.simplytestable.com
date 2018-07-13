@@ -3,10 +3,10 @@
 namespace Tests\AppBundle\Unit\Controller;
 
 use Mockery\MockInterface;
-use SimplyTestable\AppBundle\Controller\TasksController;
-use SimplyTestable\AppBundle\Resque\Job\TasksRequestJob;
-use SimplyTestable\AppBundle\Services\Resque\QueueService as ResqueQueueService;
-use SimplyTestable\AppBundle\Services\TasksService;
+use AppBundle\Controller\TasksController;
+use AppBundle\Resque\Job\TasksRequestJob;
+use AppBundle\Services\Resque\QueueService as ResqueQueueService;
+use AppBundle\Services\TasksService;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\AppBundle\Factory\MockFactory;
 

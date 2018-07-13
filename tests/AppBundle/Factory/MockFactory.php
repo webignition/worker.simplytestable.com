@@ -4,16 +4,16 @@ namespace Tests\AppBundle\Factory;
 
 use Mockery\Mock;
 use Psr\Log\LoggerInterface;
-use SimplyTestable\AppBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
-use SimplyTestable\AppBundle\Services\Request\Factory\Task\CancelRequestFactory;
-use SimplyTestable\AppBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
-use SimplyTestable\AppBundle\Services\Request\Factory\VerifyRequestFactory;
+use AppBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
+use AppBundle\Services\Request\Factory\Task\CancelRequestFactory;
+use AppBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
+use AppBundle\Services\Request\Factory\VerifyRequestFactory;
 use webignition\ResqueJobFactory\ResqueJobFactory;
-use SimplyTestable\AppBundle\Services\Resque\QueueService as ResqueQueueService;
-use SimplyTestable\AppBundle\Services\TaskFactory;
-use SimplyTestable\AppBundle\Services\TaskService;
-use SimplyTestable\AppBundle\Services\TasksService;
-use SimplyTestable\AppBundle\Services\WorkerService;
+use AppBundle\Services\Resque\QueueService as ResqueQueueService;
+use AppBundle\Services\TaskFactory;
+use AppBundle\Services\TaskService;
+use AppBundle\Services\TasksService;
+use AppBundle\Services\WorkerService;
 
 class MockFactory
 {

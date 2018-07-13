@@ -6,11 +6,11 @@ use Doctrine\ORM\OptimisticLockException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use SimplyTestable\AppBundle\Entity\Task\Task;
-use SimplyTestable\AppBundle\Entity\TimePeriod;
-use SimplyTestable\AppBundle\Services\StateService;
-use SimplyTestable\AppBundle\Services\TaskService;
-use SimplyTestable\AppBundle\Services\TaskTypeService;
+use AppBundle\Entity\Task\Task;
+use AppBundle\Entity\TimePeriod;
+use AppBundle\Services\StateService;
+use AppBundle\Services\TaskService;
+use AppBundle\Services\TaskTypeService;
 
 class TestTaskFactory
 {

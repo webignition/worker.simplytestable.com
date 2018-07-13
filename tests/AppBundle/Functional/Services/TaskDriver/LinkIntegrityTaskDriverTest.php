@@ -3,9 +3,9 @@
 namespace Tests\AppBundle\Functional\Services\TaskDriver;
 
 use GuzzleHttp\Psr7\Response;
-use SimplyTestable\AppBundle\Services\TaskDriver\LinkCheckerConfigurationFactory;
-use SimplyTestable\AppBundle\Services\TaskDriver\LinkIntegrityTaskDriver;
-use SimplyTestable\AppBundle\Services\TaskTypeService;
+use AppBundle\Services\TaskDriver\LinkCheckerConfigurationFactory;
+use AppBundle\Services\TaskDriver\LinkIntegrityTaskDriver;
+use AppBundle\Services\TaskTypeService;
 use Tests\AppBundle\Factory\ConnectExceptionFactory;
 use Tests\AppBundle\Factory\HtmlDocumentFactory;
 use Tests\AppBundle\Factory\TestTaskFactory;

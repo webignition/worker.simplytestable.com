@@ -5,7 +5,7 @@ namespace Tests\AppBundle\Functional\Services\TaskDriver;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use SimplyTestable\AppBundle\Services\TaskDriver\TaskDriver;
+use AppBundle\Services\TaskDriver\TaskDriver;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;
 use Tests\AppBundle\Factory\ConnectExceptionFactory;
 use Tests\AppBundle\Factory\TestTaskFactory;

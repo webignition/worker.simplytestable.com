@@ -2,9 +2,9 @@
 
 namespace Tests\AppBundle\Functional\Controller;
 
-use SimplyTestable\AppBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
-use SimplyTestable\AppBundle\Services\Request\Factory\Task\CancelRequestFactory;
-use SimplyTestable\AppBundle\Services\Request\Factory\Task\CreateRequestFactory;
+use AppBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
+use AppBundle\Services\Request\Factory\Task\CancelRequestFactory;
+use AppBundle\Services\Request\Factory\Task\CreateRequestFactory;
 use Tests\AppBundle\Factory\TestTaskFactory;
 
 /**

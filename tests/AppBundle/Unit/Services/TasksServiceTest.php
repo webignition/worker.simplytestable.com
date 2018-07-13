@@ -3,13 +3,13 @@
 namespace Tests\AppBundle\Unit\Services;
 
 use Psr\Log\LoggerInterface;
-use SimplyTestable\AppBundle\Services\CoreApplicationHttpClient;
-use SimplyTestable\AppBundle\Services\CoreApplicationRouter;
-use SimplyTestable\AppBundle\Services\HttpClientService;
-use SimplyTestable\AppBundle\Services\TaskService;
-use SimplyTestable\AppBundle\Services\TasksService;
-use SimplyTestable\AppBundle\Services\UrlService;
-use SimplyTestable\AppBundle\Services\WorkerService;
+use AppBundle\Services\CoreApplicationHttpClient;
+use AppBundle\Services\CoreApplicationRouter;
+use AppBundle\Services\HttpClientService;
+use AppBundle\Services\TaskService;
+use AppBundle\Services\TasksService;
+use AppBundle\Services\UrlService;
+use AppBundle\Services\WorkerService;
 
 class TasksServiceTest extends \PHPUnit\Framework\TestCase
 {

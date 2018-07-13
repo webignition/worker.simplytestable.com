@@ -3,7 +3,7 @@
 namespace Tests\AppBundle\Functional\Guzzle;
 
 use Memcached;
-use SimplyTestable\AppBundle\Services\MemcachedService;
+use AppBundle\Services\MemcachedService;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;
 
 class MemcachedServiceTest extends AbstractBaseTestCase

@@ -4,13 +4,13 @@ services:
     autoconfigure: true
     public: false
 
-  SimplyTestable\AppBundle\Services\WorkerService:
+  AppBundle\Services\WorkerService:
     class:   Tests\AppBundle\Services\TestWorkerService
     arguments:
       $salt: '%secret%'
       $hostname: '%hostname%'
 
-  SimplyTestable\AppBundle\Services\TasksService:
+  AppBundle\Services\TasksService:
     class:   Tests\AppBundle\Services\TestTasksService
     calls:
       - [setWorkerProcessCount, ['%worker_process_count%']]
@@ -18,7 +18,7 @@ services:
 
   Tests\AppBundle\Services\HttpMockHandler:
 
-  SimplyTestable\AppBundle\Services\HttpHandlerStackFactory:
+  AppBundle\Services\HttpHandlerStackFactory:
     arguments:
       - '@webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware'
       - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'

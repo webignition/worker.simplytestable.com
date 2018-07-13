@@ -2,8 +2,8 @@
 
 namespace Tests\AppBundle\Functional\Controller;
 
-use SimplyTestable\AppBundle\Resque\Job\TasksRequestJob;
-use SimplyTestable\AppBundle\Services\Resque\QueueService;
+use AppBundle\Resque\Job\TasksRequestJob;
+use AppBundle\Services\Resque\QueueService;
 
 /**
  * @group Controller/TasksController

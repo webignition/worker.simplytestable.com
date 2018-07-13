@@ -7,7 +7,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
-use SimplyTestable\AppBundle\Services\HttpClientService;
+use AppBundle\Services\HttpClientService;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;
 use Tests\AppBundle\Services\HttpMockHandler;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;

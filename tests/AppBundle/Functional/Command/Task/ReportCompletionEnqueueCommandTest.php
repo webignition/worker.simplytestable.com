@@ -3,11 +3,11 @@
 namespace Tests\AppBundle\Functional\Command\Task;
 
 use GuzzleHttp\Psr7\Response;
-use SimplyTestable\AppBundle\Command\Task\ReportCompletionEnqueueCommand;
-use SimplyTestable\AppBundle\Resque\Job\TaskReportCompletionJob;
+use AppBundle\Command\Task\ReportCompletionEnqueueCommand;
+use AppBundle\Resque\Job\TaskReportCompletionJob;
 use Tests\AppBundle\Services\HttpMockHandler;
-use SimplyTestable\AppBundle\Services\Resque\QueueService;
-use SimplyTestable\AppBundle\Services\TaskService;
+use AppBundle\Services\Resque\QueueService;
+use AppBundle\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;
 use Tests\AppBundle\Factory\HtmlValidatorFixtureFactory;

@@ -3,8 +3,8 @@
 namespace Tests\AppBundle\Unit\Command\Maintenance;
 
 use Mockery\Mock;
-use SimplyTestable\AppBundle\Command\Maintenance\EnableReadOnlyCommand;
-use SimplyTestable\AppBundle\Services\WorkerService;
+use AppBundle\Command\Maintenance\EnableReadOnlyCommand;
+use AppBundle\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\ArrayInput;
 
