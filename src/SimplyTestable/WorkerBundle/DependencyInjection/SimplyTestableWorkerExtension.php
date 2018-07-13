@@ -16,7 +16,6 @@ use Symfony\Component\Yaml\Yaml;
 class SimplyTestableWorkerExtension extends Extension
 {
     private $parameterFiles = [
-        'curl_options.yml',
         'link_integrity_user_agents.yml',
     ];
 
