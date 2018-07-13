@@ -19,10 +19,3 @@ parameters:
     database_name: test_worker_simplytestable_com
     database_user: root
     database_password: root
-
-#doctrine:
-#  dbal:
-#    connections:
-#      default:
-#        driver: pdo_sqlite
-#        path: /run/shm/worker.simplytestable.com.db
