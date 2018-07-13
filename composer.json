@@ -3,7 +3,7 @@
     "description": "Source for workers to which tasks for http://app.simplytestable.com are assigned",
     "autoload": {
         "psr-4": {
-            "SimplyTestable\\WorkerBundle\\": "src/SimplyTestable/WorkerBundle"
+            "SimplyTestable\\AppBundle\\": "src/SimplyTestable/AppBundle"
         },
         "classmap": [ "app/AppKernel.php", "app/AppCache.php" ]
     },
@@ -64,13 +64,13 @@
         "post-update-cmd": [
             "@symfony-scripts"
         ],
-        "test-unit": "./vendor/bin/phpunit --colors tests/WorkerBundle/Unit",
-        "test-functional": "./vendor/bin/phpunit --colors tests/WorkerBundle/Functional/",
+        "test-unit": "./vendor/bin/phpunit --colors tests/AppBundle/Unit",
+        "test-functional": "./vendor/bin/phpunit --colors tests/AppBundle/Functional/",
         "test": [
             "@composer test-unit",
             "@composer test-functional"
         ],
-        "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php src/SimplyTestable/WorkerBundle tests/",
+        "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php src/SimplyTestable/AppBundle tests/",
         "ci": [
             "@composer cs",
             "@composer test"
