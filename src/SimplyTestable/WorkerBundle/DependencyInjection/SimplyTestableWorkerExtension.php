@@ -17,7 +17,6 @@ class SimplyTestableWorkerExtension extends Extension
 {
     private $parameterFiles = [
         'curl_options.yml',
-        'content_type_web_resource_map.yml',
         'link_integrity_user_agents.yml',
     ];
 
