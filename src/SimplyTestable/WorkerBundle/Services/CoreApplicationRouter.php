@@ -13,7 +13,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class CoreApplicationRouter implements WarmableInterface
 {
-    const BUNDLE_CONFIG_PATH = '@SimplyTestableWorkerBundle/Resources/config';
     const ROUTING_RESOURCE = 'coreapplicationrouting.yml';
     const URL_PLACEHOLDER = '{{url}}';
 
@@ -29,15 +28,12 @@ class CoreApplicationRouter implements WarmableInterface
 
     /**
      * @param string $baseUrl
+     * @param string $kernelProjectDirectory
      * @param string $cacheDirectory
-     * @param ResourceLocator $resourceLocator
      */
-    public function __construct(
-        $baseUrl,
-        $cacheDirectory,
-        ResourceLocator $resourceLocator
-    ) {
-        $locator = new FileLocator($resourceLocator->locate(self::BUNDLE_CONFIG_PATH));
+    public function __construct($baseUrl, $kernelProjectDirectory, $cacheDirectory)
+    {
+        $locator = new FileLocator($kernelProjectDirectory . '/app/config/resources');
         $requestContext = new RequestContext();
         $requestContext->fromRequest(Request::createFromGlobals());
 
@@ -54,6 +50,11 @@ class CoreApplicationRouter implements WarmableInterface
     }
 
     /**
+     * @param string $name
+     * @param array $parameters
+     *
+     * @return string
+     *
      * @see UrlGeneratorInterface::generate()
      */
     public function generate($name, $parameters = array())

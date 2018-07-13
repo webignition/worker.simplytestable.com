@@ -1,7 +1,6 @@
 imports:
     - { resource: config_dev.yml }
     - { resource: services_test.yml }
-    - { resource: "@SimplyTestableWorkerBundle/Resources/config/parameters_test.yml" }
 
 framework:
     test: ~
@@ -19,3 +18,5 @@ parameters:
     database_name: myapp_test
     database_user: root
     database_password: null
+    hostname: hydrogen.worker.simplytestable.com
+    core_url: http://app.simplytestable.com

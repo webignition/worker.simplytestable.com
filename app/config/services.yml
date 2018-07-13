@@ -22,6 +22,7 @@ services:
   SimplyTestable\WorkerBundle\Services\CoreApplicationRouter:
     arguments:
       $baseUrl: '%core_url%'
+      $kernelProjectDirectory: '%kernel.project_dir%'
       $cacheDirectory: '%kernel.cache_dir%'
 
   SimplyTestable\WorkerBundle\Services\TaskService:
