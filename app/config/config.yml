@@ -8,6 +8,9 @@ parameters:
     CURLOPT_SSL_VERIFYPEER: false
     CURLOPT_SSL_VERIFYHOST: false
     CURLOPT_TIMEOUT_MS: 30000
+  link_integrity_user_agents:
+    - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
+    - Mozilla/5.0
 
 framework:
     #esi:             ~
