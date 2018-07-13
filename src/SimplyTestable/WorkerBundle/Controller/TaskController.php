@@ -14,7 +14,6 @@ use SimplyTestable\WorkerBundle\Services\TaskService;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
@@ -55,9 +54,7 @@ class TaskController extends AbstractController
      * @param TaskFactory $taskFactory
      * @param QueueService $resqueQueueService
      *
-     * @return JsonResponse|Response
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Exception
+     * @return JsonResponse
      */
     public function createCollectionAction(
         CreateRequestCollectionFactory $createRequestCollectionFactory,
@@ -91,8 +88,7 @@ class TaskController extends AbstractController
     /**
      * @param CancelRequestFactory $cancelRequestFactory
      *
-     * @return Response
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @return JsonResponse
      */
     public function cancelAction(CancelRequestFactory $cancelRequestFactory)
     {
@@ -110,14 +106,13 @@ class TaskController extends AbstractController
         $this->entityManager->remove($cancelRequest->getTask());
         $this->entityManager->flush();
 
-        return new Response();
+        return new JsonResponse();
     }
 
     /**
      * @param CancelRequestCollectionFactory $cancelRequestCollectionFactory
      *
-     * @return Response
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @return JsonResponse
      */
     public function cancelCollectionAction(CancelRequestCollectionFactory $cancelRequestCollectionFactory)
     {
@@ -138,6 +133,6 @@ class TaskController extends AbstractController
             $this->entityManager->flush();
         }
 
-        return new Response();
+        return new JsonResponse();
     }
 }
