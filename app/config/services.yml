@@ -23,6 +23,7 @@ services:
     arguments:
       $baseUrl: '%core_url%'
       $cacheDirectory: '%kernel.cache_dir%'
+      $routeDefinitionPath: '%kernel.root_dir%/config/resources/coreapplicationrouting.yml'
 
   SimplyTestable\WorkerBundle\Services\TaskService:
     public: true

@@ -30,14 +30,11 @@ class CoreApplicationRouter implements WarmableInterface
     /**
      * @param string $baseUrl
      * @param string $cacheDirectory
-     * @param ResourceLocator $resourceLocator
+     * @param string $routeDefinitionPath
      */
-    public function __construct(
-        $baseUrl,
-        $cacheDirectory,
-        ResourceLocator $resourceLocator
-    ) {
-        $locator = new FileLocator($resourceLocator->locate(self::BUNDLE_CONFIG_PATH));
+    public function __construct($baseUrl, $cacheDirectory, $routeDefinitionPath)
+    {
+        $locator = new FileLocator($routeDefinitionPath);
         $requestContext = new RequestContext();
         $requestContext->fromRequest(Request::createFromGlobals());
 
@@ -54,6 +51,11 @@ class CoreApplicationRouter implements WarmableInterface
     }
 
     /**
+     * @param string $name
+     * @param array $parameters
+     *
+     * @return string
+     *
      * @see UrlGeneratorInterface::generate()
      */
     public function generate($name, $parameters = array())
