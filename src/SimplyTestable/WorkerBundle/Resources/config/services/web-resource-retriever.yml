@@ -1,7 +1,0 @@
-services:
-  SimplyTestable\WorkerBundle\Services\WebResourceRetrieverFactory:
-    arguments:
-        - '@GuzzleHttp\Client'
-
-  webignition\WebResource\Retriever:
-    factory: 'SimplyTestable\WorkerBundle\Services\WebResourceRetrieverFactory:create'

@@ -1,30 +1,111 @@
 services:
-    # default configuration for services in *this* file
-    _defaults:
-        # automatically injects dependencies in your services
-        autowire: true
-        # automatically registers your services as commands, event subscribers, etc.
-        autoconfigure: true
-        # this means you cannot fetch services directly from the container via $container->get()
-        # if you need to do this, you can override this setting on individual services
-        public: false
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
 
-    # makes classes in src/AppBundle available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
-    SimplyTestable\WorkerBundle\:
-        resource: '../../src/SimplyTestable/WorkerBundle/*'
-        # you can exclude directories or files
-        # but if a service is unused, it's removed anyway
-        exclude: '../../src/SimplyTestable/WorkerBundle/{Entity,Exception,Model,Repository,Request}'
+  SimplyTestable\WorkerBundle\:
+    resource: '../../src/SimplyTestable/WorkerBundle/*'
+    # you can exclude directories or files
+    # but if a service is unused, it's removed anyway
+    exclude: '../../src/SimplyTestable/WorkerBundle/{Entity,Exception,Model,Repository,Request}'
 
-    # controllers are imported separately to make sure they're public
-    # and have a tag that allows actions to type-hint services
-    SimplyTestable\WorkerBundle\Controller\:
-        resource: '../../src/SimplyTestable/WorkerBundle/Controller'
-        public: true
-        tags: ['controller.service_arguments']
+  SimplyTestable\WorkerBundle\Controller\:
+    resource: '../../src/SimplyTestable/WorkerBundle/Controller'
+    public: true
+    tags: ['controller.service_arguments']
 
-    # add more services, or override services that need manual wiring
-    # AppBundle\Service\ExampleService:
-    #     arguments:
-    #         $someArgument: 'some_value'
+  SimplyTestable\WorkerBundle\Cache\CoreApplicationRouterCacheWarmer:
+    tags:
+      - { name: kernel.cache_warmer, priority: 0 }
+
+  SimplyTestable\WorkerBundle\Services\CoreApplicationRouter:
+    arguments:
+      $baseUrl: '%core_url%'
+      $cacheDirectory: '%kernel.cache_dir%'
+
+  SimplyTestable\WorkerBundle\Services\TaskService:
+    public: true
+    calls:
+      - [addTaskDriver, ['html validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver']]
+      - [addTaskDriver, ['css validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver']]
+      - [addTaskDriver, ['js static analysis', '@SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver']]
+      - [addTaskDriver, ['link integrity', '@SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver']]
+      - [addTaskDriver, ['url discovery', '@SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver']]
+
+  SimplyTestable\WorkerBundle\Services\TasksService:
+    public: true
+    calls:
+      - [setWorkerProcessCount, ['%worker_process_count%']]
+      - [setMaxTasksRequestFactor, ['%max_tasks_request_factor%']]
+
+  SimplyTestable\WorkerBundle\Services\WorkerService:
+    public: true
+    arguments:
+      $salt: '%secret%'
+      $hostname: '%hostname%'
+
+  GuzzleHttp\Cookie\CookieJarInterface:
+    class: GuzzleHttp\Cookie\CookieJar
+
+  GuzzleHttp\HandlerStack:
+    factory: 'SimplyTestable\WorkerBundle\Services\HttpHandlerStackFactory:create'
+
+  Kevinrob\GuzzleCache\CacheMiddleware:
+    factory: 'SimplyTestable\WorkerBundle\Services\HttpCacheMiddlewareFactory:create'
+
+  webignition\HttpHistoryContainer\Container:
+
+  SimplyTestable\WorkerBundle\Services\HttpClientService:
+    arguments:
+      $curlOptions: '%curl_options%'
+
+  GuzzleHttp\Client:
+    factory: 'SimplyTestable\WorkerBundle\Services\HttpClientService:getHttpClient'
+
+  SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver:
+    arguments:
+      $validatorPath: '%html-validator-path%'
+
+  SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidatorWrapperConfigurationFactory:
+    arguments:
+      - '%css-validator-jar-path%'
+
+  SimplyTestable\WorkerBundle\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory:
+    arguments:
+      - '%node-path%'
+      - '%node-jslint-path%'
+
+  SimplyTestable\WorkerBundle\Services\TaskDriver\LinkCheckerConfigurationFactory:
+    arguments:
+      - '%link_integrity_user_agents%'
+
+  SimplyTestable\WorkerBundle\Services\WebResourceRetrieverFactory:
+    arguments:
+        - '@GuzzleHttp\Client'
+
+  webignition\WebResource\Retriever:
+    factory: 'SimplyTestable\WorkerBundle\Services\WebResourceRetrieverFactory:create'
+
+  webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
+
+  webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware:
+
+  webignition\HtmlValidator\Wrapper\Wrapper:
+
+  webignition\CssValidatorWrapper\Wrapper:
+
+  webignition\NodeJslint\Wrapper\Wrapper:
+
+  SimplyTestable\WorkerBundle\Services\Resque\QueueService:
+    public: true
+
+  # For retrieval of commands from container in resque jobs
+  SimplyTestable\WorkerBundle\Command\Task\PerformCommand:
+    public: true
+
+  SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand:
+    public: true
+
+  SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand:
+    public: true

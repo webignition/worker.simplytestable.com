@@ -33,9 +33,6 @@ class SimplyTestableWorkerExtension extends Extension
             __DIR__.'/../Resources/config',
         ]);
 
-        $loader = new Loader\YamlFileLoader($container, $fileLocator);
-        $loader->load('services.yml');
-
         foreach ($this->parameterFiles as $parameterFile) {
             $parameterName = str_replace('.yml', '', $parameterFile);
             $container->setParameter(
