@@ -1,0 +1,99 @@
+<?php
+
+namespace Tests\AppBundle\Unit\Controller;
+
+use Mockery\MockInterface;
+use SimplyTestable\AppBundle\Controller\TasksController;
+use SimplyTestable\AppBundle\Resque\Job\TasksRequestJob;
+use SimplyTestable\AppBundle\Services\Resque\QueueService as ResqueQueueService;
+use SimplyTestable\AppBundle\Services\TasksService;
+use Symfony\Component\HttpFoundation\Response;
+use Tests\AppBundle\Factory\MockFactory;
+
+/**
+ * @group Controller/TasksController
+ */
+class TasksControllerTest extends \PHPUnit\Framework\TestCase
+{
+    /**
+     * @dataProvider notifyActionDataProvider
+     *
+     * @param ResqueQueueService $resqueQueueService
+     * @param TasksService $tasksService
+     * @throws \Exception
+     */
+    public function testNotifyAction(
+        ResqueQueueService $resqueQueueService,
+        TasksService $tasksService
+    ) {
+        $tasksController = new TasksController();
+
+        $response = $tasksController->notifyAction($resqueQueueService, $tasksService);
+
+        $this->assertInstanceOf(Response::class, $response);
+    }
+
+    /**
+     * @return array
+     */
+    public function notifyActionDataProvider()
+    {
+        return [
+            'tasks-request queue empty' => [
+                'resqueQueueService' => $this->createResqueQueueServiceWithEnqueueCall(),
+                'tasksService' => MockFactory::createTasksService([
+                    'getWorkerProcessCount' => [
+                        'return' => 1,
+                    ],
+                ]),
+            ],
+            'tasks-request queue not empty' => [
+                'resqueQueueService' => $this->createResqueQueueService(false),
+                'tasksService' => MockFactory::createTasksService(),
+            ],
+        ];
+    }
+
+    /**
+     * @return MockInterface|ResqueQueueService
+     */
+    private function createResqueQueueServiceWithEnqueueCall()
+    {
+        $resqueQueueService = $this->createResqueQueueService(true);
+
+        $resqueQueueService
+            ->shouldReceive('enqueue')
+            ->withArgs(function (TasksRequestJob $tasksRequestJob) {
+                $this->assertInstanceOf(TasksRequestJob::class, $tasksRequestJob);
+                return true;
+            });
+
+        return $resqueQueueService;
+    }
+
+    /**
+     * @param bool $isEmpty
+     *
+     * @return MockInterface|ResqueQueueService
+     */
+    private function createResqueQueueService($isEmpty)
+    {
+        $resqueQueueService = \Mockery::mock(ResqueQueueService::class);
+
+        $resqueQueueService
+            ->shouldReceive('isEmpty')
+            ->with('tasks-request')
+            ->andReturn($isEmpty);
+
+        return $resqueQueueService;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
+    }
+}

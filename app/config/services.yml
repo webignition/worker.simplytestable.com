@@ -4,43 +4,43 @@ services:
     autoconfigure: true
     public: false
 
-  SimplyTestable\WorkerBundle\:
-    resource: '../../src/SimplyTestable/WorkerBundle/*'
+  SimplyTestable\AppBundle\:
+    resource: '../../src/SimplyTestable/AppBundle/*'
     # you can exclude directories or files
     # but if a service is unused, it's removed anyway
-    exclude: '../../src/SimplyTestable/WorkerBundle/{Entity,Exception,Model,Repository,Request}'
+    exclude: '../../src/SimplyTestable/AppBundle/{Entity,Exception,Model,Repository,Request}'
 
-  SimplyTestable\WorkerBundle\Controller\:
-    resource: '../../src/SimplyTestable/WorkerBundle/Controller'
+  SimplyTestable\AppBundle\Controller\:
+    resource: '../../src/SimplyTestable/AppBundle/Controller'
     public: true
     tags: ['controller.service_arguments']
 
-  SimplyTestable\WorkerBundle\Cache\CoreApplicationRouterCacheWarmer:
+  SimplyTestable\AppBundle\Cache\CoreApplicationRouterCacheWarmer:
     tags:
       - { name: kernel.cache_warmer, priority: 0 }
 
-  SimplyTestable\WorkerBundle\Services\CoreApplicationRouter:
+  SimplyTestable\AppBundle\Services\CoreApplicationRouter:
     arguments:
       $baseUrl: '%core_url%'
       $kernelProjectDirectory: '%kernel.project_dir%'
       $cacheDirectory: '%kernel.cache_dir%'
 
-  SimplyTestable\WorkerBundle\Services\TaskService:
+  SimplyTestable\AppBundle\Services\TaskService:
     public: true
     calls:
-      - [addTaskDriver, ['html validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver']]
-      - [addTaskDriver, ['css validation', '@SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidationTaskDriver']]
-      - [addTaskDriver, ['js static analysis', '@SimplyTestable\WorkerBundle\Services\TaskDriver\JsLintTaskDriver']]
-      - [addTaskDriver, ['link integrity', '@SimplyTestable\WorkerBundle\Services\TaskDriver\LinkIntegrityTaskDriver']]
-      - [addTaskDriver, ['url discovery', '@SimplyTestable\WorkerBundle\Services\TaskDriver\UrlDiscoveryTaskDriver']]
+      - [addTaskDriver, ['html validation', '@SimplyTestable\AppBundle\Services\TaskDriver\HtmlValidationTaskDriver']]
+      - [addTaskDriver, ['css validation', '@SimplyTestable\AppBundle\Services\TaskDriver\CssValidationTaskDriver']]
+      - [addTaskDriver, ['js static analysis', '@SimplyTestable\AppBundle\Services\TaskDriver\JsLintTaskDriver']]
+      - [addTaskDriver, ['link integrity', '@SimplyTestable\AppBundle\Services\TaskDriver\LinkIntegrityTaskDriver']]
+      - [addTaskDriver, ['url discovery', '@SimplyTestable\AppBundle\Services\TaskDriver\UrlDiscoveryTaskDriver']]
 
-  SimplyTestable\WorkerBundle\Services\TasksService:
+  SimplyTestable\AppBundle\Services\TasksService:
     public: true
     calls:
       - [setWorkerProcessCount, ['%worker_process_count%']]
       - [setMaxTasksRequestFactor, ['%max_tasks_request_factor%']]
 
-  SimplyTestable\WorkerBundle\Services\WorkerService:
+  SimplyTestable\AppBundle\Services\WorkerService:
     public: true
     arguments:
       $salt: '%secret%'
@@ -50,43 +50,43 @@ services:
     class: GuzzleHttp\Cookie\CookieJar
 
   GuzzleHttp\HandlerStack:
-    factory: 'SimplyTestable\WorkerBundle\Services\HttpHandlerStackFactory:create'
+    factory: 'SimplyTestable\AppBundle\Services\HttpHandlerStackFactory:create'
 
   Kevinrob\GuzzleCache\CacheMiddleware:
-    factory: 'SimplyTestable\WorkerBundle\Services\HttpCacheMiddlewareFactory:create'
+    factory: 'SimplyTestable\AppBundle\Services\HttpCacheMiddlewareFactory:create'
 
   webignition\HttpHistoryContainer\Container:
 
-  SimplyTestable\WorkerBundle\Services\HttpClientService:
+  SimplyTestable\AppBundle\Services\HttpClientService:
     arguments:
       $curlOptions: '%curl_options%'
 
   GuzzleHttp\Client:
-    factory: 'SimplyTestable\WorkerBundle\Services\HttpClientService:getHttpClient'
+    factory: 'SimplyTestable\AppBundle\Services\HttpClientService:getHttpClient'
 
-  SimplyTestable\WorkerBundle\Services\TaskDriver\HtmlValidationTaskDriver:
+  SimplyTestable\AppBundle\Services\TaskDriver\HtmlValidationTaskDriver:
     arguments:
       $validatorPath: '%html-validator-path%'
 
-  SimplyTestable\WorkerBundle\Services\TaskDriver\CssValidatorWrapperConfigurationFactory:
+  SimplyTestable\AppBundle\Services\TaskDriver\CssValidatorWrapperConfigurationFactory:
     arguments:
       - '%css-validator-jar-path%'
 
-  SimplyTestable\WorkerBundle\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory:
+  SimplyTestable\AppBundle\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory:
     arguments:
       - '%node-path%'
       - '%node-jslint-path%'
 
-  SimplyTestable\WorkerBundle\Services\TaskDriver\LinkCheckerConfigurationFactory:
+  SimplyTestable\AppBundle\Services\TaskDriver\LinkCheckerConfigurationFactory:
     arguments:
       - '%link_integrity_user_agents%'
 
-  SimplyTestable\WorkerBundle\Services\WebResourceRetrieverFactory:
+  SimplyTestable\AppBundle\Services\WebResourceRetrieverFactory:
     arguments:
         - '@GuzzleHttp\Client'
 
   webignition\WebResource\Retriever:
-    factory: 'SimplyTestable\WorkerBundle\Services\WebResourceRetrieverFactory:create'
+    factory: 'SimplyTestable\AppBundle\Services\WebResourceRetrieverFactory:create'
 
   webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
 
@@ -98,15 +98,15 @@ services:
 
   webignition\NodeJslint\Wrapper\Wrapper:
 
-  SimplyTestable\WorkerBundle\Services\Resque\QueueService:
+  SimplyTestable\AppBundle\Services\Resque\QueueService:
     public: true
 
   # For retrieval of commands from container in resque jobs
-  SimplyTestable\WorkerBundle\Command\Task\PerformCommand:
+  SimplyTestable\AppBundle\Command\Task\PerformCommand:
     public: true
 
-  SimplyTestable\WorkerBundle\Command\Task\ReportCompletionCommand:
+  SimplyTestable\AppBundle\Command\Task\ReportCompletionCommand:
     public: true
 
-  SimplyTestable\WorkerBundle\Command\Tasks\RequestCommand:
+  SimplyTestable\AppBundle\Command\Tasks\RequestCommand:
     public: true

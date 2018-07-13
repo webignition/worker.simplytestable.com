@@ -13,7 +13,7 @@ class AppKernel extends Kernel
             new Symfony\Bundle\MonologBundle\MonologBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
-            new SimplyTestable\WorkerBundle\SimplyTestableWorkerBundle(),
+            new SimplyTestable\AppBundle\SimplyTestableAppBundle(),
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
             new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new ResqueBundle\Resque\ResqueBundle(),
