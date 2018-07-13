@@ -4,8 +4,8 @@ namespace Tests\AppBundle\Functional\Services;
 
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
-use SimplyTestable\AppBundle\Exception\Services\TasksService\RequestException;
-use SimplyTestable\AppBundle\Services\TasksService;
+use AppBundle\Exception\Services\TasksService\RequestException;
+use AppBundle\Services\TasksService;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;
 use Tests\AppBundle\Factory\ConnectExceptionFactory;
 use Tests\AppBundle\Services\HttpMockHandler;

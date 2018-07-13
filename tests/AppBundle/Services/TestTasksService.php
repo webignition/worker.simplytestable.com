@@ -1,7 +1,7 @@
 <?php
 namespace Tests\AppBundle\Services;
 
-use SimplyTestable\AppBundle\Services\TasksService;
+use AppBundle\Services\TasksService;
 
 class TestTasksService extends TasksService
 {

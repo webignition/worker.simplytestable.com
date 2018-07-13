@@ -17,7 +17,6 @@ app/config/security_credentials.yml
 !var/SymfonyRequirements.php
 /vendor/
 /web/bundles/
-src/SimplyTestable/WorkerBundle/Resources/config/parameters.yml
 
 # IDE meta
 /.idea

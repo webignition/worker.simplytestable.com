@@ -2,7 +2,7 @@
 
 namespace Tests\AppBundle\Unit\Request;
 
-use SimplyTestable\AppBundle\Request\VerifyRequest;
+use AppBundle\Request\VerifyRequest;
 
 class VerifyRequestTest extends \PHPUnit\Framework\TestCase
 {

@@ -3,8 +3,8 @@
 namespace Tests\AppBundle\Functional\Services\TaskDriver;
 
 use GuzzleHttp\Psr7\Response;
-use SimplyTestable\AppBundle\Services\TaskDriver\UrlDiscoveryTaskDriver;
-use SimplyTestable\AppBundle\Services\TaskTypeService;
+use AppBundle\Services\TaskDriver\UrlDiscoveryTaskDriver;
+use AppBundle\Services\TaskTypeService;
 use Tests\AppBundle\Factory\HtmlDocumentFactory;
 use Tests\AppBundle\Factory\TestTaskFactory;
 

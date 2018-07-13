@@ -2,7 +2,7 @@
 
 namespace Tests\AppBundle\Functional\Controller;
 
-use SimplyTestable\AppBundle\Services\WorkerService;
+use AppBundle\Services\WorkerService;
 
 class MaintenanceControllerTest extends AbstractControllerTest
 {

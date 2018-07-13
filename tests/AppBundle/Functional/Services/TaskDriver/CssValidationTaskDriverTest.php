@@ -3,8 +3,8 @@
 namespace Tests\AppBundle\Functional\Services\TaskDriver;
 
 use GuzzleHttp\Psr7\Response;
-use SimplyTestable\AppBundle\Services\TaskDriver\CssValidationTaskDriver;
-use SimplyTestable\AppBundle\Services\TaskTypeService;
+use AppBundle\Services\TaskDriver\CssValidationTaskDriver;
+use AppBundle\Services\TaskTypeService;
 use Tests\AppBundle\Factory\ConnectExceptionFactory;
 use Tests\AppBundle\Factory\CssValidatorFixtureFactory;
 use Tests\AppBundle\Factory\HtmlDocumentFactory;

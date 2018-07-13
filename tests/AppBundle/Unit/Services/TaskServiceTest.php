@@ -6,13 +6,13 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
-use SimplyTestable\AppBundle\Entity\Task\Task;
-use SimplyTestable\AppBundle\Repository\TaskRepository;
-use SimplyTestable\AppBundle\Services\CoreApplicationHttpClient;
-use SimplyTestable\AppBundle\Services\StateService;
-use SimplyTestable\AppBundle\Services\TaskService;
-use SimplyTestable\AppBundle\Services\TaskTypeService;
-use SimplyTestable\AppBundle\Services\WorkerService;
+use AppBundle\Entity\Task\Task;
+use AppBundle\Repository\TaskRepository;
+use AppBundle\Services\CoreApplicationHttpClient;
+use AppBundle\Services\StateService;
+use AppBundle\Services\TaskService;
+use AppBundle\Services\TaskTypeService;
+use AppBundle\Services\WorkerService;
 use Tests\AppBundle\Factory\MockEntityFactory;
 
 /**

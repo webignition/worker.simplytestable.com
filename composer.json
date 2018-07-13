@@ -3,12 +3,12 @@
     "description": "Source for workers to which tasks for http://app.simplytestable.com are assigned",
     "autoload": {
         "psr-4": {
-            "SimplyTestable\\AppBundle\\": "src/SimplyTestable/AppBundle"
+            "AppBundle\\": "src/AppBundle"
         },
         "classmap": [ "app/AppKernel.php", "app/AppCache.php" ]
     },
     "autoload-dev": {
-        "psr-4": { "Tests\\": "tests/" },
+        "psr-4": { "Tests\\AppBundle\\": "tests/AppBundle" },
         "files": [ "vendor/symfony/symfony/src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
     },
     "require": {
@@ -70,7 +70,7 @@
             "@composer test-unit",
             "@composer test-functional"
         ],
-        "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php src/SimplyTestable/AppBundle tests/",
+        "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php src/AppBundle tests/",
         "ci": [
             "@composer cs",
             "@composer test"

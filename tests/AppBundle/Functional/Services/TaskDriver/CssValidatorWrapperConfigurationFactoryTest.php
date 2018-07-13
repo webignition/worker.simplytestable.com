@@ -2,8 +2,8 @@
 
 namespace Tests\AppBundle\Functional\Services\TaskDriver;
 
-use SimplyTestable\AppBundle\Services\TaskDriver\CssValidatorWrapperConfigurationFactory;
-use SimplyTestable\AppBundle\Services\TaskTypeService;
+use AppBundle\Services\TaskDriver\CssValidatorWrapperConfigurationFactory;
+use AppBundle\Services\TaskTypeService;
 use Tests\AppBundle\Factory\TestTaskFactory;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;
 use webignition\CssValidatorOutput\Parser\Configuration as OutputParserConfiguration;

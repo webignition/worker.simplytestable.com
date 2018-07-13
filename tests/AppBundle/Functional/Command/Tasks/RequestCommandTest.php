@@ -3,9 +3,9 @@
 namespace Tests\AppBundle\Functional\Command\Tasks;
 
 use GuzzleHttp\Psr7\Response;
-use SimplyTestable\AppBundle\Command\Tasks\RequestCommand;
-use SimplyTestable\AppBundle\Services\Resque\QueueService;
-use SimplyTestable\AppBundle\Services\TasksService;
+use AppBundle\Command\Tasks\RequestCommand;
+use AppBundle\Services\Resque\QueueService;
+use AppBundle\Services\TasksService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\AppBundle\Factory\ConnectExceptionFactory;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;

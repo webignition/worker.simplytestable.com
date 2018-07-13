@@ -2,7 +2,7 @@
 
 namespace Tests\AppBundle\Functional;
 
-use SimplyTestable\AppBundle\Services\WorkerService;
+use AppBundle\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

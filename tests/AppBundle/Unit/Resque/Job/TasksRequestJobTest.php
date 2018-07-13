@@ -4,8 +4,8 @@ namespace Tests\AppBundle\Unit\Resque\Job;
 
 use Mockery\Mock;
 use Psr\Log\LoggerInterface;
-use SimplyTestable\AppBundle\Command\Tasks\RequestCommand;
-use SimplyTestable\AppBundle\Resque\Job\TasksRequestJob;
+use AppBundle\Command\Tasks\RequestCommand;
+use AppBundle\Resque\Job\TasksRequestJob;
 
 class TasksRequestJobTest extends AbstractJobTest
 {

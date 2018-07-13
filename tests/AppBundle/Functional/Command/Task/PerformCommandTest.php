@@ -3,10 +3,10 @@
 namespace Tests\AppBundle\Functional\Command\Task;
 
 use GuzzleHttp\Psr7\Response;
-use SimplyTestable\AppBundle\Command\Task\PerformCommand;
-use SimplyTestable\AppBundle\Services\Resque\QueueService;
-use SimplyTestable\AppBundle\Services\TaskTypeService;
-use SimplyTestable\AppBundle\Services\WorkerService;
+use AppBundle\Command\Task\PerformCommand;
+use AppBundle\Services\Resque\QueueService;
+use AppBundle\Services\TaskTypeService;
+use AppBundle\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\AppBundle\Factory\CssValidatorFixtureFactory;
 use Tests\AppBundle\Factory\HtmlValidatorFixtureFactory;

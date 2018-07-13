@@ -2,9 +2,9 @@
 
 namespace Tests\AppBundle\Functional\Command\Maintenance;
 
-use SimplyTestable\AppBundle\Command\Maintenance\RequeueInProgressTasksCommand;
-use SimplyTestable\AppBundle\Entity\Task\Task;
-use SimplyTestable\AppBundle\Services\StateService;
+use AppBundle\Command\Maintenance\RequeueInProgressTasksCommand;
+use AppBundle\Entity\Task\Task;
+use AppBundle\Services\StateService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\AppBundle\Factory\TestTaskFactory;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;

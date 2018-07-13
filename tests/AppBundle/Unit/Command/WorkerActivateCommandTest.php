@@ -2,8 +2,8 @@
 
 namespace Tests\AppBundle\Unit\Command;
 
-use SimplyTestable\AppBundle\Command\WorkerActivateCommand;
-use SimplyTestable\AppBundle\Services\WorkerService;
+use AppBundle\Command\WorkerActivateCommand;
+use AppBundle\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\AppBundle\Factory\MockFactory;
 use Symfony\Component\Console\Input\ArrayInput;

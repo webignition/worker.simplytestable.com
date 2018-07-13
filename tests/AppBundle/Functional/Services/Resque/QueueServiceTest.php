@@ -2,11 +2,11 @@
 
 namespace Tests\AppBundle\Functional\Services\Resque;
 
-use SimplyTestable\AppBundle\Resque\Job\Job;
-use SimplyTestable\AppBundle\Resque\Job\TaskPerformJob;
-use SimplyTestable\AppBundle\Resque\Job\TaskReportCompletionJob;
-use SimplyTestable\AppBundle\Resque\Job\TasksRequestJob;
-use SimplyTestable\AppBundle\Services\Resque\QueueService;
+use AppBundle\Resque\Job\Job;
+use AppBundle\Resque\Job\TaskPerformJob;
+use AppBundle\Resque\Job\TaskReportCompletionJob;
+use AppBundle\Resque\Job\TasksRequestJob;
+use AppBundle\Services\Resque\QueueService;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;
 
 class QueueServiceTest extends AbstractBaseTestCase
