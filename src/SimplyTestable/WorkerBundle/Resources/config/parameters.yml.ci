@@ -1,8 +1,0 @@
-parameters:
-  core_url: http://ci.app.simplytestable.com
-  html-validator-path: /usr/lib/cgi-bin/w3c-markup-validator/check
-  css-validator-jar-path: /usr/share/css-validator/2002/css-validator/css-validator.jar
-  node-path: /usr/bin/nodejs
-  node-jslint-path: /usr/share/node-jslint/node_modules/jslint/bin/jslint.js
-  admin_password: password
-

@@ -1,4 +1,0 @@
-  bcc_resque_prefix: worker-test
-  hostname: test.worker.simplytestable.com
-  worker_process_count: 5
-  max_tasks_request_factor: 2
