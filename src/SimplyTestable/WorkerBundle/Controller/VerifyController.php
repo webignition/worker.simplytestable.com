@@ -7,12 +7,18 @@ use SimplyTestable\WorkerBundle\Request\VerifyRequest;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\VerifyRequestFactory;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class VerifyController extends AbstractController
 {
+    /**
+     * @param WorkerService $workerService
+     * @param VerifyRequestFactory $verifyRequestFactory
+     *
+     * @return JsonResponse
+     */
     public function indexAction(WorkerService $workerService, VerifyRequestFactory $verifyRequestFactory)
     {
         if ($workerService->isMaintenanceReadOnly()) {
@@ -31,7 +37,7 @@ class VerifyController extends AbstractController
 
         $workerService->verify();
 
-        return new Response();
+        return new JsonResponse();
     }
 
     /**

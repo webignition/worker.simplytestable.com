@@ -18,6 +18,7 @@ class MaintenanceController extends AbstractController
      * @param EnableReadOnlyCommand $enableReadOnlyCommand
      *
      * @return JsonResponse
+     * @throws \Exception
      */
     public function enableReadOnlyAction(EnableReadOnlyCommand $enableReadOnlyCommand)
     {
@@ -28,6 +29,7 @@ class MaintenanceController extends AbstractController
      * @param DisableReadOnlyCommand $disableReadOnlyCommand
      *
      * @return JsonResponse
+     * @throws \Exception
      */
     public function disableReadOnlyAction(DisableReadOnlyCommand $disableReadOnlyCommand)
     {
@@ -38,6 +40,7 @@ class MaintenanceController extends AbstractController
      * @param PerformEnqueueCommand $performEnqueueCommand
      *
      * @return JsonResponse
+     * @throws \Exception
      */
     public function taskPerformEnqueueAction(PerformEnqueueCommand $performEnqueueCommand)
     {
@@ -50,6 +53,7 @@ class MaintenanceController extends AbstractController
      * @param PerformEnqueueCommand $performEnqueueCommand
      *
      * @return JsonResponse
+     * @throws \Exception
      */
     public function leaveReadOnlyAction(
         DisableReadOnlyCommand $disableReadOnlyCommand,
@@ -81,6 +85,7 @@ class MaintenanceController extends AbstractController
      * @param Command $command
      *
      * @return JsonResponse
+     * @throws \Exception
      */
     private function executeCommand(Command $command)
     {

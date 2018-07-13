@@ -2,21 +2,10 @@
 
 namespace Tests\WorkerBundle\Functional\Controller;
 
-use SimplyTestable\WorkerBundle\Command\Maintenance\DisableReadOnlyCommand;
-use SimplyTestable\WorkerBundle\Command\Maintenance\EnableReadOnlyCommand;
-use SimplyTestable\WorkerBundle\Command\Task\PerformEnqueueCommand;
-use SimplyTestable\WorkerBundle\Command\Task\ReportCompletionEnqueueCommand;
-use SimplyTestable\WorkerBundle\Controller\MaintenanceController;
 use SimplyTestable\WorkerBundle\Services\WorkerService;
-use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
 
-class MaintenanceControllerTest extends AbstractBaseTestCase
+class MaintenanceControllerTest extends AbstractControllerTest
 {
-    /**
-     * @var MaintenanceController
-     */
-    private $maintenanceController;
-
     /**
      * @var WorkerService
      */
@@ -29,63 +18,56 @@ class MaintenanceControllerTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->maintenanceController = new MaintenanceController();
         $this->workerService = self::$container->get(WorkerService::class);
     }
 
     public function testEnableReadOnlyAction()
     {
-        $response = $this->maintenanceController->enableReadOnlyAction(
-            self::$container->get(EnableReadOnlyCommand::class)
-        );
+        $this->client->request('GET', $this->router->generate('enable_readonly'));
 
-        $this->assertEquals(
-            '["Set state to maintenance-read-only"]',
-            $response->getContent()
-        );
+        $this->assertSuccessResponse('["Set state to maintenance-read-only"]');
         $this->assertTrue($this->workerService->isMaintenanceReadOnly());
         $this->assertFalse($this->workerService->isActive());
     }
 
     public function testDisableReadOnlyAction()
     {
-        $response = $this->maintenanceController->disableReadOnlyAction(
-            self::$container->get(DisableReadOnlyCommand::class)
-        );
+        $this->client->request('GET', $this->router->generate('disable_readonly'));
 
-        $this->assertEquals(
-            '["Set state to active"]',
-            $response->getContent()
-        );
+        $this->assertSuccessResponse('["Set state to active"]');
         $this->assertFalse($this->workerService->isMaintenanceReadOnly());
         $this->assertTrue($this->workerService->isActive());
     }
 
     public function testTaskPerformEnqueueAction()
     {
-        $response = $this->maintenanceController->taskPerformEnqueueAction(
-            self::$container->get(PerformEnqueueCommand::class)
-        );
+        $this->client->request('GET', $this->router->generate('task_perform_enqueue'));
 
-        $this->assertEquals(
-            '["0 queued tasks ready to be enqueued"]',
-            $response->getContent()
-        );
+        $this->assertSuccessResponse('["0 queued tasks ready to be enqueued"]');
     }
 
     public function testLeaveReadOnlyAction()
     {
-        $response = $this->maintenanceController->leaveReadOnlyAction(
-            self::$container->get(DisableReadOnlyCommand::class),
-            self::$container->get(ReportCompletionEnqueueCommand::class),
-            self::$container->get(PerformEnqueueCommand::class)
-        );
+        $this->client->request('GET', $this->router->generate('leave_readonly'));
 
-        $this->assertEquals(
-            '["Set state to active","0 completed tasks ready to be enqueued","0 queued tasks ready to be enqueued"]',
-            $response->getContent()
+        $this->assertSuccessResponse(
+            '["Set state to active","0 completed tasks ready to be enqueued","0 queued tasks ready to be enqueued"]'
         );
         $this->assertFalse($this->workerService->isMaintenanceReadOnly());
         $this->assertTrue($this->workerService->isActive());
+    }
+
+    /**
+     * @param string $expectedContent
+     */
+    private function assertSuccessResponse($expectedContent)
+    {
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(
+            $expectedContent,
+            $response->getContent()
+        );
     }
 }

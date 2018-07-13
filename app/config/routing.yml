@@ -1,8 +1,39 @@
-SimplyTestableWorkerBundle:
-    resource: "@SimplyTestableWorkerBundle/Resources/config/routing.yml"
-    prefix:   /
+status:
+    path:  /
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\StatusController::indexAction, _format: json }
 
-# Internal routing configuration to handle ESI
-#_internal:
-#    resource: "@FrameworkBundle/Resources/config/routing/internal.xml"
-#    prefix:   /_internal
+verify:
+    path:  /verify/
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\VerifyController::indexAction, _format: json  }
+
+task_create_collection:
+    path:  /task/create/collection/
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\TaskController::createCollectionAction, _format: json  }
+
+task_cancel:
+    path:  /task/cancel/
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\TaskController::cancelAction, _format: json  }
+
+task_cancel_collection:
+    path:  /task/cancel/collection/
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\TaskController::cancelCollectionAction, _format: json  }
+
+disable_readonly:
+    path: /maintenance/disable-read-only/
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\MaintenanceController::disableReadOnlyAction, _format: json n }
+
+enable_readonly:
+    path: /maintenance/enable-read-only/
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\MaintenanceController::enableReadOnlyAction, _format: json  }
+
+leave_readonly:
+    path: /maintenance/leave-read-only/
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\MaintenanceController::leaveReadOnlyAction, _format: json  }
+
+task_perform_enqueue:
+    path: /maintenance/task-perform-enqueue/
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\MaintenanceController::taskPerformEnqueueAction, _format: json  }
+
+tasks_notify:
+    path: /tasks/notify/
+    defaults: { _controller: SimplyTestable\WorkerBundle\Controller\TasksController::notifyAction, _format: json  }

@@ -6,7 +6,7 @@ use SimplyTestable\WorkerBundle\Resque\Job\TasksRequestJob;
 use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
 use SimplyTestable\WorkerBundle\Services\TasksService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TasksController extends Controller
 {
@@ -14,8 +14,7 @@ class TasksController extends Controller
      * @param QueueService $resqueQueueService
      * @param TasksService $tasksService
      *
-     * @return Response
-     * @throws \Exception
+     * @return JsonResponse
      */
     public function notifyAction(
         QueueService $resqueQueueService,
@@ -25,6 +24,6 @@ class TasksController extends Controller
             $resqueQueueService->enqueue(new TasksRequestJob(['limit' => $tasksService->getWorkerProcessCount()]));
         }
 
-        return new Response();
+        return new JsonResponse();
     }
 }

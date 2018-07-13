@@ -2,65 +2,31 @@
 
 namespace Tests\WorkerBundle\Functional\Controller;
 
-use SimplyTestable\WorkerBundle\Controller\TaskController;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CancelRequestFactory;
-use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use SimplyTestable\WorkerBundle\Services\Request\Factory\Task\CreateRequestFactory;
-use SimplyTestable\WorkerBundle\Services\Resque\QueueService;
-use SimplyTestable\WorkerBundle\Services\TaskFactory;
 use Tests\WorkerBundle\Factory\TestTaskFactory;
-use Tests\WorkerBundle\Functional\AbstractBaseTestCase;
-use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @group Controller/TaskController
  */
-class TaskControllerTest extends AbstractBaseTestCase
+class TaskControllerTest extends AbstractControllerTest
 {
-    /**
-     * @var TaskController
-     */
-    private $taskController;
-
-    /**
-     * @var TestTaskFactory
-     */
-    private $testTaskFactory;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->taskController = self::$container->get(TaskController::class);
-
-        $this->testTaskFactory = new TestTaskFactory(self::$container);
-    }
-
     /**
      * @dataProvider createCollectionActionDataProvider
      *
      * @param array $postData
      * @param array $expectedResponseTaskCollection
-     *
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Exception
      */
     public function testCreateCollectionAction($postData, $expectedResponseTaskCollection)
     {
-        $request = new Request();
-        $request->request = $postData;
-        self::$container->get('request_stack')->push($request);
-
-        $response = $this->taskController->createCollectionAction(
-            self::$container->get(CreateRequestCollectionFactory::class),
-            self::$container->get(TaskFactory::class),
-            self::$container->get(QueueService::class)
+        $this->client->request(
+            'POST',
+            $this->router->generate('task_create_collection'),
+            $postData
         );
+
+        $response = $this->client->getResponse();
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('application/json', $response->headers->get('content-type'));
@@ -84,28 +50,28 @@ class TaskControllerTest extends AbstractBaseTestCase
     {
         return [
             'no tasks data' => [
-                'postData' => new ParameterBag([]),
+                'postData' => [],
                 'expectedResponseTaskCollection' => []
             ],
             'empty tasks data' => [
-                'postData' => new ParameterBag([
+                'postData' => [
                     'tasks' => [],
-                ]),
+                ],
                 'expectedResponseTaskCollection' => [],
             ],
             'single invalid task' => [
-                'postData' => new ParameterBag([
+                'postData' => [
                     'tasks' => [
                         [
                             CreateRequestFactory::PARAMETER_TYPE => 'foo',
                             CreateRequestFactory::PARAMETER_URL => 'http://example.com/',
                         ],
                     ],
-                ]),
+                ],
                 'expectedResponseTaskCollection' => [],
             ],
             'valid tasks' => [
-                'postData' => new ParameterBag([
+                'postData' => [
                     'tasks' => [
                         [
                             CreateRequestFactory::PARAMETER_TYPE => 'html validation',
@@ -116,7 +82,7 @@ class TaskControllerTest extends AbstractBaseTestCase
                             CreateRequestFactory::PARAMETER_URL => 'http://example.com/',
                         ],
                     ],
-                ]),
+                ],
                 'expectedResponseTaskCollection' => [
                     [
                         'type' => 'HTML validation',
@@ -131,39 +97,37 @@ class TaskControllerTest extends AbstractBaseTestCase
         ];
     }
 
-    /**
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
     public function testCancelAction()
     {
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $testTaskFactory = new TestTaskFactory(self::$container);
+
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
         $this->assertEquals('task-queued', $task->getState());
 
-        $request = new Request();
-        $request->request = new ParameterBag([
-            CancelRequestFactory::PARAMETER_ID => $task->getId(),
-        ]);
-        self::$container->get('request_stack')->push($request);
-
-        $response = $this->taskController->cancelAction(
-            self::$container->get(CancelRequestFactory::class)
+        $this->client->request(
+            'POST',
+            $this->router->generate('task_cancel'),
+            [
+                CancelRequestFactory::PARAMETER_ID => $task->getId(),
+            ]
         );
+
+        $response = $this->client->getResponse();
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('task-cancelled', $task->getState());
     }
 
-    /**
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
     public function testCancelCollectionAction()
     {
+        $testTaskFactory = new TestTaskFactory(self::$container);
+
         $taskIds = [];
         $tasks = [];
-        $tasks[] = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'html validation',
         ]));
-        $tasks[] = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'css validation',
         ]));
 
@@ -172,15 +136,15 @@ class TaskControllerTest extends AbstractBaseTestCase
             $this->assertEquals('task-queued', $task->getState());
         }
 
-        $request = new Request();
-        $request->request = new ParameterBag([
-            CancelRequestCollectionFactory::PARAMETER_IDS => $taskIds,
-        ]);
-        self::$container->get('request_stack')->push($request);
-
-        $response = $this->taskController->cancelCollectionAction(
-            self::$container->get(CancelRequestCollectionFactory::class)
+        $this->client->request(
+            'POST',
+            $this->router->generate('task_cancel_collection'),
+            [
+                CancelRequestCollectionFactory::PARAMETER_IDS => $taskIds,
+            ]
         );
+
+        $response = $this->client->getResponse();
 
         $this->assertEquals(200, $response->getStatusCode());
 
