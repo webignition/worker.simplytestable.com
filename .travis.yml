@@ -3,6 +3,9 @@ services:
   - redis-server
   - memcache
 
+env:
+  - SYMFONY_ENV=test
+
 language: php
 php:
   - 7.2
