@@ -3,6 +3,12 @@ imports:
     - { resource: "@SimplyTestableWorkerBundle/Resources/config/parameters.yml" }
     - { resource: services.yml }
 
+parameters:
+  curl_options:
+    CURLOPT_SSL_VERIFYPEER: false
+    CURLOPT_SSL_VERIFYHOST: false
+    CURLOPT_TIMEOUT_MS: 30000
+
 framework:
     #esi:             ~
     #translator:      { fallback: %locale% }
