@@ -2,7 +2,7 @@
 
 namespace Tests\AppBundle\Unit\Model;
 
-use AppBundle\Model\HttpCacheStats;
+use App\Model\HttpCacheStats;
 
 class HttpCacheStatsTest extends \PHPUnit\Framework\TestCase
 {

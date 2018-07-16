@@ -2,8 +2,8 @@
 
 namespace Tests\AppBundle\Functional\Services\TaskDriver;
 
-use AppBundle\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory;
-use AppBundle\Services\TaskTypeService;
+use App\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory;
+use App\Services\TaskTypeService;
 use Tests\AppBundle\Factory\TestTaskFactory;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;
 use webignition\NodeJslint\Wrapper\Configuration\Configuration as WrapperConfiguration;

@@ -4,8 +4,8 @@ namespace Tests\AppBundle\Unit\Resque\Job;
 
 use Mockery\Mock;
 use Psr\Log\LoggerInterface;
-use AppBundle\Command\Task\ReportCompletionCommand;
-use AppBundle\Resque\Job\TaskReportCompletionJob;
+use App\Command\Task\ReportCompletionCommand;
+use App\Resque\Job\TaskReportCompletionJob;
 
 class TaskReportCompletionJobTest extends AbstractJobTest
 {

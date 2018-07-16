@@ -3,14 +3,14 @@
 namespace Tests\AppBundle\Unit\Command\Task;
 
 use Psr\Log\LoggerInterface;
-use AppBundle\Command\Task\PerformCommand;
-use AppBundle\Services\TaskService;
-use AppBundle\Services\WorkerService;
+use App\Command\Task\PerformCommand;
+use App\Services\TaskService;
+use App\Services\WorkerService;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\AppBundle\Factory\MockFactory;
 use webignition\ResqueJobFactory\ResqueJobFactory;
-use AppBundle\Services\Resque\QueueService as ResqueQueueService;
+use App\Services\Resque\QueueService as ResqueQueueService;
 
 /**
  * @group Command/Task/PerformCommand

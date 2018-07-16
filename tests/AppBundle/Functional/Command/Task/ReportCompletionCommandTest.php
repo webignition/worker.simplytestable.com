@@ -3,8 +3,8 @@
 namespace Tests\AppBundle\Functional\Command\Task;
 
 use GuzzleHttp\Psr7\Response;
-use AppBundle\Command\Task\ReportCompletionCommand;
-use AppBundle\Services\TaskService;
+use App\Command\Task\ReportCompletionCommand;
+use App\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\AppBundle\Factory\ConnectExceptionFactory;
 use Tests\AppBundle\Factory\HtmlValidatorFixtureFactory;

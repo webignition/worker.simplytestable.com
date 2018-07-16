@@ -3,8 +3,8 @@
 namespace Tests\AppBundle\Unit\Model\Task;
 
 use Mockery\Mock;
-use AppBundle\Entity\Task\Task;
-use AppBundle\Model\Task\Parameters;
+use App\Entity\Task\Task;
+use App\Model\Task\Parameters;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 
 class ParametersTest extends \PHPUnit\Framework\TestCase

@@ -2,8 +2,8 @@
 
 namespace Tests\AppBundle\Unit\Request\Task;
 
-use AppBundle\Request\Task\CancelRequest;
-use AppBundle\Request\Task\CancelRequestCollection;
+use App\Request\Task\CancelRequest;
+use App\Request\Task\CancelRequestCollection;
 
 class CancelRequestCollectionTest extends \PHPUnit\Framework\TestCase
 {

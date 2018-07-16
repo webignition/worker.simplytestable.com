@@ -3,8 +3,8 @@
 namespace Tests\AppBundle\Factory;
 
 use Mockery\MockInterface;
-use AppBundle\Entity\State;
-use AppBundle\Entity\Task\Task;
+use App\Entity\State;
+use App\Entity\Task\Task;
 
 class MockEntityFactory
 {

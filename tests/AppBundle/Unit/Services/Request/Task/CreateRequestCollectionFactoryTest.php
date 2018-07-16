@@ -3,11 +3,11 @@
 namespace Tests\AppBundle\Unit\Request\Task;
 
 use Mockery\MockInterface;
-use AppBundle\Services\Request\Factory\Task\CreateRequestCollectionFactory;
-use AppBundle\Services\Request\Factory\Task\CreateRequestFactory;
-use AppBundle\Services\TaskTypeService;
+use App\Services\Request\Factory\Task\CreateRequestCollectionFactory;
+use App\Services\Request\Factory\Task\CreateRequestFactory;
+use App\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Entity\Task\Type\Type as TaskType;
+use App\Entity\Task\Type\Type as TaskType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class CreateRequestCollectionFactoryTest extends \PHPUnit\Framework\TestCase

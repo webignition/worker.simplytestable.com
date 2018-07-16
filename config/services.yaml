@@ -25,7 +25,7 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php,AppBundle}'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php,App}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -34,13 +34,13 @@ services:
         tags: ['controller.service_arguments']
 
     AppBundle\:
-      resource: '../src/AppBundle/*'
+      resource: '../src/App/*'
       # you can exclude directories or files
       # but if a service is unused, it's removed anyway
-      exclude: '../src/AppBundle/{Entity,Exception,Model,Repository,Request}'
+      exclude: '../src/App/{Entity,Exception,Model,Repository,Request}'
 
     AppBundle\Controller\:
-      resource: '../src/AppBundle/Controller'
+      resource: '../src/App/Controller'
       public: true
       tags: ['controller.service_arguments']
 
@@ -57,11 +57,11 @@ services:
     AppBundle\Services\TaskService:
       public: true
       calls:
-        - [addTaskDriver, ['html validation', '@AppBundle\Services\TaskDriver\HtmlValidationTaskDriver']]
-        - [addTaskDriver, ['css validation', '@AppBundle\Services\TaskDriver\CssValidationTaskDriver']]
-        - [addTaskDriver, ['js static analysis', '@AppBundle\Services\TaskDriver\JsLintTaskDriver']]
-        - [addTaskDriver, ['link integrity', '@AppBundle\Services\TaskDriver\LinkIntegrityTaskDriver']]
-        - [addTaskDriver, ['url discovery', '@AppBundle\Services\TaskDriver\UrlDiscoveryTaskDriver']]
+        - [addTaskDriver, ['html validation', '@App\Services\TaskDriver\HtmlValidationTaskDriver']]
+        - [addTaskDriver, ['css validation', '@App\Services\TaskDriver\CssValidationTaskDriver']]
+        - [addTaskDriver, ['js static analysis', '@App\Services\TaskDriver\JsLintTaskDriver']]
+        - [addTaskDriver, ['link integrity', '@App\Services\TaskDriver\LinkIntegrityTaskDriver']]
+        - [addTaskDriver, ['url discovery', '@App\Services\TaskDriver\UrlDiscoveryTaskDriver']]
 
     AppBundle\Services\TasksService:
       public: true
@@ -79,10 +79,10 @@ services:
       class: GuzzleHttp\Cookie\CookieJar
 
     GuzzleHttp\HandlerStack:
-      factory: 'AppBundle\Services\HttpHandlerStackFactory:create'
+      factory: 'App\Services\HttpHandlerStackFactory:create'
 
     Kevinrob\GuzzleCache\CacheMiddleware:
-      factory: 'AppBundle\Services\HttpCacheMiddlewareFactory:create'
+      factory: 'App\Services\HttpCacheMiddlewareFactory:create'
 
     webignition\HttpHistoryContainer\Container:
 
@@ -91,7 +91,7 @@ services:
         $curlOptions: '%curl_options%'
 
     GuzzleHttp\Client:
-      factory: 'AppBundle\Services\HttpClientService:getHttpClient'
+      factory: 'App\Services\HttpClientService:getHttpClient'
 
     AppBundle\Services\TaskDriver\HtmlValidationTaskDriver:
       arguments:
@@ -115,7 +115,7 @@ services:
           - '@GuzzleHttp\Client'
 
     webignition\WebResource\Retriever:
-      factory: 'AppBundle\Services\WebResourceRetrieverFactory:create'
+      factory: 'App\Services\WebResourceRetrieverFactory:create'
 
     webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
 

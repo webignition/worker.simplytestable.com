@@ -3,9 +3,9 @@
 namespace Tests\AppBundle\Unit\Command\Task;
 
 use Psr\Log\LoggerInterface;
-use AppBundle\Command\Task\ReportCompletionCommand;
-use AppBundle\Services\TaskService;
-use AppBundle\Services\WorkerService;
+use App\Command\Task\ReportCompletionCommand;
+use App\Services\TaskService;
+use App\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\AppBundle\Factory\MockFactory;
 use Symfony\Component\Console\Input\ArrayInput;

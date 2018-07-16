@@ -4,8 +4,8 @@ namespace Tests\AppBundle\Functional\Services;
 
 use GuzzleHttp\Cookie\CookieJarInterface;
 use Mockery\Mock;
-use AppBundle\Entity\Task\Task;
-use AppBundle\Services\HttpClientConfigurationService;
+use App\Entity\Task\Task;
+use App\Services\HttpClientConfigurationService;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;

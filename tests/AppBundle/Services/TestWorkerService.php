@@ -1,8 +1,8 @@
 <?php
 namespace Tests\AppBundle\Services;
 
-use AppBundle\Entity\ThisWorker;
-use AppBundle\Services\WorkerService;
+use App\Entity\ThisWorker;
+use App\Services\WorkerService;
 
 class TestWorkerService extends WorkerService
 {

@@ -2,10 +2,10 @@
 
 namespace Tests\AppBundle\Functional\Services;
 
-use AppBundle\Entity\Task\Task;
-use AppBundle\Request\Task\CreateRequest;
-use AppBundle\Services\TaskFactory;
-use AppBundle\Services\TaskTypeService;
+use App\Entity\Task\Task;
+use App\Request\Task\CreateRequest;
+use App\Services\TaskFactory;
+use App\Services\TaskTypeService;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;
 
 class TaskFactoryTest extends AbstractBaseTestCase

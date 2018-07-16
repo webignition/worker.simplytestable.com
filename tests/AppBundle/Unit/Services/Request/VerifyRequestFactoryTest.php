@@ -2,7 +2,7 @@
 
 namespace Tests\AppBundle\Unit\Request;
 
-use AppBundle\Services\Request\Factory\VerifyRequestFactory;
+use App\Services\Request\Factory\VerifyRequestFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

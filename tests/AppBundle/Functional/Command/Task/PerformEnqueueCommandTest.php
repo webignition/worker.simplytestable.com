@@ -2,9 +2,9 @@
 
 namespace Tests\AppBundle\Functional\Command\Task;
 
-use AppBundle\Command\Task\PerformEnqueueCommand;
-use AppBundle\Resque\Job\TaskPerformJob;
-use AppBundle\Services\Resque\QueueService;
+use App\Command\Task\PerformEnqueueCommand;
+use App\Resque\Job\TaskPerformJob;
+use App\Services\Resque\QueueService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\AppBundle\Factory\TestTaskFactory;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;

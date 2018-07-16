@@ -2,9 +2,9 @@
 
 namespace Tests\AppBundle\Unit\Controller;
 
-use AppBundle\Controller\VerifyController;
-use AppBundle\Entity\ThisWorker;
-use AppBundle\Request\VerifyRequest;
+use App\Controller\VerifyController;
+use App\Entity\ThisWorker;
+use App\Request\VerifyRequest;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Tests\AppBundle\Factory\MockFactory;

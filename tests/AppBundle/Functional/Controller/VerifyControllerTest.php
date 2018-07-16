@@ -2,11 +2,11 @@
 
 namespace Tests\AppBundle\Functional\Controller;
 
-use AppBundle\Controller\VerifyController;
-use AppBundle\Entity\State;
-use AppBundle\Entity\ThisWorker;
-use AppBundle\Services\Request\Factory\VerifyRequestFactory;
-use AppBundle\Services\WorkerService;
+use App\Controller\VerifyController;
+use App\Entity\State;
+use App\Entity\ThisWorker;
+use App\Services\Request\Factory\VerifyRequestFactory;
+use App\Services\WorkerService;
 
 /**
  * @group Controller/VerifyController

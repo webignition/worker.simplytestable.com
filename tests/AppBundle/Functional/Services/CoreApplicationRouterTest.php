@@ -2,7 +2,7 @@
 
 namespace Tests\AppBundle\Functional\Guzzle;
 
-use AppBundle\Services\CoreApplicationRouter;
+use App\Services\CoreApplicationRouter;
 use Tests\AppBundle\Functional\AbstractBaseTestCase;
 
 class CoreApplicationRouterTest extends AbstractBaseTestCase

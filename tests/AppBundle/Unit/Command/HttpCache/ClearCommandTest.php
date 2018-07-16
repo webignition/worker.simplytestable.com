@@ -3,8 +3,8 @@
 namespace Tests\AppBundle\Unit\Command\HttpCache;
 
 use Mockery\Mock;
-use AppBundle\Command\HttpCache\ClearCommand;
-use AppBundle\Services\HttpCache;
+use App\Command\HttpCache\ClearCommand;
+use App\Services\HttpCache;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\ArrayInput;
 

@@ -1,7 +1,7 @@
 <?php
 namespace Tests\AppBundle\Services;
 
-use AppBundle\Services\TasksService;
+use App\Services\TasksService;
 
 class TestTasksService extends TasksService
 {

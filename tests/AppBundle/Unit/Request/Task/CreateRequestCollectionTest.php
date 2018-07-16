@@ -2,8 +2,8 @@
 
 namespace Tests\AppBundle\Unit\Request\Task;
 
-use AppBundle\Request\Task\CreateRequest;
-use AppBundle\Request\Task\CreateRequestCollection;
+use App\Request\Task\CreateRequest;
+use App\Request\Task\CreateRequestCollection;
 
 class CreateRequestCollectionTest extends \PHPUnit\Framework\TestCase
 {

@@ -2,7 +2,7 @@
 
 namespace Tests\AppBundle\Unit\Entity\Task;
 
-use AppBundle\Entity\Task\Task;
+use App\Entity\Task\Task;
 
 class TaskTest extends \PHPUnit\Framework\TestCase
 {

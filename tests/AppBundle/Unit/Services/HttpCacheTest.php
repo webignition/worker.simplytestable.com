@@ -4,8 +4,8 @@ namespace Tests\AppBundle\Unit\Services;
 
 use Doctrine\Common\Cache\MemcachedCache;
 use Memcached;
-use AppBundle\Services\HttpCache;
-use AppBundle\Services\MemcachedService;
+use App\Services\HttpCache;
+use App\Services\MemcachedService;
 
 class HttpCacheTest extends \PHPUnit\Framework\TestCase
 {

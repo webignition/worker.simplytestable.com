@@ -3,14 +3,14 @@
 namespace Tests\AppBundle\Unit\Command\Tasks;
 
 use Mockery\MockInterface;
-use AppBundle\Command\Tasks\RequestCommand;
-use AppBundle\Resque\Job\TasksRequestJob;
-use AppBundle\Services\TasksService;
-use AppBundle\Services\WorkerService;
+use App\Command\Tasks\RequestCommand;
+use App\Resque\Job\TasksRequestJob;
+use App\Services\TasksService;
+use App\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\AppBundle\Factory\MockFactory;
 use Symfony\Component\Console\Input\ArrayInput;
-use AppBundle\Services\Resque\QueueService as ResqueQueueService;
+use App\Services\Resque\QueueService as ResqueQueueService;
 
 /**
  * @group Command/Tasks/RequestCommand

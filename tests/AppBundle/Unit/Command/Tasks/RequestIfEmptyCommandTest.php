@@ -3,12 +3,12 @@
 namespace Tests\AppBundle\Unit\Command\Tasks;
 
 use Mockery\Mock;
-use AppBundle\Command\Tasks\RequestIfEmptyCommand;
-use AppBundle\Resque\Job\TasksRequestJob;
+use App\Command\Tasks\RequestIfEmptyCommand;
+use App\Resque\Job\TasksRequestJob;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\AppBundle\Factory\MockFactory;
-use AppBundle\Services\Resque\QueueService as ResqueQueueService;
+use App\Services\Resque\QueueService as ResqueQueueService;
 
 /**
  * @group Command/Tasks/RequestIfEmptyCommand

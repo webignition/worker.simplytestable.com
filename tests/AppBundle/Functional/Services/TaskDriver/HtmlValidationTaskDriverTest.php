@@ -3,9 +3,9 @@
 namespace Tests\AppBundle\Functional\Services\TaskDriver;
 
 use GuzzleHttp\Psr7\Response;
-use AppBundle\Services\HttpClientService;
-use AppBundle\Services\TaskDriver\HtmlValidationTaskDriver;
-use AppBundle\Services\TaskTypeService;
+use App\Services\HttpClientService;
+use App\Services\TaskDriver\HtmlValidationTaskDriver;
+use App\Services\TaskTypeService;
 use Tests\AppBundle\Factory\HtmlValidatorFixtureFactory;
 use Tests\AppBundle\Factory\TestTaskFactory;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
