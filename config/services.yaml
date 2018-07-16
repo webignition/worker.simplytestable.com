@@ -4,6 +4,13 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+  curl_options:
+    CURLOPT_SSL_VERIFYPEER: false
+    CURLOPT_SSL_VERIFYHOST: false
+    CURLOPT_TIMEOUT_MS: 30000
+  link_integrity_user_agents:
+    - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
+    - Mozilla/5.0
 
 services:
     # default configuration for services in *this* file
