@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1fc0608468eef186b3ac31dc93a62ca3",
+    "content-hash": "6adb1d7d8684a80263cf5677ef3bd19c",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -2330,16 +2330,16 @@
         },
         {
             "name": "resquebundle/resque",
-            "version": "2.0.1",
+            "version": "2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/resquebundle/resque.git",
-                "reference": "a412019efd13db145134d40cae3ae9c9271036ec"
+                "reference": "762727ad1a2e06465e73ef8af282514f794795f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/resquebundle/resque/zipball/a412019efd13db145134d40cae3ae9c9271036ec",
-                "reference": "a412019efd13db145134d40cae3ae9c9271036ec",
+                "url": "https://api.github.com/repos/resquebundle/resque/zipball/762727ad1a2e06465e73ef8af282514f794795f3",
+                "reference": "762727ad1a2e06465e73ef8af282514f794795f3",
                 "shasum": ""
             },
             "require": {
@@ -2395,7 +2395,7 @@
                 "symfony",
                 "symfony3"
             ],
-            "time": "2018-03-13T18:03:40+00:00"
+            "time": "2018-06-26T11:55:22+00:00"
         },
         {
             "name": "sensio/framework-extra-bundle",
