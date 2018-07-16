@@ -33,5 +33,109 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    AppBundle\:
+      resource: '../src/AppBundle/*'
+      # you can exclude directories or files
+      # but if a service is unused, it's removed anyway
+      exclude: '../src/AppBundle/{Entity,Exception,Model,Repository,Request}'
+
+    AppBundle\Controller\:
+      resource: '../src/AppBundle/Controller'
+      public: true
+      tags: ['controller.service_arguments']
+
+    AppBundle\Cache\CoreApplicationRouterCacheWarmer:
+      tags:
+        - { name: kernel.cache_warmer, priority: 0 }
+
+    AppBundle\Services\CoreApplicationRouter:
+      arguments:
+        $baseUrl: '%env(CORE_URL)%'
+        $kernelProjectDirectory: '%kernel.project_dir%'
+        $cacheDirectory: '%kernel.cache_dir%'
+
+    AppBundle\Services\TaskService:
+      public: true
+      calls:
+        - [addTaskDriver, ['html validation', '@AppBundle\Services\TaskDriver\HtmlValidationTaskDriver']]
+        - [addTaskDriver, ['css validation', '@AppBundle\Services\TaskDriver\CssValidationTaskDriver']]
+        - [addTaskDriver, ['js static analysis', '@AppBundle\Services\TaskDriver\JsLintTaskDriver']]
+        - [addTaskDriver, ['link integrity', '@AppBundle\Services\TaskDriver\LinkIntegrityTaskDriver']]
+        - [addTaskDriver, ['url discovery', '@AppBundle\Services\TaskDriver\UrlDiscoveryTaskDriver']]
+
+    AppBundle\Services\TasksService:
+      public: true
+      calls:
+        - [setWorkerProcessCount, ['%env(WORKER_PROCESS_COUNT)%']]
+        - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
+
+    AppBundle\Services\WorkerService:
+      public: true
+      arguments:
+        $salt: '%kernel.secret%'
+        $hostname: '%env(HOSTNAME)%'
+
+    GuzzleHttp\Cookie\CookieJarInterface:
+      class: GuzzleHttp\Cookie\CookieJar
+
+    GuzzleHttp\HandlerStack:
+      factory: 'AppBundle\Services\HttpHandlerStackFactory:create'
+
+    Kevinrob\GuzzleCache\CacheMiddleware:
+      factory: 'AppBundle\Services\HttpCacheMiddlewareFactory:create'
+
+    webignition\HttpHistoryContainer\Container:
+
+    AppBundle\Services\HttpClientService:
+      arguments:
+        $curlOptions: '%curl_options%'
+
+    GuzzleHttp\Client:
+      factory: 'AppBundle\Services\HttpClientService:getHttpClient'
+
+    AppBundle\Services\TaskDriver\HtmlValidationTaskDriver:
+      arguments:
+        $validatorPath: '%env(HTML_VALIDATOR_PATH)%'
+
+    AppBundle\Services\TaskDriver\CssValidatorWrapperConfigurationFactory:
+      arguments:
+        - '%env(CSS_VALIDATOR_JAR_PATH)%'
+
+    AppBundle\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory:
+      arguments:
+        - '%env(NODE_PATH)%'
+        - '%env(NODE_JSLINT_PATH)%'
+
+    AppBundle\Services\TaskDriver\LinkCheckerConfigurationFactory:
+      arguments:
+        - '%link_integrity_user_agents%'
+
+    AppBundle\Services\WebResourceRetrieverFactory:
+      arguments:
+          - '@GuzzleHttp\Client'
+
+    webignition\WebResource\Retriever:
+      factory: 'AppBundle\Services\WebResourceRetrieverFactory:create'
+
+    webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
+
+    webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware:
+
+    webignition\HtmlValidator\Wrapper\Wrapper:
+
+    webignition\CssValidatorWrapper\Wrapper:
+
+    webignition\NodeJslint\Wrapper\Wrapper:
+
+    AppBundle\Services\Resque\QueueService:
+      public: true
+
+    # For retrieval of commands from container in resque jobs
+    AppBundle\Command\Task\PerformCommand:
+      public: true
+
+    AppBundle\Command\Task\ReportCompletionCommand:
+      public: true
+
+    AppBundle\Command\Tasks\RequestCommand:
+      public: true

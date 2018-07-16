@@ -7,14 +7,14 @@ services:
   AppBundle\Services\WorkerService:
     class:   Tests\AppBundle\Services\TestWorkerService
     arguments:
-      $salt: '%secret%'
+      $salt: '%kernel.secret%'
       $hostname: '%hostname%'
 
   AppBundle\Services\TasksService:
     class:   Tests\AppBundle\Services\TestTasksService
     calls:
-      - [setWorkerProcessCount, ['%worker_process_count%']]
-      - [setMaxTasksRequestFactor, ['%max_tasks_request_factor%']]
+      - [setWorkerProcessCount, ['%env(WORKER_PROCESS_COUNT)%']]
+      - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
 
   Tests\AppBundle\Services\HttpMockHandler:
 
