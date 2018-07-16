@@ -5,13 +5,13 @@ services:
     public: false
 
   App\Services\WorkerService:
-    class:   App\Test\Services\TestWorkerService
+    class:   App\Tests\Services\TestWorkerService
     arguments:
       $salt: '%kernel.secret%'
-      $hostname: '%hostname%'
+      $hostname: '%env(HOSTNAME)%'
 
   App\Services\TasksService:
-    class:   App\Test\Services\TestTasksService
+    class:   App\Tests\Services\TestTasksService
     calls:
       - [setWorkerProcessCount, ['%env(WORKER_PROCESS_COUNT)%']]
       - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
@@ -25,4 +25,4 @@ services:
       - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'
       - '@webignition\HttpHistoryContainer\Container'
       - '@Kevinrob\GuzzleCache\CacheMiddleware'
-      - '@App\Test\Services\HttpMockHandler'
+      - '@App\Tests\Services\HttpMockHandler'
