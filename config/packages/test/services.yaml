@@ -4,24 +4,25 @@ services:
     autoconfigure: true
     public: false
 
-  AppBundle\Services\WorkerService:
-    class:   Tests\AppBundle\Services\TestWorkerService
+  App\Services\WorkerService:
+    class:   App\Test\Services\TestWorkerService
     arguments:
       $salt: '%kernel.secret%'
       $hostname: '%hostname%'
 
-  AppBundle\Services\TasksService:
-    class:   Tests\AppBundle\Services\TestTasksService
+  App\Services\TasksService:
+    class:   App\Test\Services\TestTasksService
     calls:
       - [setWorkerProcessCount, ['%env(WORKER_PROCESS_COUNT)%']]
       - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
 
-  Tests\AppBundle\Services\HttpMockHandler:
+  App\Tests\Services\HttpMockHandler:
+    public: true
 
-  AppBundle\Services\HttpHandlerStackFactory:
+  App\Services\HttpHandlerStackFactory:
     arguments:
       - '@webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware'
       - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'
       - '@webignition\HttpHistoryContainer\Container'
       - '@Kevinrob\GuzzleCache\CacheMiddleware'
-      - '@Tests\AppBundle\Services\HttpMockHandler'
+      - '@App\Test\Services\HttpMockHandler'

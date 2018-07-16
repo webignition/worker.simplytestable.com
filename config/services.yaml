@@ -33,28 +33,17 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
-    AppBundle\:
-      resource: '../src/App/*'
-      # you can exclude directories or files
-      # but if a service is unused, it's removed anyway
-      exclude: '../src/App/{Entity,Exception,Model,Repository,Request}'
-
-    AppBundle\Controller\:
-      resource: '../src/App/Controller'
-      public: true
-      tags: ['controller.service_arguments']
-
-    AppBundle\Cache\CoreApplicationRouterCacheWarmer:
+    App\Cache\CoreApplicationRouterCacheWarmer:
       tags:
         - { name: kernel.cache_warmer, priority: 0 }
 
-    AppBundle\Services\CoreApplicationRouter:
+    App\Services\CoreApplicationRouter:
       arguments:
         $baseUrl: '%env(CORE_URL)%'
         $kernelProjectDirectory: '%kernel.project_dir%'
         $cacheDirectory: '%kernel.cache_dir%'
 
-    AppBundle\Services\TaskService:
+    App\Services\TaskService:
       public: true
       calls:
         - [addTaskDriver, ['html validation', '@App\Services\TaskDriver\HtmlValidationTaskDriver']]
@@ -63,13 +52,13 @@ services:
         - [addTaskDriver, ['link integrity', '@App\Services\TaskDriver\LinkIntegrityTaskDriver']]
         - [addTaskDriver, ['url discovery', '@App\Services\TaskDriver\UrlDiscoveryTaskDriver']]
 
-    AppBundle\Services\TasksService:
+    App\Services\TasksService:
       public: true
       calls:
         - [setWorkerProcessCount, ['%env(WORKER_PROCESS_COUNT)%']]
         - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
 
-    AppBundle\Services\WorkerService:
+    App\Services\WorkerService:
       public: true
       arguments:
         $salt: '%kernel.secret%'
@@ -86,31 +75,31 @@ services:
 
     webignition\HttpHistoryContainer\Container:
 
-    AppBundle\Services\HttpClientService:
+    App\Services\HttpClientService:
       arguments:
         $curlOptions: '%curl_options%'
 
     GuzzleHttp\Client:
       factory: 'App\Services\HttpClientService:getHttpClient'
 
-    AppBundle\Services\TaskDriver\HtmlValidationTaskDriver:
+    App\Services\TaskDriver\HtmlValidationTaskDriver:
       arguments:
         $validatorPath: '%env(HTML_VALIDATOR_PATH)%'
 
-    AppBundle\Services\TaskDriver\CssValidatorWrapperConfigurationFactory:
+    App\Services\TaskDriver\CssValidatorWrapperConfigurationFactory:
       arguments:
         - '%env(CSS_VALIDATOR_JAR_PATH)%'
 
-    AppBundle\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory:
+    App\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory:
       arguments:
         - '%env(NODE_PATH)%'
         - '%env(NODE_JSLINT_PATH)%'
 
-    AppBundle\Services\TaskDriver\LinkCheckerConfigurationFactory:
+    App\Services\TaskDriver\LinkCheckerConfigurationFactory:
       arguments:
         - '%link_integrity_user_agents%'
 
-    AppBundle\Services\WebResourceRetrieverFactory:
+    App\Services\WebResourceRetrieverFactory:
       arguments:
           - '@GuzzleHttp\Client'
 
@@ -127,15 +116,15 @@ services:
 
     webignition\NodeJslint\Wrapper\Wrapper:
 
-    AppBundle\Services\Resque\QueueService:
+    App\Services\Resque\QueueService:
       public: true
 
     # For retrieval of commands from container in resque jobs
-    AppBundle\Command\Task\PerformCommand:
+    App\Command\Task\PerformCommand:
       public: true
 
-    AppBundle\Command\Task\ReportCompletionCommand:
+    App\Command\Task\ReportCompletionCommand:
       public: true
 
-    AppBundle\Command\Tasks\RequestCommand:
+    App\Command\Tasks\RequestCommand:
       public: true
