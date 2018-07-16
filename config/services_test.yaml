@@ -17,7 +17,6 @@ services:
       - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
 
   App\Tests\Services\HttpMockHandler:
-    public: true
 
   App\Services\HttpHandlerStackFactory:
     arguments:
