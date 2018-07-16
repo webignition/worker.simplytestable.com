@@ -29,12 +29,12 @@ class CoreApplicationRouterTest extends AbstractBaseTestCase
             'worker_activate' => [
                 'name' => 'worker_activate',
                 'parameters' => [],
-                'expectedUrl' => 'http://app.simplytestable.com/worker/activate/',
+                'expectedUrl' => 'http://test.app.simplytestable.com/worker/activate/',
             ],
             'tasks_request' => [
                 'name' => 'tasks_request',
                 'parameters' => [],
-                'expectedUrl' => 'http://app.simplytestable.com/worker/tasks/request/',
+                'expectedUrl' => 'http://test.app.simplytestable.com/worker/tasks/request/',
             ],
             'task_complete' => [
                 'name' => 'task_complete',
@@ -44,7 +44,7 @@ class CoreApplicationRouterTest extends AbstractBaseTestCase
                     'parameter_hash' => 'foo',
                 ],
                 'expectedUrl' =>
-                    'http://app.simplytestable.com/task/http%3A%2F%2Fexample.com%2F/html%20validation/foo/complete/',
+                    'http://test.app.simplytestable.com/task/http%3A%2F%2Fexample.com%2F/html%20validation/foo/complete/',
             ],
         ];
     }
