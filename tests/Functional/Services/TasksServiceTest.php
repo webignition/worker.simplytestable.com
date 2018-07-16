@@ -44,7 +44,7 @@ class TasksServiceTest extends AbstractBaseTestCase
     public function testGetMaxTasksRequestFactor()
     {
         $this->assertEquals(
-            self::$container->getParameter('max_tasks_request_factor'),
+            getenv('MAX_TASKS_REQUEST_FACTOR'),
             $this->tasksService->getMaxTasksRequestFactor()
         );
     }
@@ -52,7 +52,7 @@ class TasksServiceTest extends AbstractBaseTestCase
     public function testGetWorkerProcessCount()
     {
         $this->assertEquals(
-            self::$container->getParameter('worker_process_count'),
+            getenv('WORKER_PROCESS_COUNT'),
             $this->tasksService->getWorkerProcessCount()
         );
     }

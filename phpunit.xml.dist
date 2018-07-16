@@ -12,7 +12,7 @@
         <server name="KERNEL_CLASS" value="App\Kernel" />
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" />
 
-        <env name="CORE_URL" value="http://local.app.simplytestable.com"/>
+        <env name="CORE_URL" value="http://app.simplytestable.com"/>
         <env name="HTML_VALIDATOR_PATH" value="/usr/local/validator/cgi-bin/check"/>
         <env name="CSS_VALIDATOR_JAR_PATH" value="/usr/share/css-validator/2002/css-validator/css-validator.jar"/>
         <env name="NODE_PATH" value="/usr/bin/node"/>
