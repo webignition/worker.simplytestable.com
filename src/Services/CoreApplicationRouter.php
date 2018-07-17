@@ -33,7 +33,7 @@ class CoreApplicationRouter implements WarmableInterface
      */
     public function __construct($baseUrl, $kernelProjectDirectory, $cacheDirectory)
     {
-        $locator = new FileLocator($kernelProjectDirectory . '/app/config/resources');
+        $locator = new FileLocator($kernelProjectDirectory . '/config/resources');
         $requestContext = new RequestContext();
         $requestContext->fromRequest(Request::createFromGlobals());
 
