@@ -44,7 +44,8 @@ class CoreApplicationRouterTest extends AbstractBaseTestCase
                     'parameter_hash' => 'foo',
                 ],
                 'expectedUrl' =>
-                    'http://test.app.simplytestable.com/task/http%3A%2F%2Fexample.com%2F/html%20validation/foo/complete/',
+                    'http://test.app.simplytestable.com/task/http%3A%2F%2Fexample.com%2F/'
+                    .'html%20validation/foo/complete/',
             ],
         ];
     }

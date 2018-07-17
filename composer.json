@@ -84,13 +84,13 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "test-unit": "./vendor/bin/phpunit --colors tests/AppBundle/Unit",
-        "test-functional": "./vendor/bin/phpunit --colors tests/AppBundle/Functional/",
+        "test-unit": "./vendor/bin/phpunit --colors tests/Unit",
+        "test-functional": "./vendor/bin/phpunit --colors tests/Functional/",
         "test": [
             "@composer test-unit",
             "@composer test-functional"
         ],
-        "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php src/AppBundle tests/",
+        "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php --ignore=src/Migrations src/ tests/",
         "ci": [
             "@composer cs",
             "@composer test"
