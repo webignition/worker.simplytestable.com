@@ -1,95 +1,107 @@
 {
     "name": "webignition/worker.simplytestable.com",
     "description": "Source for workers to which tasks for http://app.simplytestable.com are assigned",
-    "autoload": {
-        "psr-4": {
-            "AppBundle\\": "src/AppBundle"
-        },
-        "classmap": [ "app/AppKernel.php", "app/AppCache.php" ]
-    },
-    "autoload-dev": {
-        "psr-4": { "Tests\\AppBundle\\": "tests/AppBundle" },
-        "files": [ "vendor/symfony/symfony/src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
-    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/webignition/resque"
+        }
+    ],
     "require": {
         "php": ">=7.2.0",
-        "doctrine/doctrine-bundle": "^1.6",
-        "doctrine/orm": "^2.6",
-        "sensio/framework-extra-bundle": "^5.0.0",
-        "symfony/monolog-bundle": "^3.1.0",
-        "symfony/symfony": "^4.0.0",
-        "twig/twig": "^2.0",
-        "doctrine/migrations": "~1.8",
-        "doctrine/doctrine-migrations-bundle": "~1.2",
-        "webignition/url": ">=2,<3",
-        "webignition/internet-media-type":">=1,<2.0",
-        "webignition/web-page-model":">=3,<4",
-        "webignition/web-json-model":">=3,<4",
-        "webignition/absolute-url-deriver":">=1.5",
-        "guzzlehttp/guzzle":"^6",
-        "doctrine/doctrine-fixtures-bundle": "~3",
-        "webignition/html-document-link-finder":">=3.1,<4",
-        "webignition/html-document-link-checker":">=2,<3",
-        "webignition/html-validator-wrapper":">=0.5.1,<1",
-        "webignition/html-validator-output-parser":">=0.7.1,<1",
-        "webignition/css-validator-wrapper":">=2.2,<3",
-        "webignition/web-resource-retriever":">=0.7,<1",
-        "webignition/node-jslint-wrapper":">=1,<2",
         "chrisboulton/php-resque": "dev-master",
         "chrisboulton/php-resque-scheduler": "dev-master",
-        "resquebundle/resque": "2.0.1",
+        "doctrine/doctrine-bundle": "^1.6",
+        "doctrine/doctrine-fixtures-bundle": "~3",
+        "doctrine/doctrine-migrations-bundle": "~1.2",
+        "doctrine/migrations": "~1.8",
+        "doctrine/orm": "^2.6",
+        "guzzlehttp/guzzle": "^6",
         "kevinrob/guzzle-cache-middleware": "^3",
-        "webignition/guzzle-curl-exception":">=1,<2",
-        "webignition/html-document-type":">=0.1.1,<1.0",
-        "webignition/http-history-container": ">=0.3,<1",
+        "sensio/framework-extra-bundle": "^5.0.0",
+        "symfony/console": "^4.1",
+        "symfony/dotenv": "^4.1",
+        "symfony/flex": "^1.0",
+        "symfony/framework-bundle": "^4.1",
+        "symfony/lts": "^4@dev",
+        "symfony/monolog-bundle": "^3.1.0",
+        "symfony/yaml": "^4.1",
+        "twig/twig": "^2.0",
+        "webignition/absolute-url-deriver": ">=1.5",
         "webignition/css-validator-output-parser": ">=3.2,<4",
+        "webignition/css-validator-wrapper": ">=2.2,<3",
+        "webignition/guzzle-curl-exception": ">=1,<2",
         "webignition/guzzle-http-authentication-middleware": ">=0.1,<1",
-        "webignition/guzzle-request-headers-middleware": ">=0.1,<1"
+        "webignition/guzzle-request-headers-middleware": ">=0.1,<1",
+        "webignition/html-document-link-checker": ">=2,<3",
+        "webignition/html-document-link-finder": ">=3.1,<4",
+        "webignition/html-document-type": ">=0.1.1,<1.0",
+        "webignition/html-validator-output-parser": ">=0.7.1,<1",
+        "webignition/html-validator-wrapper": ">=0.5.1,<1",
+        "webignition/http-history-container": ">=0.3,<1",
+        "webignition/internet-media-type": ">=1,<2.0",
+        "webignition/node-jslint-wrapper": ">=1,<2",
+        "webignition/resque-bundle": "dev-master",
+        "webignition/url": ">=2,<3",
+        "webignition/web-json-model": ">=3,<4",
+        "webignition/web-page-model": ">=3,<4",
+        "webignition/web-resource-retriever": ">=0.7,<1"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^4.0.0",
+        "mockery/mockery": "^1",
+        "php-mock/php-mock-mockery": "^1",
         "phpunit/phpunit": "~7.0",
         "squizlabs/php_codesniffer": "3.*",
-        "mockery/mockery": "^1",
-        "php-mock/php-mock-mockery": "^1"
+        "symfony/browser-kit": "^4.1",
+        "symfony/phpunit-bridge": "^4.0.0"
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "AppBundle\\": "src/AppBundle",
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\AppBundle\\": "tests/AppBundle",
+            "App\\Tests\\": "tests/"
+        }
     },
     "scripts": {
-        "symfony-scripts": [
-            "./bin/console cache:clear --no-warmup",
-            "./bin/console cache:warmup"
-        ],
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
         "post-install-cmd": [
-            "@symfony-scripts"
+            "@auto-scripts"
         ],
         "post-update-cmd": [
-            "@symfony-scripts"
+            "@auto-scripts"
         ],
-        "test-unit": "./vendor/bin/phpunit --colors tests/AppBundle/Unit",
-        "test-functional": "./vendor/bin/phpunit --colors tests/AppBundle/Functional/",
+        "test-unit": "./vendor/bin/phpunit --colors tests/Unit",
+        "test-functional": "./vendor/bin/phpunit --colors tests/Functional/",
         "test": [
             "@composer test-unit",
             "@composer test-functional"
         ],
-        "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php src/AppBundle tests/",
+        "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php --ignore=src/Migrations src/ tests/",
         "ci": [
             "@composer cs",
             "@composer test"
         ]
     },
-    "config": {
-        "sort-packages": true
+    "conflict": {
+        "symfony/symfony": "*"
     },
-    "minimum-stability": "stable",
-    "prefer-stable": true,
     "extra": {
-        "symfony-app-dir": "app",
-        "symfony-web-dir": "web",
-        "symfony-var-dir": "var",
-        "symfony-bin-dir": "bin",
-        "symfony-tests-dir": "tests",
-        "symfony-assets-install": "relative",
-        "incenteev-parameters": {
-            "file": "app/config/parameters.yml"
+        "symfony": {
+            "allow-contrib": false
         }
     }
 }

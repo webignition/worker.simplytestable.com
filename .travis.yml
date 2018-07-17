@@ -4,7 +4,19 @@ services:
   - memcache
 
 env:
-  - SYMFONY_ENV=test
+  global:
+    - APP_ENV=test
+    - DATABASE_URL=mysql://root:@127.0.0.1:3306/myapp_test
+    - APP_SECRET=Secret!
+    - CORE_URL=http://test.app.simplytestable.com
+    - HTML_VALIDATOR_PATH=/usr/local/validator/cgi-bin/check
+    - CSS_VALIDATOR_JAR_PATH=/usr/share/css-validator/2002/css-validator/css-validator.jar
+    - NODE_PATH=/usr/bin/node
+    - NODE_JSLINT_PATH=/usr/share/node-jslint/node_modules/jslint/bin/jslint.js
+    - HOSTNAME=worker.simplytestable.com
+    - WORKER_PROCESS_COUNT=5
+    - MAX_TASKS_REQUEST_FACTOR=2
+    - RESQUE_PREFIX=worker
 
 language: php
 php:
@@ -13,8 +25,8 @@ php:
 before_install:
   - composer self-update
   - cp .travis.composer.config.json ~/.composer/config.json
-  - mv app/config/parameters.yml.travis app/config/parameters.yml
-  - mv --force app/config/config_travis.yml app/config/config_test.yml
+  - rm phpunit.xml.dist
+  - mv phpunit.travis-ci.xml phpunit.xml.dist
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mysql -e 'CREATE DATABASE myapp_test;'
   - chmod +x ./bin/console

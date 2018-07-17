@@ -1,0 +1,27 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  App\Services\WorkerService:
+    class:   App\Tests\Services\TestWorkerService
+    arguments:
+      $salt: '%kernel.secret%'
+      $hostname: '%env(HOSTNAME)%'
+
+  App\Services\TasksService:
+    class:   App\Tests\Services\TestTasksService
+    calls:
+      - [setWorkerProcessCount, ['%env(WORKER_PROCESS_COUNT)%']]
+      - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
+
+  App\Tests\Services\HttpMockHandler:
+
+  App\Services\HttpHandlerStackFactory:
+    arguments:
+      - '@webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware'
+      - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'
+      - '@webignition\HttpHistoryContainer\Container'
+      - '@Kevinrob\GuzzleCache\CacheMiddleware'
+      - '@App\Tests\Services\HttpMockHandler'

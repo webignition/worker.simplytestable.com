@@ -5,11 +5,36 @@
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.8/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootstrap="app/autoload.php"
+         bootstrap="vendor/autoload.php"
 >
     <php>
         <ini name="error_reporting" value="-1" />
-        <server name="KERNEL_CLASS" value="AppKernel" />
+        <server name="KERNEL_CLASS" value="App\Kernel" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" />
+
+        <env name="CORE_URL" value="http://test.app.simplytestable.com"/>
+        <env name="HTML_VALIDATOR_PATH" value="/usr/local/validator/cgi-bin/check"/>
+        <env name="CSS_VALIDATOR_JAR_PATH" value="/usr/share/css-validator/2002/css-validator/css-validator.jar"/>
+        <env name="NODE_PATH" value="/usr/bin/node"/>
+        <env name="NODE_JSLINT_PATH" value="/usr/share/node-jslint/node_modules/jslint/bin/jslint.js"/>
+        <env name="HOSTNAME" value="worker.simplytestable.com"/>
+        <env name="WORKER_PROCESS_COUNT" value="5"/>
+        <env name="MAX_TASKS_REQUEST_FACTOR" value="2"/>
+        <env name="RESQUE_PREFIX" value="worker"/>
+
+        <!-- ###+ doctrine/doctrine-bundle ### -->
+        <!-- Format described at http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url -->
+        <!-- For an SQLite database, use: "sqlite:///%kernel.project_dir%/var/data.db" -->
+        <!-- Configure your db driver and server_version in config/packages/doctrine.yaml -->
+        <env name="DATABASE_URL" value="mysql://root:root@127.0.0.1:3306/test_worker_simplytestable_com"/>
+        <!-- ###- doctrine/doctrine-bundle ### -->
+
+        <!-- ###+ symfony/framework-bundle ### -->
+        <env name="APP_ENV" value="test"/>
+        <env name="APP_SECRET" value="70850017338905a8038f8161dc838bf1"/>
+        <!-- env name="TRUSTED_PROXIES" value="127.0.0.1,127.0.0.2" -->
+        <!-- env name="TRUSTED_HOSTS" value="localhost,example.com" -->
+        <!-- ###- symfony/framework-bundle ### -->
     </php>
 
     <testsuites>

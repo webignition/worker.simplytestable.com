@@ -1,0 +1,130 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+  curl_options:
+    CURLOPT_SSL_VERIFYPEER: false
+    CURLOPT_SSL_VERIFYHOST: false
+    CURLOPT_TIMEOUT_MS: 30000
+  link_integrity_user_agents:
+    - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
+    - Mozilla/5.0
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        public: false       # Allows optimizing the container by removing unused services; this also means
+                            # fetching services directly from the container via $container->get() won't work.
+                            # The best practice is to be explicit about your dependencies anyway.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php,App}'
+
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    App\Controller\:
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
+
+    App\Cache\CoreApplicationRouterCacheWarmer:
+      tags:
+        - { name: kernel.cache_warmer, priority: 0 }
+
+    App\Services\CoreApplicationRouter:
+      arguments:
+        $baseUrl: '%env(CORE_URL)%'
+        $kernelProjectDirectory: '%kernel.project_dir%'
+        $cacheDirectory: '%kernel.cache_dir%'
+
+    App\Services\TaskService:
+      public: true
+      calls:
+        - [addTaskDriver, ['html validation', '@App\Services\TaskDriver\HtmlValidationTaskDriver']]
+        - [addTaskDriver, ['css validation', '@App\Services\TaskDriver\CssValidationTaskDriver']]
+        - [addTaskDriver, ['js static analysis', '@App\Services\TaskDriver\JsLintTaskDriver']]
+        - [addTaskDriver, ['link integrity', '@App\Services\TaskDriver\LinkIntegrityTaskDriver']]
+        - [addTaskDriver, ['url discovery', '@App\Services\TaskDriver\UrlDiscoveryTaskDriver']]
+
+    App\Services\TasksService:
+      public: true
+      calls:
+        - [setWorkerProcessCount, ['%env(WORKER_PROCESS_COUNT)%']]
+        - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
+
+    App\Services\WorkerService:
+      public: true
+      arguments:
+        $salt: '%kernel.secret%'
+        $hostname: '%env(HOSTNAME)%'
+
+    GuzzleHttp\Cookie\CookieJarInterface:
+      class: GuzzleHttp\Cookie\CookieJar
+
+    GuzzleHttp\HandlerStack:
+      factory: 'App\Services\HttpHandlerStackFactory:create'
+
+    Kevinrob\GuzzleCache\CacheMiddleware:
+      factory: 'App\Services\HttpCacheMiddlewareFactory:create'
+
+    webignition\HttpHistoryContainer\Container:
+
+    App\Services\HttpClientService:
+      arguments:
+        $curlOptions: '%curl_options%'
+
+    GuzzleHttp\Client:
+      factory: 'App\Services\HttpClientService:getHttpClient'
+
+    App\Services\TaskDriver\HtmlValidationTaskDriver:
+      arguments:
+        $validatorPath: '%env(HTML_VALIDATOR_PATH)%'
+
+    App\Services\TaskDriver\CssValidatorWrapperConfigurationFactory:
+      arguments:
+        - '%env(CSS_VALIDATOR_JAR_PATH)%'
+
+    App\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory:
+      arguments:
+        - '%env(NODE_PATH)%'
+        - '%env(NODE_JSLINT_PATH)%'
+
+    App\Services\TaskDriver\LinkCheckerConfigurationFactory:
+      arguments:
+        - '%link_integrity_user_agents%'
+
+    App\Services\WebResourceRetrieverFactory:
+      arguments:
+          - '@GuzzleHttp\Client'
+
+    webignition\WebResource\Retriever:
+      factory: 'App\Services\WebResourceRetrieverFactory:create'
+
+    webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
+
+    webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware:
+
+    webignition\HtmlValidator\Wrapper\Wrapper:
+
+    webignition\CssValidatorWrapper\Wrapper:
+
+    webignition\NodeJslint\Wrapper\Wrapper:
+
+    App\Services\Resque\QueueService:
+      public: true
+
+    # For retrieval of commands from container in resque jobs
+    App\Command\Task\PerformCommand:
+      public: true
+
+    App\Command\Task\ReportCompletionCommand:
+      public: true
+
+    App\Command\Tasks\RequestCommand:
+      public: true
