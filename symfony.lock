@@ -191,9 +191,6 @@
     "querypath/querypath": {
         "version": "3.0.5"
     },
-    "resquebundle/resque": {
-        "version": "2.0.1"
-    },
     "sebastian/code-unit-reverse-lookup": {
         "version": "1.0.1"
     },
@@ -412,6 +409,9 @@
     },
     "webignition/quoted-string": {
         "version": "0.2.1"
+    },
+    "webignition/resque-bundle": {
+        "version": "dev-master"
     },
     "webignition/string-parser": {
         "version": "0.2.3"

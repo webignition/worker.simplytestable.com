@@ -1,6 +1,12 @@
 {
     "name": "webignition/worker.simplytestable.com",
     "description": "Source for workers to which tasks for http://app.simplytestable.com are assigned",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/webignition/resque"
+        }
+    ],
     "require": {
         "php": ">=7.2.0",
         "chrisboulton/php-resque": "dev-master",
@@ -12,7 +18,6 @@
         "doctrine/orm": "^2.6",
         "guzzlehttp/guzzle": "^6",
         "kevinrob/guzzle-cache-middleware": "^3",
-        "resquebundle/resque": "2.0.6",
         "sensio/framework-extra-bundle": "^5.0.0",
         "symfony/console": "^4.1",
         "symfony/dotenv": "^4.1",
@@ -36,6 +41,7 @@
         "webignition/http-history-container": ">=0.3,<1",
         "webignition/internet-media-type": ">=1,<2.0",
         "webignition/node-jslint-wrapper": ">=1,<2",
+        "webignition/resque-bundle": "dev-master",
         "webignition/url": ">=2,<3",
         "webignition/web-json-model": ">=3,<4",
         "webignition/web-page-model": ">=3,<4",
