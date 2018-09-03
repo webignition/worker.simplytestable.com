@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Functional\Guzzle;
+namespace App\Tests\Functional\Services;
 
 use App\Services\CoreApplicationRouter;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -39,12 +39,12 @@ class CoreApplicationRouterTest extends AbstractBaseTestCase
             'task_complete' => [
                 'name' => 'task_complete',
                 'parameters' => [
-                    'url' => 'http://example.com/',
+                    'url' => base64_encode('http://example.com/'),
                     'type' => 'html validation',
                     'parameter_hash' => 'foo',
                 ],
                 'expectedUrl' =>
-                    'http://test.app.simplytestable.com/task/http%3A%2F%2Fexample.com%2F/'
+                    'http://test.app.simplytestable.com/task/aHR0cDovL2V4YW1wbGUuY29tLw%3D%3D/'
                     .'html%20validation/foo/complete/',
             ],
         ];

@@ -326,6 +326,10 @@ class TaskServiceTest extends AbstractBaseTestCase
         $lastRequest = $this->httpHistoryContainer->getLastRequest();
 
         $this->assertEquals('application/x-www-form-urlencoded', $lastRequest->getHeaderLine('content-type'));
+        $this->assertEquals(
+            '/task/aHR0cDovL2V4YW1wbGUuY29tLw%3D%3D/HTML%20validation/d41d8cd98f00b204e9800998ecf8427e/complete/',
+            $lastRequest->getUri()->getPath()
+        );
 
         $postedData = [];
         parse_str(urldecode($lastRequest->getBody()->getContents()), $postedData);

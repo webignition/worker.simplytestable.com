@@ -276,7 +276,7 @@ class TaskService
         $request = $this->coreApplicationHttpClient->createPostRequest(
             'task_complete',
             [
-                'url' => $task->getUrl(),
+                'url' => base64_encode($task->getUrl()),
                 'type' => $task->getType()->getName(),
                 'parameter_hash' => $task->getParametersHash(),
             ],
