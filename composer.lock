@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "940fc816fc812fe72f9024083cbfdc79",
+    "content-hash": "87e644c230d0b07e4f69c44d7a29683d",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4337,16 +4337,16 @@
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "3.1",
+            "version": "3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "13809046806e6268a44099e510aad987e0c17e69"
+                "reference": "d7fdc20f1a4a174d0dd8f57dd00ed3d10e9e95cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/13809046806e6268a44099e510aad987e0c17e69",
-                "reference": "13809046806e6268a44099e510aad987e0c17e69",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/d7fdc20f1a4a174d0dd8f57dd00ed3d10e9e95cc",
+                "reference": "d7fdc20f1a4a174d0dd8f57dd00ed3d10e9e95cc",
                 "shasum": ""
             },
             "require": {
@@ -4385,7 +4385,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2018-04-17T15:54:47+00:00"
+            "time": "2018-09-04T14:07:34+00:00"
         },
         {
             "name": "webignition/html-document-type",
