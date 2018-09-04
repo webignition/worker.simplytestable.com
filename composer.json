@@ -34,7 +34,7 @@
         "webignition/guzzle-http-authentication-middleware": ">=0.1,<1",
         "webignition/guzzle-request-headers-middleware": ">=0.1,<1",
         "webignition/html-document-link-checker": ">=2,<3",
-        "webignition/html-document-link-finder": ">=3.1,<4",
+        "webignition/html-document-link-finder": ">=3.2,<4",
         "webignition/html-document-type": ">=0.1.1,<1.0",
         "webignition/html-validator-output-parser": ">=0.7.1,<1",
         "webignition/html-validator-wrapper": ">=0.5.1,<1",
