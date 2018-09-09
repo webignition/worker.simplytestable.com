@@ -4435,16 +4435,16 @@
         },
         {
             "name": "webignition/html-validator-output-parser",
-            "version": "0.7.1",
+            "version": "0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-validator-output-parser.git",
-                "reference": "cf979523df764afbc5baab689381124449ef7e23"
+                "reference": "64722a4b70adab223c6ee407fff99172129b958a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-validator-output-parser/zipball/cf979523df764afbc5baab689381124449ef7e23",
-                "reference": "cf979523df764afbc5baab689381124449ef7e23",
+                "url": "https://api.github.com/repos/webignition/html-validator-output-parser/zipball/64722a4b70adab223c6ee407fff99172129b958a",
+                "reference": "64722a4b70adab223c6ee407fff99172129b958a",
                 "shasum": ""
             },
             "require": {
@@ -4473,7 +4473,7 @@
                 "parser",
                 "validator"
             ],
-            "time": "2018-03-13T07:34:02+00:00"
+            "time": "2018-09-09T18:40:45+00:00"
         },
         {
             "name": "webignition/html-validator-wrapper",
