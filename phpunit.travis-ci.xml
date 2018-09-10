@@ -15,8 +15,6 @@
         <env name="CORE_URL" value="http://test.app.simplytestable.com"/>
         <env name="HTML_VALIDATOR_PATH" value="/usr/local/validator/cgi-bin/check"/>
         <env name="CSS_VALIDATOR_JAR_PATH" value="/usr/share/css-validator/2002/css-validator/css-validator.jar"/>
-        <env name="NODE_PATH" value="/usr/bin/node"/>
-        <env name="NODE_JSLINT_PATH" value="/usr/share/node-jslint/node_modules/jslint/bin/jslint.js"/>
         <env name="HOSTNAME" value="worker.simplytestable.com"/>
         <env name="WORKER_PROCESS_COUNT" value="5"/>
         <env name="MAX_TASKS_REQUEST_FACTOR" value="2"/>
