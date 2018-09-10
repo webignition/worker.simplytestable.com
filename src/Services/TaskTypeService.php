@@ -10,7 +10,6 @@ class TaskTypeService
 {
     const HTML_VALIDATION_NAME = 'HTML Validation';
     const CSS_VALIDATION_NAME = 'CSS Validation';
-    const JS_STATIC_ANALYSIS_NAME = 'JS static analysis';
     const URL_DISCOVERY_NAME = 'URL discovery';
     const LINK_INTEGRITY_NAME = 'Link integrity';
 
@@ -77,14 +76,6 @@ class TaskTypeService
     public function getCssValidationTaskType()
     {
         return $this->fetch(self::CSS_VALIDATION_NAME);
-    }
-
-    /**
-     * @return TaskType
-     */
-    public function getJavaScriptStatisAnalysisTaskType()
-    {
-        return $this->fetch(self::JS_STATIC_ANALYSIS_NAME);
     }
 
     /**

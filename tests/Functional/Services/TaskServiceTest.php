@@ -105,11 +105,6 @@ class TaskServiceTest extends AbstractBaseTestCase
                 'taskTypeName' => TaskTypeService::CSS_VALIDATION_NAME,
                 'parameters' => self::DEFAULT_TASK_PARAMETERS,
             ],
-            'js static analysis default' => [
-                'url' => self::DEFAULT_TASK_URL,
-                'taskTypeName' => TaskTypeService::JS_STATIC_ANALYSIS_NAME,
-                'parameters' => self::DEFAULT_TASK_PARAMETERS,
-            ],
             'link integrity default' => [
                 'url' => self::DEFAULT_TASK_URL,
                 'taskTypeName' => TaskTypeService::LINK_INTEGRITY_NAME,
