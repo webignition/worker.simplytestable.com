@@ -401,12 +401,6 @@
     "webignition/internet-media-type-interface": {
         "version": "0.1"
     },
-    "webignition/node-jslint-output-parser": {
-        "version": "2.0"
-    },
-    "webignition/node-jslint-wrapper": {
-        "version": "1.0"
-    },
     "webignition/quoted-string": {
         "version": "0.2.1"
     },

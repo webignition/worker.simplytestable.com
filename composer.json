@@ -40,7 +40,6 @@
         "webignition/html-validator-wrapper": ">=0.5.1,<1",
         "webignition/http-history-container": ">=0.3,<1",
         "webignition/internet-media-type": ">=1,<2.0",
-        "webignition/node-jslint-wrapper": ">=1,<2",
         "webignition/resque-bundle": "dev-master",
         "webignition/url": ">=2,<3",
         "webignition/web-json-model": ">=3,<4",
