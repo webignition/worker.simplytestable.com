@@ -48,7 +48,6 @@ services:
       calls:
         - [addTaskDriver, ['html validation', '@App\Services\TaskDriver\HtmlValidationTaskDriver']]
         - [addTaskDriver, ['css validation', '@App\Services\TaskDriver\CssValidationTaskDriver']]
-        - [addTaskDriver, ['js static analysis', '@App\Services\TaskDriver\JsLintTaskDriver']]
         - [addTaskDriver, ['link integrity', '@App\Services\TaskDriver\LinkIntegrityTaskDriver']]
         - [addTaskDriver, ['url discovery', '@App\Services\TaskDriver\UrlDiscoveryTaskDriver']]
 
@@ -89,11 +88,6 @@ services:
     App\Services\TaskDriver\CssValidatorWrapperConfigurationFactory:
       arguments:
         - '%env(CSS_VALIDATOR_JAR_PATH)%'
-
-    App\Services\TaskDriver\NodeJsLintWrapperConfigurationFactory:
-      arguments:
-        - '%env(NODE_PATH)%'
-        - '%env(NODE_JSLINT_PATH)%'
 
     App\Services\TaskDriver\LinkCheckerConfigurationFactory:
       arguments:
