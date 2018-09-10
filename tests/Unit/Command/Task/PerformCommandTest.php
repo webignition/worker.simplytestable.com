@@ -9,7 +9,6 @@ use App\Services\WorkerService;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\MockFactory;
-use webignition\ResqueJobFactory\ResqueJobFactory;
 use App\Services\Resque\QueueService as ResqueQueueService;
 
 /**
@@ -72,16 +71,11 @@ class PerformCommandTest extends \PHPUnit\Framework\TestCase
             $services[ResqueQueueService::class] = MockFactory::createResqueQueueService();
         }
 
-        if (!isset($services[ResqueJobFactory::class])) {
-            $services[ResqueJobFactory::class] = MockFactory::createResqueJobFactory();
-        }
-
         return new PerformCommand(
             $services[LoggerInterface::class],
             $services[TaskService::class],
             $services[WorkerService::class],
-            $services[ResqueQueueService::class],
-            $services[ResqueJobFactory::class]
+            $services[ResqueQueueService::class]
         );
     }
 

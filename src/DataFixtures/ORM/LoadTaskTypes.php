@@ -24,11 +24,6 @@ class LoadTaskTypes extends Fixture implements DependentFixtureInterface
             'class' => 'verification',
             'selectable' => true
         ],
-        'JS static analysis' => [
-            'description' => 'JavaScript static code analysis (via jslint)',
-            'class' => 'verification',
-            'selectable' => true
-        ],
         'URL discovery' => [
             'description' => 'Discover in-scope URLs from the anchors within a given URL',
             'class' => 'discovery',
