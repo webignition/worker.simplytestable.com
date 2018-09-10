@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "87e644c230d0b07e4f69c44d7a29683d",
+    "content-hash": "1dc0e15bb4832401461901d21cfda5fb",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4662,105 +4662,6 @@
                 "media-type"
             ],
             "time": "2018-03-21T10:55:33+00:00"
-        },
-        {
-            "name": "webignition/node-jslint-output-parser",
-            "version": "2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webignition/node-jslint-output-parser.git",
-                "reference": "eb546e0922ea3e4d8d37987f54822a447e2e7610"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-output-parser/zipball/eb546e0922ea3e4d8d37987f54822a447e2e7610",
-                "reference": "eb546e0922ea3e4d8d37987f54822a447e2e7610",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.6.0"
-            },
-            "require-dev": {
-                "mockery/mockery": "^1",
-                "phpunit/phpunit": "^5",
-                "squizlabs/php_codesniffer": "^3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "webignition\\NodeJslintOutput\\": "src/",
-                    "webignition\\Tests\\HtmlDocumentLinkUrlFinder\\": "tests/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jon Cram",
-                    "email": "jon@webignition.net"
-                }
-            ],
-            "description": "Parser for the output of reid / node-jslint, get lovely things such as a list of errors, error counts, % of content scanned, bunnies",
-            "homepage": "https://github.com/webignition/node-jslint-output-parser",
-            "keywords": [
-                "jslint",
-                "output",
-                "parser"
-            ],
-            "time": "2018-04-03T18:09:57+00:00"
-        },
-        {
-            "name": "webignition/node-jslint-wrapper",
-            "version": "1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webignition/node-jslint-wrapper.git",
-                "reference": "e25a59e17a1445557c72efa73196982d95d1760d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webignition/node-jslint-wrapper/zipball/e25a59e17a1445557c72efa73196982d95d1760d",
-                "reference": "e25a59e17a1445557c72efa73196982d95d1760d",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "^6",
-                "php": ">=5.6.0",
-                "webignition/node-jslint-output-parser": ">=2,<3",
-                "webignition/web-resource-retriever": ">=0.6,<1",
-                "webignition/web-resource-storage": ">=0.1,<1"
-            },
-            "require-dev": {
-                "mockery/mockery": ">=0.9",
-                "php-mock/php-mock-mockery": "1.1.0",
-                "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "^3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "webignition\\NodeJslint\\Wrapper\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jon Cram",
-                    "email": "jon@webignition.net"
-                }
-            ],
-            "description": "Wrapper for the nodejs jslint wrapper. I heard you liked wrappers ...",
-            "homepage": "https://github.com/webignition/node-jslint-wrapper",
-            "keywords": [
-                "jslint",
-                "wrapper"
-            ],
-            "time": "2018-04-04T18:04:32+00:00"
         },
         {
             "name": "webignition/quoted-string",
