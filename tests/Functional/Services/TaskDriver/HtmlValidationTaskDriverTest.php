@@ -263,7 +263,7 @@ class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
         (in other words, the bytes found are not valid values in the specified
         Character Encoding). Please check both the content of the file and the
         character encoding indication.
-      </p><p>The error was: 
+      </p><p>The error was:
         utf8 "\xE1" does not map to Unicode
 
       </p>',
@@ -271,6 +271,16 @@ class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
                             'type' => 'error',
                         ]
                     ],
+                ],
+            ],
+            'css validation errors only, ignored' => [
+                'content' => '<!DOCTYPE html>',
+                'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('css-errors-only'),
+                'expectedHasSucceeded' => true,
+                'expectedIsRetryable' => true,
+                'expectedErrorCount' => 0,
+                'expectedDecodedOutput' => [
+                    'messages' => [],
                 ],
             ],
         ];

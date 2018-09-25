@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1dc0e15bb4832401461901d21cfda5fb",
+    "content-hash": "1ba265d20c1ea253d6c094322bb29672",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -3408,7 +3408,8 @@
             ],
             "description": "Enforces Long Term Supported versions of Symfony components",
             "homepage": "https://symfony.com",
-            "time": "2018-04-03T05:04:16+00:00"
+            "abandoned": "symfony/flex",
+            "time": "2018-09-13T17:13:03+00:00"
         },
         {
             "name": "symfony/monolog-bridge",
@@ -4435,24 +4436,24 @@
         },
         {
             "name": "webignition/html-validator-output-parser",
-            "version": "0.8",
+            "version": "1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-validator-output-parser.git",
-                "reference": "64722a4b70adab223c6ee407fff99172129b958a"
+                "reference": "c27486307f8939840639516ab9bac75ab633c46a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-validator-output-parser/zipball/64722a4b70adab223c6ee407fff99172129b958a",
-                "reference": "64722a4b70adab223c6ee407fff99172129b958a",
+                "url": "https://api.github.com/repos/webignition/html-validator-output-parser/zipball/c27486307f8939840639516ab9bac75ab633c46a",
+                "reference": "c27486307f8939840639516ab9bac75ab633c46a",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.6",
+                "php": ">=7.2",
                 "webignition/internet-media-type": ">=0.4.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "~5.0",
+                "phpunit/phpunit": "~7.0",
                 "squizlabs/php_codesniffer": "3.*"
             },
             "type": "library",
@@ -4473,31 +4474,31 @@
                 "parser",
                 "validator"
             ],
-            "time": "2018-09-09T18:40:45+00:00"
+            "time": "2018-09-25T13:41:23+00:00"
         },
         {
             "name": "webignition/html-validator-wrapper",
-            "version": "0.5.1",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-validator-wrapper.git",
-                "reference": "108d744560d031b145791e7807ed979a3bfcdac3"
+                "reference": "a121f6f2f783978de547b4ee77028915038bcc61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-validator-wrapper/zipball/108d744560d031b145791e7807ed979a3bfcdac3",
-                "reference": "108d744560d031b145791e7807ed979a3bfcdac3",
+                "url": "https://api.github.com/repos/webignition/html-validator-wrapper/zipball/a121f6f2f783978de547b4ee77028915038bcc61",
+                "reference": "a121f6f2f783978de547b4ee77028915038bcc61",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.6",
-                "webignition/html-validator-output-parser": ">=0.7,<1.0"
+                "php": ">=7.2",
+                "webignition/html-validator-output-parser": "^1.1"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9",
-                "php-mock/php-mock-mockery": "1.1.0",
-                "phpunit/phpunit": "~5.0",
-                "squizlabs/php_codesniffer": "3.*"
+                "mockery/mockery": "^1",
+                "php-mock/php-mock-mockery": "^1",
+                "phpunit/phpunit": "^7.0",
+                "squizlabs/php_codesniffer": "^3"
             },
             "type": "library",
             "autoload": {
@@ -4515,7 +4516,7 @@
                 "html",
                 "validator"
             ],
-            "time": "2018-03-12T16:55:32+00:00"
+            "time": "2018-09-25T14:25:02+00:00"
         },
         {
             "name": "webignition/http-history-container",
