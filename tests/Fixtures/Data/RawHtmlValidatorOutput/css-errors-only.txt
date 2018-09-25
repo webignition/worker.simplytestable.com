@@ -1,0 +1,95 @@
+Content-Type: application/json; charset=UTF-8
+X-W3C-Validator-Recursion: 1
+X-W3C-Validator-Status: Invalid
+X-W3C-Validator-Errors: 10
+X-W3C-Validator-Warnings: 0
+
+{
+    "url": "http://example.com",
+    "messages": [
+          {
+              "lastLine": 1,
+              "lastColumn": 37740,
+              "message": "CSS: min-height: Too many values or values are not recognized.",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=https%3A%2F%2Fwww.creative-asset.co.uk%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          },
+          {
+              "lastLine": 1,
+              "lastColumn": 37881,
+              "message": "CSS: text-transform: Parse Error.",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=https%3A%2F%2Fwww.creative-asset.co.uk%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          },
+          {
+              "lastLine": 1,
+              "lastColumn": 62010,
+              "message": "CSS: background: Lexical error at line 1, column 58474.  Encountered: \";\" (59), after : \"#\".",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=https%3A%2F%2Fwww.creative-asset.co.uk%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          },
+          {
+              "lastLine": 1,
+              "lastColumn": 73508,
+              "message": "CSS: font-size: px is not a font-size value.",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=https%3A%2F%2Fwww.creative-asset.co.uk%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          },
+          {
+              "lastLine": 1,
+              "lastColumn": 73526,
+              "message": "CSS: letter-spacing: px is not a letter-spacing value.",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=https%3A%2F%2Fwww.creative-asset.co.uk%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          },
+          {
+              "lastLine": 1,
+              "lastColumn": 107702,
+              "message": "CSS: background: inherit is not a background value.",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=https%3A%2F%2Fwww.creative-asset.co.uk%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          },
+          {
+              "lastLine": 1,
+              "lastColumn": 152320,
+              "message": "CSS: perspective: only 0 can be a unit. You must put a unit after your number.",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=https%3A%2F%2Fwww.creative-asset.co.uk%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          },
+          {
+              "lastLine": 1,
+              "lastColumn": 155520,
+              "message": "CSS: Parse Error.",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=https%3A%2F%2Fwww.creative-asset.co.uk%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          },
+          {
+              "lastLine": 1,
+              "lastColumn": 158903,
+              "message": "CSS: color: Lexical error at line 1, column 155367.  Encountered: \"}\" (125), after : \"#\".",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=https%3A%2F%2Fwww.creative-asset.co.uk%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          },
+          {
+              "lastLine": 19,
+              "lastColumn": 263,
+              "message": "CSS: color: Parse Error.",
+              "messageid": "html5",
+              "explanation": "    <p class=\"helpwanted\">\n      <a\n        href=\"feedback.html?uri=https%3A%2F%2Fwww.creative-asset.co.uk%2F;errmsg_id=html5#errormsg\"\n\ttitle=\"Suggest improvements on this error message through our feedback channels\" \n      >&#x2709;</a>\n    </p>\n",
+              "type": "error"
+          }
+        ],
+    "source": {
+        "encoding": "utf-8",
+        "type": "text/html"
+    }
+}

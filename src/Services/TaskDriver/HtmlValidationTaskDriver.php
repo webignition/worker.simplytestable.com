@@ -6,6 +6,7 @@ use QueryPath\Exception as QueryPathException;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\StateService;
+use webignition\HtmlValidator\Output\Parser\Configuration as HtmlValidatorOutputParserConfiguration;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\Retriever as WebResourceRetriever;
@@ -115,14 +116,17 @@ class HtmlValidationTaskDriver extends AbstractWebPageTaskDriver
 
         $webPageCharacterSet = $webPage->getCharacterSet();
 
-        $this->htmlValidatorWrapper->createConfiguration([
-            HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_URI =>
-                'file:' . $this->storeTmpFile($webPageContent),
-            HtmlValidatorWrapper::CONFIG_KEY_VALIDATOR_PATH =>
-                $this->validatorPath,
-            HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_CHARACTER_SET => is_null($webPageCharacterSet)
-                    ? self::DEFAULT_CHARACTER_ENCODING
-                    : $webPageCharacterSet
+        if (empty($webPageCharacterSet)) {
+            $webPageCharacterSet = self::DEFAULT_CHARACTER_ENCODING;
+        }
+
+        $this->htmlValidatorWrapper->configure([
+            HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_URI => 'file:' . $this->storeTmpFile($webPageContent),
+            HtmlValidatorWrapper::CONFIG_KEY_VALIDATOR_PATH => $this->validatorPath,
+            HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_CHARACTER_SET => $webPageCharacterSet,
+            HtmlValidatorWrapper::CONFIG_KEY_PARSER_CONFIGURATION_VALUES => [
+                HtmlValidatorOutputParserConfiguration::KEY_CSS_VALIDATION_ISSUES => true,
+            ],
         ]);
 
         $output = $this->htmlValidatorWrapper->validate();
