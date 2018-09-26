@@ -105,16 +105,7 @@ class PerformCommand extends Command
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }
 
-        try {
-            $this->taskService->perform($task);
-        } catch (\Exception $e) {
-            $this->logger->error('TaskPerformCommand: Exception: taskId: [' . $task->getId() . ']');
-            $this->logger->error('TaskPerformCommand: Exception: exception class: [' . get_class($e) . ']');
-            $this->logger->error('TaskPerformCommand: Exception: exception code: [' . $e->getCode() . ']');
-            $this->logger->error('TaskPerformCommand: Exception: exception msg: [' . $e->getMessage() . ']');
-
-            return self::RETURN_CODE_TASK_SERVICE_RAISED_EXCEPTION;
-        }
+        $this->taskService->perform($task);
 
         if ($this->resqueQueueService->isEmpty('tasks-request')) {
             $this->resqueQueueService->enqueue(new TasksRequestJob());
