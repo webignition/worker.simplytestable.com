@@ -62,35 +62,6 @@ class PerformCommandTest extends AbstractBaseTestCase
     /**
      * @throws \Exception
      */
-    public function testTaskServiceRaisesException()
-    {
-        $testTaskFactory = new TestTaskFactory(self::$container);
-        $httpMockHandler = self::$container->get(HttpMockHandler::class);
-
-        $httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ]);
-
-        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => TaskTypeService::CSS_VALIDATION_NAME,
-        ]));
-
-        CssValidatorFixtureFactory::set(CssValidatorFixtureFactory::load('invalid-validator-output'));
-
-        $returnCode = $this->command->run(
-            new ArrayInput([
-                'id' => $task->getId(),
-            ]),
-            new NullOutput()
-        );
-
-        $this->assertEquals(PerformCommand::RETURN_CODE_TASK_SERVICE_RAISED_EXCEPTION, $returnCode);
-    }
-
-    /**
-     * @throws \Exception
-     */
     public function testPerformSuccess()
     {
         $httpMockHandler = self::$container->get(HttpMockHandler::class);

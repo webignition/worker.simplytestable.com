@@ -33,6 +33,14 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
+    App\EventListener\KernelExceptionLoggerEventListener:
+      tags:
+      - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: 20 }
+
+    App\EventListener\ConsoleExceptionLoggerEventListener:
+      tags:
+      - { name: kernel.event_listener, event: console.error, method: onConsoleError, priority: 20 }
+
     App\Cache\CoreApplicationRouterCacheWarmer:
       tags:
         - { name: kernel.cache_warmer, priority: 0 }
