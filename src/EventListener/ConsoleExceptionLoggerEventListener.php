@@ -13,10 +13,7 @@ class ConsoleExceptionLoggerEventListener extends AbstractExceptionLoggerEventLi
         $error = $event->getError();
 
         $this->logger->error(
-            sprintf(
-                '%s',
-                $command->getName()
-            ),
+            $command->getName(),
             [
                 'args' => $input->getArguments(),
                 'options' => $input->getOptions(),

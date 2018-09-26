@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Tests\Functional\EventListener;
+namespace App\Tests\Unit\EventListener;
 
 use App\EventListener\KernelExceptionLoggerEventListener;
-use App\Tests\Functional\AbstractBaseTestCase;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,7 +11,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class KernelExceptionLoggerEventListenerTest extends AbstractBaseTestCase
+class KernelExceptionLoggerEventListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testOnKernelExceptionForSubRequest()
     {
@@ -99,7 +98,10 @@ class KernelExceptionLoggerEventListenerTest extends AbstractBaseTestCase
         \Exception $exception,
         ?int $requestType = KernelInterface::MASTER_REQUEST
     ): GetResponseForExceptionEvent {
-        return new GetResponseForExceptionEvent(self::$kernel, $request, $requestType, $exception);
+        /* @var KernelInterface $kernel */
+        $kernel = \Mockery::mock(KernelInterface::class);
+
+        return new GetResponseForExceptionEvent($kernel, $request, $requestType, $exception);
     }
 
     protected function tearDown()
