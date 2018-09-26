@@ -302,9 +302,6 @@
     "symfony/http-kernel": {
         "version": "v4.1.1"
     },
-    "symfony/lts": {
-        "version": "4-dev"
-    },
     "symfony/monolog-bridge": {
         "version": "v4.1.1"
     },
@@ -349,9 +346,6 @@
     },
     "theseer/tokenizer": {
         "version": "1.1.0"
-    },
-    "twig/twig": {
-        "version": "v2.5.0"
     },
     "webignition/absolute-url-deriver": {
         "version": "1.5.2"
