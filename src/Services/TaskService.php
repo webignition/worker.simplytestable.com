@@ -7,7 +7,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use App\Entity\Task\Task;
-use App\Entity\Task\Type\Type as TaskType;
+use App\Entity\Task\Type as TaskType;
 use Psr\Log\LoggerInterface;
 use App\Entity\TimePeriod;
 use App\Model\TaskDriver\Response as TaskDriverResponse;

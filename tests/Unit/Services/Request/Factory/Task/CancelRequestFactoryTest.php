@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Request\Task;
+namespace App\Tests\Unit\Services\Request\Factory\Task;
 
 use Mockery\MockInterface;
 use App\Entity\Task\Task;
@@ -63,9 +63,11 @@ class CancelRequestFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param Task $task
+     *
      * @return MockInterface|TaskService
      */
-    private function createTaskService($task)
+    private function createTaskService(Task $task)
     {
         $taskService = \Mockery::mock(TaskService::class);
 

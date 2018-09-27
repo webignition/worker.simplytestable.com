@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Request\Task;
+namespace App\Tests\Unit\Services\Request\Factory\Task;
 
 use Mockery\MockInterface;
 use App\Entity\Task\Task;

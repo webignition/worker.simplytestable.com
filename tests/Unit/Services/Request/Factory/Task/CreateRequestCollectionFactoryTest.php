@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Tests\Unit\Request\Task;
+namespace App\Tests\Unit\Services\Request\Factory\Task;
 
 use Mockery\MockInterface;
 use App\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use App\Services\Request\Factory\Task\CreateRequestFactory;
 use App\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\Request;
-use App\Entity\Task\Type\Type as TaskType;
+use App\Entity\Task\Type as TaskType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class CreateRequestCollectionFactoryTest extends \PHPUnit\Framework\TestCase
@@ -43,7 +43,10 @@ class CreateRequestCollectionFactoryTest extends \PHPUnit\Framework\TestCase
         $createRequestCollectionFactory = new CreateRequestCollectionFactory($requestStack, $createRequestFactory);
         $createRequestCollection = $createRequestCollectionFactory->create();
 
-        $this->assertCount($expectedCollectionCount, $createRequestCollection->getCreateRequests());
+        /* @var array $collection */
+        $collection = $createRequestCollection->getCreateRequests();
+
+        $this->assertCount($expectedCollectionCount, $collection);
     }
 
     /**

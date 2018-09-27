@@ -3,7 +3,7 @@
 namespace App\Entity\Task;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Task\Type\Type as TaskType;
+use App\Entity\Task\Type as TaskType;
 use App\Entity\TimePeriod;
 use App\Model\Task\Parameters;
 
@@ -51,7 +51,7 @@ class Task implements \JsonSerializable
     /**
      * @var TaskType
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Task\Type\Type")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Task\Type")
      * @ORM\JoinColumn(name="tasktype_id", referencedColumnName="id", nullable=false)
      */
     protected $type;
