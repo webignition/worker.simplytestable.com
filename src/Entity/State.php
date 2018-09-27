@@ -70,14 +70,6 @@ class State
     }
 
     /**
-     * @return State
-     */
-    public function getNextState()
-    {
-        return $this->nextState;
-    }
-
-    /**
      * @return string
      */
     public function __toString()
