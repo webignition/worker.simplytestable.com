@@ -25,18 +25,22 @@ class MaintenanceControllerTest extends AbstractControllerTest
     {
         $this->client->request('GET', $this->router->generate('enable_readonly'));
 
+        $worker = $this->workerService->get();
+
         $this->assertSuccessResponse('["Set state to maintenance-read-only"]');
-        $this->assertTrue($this->workerService->isMaintenanceReadOnly());
-        $this->assertFalse($this->workerService->isActive());
+        $this->assertTrue($worker->isMaintenanceReadOnly());
+        $this->assertFalse($worker->isActive());
     }
 
     public function testDisableReadOnlyAction()
     {
         $this->client->request('GET', $this->router->generate('disable_readonly'));
 
+        $worker = $this->workerService->get();
+
         $this->assertSuccessResponse('["Set state to active"]');
-        $this->assertFalse($this->workerService->isMaintenanceReadOnly());
-        $this->assertTrue($this->workerService->isActive());
+        $this->assertFalse($worker->isMaintenanceReadOnly());
+        $this->assertTrue($worker->isActive());
     }
 
     public function testTaskPerformEnqueueAction()
@@ -50,11 +54,13 @@ class MaintenanceControllerTest extends AbstractControllerTest
     {
         $this->client->request('GET', $this->router->generate('leave_readonly'));
 
+        $worker = $this->workerService->get();
+
         $this->assertSuccessResponse(
             '["Set state to active","0 completed tasks ready to be enqueued","0 queued tasks ready to be enqueued"]'
         );
-        $this->assertFalse($this->workerService->isMaintenanceReadOnly());
-        $this->assertTrue($this->workerService->isActive());
+        $this->assertFalse($worker->isMaintenanceReadOnly());
+        $this->assertTrue($worker->isActive());
     }
 
     /**

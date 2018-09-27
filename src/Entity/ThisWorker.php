@@ -113,4 +113,24 @@ class ThisWorker
     {
         return $this->activationToken;
     }
+
+    public function isNew(): bool
+    {
+        return 'worker-' . self::STATE_NEW == $this->state->getName();
+    }
+
+    public function isAwaitingActivationVerification(): bool
+    {
+        return 'worker-' . self::STATE_AWAITING_ACTIVATION_VERIFICATION == $this->state->getName();
+    }
+
+    public function isActive(): bool
+    {
+        return 'worker-' . self::STATE_ACTIVE == $this->state->getName();
+    }
+
+    public function isMaintenanceReadOnly(): bool
+    {
+        return 'worker-' . self::STATE_MAINTENANCE_READ_ONLY == $this->state->getName();
+    }
 }

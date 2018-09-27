@@ -2,6 +2,7 @@
 
 namespace App\Tests\Unit\Command\Task;
 
+use App\Entity\ThisWorker;
 use Psr\Log\LoggerInterface;
 use App\Command\Task\ReportCompletionCommand;
 use App\Services\TaskService;
@@ -22,10 +23,15 @@ class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
      */
     public function testRunInMaintenanceReadOnlyMode()
     {
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(true);
+
         $command = $this->createReportCompletionCommand([
             WorkerService::class => MockFactory::createWorkerService([
-                'isMaintenanceReadOnly' => [
-                    'return' => true,
+                'get' => [
+                    'return' => $worker,
                 ],
             ]),
         ]);
@@ -45,10 +51,15 @@ class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
      */
     public function testRunForInvalidTask()
     {
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(false);
+
         $command = $this->createReportCompletionCommand([
             WorkerService::class => MockFactory::createWorkerService([
-                'isMaintenanceReadOnly' => [
-                    'return' => false,
+                'get' => [
+                    'return' => $worker,
                 ],
             ]),
             TaskService::class => MockFactory::createTaskService([

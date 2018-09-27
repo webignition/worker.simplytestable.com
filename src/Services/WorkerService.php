@@ -122,13 +122,13 @@ class WorkerService
     {
         $this->logger->info("WorkerService::activate: Initialising");
 
-        if (!$this->isNew()) {
+        $thisWorker = $this->get();
+
+        if (!$thisWorker->isNew()) {
             $this->logger->info("WorkerService::activate: This worker is not new and cannot be activated");
 
             return 0;
         }
-
-        $thisWorker = $this->get();
 
         $request = $this->coreApplicationHttpClient->createPostRequest(
             'worker_activate',
@@ -207,7 +207,9 @@ class WorkerService
 
     public function verify()
     {
-        if (!$this->isAwaitingActivationVerification()) {
+        $thisWorker = $this->get();
+
+        if (!$thisWorker->isAwaitingActivationVerification()) {
             $this->logger->info("WorkerService::verify: This worker is not awaiting activation verification");
 
             return true;
@@ -216,46 +218,5 @@ class WorkerService
         $this->setState(self::WORKER_ACTIVE_STATE);
 
         return true;
-    }
-
-    /**
-     * @return bool
-     */
-    private function isNew()
-    {
-        return $this->get()->getState()->equals(
-            $this->stateService->fetch(self::WORKER_NEW_STATE)
-        );
-    }
-
-    /**
-     * @return bool
-     */
-    private function isAwaitingActivationVerification()
-    {
-        return $this->get()->getState()->equals(
-            $this->stateService->fetch(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE)
-        );
-    }
-
-    /**
-     * @return bool
-     */
-    public function isActive()
-    {
-        return $this->get()->getState()->equals(
-            $this->stateService->fetch(self::WORKER_ACTIVE_STATE)
-        );
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function isMaintenanceReadOnly()
-    {
-        return $this->get()->getState()->equals(
-            $this->stateService->fetch(self::WORKER_MAINTENANCE_READ_ONLY_STATE)
-        );
     }
 }

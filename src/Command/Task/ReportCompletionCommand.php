@@ -65,7 +65,9 @@ class ReportCompletionCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($this->workerService->isMaintenanceReadOnly()) {
+        $worker = $this->workerService->get();
+
+        if ($worker->isMaintenanceReadOnly()) {
             $output->writeln('Unable to report completion, worker application is in maintenance read-only mode');
 
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;

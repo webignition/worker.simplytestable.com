@@ -125,14 +125,6 @@ class MockFactory
         /* @var Mock|WorkerService $workerService */
         $workerService = \Mockery::mock(WorkerService::class);
 
-        if (isset($calls['isMaintenanceReadOnly'])) {
-            $callValues = $calls['isMaintenanceReadOnly'];
-
-            $workerService
-                ->shouldReceive('isMaintenanceReadOnly')
-                ->andReturn($callValues['return']);
-        }
-
         if (isset($calls['activate'])) {
             $callValues = $calls['activate'];
 

@@ -2,6 +2,7 @@
 
 namespace App\Tests\Unit\Controller;
 
+use App\Entity\ThisWorker;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Mockery\MockInterface;
@@ -18,15 +19,17 @@ use App\Tests\Factory\MockFactory;
  */
 class TaskControllerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @throws OptimisticLockException
-     */
     public function testCreateCollectionActionInMaintenanceReadOnlyMode()
     {
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(true);
+
         $taskController = $this->createTaskController([
             WorkerService::class => MockFactory::createWorkerService([
-                'isMaintenanceReadOnly' => [
-                    'return' => true,
+                'get' => [
+                    'return' => $worker,
                 ],
             ]),
         ]);
@@ -40,17 +43,19 @@ class TaskControllerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @throws OptimisticLockException
-     */
     public function testCancelCollectionActionInMaintenanceReadOnlyMode()
     {
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(true);
+
         $this->expectException(ServiceUnavailableHttpException::class);
 
         $taskController = $this->createTaskController([
             WorkerService::class => MockFactory::createWorkerService([
-                'isMaintenanceReadOnly' => [
-                    'return' => true,
+                'get' => [
+                    'return' => $worker,
                 ],
             ]),
         ]);
@@ -58,17 +63,19 @@ class TaskControllerTest extends \PHPUnit\Framework\TestCase
         $taskController->cancelAction(MockFactory::createCancelRequestFactory());
     }
 
-    /**
-     * @throws OptimisticLockException
-     */
     public function testCancelActionWithInvalidRequest()
     {
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(false);
+
         $this->expectException(BadRequestHttpException::class);
 
         $taskController = $this->createTaskController([
             WorkerService::class => MockFactory::createWorkerService([
-                'isMaintenanceReadOnly' => [
-                    'return' => false,
+                'get' => [
+                    'return' => $worker,
                 ],
             ]),
         ]);
@@ -82,17 +89,19 @@ class TaskControllerTest extends \PHPUnit\Framework\TestCase
         ]));
     }
 
-    /**
-     * @throws OptimisticLockException
-     */
     public function testCancelCollectionActionWithInvalidRequest()
     {
         $this->expectException(ServiceUnavailableHttpException::class);
 
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(true);
+
         $taskController = $this->createTaskController([
             WorkerService::class => MockFactory::createWorkerService([
-                'isMaintenanceReadOnly' => [
-                    'return' => true,
+                'get' => [
+                    'return' => $worker,
                 ],
             ]),
         ]);

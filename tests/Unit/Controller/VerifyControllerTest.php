@@ -18,11 +18,16 @@ class VerifyControllerTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(ServiceUnavailableHttpException::class);
 
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(true);
+
         $verifyController = new VerifyController();
         $verifyController->indexAction(
             MockFactory::createWorkerService([
-                'isMaintenanceReadOnly' => [
-                    'return' => true,
+                'get' => [
+                    'return' => $worker,
                 ],
             ]),
             MockFactory::createVerifyRequestFactory()
@@ -33,13 +38,18 @@ class VerifyControllerTest extends \PHPUnit\Framework\TestCase
     {
         $verifyRequest = new VerifyRequest(null, null);
 
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(false);
+
         $this->expectException(BadRequestHttpException::class);
 
         $verifyController = new VerifyController();
         $verifyController->indexAction(
             MockFactory::createWorkerService([
-                'isMaintenanceReadOnly' => [
-                    'return' => false,
+                'get' => [
+                    'return' => $worker,
                 ],
             ]),
             MockFactory::createVerifyRequestFactory([
@@ -52,17 +62,23 @@ class VerifyControllerTest extends \PHPUnit\Framework\TestCase
 
     public function testIndexActionWithBadRequest()
     {
-        $verifyRequest = new VerifyRequest('foo', 'bar');
-        $worker = new ThisWorker();
+        $verifyRequest = new VerifyRequest('foo', 'invalid-token');
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(false);
+        $worker
+            ->shouldReceive('getHostname')
+            ->andReturn('foo');
+        $worker
+            ->shouldReceive('getActivationToken')
+            ->andReturn('token');
 
         $this->expectException(BadRequestHttpException::class);
 
         $verifyController = new VerifyController();
         $verifyController->indexAction(
             MockFactory::createWorkerService([
-                'isMaintenanceReadOnly' => [
-                    'return' => false,
-                ],
                 'get' => [
                     'return' => $worker,
                 ],
