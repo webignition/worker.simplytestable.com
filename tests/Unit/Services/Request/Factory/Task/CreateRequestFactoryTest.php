@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Tests\Unit\Request\Task;
+namespace App\Tests\Unit\Services\Request\Factory\Task;
 
 use Mockery\MockInterface;
 use App\Services\Request\Factory\Task\CreateRequestFactory;
 use App\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\Request;
-use App\Entity\Task\Type\Type as TaskType;
+use App\Entity\Task\Type as TaskType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class CreateRequestFactoryTest extends \PHPUnit\Framework\TestCase
@@ -16,7 +16,7 @@ class CreateRequestFactoryTest extends \PHPUnit\Framework\TestCase
      *
      * @param Request $request
      * @param TaskTypeService $taskTypeService
-     * @param TaskType$expectedTaskType
+     * @param TaskType $expectedTaskType
      * @param string $expectedUrl
      * @param string $expectedParameters
      */

@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\Request\Task;
 
-use App\Entity\Task\Type\Type as TaskType;
+use App\Entity\Task\Type as TaskType;
 use App\Request\Task\CreateRequest;
 
 class CreateRequestTest extends \PHPUnit\Framework\TestCase

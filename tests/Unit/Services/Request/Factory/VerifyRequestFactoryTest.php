@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Request;
+namespace App\Tests\Unit\Services\Request\Factory;
 
 use App\Services\Request\Factory\VerifyRequestFactory;
 use Symfony\Component\HttpFoundation\Request;
