@@ -3,7 +3,6 @@
 namespace App\Tests\Functional\Controller;
 
 use App\Controller\VerifyController;
-use App\Entity\State;
 use App\Entity\ThisWorker;
 use App\Services\Request\Factory\VerifyRequestFactory;
 use App\Services\WorkerService;
@@ -37,13 +36,10 @@ class VerifyControllerTest extends AbstractControllerTest
      */
     public function testIndexAction(array $postData, $workerHostname, $workerToken)
     {
-        $workerActiveState = new State();
-        $workerActiveState->setName(WorkerService::WORKER_ACTIVE_STATE);
-
         $worker = new ThisWorker();
         $worker->setHostname($workerHostname);
         $worker->setActivationToken($workerToken);
-        $worker->setState($workerActiveState);
+        $worker->setState(ThisWorker::STATE_ACTIVE);
 
         $workerService = self::$container->get(WorkerService::class);
         $workerService->setGetResult($worker);

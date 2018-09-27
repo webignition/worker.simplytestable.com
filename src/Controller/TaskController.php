@@ -61,7 +61,8 @@ class TaskController extends AbstractController
         TaskFactory $taskFactory,
         QueueService $resqueQueueService
     ) {
-        if ($this->workerService->isMaintenanceReadOnly()) {
+        $worker = $this->workerService->get();
+        if ($worker->isMaintenanceReadOnly()) {
             throw new ServiceUnavailableHttpException();
         }
 
@@ -92,7 +93,8 @@ class TaskController extends AbstractController
      */
     public function cancelAction(CancelRequestFactory $cancelRequestFactory)
     {
-        if ($this->workerService->isMaintenanceReadOnly()) {
+        $worker = $this->workerService->get();
+        if ($worker->isMaintenanceReadOnly()) {
             throw new ServiceUnavailableHttpException();
         }
 
@@ -116,7 +118,8 @@ class TaskController extends AbstractController
      */
     public function cancelCollectionAction(CancelRequestCollectionFactory $cancelRequestCollectionFactory)
     {
-        if ($this->workerService->isMaintenanceReadOnly()) {
+        $worker = $this->workerService->get();
+        if ($worker->isMaintenanceReadOnly()) {
             throw new ServiceUnavailableHttpException();
         }
 

@@ -95,7 +95,9 @@ class PerformCommand extends Command
 
         $this->logger->info("TaskPerformCommand::execute: [".$task->getId()."] [".$task->getState()->getName()."]");
 
-        if ($this->workerService->isMaintenanceReadOnly()) {
+        $worker = $this->workerService->get();
+
+        if ($worker->isMaintenanceReadOnly()) {
             if (!$this->resqueQueueService->contains('task-perform', ['id' => $task->getId()])) {
                 $this->resqueQueueService->enqueue(new TaskPerformJob(['id' => $task->getId()]));
             }

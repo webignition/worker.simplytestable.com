@@ -9,6 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class ThisWorker
 {
+    const STATE_ACTIVE = 'active';
+    const STATE_AWAITING_ACTIVATION_VERIFICATION = 'awaiting-activation-verification';
+    const STATE_NEW = 'new';
+    const STATE_MAINTENANCE_READ_ONLY = 'maintenance-read-only';
+
     /**
      * @var integer
      *
@@ -25,12 +30,10 @@ class ThisWorker
      */
     protected $hostname;
 
-
     /**
-     * @var State
+     * @var string
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\State")
-     * @ORM\JoinColumn(name="state_id", referencedColumnName="id", nullable=false)
+     * @ORM\Column(nullable=true)
      */
     protected $state;
 
@@ -69,22 +72,12 @@ class ThisWorker
         return $this->hostname;
     }
 
-    /**
-     * @param State $state
-     *
-     * @return $this
-     */
-    public function setState(State $state)
+    public function setState(string $state)
     {
         $this->state = $state;
-
-        return $this;
     }
 
-    /**
-     * @return State
-     */
-    public function getState()
+    public function getState(): string
     {
         return $this->state;
     }
@@ -107,5 +100,25 @@ class ThisWorker
     public function getActivationToken()
     {
         return $this->activationToken;
+    }
+
+    public function isNew(): bool
+    {
+        return  self::STATE_NEW == $this->state;
+    }
+
+    public function isAwaitingActivationVerification(): bool
+    {
+        return self::STATE_AWAITING_ACTIVATION_VERIFICATION == $this->state;
+    }
+
+    public function isActive(): bool
+    {
+        return self::STATE_ACTIVE == $this->state;
+    }
+
+    public function isMaintenanceReadOnly(): bool
+    {
+        return self::STATE_MAINTENANCE_READ_ONLY == $this->state;
     }
 }

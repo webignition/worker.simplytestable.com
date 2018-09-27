@@ -13,12 +13,6 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptio
 
 class WorkerService
 {
-    const WORKER_NEW_STATE = 'worker-new';
-    const WORKER_ACTIVE_STATE = 'worker-active';
-    const WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE = 'worker-awaiting-activation-verification';
-    const WORKER_ACTIVATE_REMOTE_ENDPOINT_IDENTIFIER = 'worker-activate';
-    const WORKER_MAINTENANCE_READ_ONLY_STATE = 'worker-maintenance-read-only';
-
     /**
      * @var EntityManagerInterface
      */
@@ -101,7 +95,7 @@ class WorkerService
     {
         $thisWorker = new ThisWorker();
         $thisWorker->setHostname($this->hostname);
-        $thisWorker->setState($this->stateService->fetch('worker-new'));
+        $thisWorker->setState(ThisWorker::STATE_NEW);
         $thisWorker->setActivationToken(md5($this->salt . $this->hostname));
 
         $this->entityManager->persist($thisWorker);
@@ -122,13 +116,13 @@ class WorkerService
     {
         $this->logger->info("WorkerService::activate: Initialising");
 
-        if (!$this->isNew()) {
+        $thisWorker = $this->get();
+
+        if (!$thisWorker->isNew()) {
             $this->logger->info("WorkerService::activate: This worker is not new and cannot be activated");
 
             return 0;
         }
-
-        $thisWorker = $this->get();
 
         $request = $this->coreApplicationHttpClient->createPostRequest(
             'worker_activate',
@@ -176,19 +170,19 @@ class WorkerService
             return $responseCode;
         }
 
-        $this->setState(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE);
+        $this->setState(ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION);
 
         return 0;
     }
 
     public function setActive()
     {
-        $this->setState(self::WORKER_ACTIVE_STATE);
+        $this->setState(ThisWorker::STATE_ACTIVE);
     }
 
     public function setReadOnly()
     {
-        $this->setState(self::WORKER_MAINTENANCE_READ_ONLY_STATE);
+        $this->setState(ThisWorker::STATE_MAINTENANCE_READ_ONLY);
     }
 
     /**
@@ -197,9 +191,7 @@ class WorkerService
     private function setState($stateName)
     {
         $thisWorker = $this->get();
-        $thisWorker->setState(
-            $this->stateService->fetch($stateName)
-        );
+        $thisWorker->setState($stateName);
 
         $this->entityManager->persist($thisWorker);
         $this->entityManager->flush();
@@ -207,55 +199,16 @@ class WorkerService
 
     public function verify()
     {
-        if (!$this->isAwaitingActivationVerification()) {
+        $thisWorker = $this->get();
+
+        if (!$thisWorker->isAwaitingActivationVerification()) {
             $this->logger->info("WorkerService::verify: This worker is not awaiting activation verification");
 
             return true;
         }
 
-        $this->setState(self::WORKER_ACTIVE_STATE);
+        $this->setState(ThisWorker::STATE_ACTIVE);
 
         return true;
-    }
-
-    /**
-     * @return bool
-     */
-    private function isNew()
-    {
-        return $this->get()->getState()->equals(
-            $this->stateService->fetch(self::WORKER_NEW_STATE)
-        );
-    }
-
-    /**
-     * @return bool
-     */
-    private function isAwaitingActivationVerification()
-    {
-        return $this->get()->getState()->equals(
-            $this->stateService->fetch(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE)
-        );
-    }
-
-    /**
-     * @return bool
-     */
-    public function isActive()
-    {
-        return $this->get()->getState()->equals(
-            $this->stateService->fetch(self::WORKER_ACTIVE_STATE)
-        );
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function isMaintenanceReadOnly()
-    {
-        return $this->get()->getState()->equals(
-            $this->stateService->fetch(self::WORKER_MAINTENANCE_READ_ONLY_STATE)
-        );
     }
 }

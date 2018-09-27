@@ -3,6 +3,7 @@
 namespace App\Tests\Unit\Command;
 
 use App\Command\WorkerActivateCommand;
+use App\Entity\ThisWorker;
 use App\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\MockFactory;
@@ -18,10 +19,15 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
      */
     public function testRunInMaintenanceReadOnlyMode()
     {
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(true);
+
         $command = $this->createWorkerActivateCommand([
             WorkerService::class => MockFactory::createWorkerService([
-                'isMaintenanceReadOnly' => [
-                    'return' => true,
+                'get' => [
+                    'return' => $worker,
                 ]
             ]),
         ]);
@@ -73,11 +79,16 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
      */
     public function runDataProvider()
     {
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(false);
+
         return [
             'success' => [
                 'workerService'=> MockFactory::createWorkerService([
-                    'isMaintenanceReadOnly' => [
-                        'return' => false,
+                    'get' => [
+                        'return' => $worker,
                     ],
                     'activate' => [
                         'return' => 0,
@@ -87,8 +98,8 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
             ],
             'unknown error' => [
                 'workerService'=> MockFactory::createWorkerService([
-                    'isMaintenanceReadOnly' => [
-                        'return' => false,
+                    'get' => [
+                        'return' => $worker,
                     ],
                     'activate' => [
                         'return' => 1,
@@ -98,8 +109,8 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
             ],
             'http 404' => [
                 'workerService'=> MockFactory::createWorkerService([
-                    'isMaintenanceReadOnly' => [
-                        'return' => false,
+                    'get' => [
+                        'return' => $worker,
                     ],
                     'activate' => [
                         'return' => 404,
@@ -109,8 +120,8 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
             ],
             'curl 28' => [
                 'workerService'=> MockFactory::createWorkerService([
-                    'isMaintenanceReadOnly' => [
-                        'return' => false,
+                    'get' => [
+                        'return' => $worker,
                     ],
                     'activate' => [
                         'return' => 28,

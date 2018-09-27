@@ -21,7 +21,8 @@ class VerifyController extends AbstractController
      */
     public function indexAction(WorkerService $workerService, VerifyRequestFactory $verifyRequestFactory)
     {
-        if ($workerService->isMaintenanceReadOnly()) {
+        $worker = $workerService->get();
+        if ($worker->isMaintenanceReadOnly()) {
             throw new ServiceUnavailableHttpException();
         }
 

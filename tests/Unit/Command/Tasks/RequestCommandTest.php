@@ -2,6 +2,7 @@
 
 namespace App\Tests\Unit\Command\Tasks;
 
+use App\Entity\ThisWorker;
 use Mockery\MockInterface;
 use App\Command\Tasks\RequestCommand;
 use App\Resque\Job\TasksRequestJob;
@@ -26,10 +27,15 @@ class RequestCommandTest extends \PHPUnit\Framework\TestCase
      */
     public function testMaintenanceMode(ResqueQueueService $resqueQueueService)
     {
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(true);
+
         $command = $this->createRequestCommand([
             WorkerService::class => MockFactory::createWorkerService([
-                'isMaintenanceReadOnly' => [
-                    'return' => true,
+                'get' => [
+                    'return' => $worker,
                 ],
             ]),
             ResqueQueueService::class => $resqueQueueService,
