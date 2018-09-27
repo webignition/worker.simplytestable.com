@@ -12,15 +12,17 @@ class ConsoleExceptionLoggerEventListener extends AbstractExceptionLoggerEventLi
         $input = $event->getInput();
         $error = $event->getError();
 
-        $this->logger->error(
-            $command->getName(),
-            [
-                'args' => $input->getArguments(),
-                'options' => $input->getOptions(),
-                'trace' => $error->getTrace()[0],
-            ]
-        );
+        if (!substr_count(get_class($error), 'Symfony\Component\Console')) {
+            $this->logger->error(
+                $command->getName(),
+                [
+                    'args' => $input->getArguments(),
+                    'options' => $input->getOptions(),
+                    'trace' => $error->getTrace()[0],
+                ]
+            );
 
-        $event->stopPropagation();
+            $event->stopPropagation();
+        }
     }
 }
