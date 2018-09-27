@@ -59,17 +59,6 @@ class State
     }
 
     /**
-     * @param State $nextState
-     *
-     * @return State
-     */
-    public function setNextState(State $nextState = null)
-    {
-        $this->nextState = $nextState;
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function __toString()
