@@ -1,8 +1,8 @@
 <?php
+
 namespace App\Entity\Task;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\State;
 use webignition\InternetMediaType\InternetMediaType;
 
 /**
@@ -22,14 +22,6 @@ class Output
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
-
-    /**
-     * @var State
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\State")
-     * @ORM\JoinColumn(name="state_id", referencedColumnName="id", nullable=false)
-     */
-    protected $state;
 
     /**
      * @var string
@@ -63,26 +55,6 @@ class Output
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param State $state
-     *
-     * @return $this
-     */
-    public function setState(State $state)
-    {
-        $this->state = $state;
-
-        return $this;
-    }
-
-    /**
-     * @return State
-     */
-    public function getState()
-    {
-        return $this->state;
     }
 
     /**
