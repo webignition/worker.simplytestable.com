@@ -2,22 +2,9 @@
 
 namespace App\Services\TaskDriver;
 
-use QueryPath\Exception as QueryPathException;
 use App\Entity\Task\Task;
-use App\Services\HttpClientService;
-use App\Services\StateService;
-use webignition\CssValidatorOutput\CssValidatorOutput;
-use webignition\CssValidatorOutput\Message\AbstractMessage as CssValidatorOutputMessage;
-use webignition\CssValidatorOutput\Message\AbstractMessage;
-use webignition\CssValidatorOutput\Message\Error as CssValidatorOutputError;
-use webignition\CssValidatorOutput\Message\Factory as CssValidatorOutputMessageFactory;
 use webignition\CssValidatorOutput\Parser\Configuration as OutputParserConfiguration;
-use webignition\CssValidatorOutput\Parser\InvalidValidatorOutputException;
 use webignition\CssValidatorWrapper\Configuration\Configuration as WrapperConfiguration;
-use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
-use webignition\InternetMediaType\InternetMediaType;
-use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
-use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
 
 class CssValidatorWrapperConfigurationFactory

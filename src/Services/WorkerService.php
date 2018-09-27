@@ -39,36 +39,21 @@ class WorkerService
     private $hostname;
 
     /**
-     * @var StateService
-     */
-    private $stateService;
-
-    /**
      * @var CoreApplicationHttpClient
      */
     private $coreApplicationHttpClient;
 
-    /**
-     * @param string $salt
-     * @param string $hostname
-     * @param EntityManagerInterface $entityManager
-     * @param LoggerInterface $logger
-     * @param StateService $stateService
-     * @param CoreApplicationHttpClient $coreApplicationHttpClient
-     */
     public function __construct(
-        $salt,
-        $hostname,
+        string $salt,
+        string $hostname,
         EntityManagerInterface $entityManager,
         LoggerInterface $logger,
-        StateService $stateService,
         CoreApplicationHttpClient $coreApplicationHttpClient
     ) {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
         $this->salt = $salt;
         $this->hostname = $hostname;
-        $this->stateService = $stateService;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
 
         $this->entityRepository = $entityManager->getRepository(ThisWorker::class);

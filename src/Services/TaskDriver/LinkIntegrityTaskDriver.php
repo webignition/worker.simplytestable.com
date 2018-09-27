@@ -9,7 +9,6 @@ use QueryPath\Exception as QueryPathException;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
-use App\Services\StateService;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
@@ -32,17 +31,7 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
      */
     private $httpRetryMiddleware;
 
-    /**
-     * @param StateService $stateService
-     * @param HttpClientService $httpClientService
-     * @param HttpClientConfigurationService $httpClientConfigurationService
-     * @param WebResourceRetriever $webResourceRetriever
-     * @param HttpHistoryContainer $httpHistoryContainer
-     * @param LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory
-     * @param HttpRetryMiddleware $httpRetryMiddleware
-     */
     public function __construct(
-        StateService $stateService,
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
@@ -51,7 +40,6 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
         HttpRetryMiddleware $httpRetryMiddleware
     ) {
         parent::__construct(
-            $stateService,
             $httpClientService,
             $httpClientConfigurationService,
             $webResourceRetriever,

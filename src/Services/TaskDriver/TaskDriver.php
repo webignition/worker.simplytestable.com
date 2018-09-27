@@ -4,7 +4,6 @@ namespace App\Services\TaskDriver;
 
 use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
-use App\Services\StateService;
 use App\Model\TaskDriver\Response as TaskDriverResponse;
 use webignition\InternetMediaType\InternetMediaType;
 
@@ -13,22 +12,10 @@ abstract class TaskDriver
     const OUTPUT_STARTING_STATE = 'taskoutput-queued';
 
     /**
-     * @var StateService
-     */
-    private $stateService;
-
-    /**
      * @var TaskDriverResponse
      */
     protected $response = null;
 
-    /**
-     * @param StateService $stateService
-     */
-    public function __construct(StateService $stateService)
-    {
-        $this->stateService = $stateService;
-    }
     /**
      * @param Task $task
      *

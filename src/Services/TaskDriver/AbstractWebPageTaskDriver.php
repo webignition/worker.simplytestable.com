@@ -7,7 +7,6 @@ use GuzzleHttp\Psr7\Request;
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
-use App\Services\StateService;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebResource\Exception\HttpException;
 use webignition\WebResource\Exception\InvalidResponseContentTypeException;
@@ -60,22 +59,12 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
      */
     private $httpHistoryContainer;
 
-    /**
-     * @param StateService $stateService
-     * @param HttpClientService $httpClientService
-     * @param HttpClientConfigurationService $httpClientConfigurationService
-     * @param WebResourceRetriever $webResourceRetriever
-     * @param HttpHistoryContainer $httpHistoryContainer
-     */
     public function __construct(
-        StateService $stateService,
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
         HttpHistoryContainer $httpHistoryContainer
     ) {
-        parent::__construct($stateService);
-
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->webResourceRetriever = $webResourceRetriever;
