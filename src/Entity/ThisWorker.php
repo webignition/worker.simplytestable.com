@@ -9,6 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class ThisWorker
 {
+    const STATE_ACTIVE = 'active';
+    const STATE_AWAITING_ACTIVATION_VERIFICATION = 'awaiting-activation-verification';
+    const STATE_NEW = 'new';
+    const STATE_MAINTENANCE_READ_ONLY = 'maintenance-read-only';
+
     /**
      * @var integer
      *
