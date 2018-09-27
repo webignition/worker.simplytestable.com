@@ -9,24 +9,24 @@ use App\Entity\State;
 class LoadStates extends Fixture
 {
     /**
-     * @var array
+     * @var string[]
      */
-    private $stateDetails = [
-        'worker-active' => null,
-        'worker-awaiting-activation-verification' => 'worker-active',
-        'worker-new' => 'worker-awaiting-activation-verification',
-        'task-cancelled' => null,
-        'task-completed' => null,
-        'task-in-progress' => 'task-completed',
-        'task-queued' => 'task-in-progress',
-        'taskoutput-sent' => null,
-        'taskoutput-sending' => 'taskoutput-sent',
-        'taskoutput-queued' => 'taskoutput-sending',
-        'task-failed-no-retry-available' => null,
-        'task-failed-retry-available' => null,
-        'task-failed-retry-limit-reached' => null,
-        'task-skipped' => null,
-        'worker-maintenance-read-only' => null
+    private $stateNames = [
+        'worker-active',
+        'worker-awaiting-activation-verification',
+        'worker-new',
+        'task-cancelled',
+        'task-completed',
+        'task-in-progress',
+        'task-queued',
+        'taskoutput-sent',
+        'taskoutput-sending',
+        'taskoutput-queued',
+        'task-failed-no-retry-available',
+        'task-failed-retry-available',
+        'task-failed-retry-limit-reached',
+        'task-skipped',
+        'worker-maintenance-read-only',
     ];
 
     /**
@@ -34,23 +34,15 @@ class LoadStates extends Fixture
      */
     public function load(ObjectManager $manager)
     {
-        foreach ($this->stateDetails as $name => $nextStateName) {
+        foreach ($this->stateNames as $stateName) {
             $stateRepository = $manager->getRepository(State::class);
             $state = $stateRepository->findOneBy([
-                'name' => $name,
+                'name' => $stateName,
             ]);
 
             if (empty($state)) {
                 $state = new State();
-                $state->setName($name);
-
-                if (!is_null($nextStateName)) {
-                    $nextState = $stateRepository->findOneBy([
-                        'name' => $nextStateName,
-                    ]);
-
-                    $state->setNextState($nextState);
-                }
+                $state->setName($stateName);
 
                 $manager->persist($state);
                 $manager->flush();

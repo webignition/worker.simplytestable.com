@@ -25,13 +25,6 @@ class State
     protected $name;
 
     /**
-     * @var State
-     *
-     * @ORM\OneToOne(targetEntity="State")
-     */
-    protected $nextState;
-
-    /**
      * @return integer
      */
     public function getId()
@@ -56,25 +49,6 @@ class State
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @param State $nextState
-     *
-     * @return State
-     */
-    public function setNextState(State $nextState = null)
-    {
-        $this->nextState = $nextState;
-        return $this;
-    }
-
-    /**
-     * @return State
-     */
-    public function getNextState()
-    {
-        return $this->nextState;
     }
 
     /**
