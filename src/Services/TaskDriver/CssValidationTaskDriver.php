@@ -6,7 +6,6 @@ use QueryPath\Exception as QueryPathException;
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
-use App\Services\StateService;
 use webignition\CssValidatorOutput\CssValidatorOutput;
 use webignition\CssValidatorOutput\Message\AbstractMessage as CssValidatorOutputMessage;
 use webignition\CssValidatorOutput\Message\AbstractMessage;
@@ -32,17 +31,7 @@ class CssValidationTaskDriver extends AbstractWebPageTaskDriver
      */
     private $configurationFactory;
 
-    /**
-     * @param StateService $stateService
-     * @param HttpClientService $httpClientService
-     * @param HttpClientConfigurationService $httpClientConfigurationService
-     * @param WebResourceRetriever $webResourceRetriever
-     * @param HttpHistoryContainer $httpHistoryContainer
-     * @param CssValidatorWrapper $cssValidatorWrapper
-     * @param CssValidatorWrapperConfigurationFactory $configurationFactory
-     */
     public function __construct(
-        StateService $stateService,
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
@@ -51,7 +40,6 @@ class CssValidationTaskDriver extends AbstractWebPageTaskDriver
         CssValidatorWrapperConfigurationFactory $configurationFactory
     ) {
         parent::__construct(
-            $stateService,
             $httpClientService,
             $httpClientConfigurationService,
             $webResourceRetriever,

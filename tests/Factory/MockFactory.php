@@ -8,7 +8,6 @@ use App\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use App\Services\Request\Factory\Task\CancelRequestFactory;
 use App\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use App\Services\Request\Factory\VerifyRequestFactory;
-use webignition\ResqueJobFactory\ResqueJobFactory;
 use App\Services\Resque\QueueService as ResqueQueueService;
 use App\Services\TaskFactory;
 use App\Services\TaskService;
@@ -70,28 +69,6 @@ class MockFactory
         }
 
         return $resqueQueueService;
-    }
-
-    /**
-     * @param array $calls
-     *
-     * @return Mock|ResqueJobFactory
-     */
-    public static function createResqueJobFactory($calls = [])
-    {
-        /* @var Mock|ResqueJobFactory $resqueJobFactory */
-        $resqueJobFactory = \Mockery::mock(ResqueJobFactory::class);
-
-        if (isset($calls['create'])) {
-            $callValues = $calls['create'];
-
-            $resqueJobFactory
-                ->shouldReceive('create')
-                ->withArgs($callValues['withArgs'])
-                ->andReturn($callValues['return']);
-        }
-
-        return $resqueJobFactory;
     }
 
     /**

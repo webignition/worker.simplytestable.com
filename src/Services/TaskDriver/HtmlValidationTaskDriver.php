@@ -5,7 +5,6 @@ namespace App\Services\TaskDriver;
 use QueryPath\Exception as QueryPathException;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
-use App\Services\StateService;
 use webignition\HtmlValidator\Output\Parser\Configuration as HtmlValidatorOutputParserConfiguration;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
@@ -30,26 +29,15 @@ class HtmlValidationTaskDriver extends AbstractWebPageTaskDriver
      */
     private $validatorPath;
 
-    /**
-     * @param StateService $stateService
-     * @param HttpClientService $httpClientService
-     * @param HttpClientConfigurationService $httpClientConfigurationService
-     * @param WebResourceRetriever $webResourceRetriever
-     * @param HttpHistoryContainer $httpHistoryContainer
-     * @param HtmlValidatorWrapper $htmlValidatorWrapper
-     * @param $validatorPath
-     */
     public function __construct(
-        StateService $stateService,
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
         HttpHistoryContainer $httpHistoryContainer,
         HtmlValidatorWrapper $htmlValidatorWrapper,
-        $validatorPath
+        string $validatorPath
     ) {
         parent::__construct(
-            $stateService,
             $httpClientService,
             $httpClientConfigurationService,
             $webResourceRetriever,

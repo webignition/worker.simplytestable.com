@@ -3,11 +3,10 @@
 namespace App\DataFixtures\ORM;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use App\Entity\Task\Type\TaskTypeClass;
 
-class LoadTaskTypeClasses extends Fixture implements DependentFixtureInterface
+class LoadTaskTypeClasses extends Fixture
 {
     /**
      * @var array
@@ -39,15 +38,5 @@ class LoadTaskTypeClasses extends Fixture implements DependentFixtureInterface
                 $manager->flush();
             }
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDependencies()
-    {
-        return [
-            LoadStates::class,
-        ];
     }
 }
