@@ -13,12 +13,6 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptio
 
 class WorkerService
 {
-    const WORKER_NEW_STATE = 'worker-new';
-    const WORKER_ACTIVE_STATE = 'worker-active';
-    const WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE = 'worker-awaiting-activation-verification';
-    const WORKER_ACTIVATE_REMOTE_ENDPOINT_IDENTIFIER = 'worker-activate';
-    const WORKER_MAINTENANCE_READ_ONLY_STATE = 'worker-maintenance-read-only';
-
     /**
      * @var EntityManagerInterface
      */
@@ -101,7 +95,7 @@ class WorkerService
     {
         $thisWorker = new ThisWorker();
         $thisWorker->setHostname($this->hostname);
-        $thisWorker->setState($this->stateService->fetch('worker-new'));
+        $thisWorker->setState(ThisWorker::STATE_NEW);
         $thisWorker->setActivationToken(md5($this->salt . $this->hostname));
 
         $this->entityManager->persist($thisWorker);
@@ -176,19 +170,19 @@ class WorkerService
             return $responseCode;
         }
 
-        $this->setState(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE);
+        $this->setState(ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION);
 
         return 0;
     }
 
     public function setActive()
     {
-        $this->setState(self::WORKER_ACTIVE_STATE);
+        $this->setState(ThisWorker::STATE_ACTIVE);
     }
 
     public function setReadOnly()
     {
-        $this->setState(self::WORKER_MAINTENANCE_READ_ONLY_STATE);
+        $this->setState(ThisWorker::STATE_MAINTENANCE_READ_ONLY);
     }
 
     /**
@@ -197,9 +191,7 @@ class WorkerService
     private function setState($stateName)
     {
         $thisWorker = $this->get();
-        $thisWorker->setState(
-            $this->stateService->fetch($stateName)
-        );
+        $thisWorker->setState($stateName);
 
         $this->entityManager->persist($thisWorker);
         $this->entityManager->flush();
@@ -215,7 +207,7 @@ class WorkerService
             return true;
         }
 
-        $this->setState(self::WORKER_ACTIVE_STATE);
+        $this->setState(ThisWorker::STATE_ACTIVE);
 
         return true;
     }

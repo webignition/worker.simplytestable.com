@@ -30,12 +30,10 @@ class ThisWorker
      */
     protected $hostname;
 
-
     /**
-     * @var State
+     * @var string
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\State")
-     * @ORM\JoinColumn(name="state_id", referencedColumnName="id", nullable=false)
+     * @ORM\Column(nullable=true)
      */
     protected $state;
 
@@ -74,22 +72,12 @@ class ThisWorker
         return $this->hostname;
     }
 
-    /**
-     * @param State $state
-     *
-     * @return $this
-     */
-    public function setState(State $state)
+    public function setState(string $state)
     {
         $this->state = $state;
-
-        return $this;
     }
 
-    /**
-     * @return State
-     */
-    public function getState()
+    public function getState(): string
     {
         return $this->state;
     }
@@ -116,21 +104,21 @@ class ThisWorker
 
     public function isNew(): bool
     {
-        return 'worker-' . self::STATE_NEW == $this->state->getName();
+        return  self::STATE_NEW == $this->state;
     }
 
     public function isAwaitingActivationVerification(): bool
     {
-        return 'worker-' . self::STATE_AWAITING_ACTIVATION_VERIFICATION == $this->state->getName();
+        return self::STATE_AWAITING_ACTIVATION_VERIFICATION == $this->state;
     }
 
     public function isActive(): bool
     {
-        return 'worker-' . self::STATE_ACTIVE == $this->state->getName();
+        return self::STATE_ACTIVE == $this->state;
     }
 
     public function isMaintenanceReadOnly(): bool
     {
-        return 'worker-' . self::STATE_MAINTENANCE_READ_ONLY == $this->state->getName();
+        return self::STATE_MAINTENANCE_READ_ONLY == $this->state;
     }
 }

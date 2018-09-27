@@ -6,7 +6,6 @@ use Doctrine\ORM\ORMException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use App\Entity\ThisWorker;
-use App\Services\StateService;
 use App\Services\WorkerService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\ConnectExceptionFactory;
@@ -42,7 +41,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
     public function testActivateWhenNotNew()
     {
         $worker = $this->workerService->get();
-        $this->setWorkerState($worker, WorkerService::WORKER_ACTIVE_STATE);
+        $this->setWorkerState($worker, ThisWorker::STATE_ACTIVE);
 
         $this->assertEquals(0, $this->workerService->activate());
     }
@@ -62,7 +61,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $worker = $this->workerService->get();
-        $this->setWorkerState($worker, WorkerService::WORKER_NEW_STATE);
+        $this->setWorkerState($worker, ThisWorker::STATE_NEW);
 
         $this->assertEquals(
             $expectedReturnCode,
@@ -85,14 +84,14 @@ class WorkerServiceTest extends AbstractBaseTestCase
                     new Response(200),
                 ],
                 'expectedReturnCode' => 0,
-                'expectedWorkerState' => 'worker-awaiting-activation-verification',
+                'expectedWorkerState' => ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION,
             ],
             'failure http 404' => [
                 'httpFixtures' => [
                     new Response(404),
                 ],
                 'expectedReturnCode' => 404,
-                'expectedWorkerState' => 'worker-new',
+                'expectedWorkerState' => ThisWorker::STATE_NEW,
             ],
             'failure curl 28' => [
                 'httpFixtures' => [
@@ -104,7 +103,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
                     $curl28ConnectException,
                 ],
                 'expectedReturnCode' => 28,
-                'expectedWorkerState' => 'worker-new',
+                'expectedWorkerState' => ThisWorker::STATE_NEW,
             ],
         ];
     }
@@ -154,7 +153,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
 
         $this->workerService->setActive();
 
-        $this->assertEquals(WorkerService::WORKER_ACTIVE_STATE, $worker->getState());
+        $this->assertEquals(ThisWorker::STATE_ACTIVE, $worker->getState());
     }
 
     /**
@@ -170,7 +169,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
         $this->setWorkerState($worker, $stateName);
 
         $this->workerService->setReadOnly();
-        $this->assertEquals(WorkerService::WORKER_MAINTENANCE_READ_ONLY_STATE, $worker->getState());
+        $this->assertEquals(ThisWorker::STATE_MAINTENANCE_READ_ONLY, $worker->getState());
     }
 
     /**
@@ -180,16 +179,16 @@ class WorkerServiceTest extends AbstractBaseTestCase
     {
         return [
             'new' => [
-                'worker-new',
+                ThisWorker::STATE_NEW,
             ],
             'awaiting-activation-verification' => [
-                'worker-awaiting-activation-verification',
+                ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION,
             ],
             'active' => [
-                'worker-active',
+                ThisWorker::STATE_ACTIVE,
             ],
             'maintenance-read-only' => [
-                'worker-maintenance-read-only',
+                ThisWorker::STATE_MAINTENANCE_READ_ONLY,
             ],
         ];
     }
@@ -218,20 +217,20 @@ class WorkerServiceTest extends AbstractBaseTestCase
     {
         return [
             'new' => [
-                'stateName' => 'worker-new',
-                'expectedWorkerState' => 'worker-new',
+                'stateName' => ThisWorker::STATE_NEW,
+                'expectedWorkerState' => ThisWorker::STATE_NEW,
             ],
             'awaiting-activation-verification' => [
-                'stateName' => 'worker-awaiting-activation-verification',
-                'expectedWorkerState' => 'worker-active',
+                'stateName' => ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION,
+                'expectedWorkerState' => ThisWorker::STATE_ACTIVE,
             ],
             'active' => [
-                'stateName' => 'worker-active',
-                'expectedWorkerState' => 'worker-active',
+                'stateName' => ThisWorker::STATE_ACTIVE,
+                'expectedWorkerState' => ThisWorker::STATE_ACTIVE,
             ],
             'maintenance-read-only' => [
-                'stateName' => 'worker-maintenance-read-only',
-                'expectedWorkerState' => 'worker-maintenance-read-only',
+                'stateName' => ThisWorker::STATE_MAINTENANCE_READ_ONLY,
+                'expectedWorkerState' => ThisWorker::STATE_MAINTENANCE_READ_ONLY,
             ],
         ];
     }
@@ -244,10 +243,9 @@ class WorkerServiceTest extends AbstractBaseTestCase
      */
     private function setWorkerState(ThisWorker $worker, $stateName)
     {
-        $stateService = self::$container->get(StateService::class);
         $entityManager = self::$container->get('doctrine.orm.entity_manager');
 
-        $worker->setState($stateService->fetch($stateName));
+        $worker->setState($stateName);
         $entityManager->persist($worker);
         $entityManager->flush();
     }

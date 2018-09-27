@@ -19,10 +19,10 @@ class StatusController extends AbstractController
     public function indexAction(WorkerService $workerService, HttpCache $httpCache)
     {
         $status = array();
-        $thisWorker = $workerService->get();
+        $worker = $workerService->get();
 
-        $status['hostname'] = $thisWorker->getHostname();
-        $status['state'] = $thisWorker->getState()->getName();
+        $status['hostname'] = $worker->getHostname();
+        $status['state'] = $worker->getState();
         $status['version'] = $this->getLatestGitHash();
 
         if ($httpCache->has()) {
