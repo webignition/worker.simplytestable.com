@@ -9,6 +9,7 @@ use App\Services\TaskTypeService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Factory\TestTaskFactory;
+use Psr\Http\Message\RequestInterface;
 
 class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
 {
@@ -259,6 +260,7 @@ class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         $this->taskDriver->perform($task);
 
+        /* @var RequestInterface[]|array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
         $this->assertCount(3, $historicalRequests);
 
@@ -292,6 +294,7 @@ class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         $this->taskDriver->perform($task);
 
+        /* @var RequestInterface[]|array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
         $this->assertCount(3, $historicalRequests);
 
