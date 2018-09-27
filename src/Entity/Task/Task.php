@@ -3,7 +3,6 @@
 namespace App\Entity\Task;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\State;
 use App\Entity\Task\Type\Type as TaskType;
 use App\Entity\TimePeriod;
 use App\Model\Task\Parameters;
@@ -17,14 +16,14 @@ use App\Model\Task\Parameters;
  */
 class Task implements \JsonSerializable
 {
-    const STATE_QUEUED = 'task-queued';
-    const STATE_IN_PROGRESS = 'task-in-progress';
-    const STATE_COMPLETED = 'task-completed';
-    const STATE_CANCELLED = 'task-cancelled';
-    const STATE_FAILED_NO_RETRY_AVAILABLE = 'task-failed-no-retry-available';
-    const STATE_FAILED_RETRY_AVAILABLE = 'task-failed-retry-available';
-    const STATE_FAILED_RETRY_LIMIT_REACHED = 'task-failed-retry-limit-reached';
-    const STATE_SKIPPED = 'task-skipped';
+    const STATE_QUEUED = 'queued';
+    const STATE_IN_PROGRESS = 'in-progress';
+    const STATE_COMPLETED = 'completed';
+    const STATE_CANCELLED = 'cancelled';
+    const STATE_FAILED_NO_RETRY_AVAILABLE = 'failed-no-retry-available';
+    const STATE_FAILED_RETRY_AVAILABLE = 'failed-retry-available';
+    const STATE_FAILED_RETRY_LIMIT_REACHED = 'failed-retry-limit-reached';
+    const STATE_SKIPPED = 'skipped';
 
     /**
      * @var integer
@@ -43,10 +42,9 @@ class Task implements \JsonSerializable
     protected $url;
 
     /**
-     * @var State
+     * @var string
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\State")
-     * @ORM\JoinColumn(name="state_id", referencedColumnName="id", nullable=false)
+     * @ORM\Column(name="state", nullable=false)
      */
     protected $state;
 
@@ -112,22 +110,12 @@ class Task implements \JsonSerializable
         return $this->url;
     }
 
-    /**
-     * @param State $state
-     *
-     * @return Task
-     */
-    public function setState(State $state)
+    public function setState(string $state)
     {
         $this->state = $state;
-
-        return $this;
     }
 
-    /**
-     * @return State
-     */
-    public function getState()
+    public function getState(): string
     {
         return $this->state;
     }

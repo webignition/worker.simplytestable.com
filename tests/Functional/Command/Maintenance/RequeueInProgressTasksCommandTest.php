@@ -4,7 +4,6 @@ namespace App\Tests\Functional\Command\Maintenance;
 
 use App\Command\Maintenance\RequeueInProgressTasksCommand;
 use App\Entity\Task\Task;
-use App\Services\StateService;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\TestTaskFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -33,15 +32,11 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
 
         $entityManager = self::$container->get('doctrine.orm.entity_manager');
         $taskRepository = $entityManager->getRepository(Task::class);
-        $stateService = self::$container->get(StateService::class);
 
         $testTaskFactory = new TestTaskFactory(self::$container);
 
         /* @var Task[] $tasks */
         $tasks = [];
-
-        $queuedState = $stateService->fetch(Task::STATE_QUEUED);
-        $inProgressState = $stateService->fetch(Task::STATE_IN_PROGRESS);
 
         foreach ($taskValuesCollection as $taskValues) {
             $tasks[] = $testTaskFactory->create($taskValues);
@@ -49,12 +44,12 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
 
         $this->assertCount(
             $expectedInitialQueuedTaskCount,
-            $taskRepository->getIdsByState($queuedState)
+            $taskRepository->getIdsByState(Task::STATE_QUEUED)
         );
 
         $this->assertCount(
             $expectedInitialInProgressTaskCount,
-            $taskRepository->getIdsByState($inProgressState)
+            $taskRepository->getIdsByState(Task::STATE_IN_PROGRESS)
         );
 
         $command = self::$container->get(RequeueInProgressTasksCommand::class);
@@ -68,7 +63,7 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
 
         $this->assertCount(
             $expectedQueuedTaskCount,
-            $taskRepository->getIdsByState($queuedState)
+            $taskRepository->getIdsByState(Task::STATE_QUEUED)
         );
     }
 

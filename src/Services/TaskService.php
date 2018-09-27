@@ -7,7 +7,6 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use App\Entity\Task\Task;
-use App\Entity\State;
 use App\Entity\Task\Type\Type as TaskType;
 use Psr\Log\LoggerInterface;
 use App\Entity\TimePeriod;
@@ -34,11 +33,6 @@ class TaskService
     private $logger;
 
     /**
-     * @var StateService
-     */
-    private $stateService;
-
-    /**
      * @var WorkerService
      */
     private $workerService;
@@ -56,20 +50,17 @@ class TaskService
     /**
      * @param EntityManagerInterface $entityManager
      * @param LoggerInterface $logger
-     * @param StateService $stateService
      * @param WorkerService $workerService
      * @param CoreApplicationHttpClient $coreApplicationHttpClient
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         LoggerInterface $logger,
-        StateService $stateService,
         WorkerService $workerService,
         CoreApplicationHttpClient $coreApplicationHttpClient
     ) {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
-        $this->stateService = $stateService;
         $this->workerService = $workerService;
 
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
@@ -123,23 +114,17 @@ class TaskService
      */
     public function getQueuedTaskIds()
     {
-        return $this->taskRepository->getIdsByState($this->stateService->fetch(Task::STATE_QUEUED));
+        return $this->taskRepository->getIdsByState(Task::STATE_QUEUED);
     }
 
-    /**
-     * @param Task $task
-     */
     public function setQueued(Task $task)
     {
-        $task->setState($this->stateService->fetch(Task::STATE_QUEUED));
+        $task->setState(Task::STATE_QUEUED);
     }
 
-    /**
-     * @param Task $task
-     */
     public function setInProgress(Task $task)
     {
-        $task->setState($this->stateService->fetch(Task::STATE_IN_PROGRESS));
+        $task->setState(Task::STATE_IN_PROGRESS);
     }
 
     /**
@@ -198,57 +183,40 @@ class TaskService
         return $task;
     }
 
-    /**
-     * @param TaskDriverResponse $taskDriverResponse
-     *
-     * @return State
-     */
-    private function getCompletionStateFromTaskDriverResponse(TaskDriverResponse $taskDriverResponse)
+    private function getCompletionStateFromTaskDriverResponse(TaskDriverResponse $taskDriverResponse): string
     {
         if ($taskDriverResponse->hasBeenSkipped()) {
-            return $this->stateService->fetch(Task::STATE_SKIPPED);
+            return Task::STATE_SKIPPED;
         }
 
         if ($taskDriverResponse->hasSucceeded()) {
-            return $this->stateService->fetch(Task::STATE_COMPLETED);
+            return Task::STATE_COMPLETED;
         }
 
-        return $this->stateService->fetch(Task::STATE_FAILED_NO_RETRY_AVAILABLE);
+        return Task::STATE_FAILED_NO_RETRY_AVAILABLE;
     }
 
     /**
      * @param Task $task
-     *
-     * @return Task
      */
     public function cancel(Task $task)
     {
-        $taskStateName = $task->getState()->getName();
+        $taskStateName = $task->getState();
 
         $isCancelled = Task::STATE_CANCELLED === $taskStateName;
         $isCompleted = Task::STATE_COMPLETED === $taskStateName;
 
-        if ($isCancelled || $isCompleted) {
-            return $task;
+        if (!($isCancelled || $isCompleted)) {
+            $this->finish($task, Task::STATE_CANCELLED);
         }
-
-        return $this->finish($task, $this->stateService->fetch(Task::STATE_CANCELLED));
     }
 
-    /**
-     * @param Task $task
-     * @param State $state
-     *
-     * @return Task
-     */
-    private function finish(Task $task, State $state)
+    private function finish(Task $task, string $state)
     {
         $task->setState($state);
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
-
-        return $task;
     }
 
     /**
@@ -284,7 +252,7 @@ class TaskService
                 'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
                 'output' => $task->getOutput()->getOutput(),
                 'contentType' => (string)$task->getOutput()->getContentType(),
-                'state' => $task->getState()->getName(),
+                'state' => 'task-' . $task->getState(),
                 'errorCount' => $task->getOutput()->getErrorCount(),
                 'warningCount' => $task->getOutput()->getWarningCount()
             ]
@@ -343,8 +311,8 @@ class TaskService
     public function getInCompleteCount()
     {
         return $this->taskRepository->getCountByStates([
-            $this->stateService->fetch(Task::STATE_QUEUED),
-            $this->stateService->fetch(Task::STATE_IN_PROGRESS)
+            Task::STATE_QUEUED,
+            Task::STATE_IN_PROGRESS
         ]);
     }
 }

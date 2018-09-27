@@ -4,16 +4,13 @@ namespace App\Tests\Unit\Services;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 use App\Entity\Task\Task;
 use App\Repository\TaskRepository;
 use App\Services\CoreApplicationHttpClient;
-use App\Services\StateService;
 use App\Services\TaskService;
 use App\Services\TaskTypeService;
 use App\Services\WorkerService;
-use App\Tests\Factory\MockEntityFactory;
 
 /**
  * @group TaskService
@@ -34,16 +31,12 @@ class TaskServiceTest extends \PHPUnit\Framework\TestCase
     public function testCancelNoStateChange($stateName, $expectedEndState)
     {
         $task = new Task();
-        $task->setState(MockEntityFactory::createState($stateName));
+        $task->setState($stateName);
 
-        $taskService = $this->createTaskService([
-            StateService::class => $this->createStateService([
-                Task::STATE_CANCELLED,
-            ]),
-        ]);
+        $taskService = $this->createTaskService();
 
         $taskService->cancel($task);
-        $this->assertEquals($expectedEndState, $task->getState()->getName());
+        $this->assertEquals($expectedEndState, $task->getState());
     }
 
     /**
@@ -72,13 +65,7 @@ class TaskServiceTest extends \PHPUnit\Framework\TestCase
     public function testCancel($stateName, $expectedEndState)
     {
         $task = new Task();
-        $task->setState(MockEntityFactory::createState($stateName));
-
-        $stateService = \Mockery::mock(StateService::class);
-        $stateService
-            ->shouldReceive('fetch')
-            ->with(Task::STATE_CANCELLED)
-            ->andReturn(MockEntityFactory::createState(Task::STATE_CANCELLED));
+        $task->setState($stateName);
 
         $taskRepository = \Mockery::mock(TaskRepository::class);
 
@@ -96,11 +83,10 @@ class TaskServiceTest extends \PHPUnit\Framework\TestCase
 
         $taskService = $this->createTaskService([
             EntityManagerInterface::class => $entityManager,
-            StateService::class => $stateService,
         ]);
 
         $taskService->cancel($task);
-        $this->assertEquals($expectedEndState, $task->getState()->getName());
+        $this->assertEquals($expectedEndState, $task->getState());
     }
 
     /**
@@ -143,10 +129,6 @@ class TaskServiceTest extends \PHPUnit\Framework\TestCase
             $services[LoggerInterface::class] = \Mockery::mock(LoggerInterface::class);
         }
 
-        if (!isset($services[StateService::class])) {
-            $services[StateService::class] = \Mockery::mock(StateService::class);
-        }
-
         if (!isset($services[WorkerService::class])) {
             $services[WorkerService::class] = \Mockery::mock(WorkerService::class);
         }
@@ -158,29 +140,9 @@ class TaskServiceTest extends \PHPUnit\Framework\TestCase
         return new TaskService(
             $services[EntityManagerInterface::class],
             $services[LoggerInterface::class],
-            $services[StateService::class],
             $services[WorkerService::class],
             $services[CoreApplicationHttpClient::class]
         );
-    }
-
-    /**
-     * @param string[] $stateNamesToFetch
-     *
-     * @return MockInterface|StateService
-     */
-    private function createStateService($stateNamesToFetch)
-    {
-        $stateService = \Mockery::mock(StateService::class);
-
-        foreach ($stateNamesToFetch as $stateName) {
-            $stateService
-                ->shouldReceive('fetch')
-                ->with($stateName)
-                ->andReturn(MockEntityFactory::createState($stateName));
-        }
-
-        return $stateService;
     }
 
     /**

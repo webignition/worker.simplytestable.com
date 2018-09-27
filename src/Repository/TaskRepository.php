@@ -1,19 +1,19 @@
 <?php
+
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use App\Entity\State;
 
 class TaskRepository extends EntityRepository
 {
     /**
      * Get collection of task ids for tasks in given state
      *
-     * @param State $state
+     * @param string $state
      *
      * @return int[]
      */
-    public function getIdsByState(State $state)
+    public function getIdsByState(string $state)
     {
         $queryBuilder = $this->createQueryBuilder('Task');
         $queryBuilder->select('Task.id');

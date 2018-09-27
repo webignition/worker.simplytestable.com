@@ -224,7 +224,7 @@ class TaskServiceTest extends AbstractBaseTestCase
             sprintf(
                 '/%s/',
                 preg_quote(
-                    "TaskService::reportCompletion: Task state is [task-queued], we can't report back just yet"
+                    "TaskService::reportCompletion: Task state is [queued], we can't report back just yet"
                 )
             ),
             $lastLogLine
@@ -252,10 +252,10 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $this->taskService->perform($task);
-        $initialTaskState = (string)$task->getState();
+        $initialTaskState = $task->getState();
 
         $this->assertEquals($expectedReturnValue, $this->taskService->reportCompletion($task));
-        $this->assertEquals($initialTaskState, (string)$task->getState());
+        $this->assertEquals($initialTaskState, $task->getState());
         $this->assertInternalType('int', $task->getId());
         $this->assertInternalType('int', $task->getOutput()->getId());
         $this->assertInternalType('int', $task->getTimePeriod()->getId());
@@ -312,7 +312,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->assertInternalType('int', $task->getTimePeriod()->getId());
 
         $this->assertTrue($this->taskService->reportCompletion($task));
-        $this->assertEquals(Task::STATE_COMPLETED, (string)$task->getState());
+        $this->assertEquals(Task::STATE_COMPLETED, $task->getState());
 
         $this->assertNull($task->getId());
         $this->assertNull($task->getOutput()->getId());
@@ -338,7 +338,7 @@ class TaskServiceTest extends AbstractBaseTestCase
             [
                 'output' => '{"messages":[]}',
                 'contentType' => 'application/json',
-                'state' => 'task-completed',
+                'state' => 'task-' . Task::STATE_COMPLETED,
                 'errorCount' => '0',
                 'warningCount' => '0',
             ],

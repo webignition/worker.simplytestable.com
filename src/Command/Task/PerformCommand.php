@@ -88,12 +88,16 @@ class PerformCommand extends Command
                 'TaskPerformCommand::execute: [%s] does not exist',
                 $taskId
             ));
-            $output->writeln('Unable to execute, task '.$input->getArgument('id').' does not exist');
+            $output->writeln('Unable to execute, task ' . $taskId . ' does not exist');
 
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
         }
 
-        $this->logger->info("TaskPerformCommand::execute: [".$task->getId()."] [".$task->getState()->getName()."]");
+        $this->logger->info(sprintf(
+            'TaskPerformCommand::execute: [%s] [%s]',
+            $task->getId(),
+            $task->getState()
+        ));
 
         $worker = $this->workerService->get();
 
