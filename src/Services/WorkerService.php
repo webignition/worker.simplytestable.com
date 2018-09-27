@@ -176,9 +176,7 @@ class WorkerService
             return $responseCode;
         }
 
-        $thisWorker->setNextState();
-        $this->entityManager->persist($thisWorker);
-        $this->entityManager->flush();
+        $this->setState(self::WORKER_AWAITING_ACTIVATION_VERIFICATION_STATE);
 
         return 0;
     }
@@ -215,11 +213,7 @@ class WorkerService
             return true;
         }
 
-        $thisWorker = $this->get();
-        $thisWorker->setNextState();
-
-        $this->entityManager->persist($thisWorker);
-        $this->entityManager->flush();
+        $this->setState(self::WORKER_ACTIVE_STATE);
 
         return true;
     }

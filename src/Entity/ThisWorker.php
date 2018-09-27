@@ -108,14 +108,4 @@ class ThisWorker
     {
         return $this->activationToken;
     }
-
-    /**
-     * @return $this
-     */
-    public function setNextState()
-    {
-        $this->state = $this->getState()->getNextState();
-
-        return $this;
-    }
 }
