@@ -2,6 +2,8 @@
 
 namespace App\Services\TaskDriver;
 
+use App\Model\LinkIntegrityResult;
+use App\Model\LinkIntegrityResultCollection;
 use GuzzleHttp\Exception\GuzzleException;
 use QueryPath\Exception as QueryPathException;
 use App\Services\HttpClientConfigurationService;
@@ -13,6 +15,8 @@ use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
+use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkFinderConfiguration;
+use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
 class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
 {
@@ -90,17 +94,48 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
             $this->httpClientService->getHttpClient()
         );
 
-        $linkChecker->setWebPage($webPage);
+        $linkIntegrityResultCollection = new LinkIntegrityResultCollection();
 
         $this->httpRetryMiddleware->disable();
 
-        $linkCheckResults = $linkChecker->getAll();
+        $links = $this->findWebPageLinks($webPage);
+        foreach ($links as $link) {
+            $link['url'] = rawurldecode($link['url']);
+
+            $linkState = $linkChecker->getLinkState($link['url']);
+
+            if ($linkState) {
+                $linkIntegrityResultCollection->add(new LinkIntegrityResult(
+                    $link['url'],
+                    $link['element'],
+                    $linkState
+                ));
+            }
+        }
 
         $this->httpRetryMiddleware->enable();
 
-        $this->response->setErrorCount(count($linkChecker->getErrored()));
+        $this->response->setErrorCount($linkIntegrityResultCollection->getErrorCount());
 
-        return json_encode($this->getOutputObject($linkCheckResults));
+        return json_encode($linkIntegrityResultCollection);
+    }
+
+    /**
+     * @param WebPage $webPage
+     * @return array
+     * @throws QueryPathException
+     */
+    private function findWebPageLinks(WebPage $webPage): array
+    {
+        $linkFinderConfiguration = new LinkFinderConfiguration([
+            LinkFinderConfiguration::CONFIG_KEY_SOURCE => $webPage,
+            LinkFinderConfiguration::CONFIG_KEY_SOURCE_URL => (string)$webPage->getUri(),
+        ]);
+
+        $linkFinder = new HtmlDocumentLinkUrlFinder();
+        $linkFinder->setConfiguration($linkFinderConfiguration);
+
+        return $linkFinder->getAll();
     }
 
     /**
@@ -113,26 +148,5 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
         $contentType->setSubtype('json');
 
         return $contentType;
-    }
-
-    /**
-     * @param array $linkCheckResults
-     *
-     * @return array
-     */
-    private function getOutputObject($linkCheckResults)
-    {
-        $outputObject = [];
-
-        foreach ($linkCheckResults as $linkCheckResult) {
-            $outputObject[] = [
-                'context' => $linkCheckResult->getContext(),
-                'state' => $linkCheckResult->getLinkState()->getState(),
-                'type' => $linkCheckResult->getLinkState()->getType(),
-                'url' => $linkCheckResult->getUrl()
-            ];
-        }
-
-        return $outputObject;
     }
 }
