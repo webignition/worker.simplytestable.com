@@ -2,13 +2,12 @@
 
 namespace App\Tests\Factory;
 
-use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use App\Entity\Task\Task;
 use App\Entity\TimePeriod;
-use App\Services\StateService;
 use App\Services\TaskService;
 use App\Services\TaskTypeService;
 
@@ -69,7 +68,6 @@ class TestTaskFactory
         try {
             $taskTypeService = $this->container->get(TaskTypeService::class);
             $taskService = $this->container->get(TaskService::class);
-            $stateService = $this->container->get(StateService::class);
             $entityManager = $this->container->get('doctrine.orm.entity_manager');
         } catch (NotFoundExceptionInterface $e) {
         } catch (ContainerExceptionInterface $e) {
@@ -83,7 +81,7 @@ class TestTaskFactory
         $task = $taskService->create($taskValues['url'], $taskType, $taskValues['parameters']);
 
         if ($taskValues['state'] != self::DEFAULT_TASK_STATE) {
-            $task->setState($stateService->fetch($taskValues['state']));
+            $task->setState($taskValues['state']);
         }
 
         if (isset($taskValues['age'])) {
@@ -93,11 +91,10 @@ class TestTaskFactory
             $task->setTimePeriod($timePeriod);
         }
 
-        $entityManager->persist($task);
-
         try {
+            $entityManager->persist($task);
             $entityManager->flush();
-        } catch (OptimisticLockException $e) {
+        } catch (ORMException $e) {
         }
 
         return $task;

@@ -38,7 +38,7 @@ class PerformCommandTest extends AbstractBaseTestCase
             'type' => 'html validation',
         ]));
 
-        $this->assertEquals(Task::STATE_QUEUED, (string)$task->getState());
+        $this->assertEquals(Task::STATE_QUEUED, $task->getState());
 
         $command = self::$container->get(PerformCommand::class);
 
@@ -48,7 +48,7 @@ class PerformCommandTest extends AbstractBaseTestCase
         );
 
         $this->assertEquals(0, $returnCode);
-        $this->assertEquals(Task::STATE_COMPLETED, (string)$task->getState());
+        $this->assertEquals(Task::STATE_COMPLETED, $task->getState());
 
         $this->assertTrue($resqueQueueService->contains(
             'task-report-completion',

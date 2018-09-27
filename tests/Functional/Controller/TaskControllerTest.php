@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Controller;
 
+use App\Entity\Task\Task;
 use App\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use App\Services\Request\Factory\Task\CancelRequestFactory;
 use App\Services\Request\Factory\Task\CreateRequestFactory;
@@ -102,7 +103,7 @@ class TaskControllerTest extends AbstractControllerTest
         $testTaskFactory = new TestTaskFactory(self::$container);
 
         $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
-        $this->assertEquals('task-queued', $task->getState());
+        $this->assertEquals(Task::STATE_QUEUED, $task->getState());
 
         $this->client->request(
             'POST',
@@ -115,7 +116,7 @@ class TaskControllerTest extends AbstractControllerTest
         $response = $this->client->getResponse();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('task-cancelled', $task->getState());
+        $this->assertEquals(Task::STATE_CANCELLED, $task->getState());
     }
 
     public function testCancelCollectionAction()
@@ -133,7 +134,7 @@ class TaskControllerTest extends AbstractControllerTest
 
         foreach ($tasks as $task) {
             $taskIds[] = $task->getId();
-            $this->assertEquals('task-queued', $task->getState());
+            $this->assertEquals(Task::STATE_QUEUED, $task->getState());
         }
 
         $this->client->request(
@@ -149,7 +150,7 @@ class TaskControllerTest extends AbstractControllerTest
         $this->assertEquals(200, $response->getStatusCode());
 
         foreach ($tasks as $task) {
-            $this->assertEquals('task-cancelled', $task->getState());
+            $this->assertEquals(Task::STATE_CANCELLED, $task->getState());
         }
     }
 }
