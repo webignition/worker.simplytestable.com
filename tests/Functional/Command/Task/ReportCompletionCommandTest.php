@@ -2,16 +2,16 @@
 
 namespace App\Tests\Functional\Command\Task;
 
-use GuzzleHttp\Psr7\Response;
 use App\Command\Task\ReportCompletionCommand;
 use App\Services\TaskService;
-use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use App\Tests\Factory\TestTaskFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
-use Symfony\Component\Console\Input\ArrayInput;
 use App\Tests\Services\HttpMockHandler;
+use GuzzleHttp\Psr7\Response;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 /**
  * @group Command/Task/ReportCompletionCommand

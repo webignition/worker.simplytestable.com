@@ -2,8 +2,8 @@
 
 namespace App\Tests\Functional\Services\TaskDriver;
 
+use App\Model\Task\TypeInterface;
 use App\Services\TaskDriver\CssValidatorWrapperConfigurationFactory;
-use App\Services\TaskTypeService;
 use App\Tests\Factory\TestTaskFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use webignition\CssValidatorOutput\Parser\Configuration as OutputParserConfiguration;
@@ -53,7 +53,7 @@ class CssValidatorWrapperConfigurationFactoryTest extends AbstractBaseTestCase
 
         $task = $testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => TaskTypeService::CSS_VALIDATION_NAME,
+                'type' => TypeInterface::TYPE_CSS_VALIDATION,
                 'parameters' => json_encode($taskParameters),
             ])
         );

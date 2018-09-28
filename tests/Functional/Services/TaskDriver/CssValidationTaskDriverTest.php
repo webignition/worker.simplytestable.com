@@ -2,9 +2,9 @@
 
 namespace App\Tests\Functional\Services\TaskDriver;
 
+use App\Model\Task\TypeInterface;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskDriver\CssValidationTaskDriver;
-use App\Services\TaskTypeService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\CssValidatorFixtureFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
@@ -40,7 +40,7 @@ class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
      */
     protected function getTaskTypeString()
     {
-        return strtolower(TaskTypeService::CSS_VALIDATION_NAME);
+        return TypeInterface::TYPE_CSS_VALIDATION;
     }
 
     /**
@@ -341,6 +341,7 @@ class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         $this->taskDriver->perform($task);
 
+        /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
         $this->assertCount(4, $historicalRequests);
 
@@ -377,6 +378,7 @@ class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         $this->taskDriver->perform($task);
 
+        /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
         $this->assertCount(4, $historicalRequests);
 

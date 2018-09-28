@@ -2,9 +2,9 @@
 
 namespace App\Tests\Functional\Services\TaskDriver;
 
+use App\Model\Task\TypeInterface;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskDriver\UrlDiscoveryTaskDriver;
-use App\Services\TaskTypeService;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Factory\TestTaskFactory;
 
@@ -37,7 +37,7 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
      */
     protected function getTaskTypeString()
     {
-        return strtolower(TaskTypeService::URL_DISCOVERY_NAME);
+        return TypeInterface::TYPE_URL_DISCOVERY;
     }
 
     /**
@@ -152,6 +152,7 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         $this->taskDriver->perform($task);
 
+        /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
         $this->assertCount(2, $historicalRequests);
 
@@ -180,6 +181,7 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         $this->taskDriver->perform($task);
 
+        /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
         $this->assertCount(2, $historicalRequests);
 

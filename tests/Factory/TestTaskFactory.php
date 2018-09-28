@@ -2,6 +2,7 @@
 
 namespace App\Tests\Factory;
 
+use App\Model\Task\TypeInterface;
 use Doctrine\ORM\ORMException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -9,13 +10,12 @@ use Psr\Container\NotFoundExceptionInterface;
 use App\Entity\Task\Task;
 use App\Entity\TimePeriod;
 use App\Services\TaskService;
-use App\Services\TaskTypeService;
 
 class TestTaskFactory
 {
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';
-    const DEFAULT_TASK_TYPE = TaskTypeService::HTML_VALIDATION_NAME;
+    const DEFAULT_TASK_TYPE = TypeInterface::TYPE_HTML_VALIDATION;
     const DEFAULT_TASK_STATE = Task::STATE_QUEUED;
 
     /**
@@ -60,13 +60,11 @@ class TestTaskFactory
      */
     public function create($taskValues)
     {
-        $taskTypeService = null;
         $taskService = null;
         $stateService = null;
         $entityManager = null;
 
         try {
-            $taskTypeService = $this->container->get(TaskTypeService::class);
             $taskService = $this->container->get(TaskService::class);
             $entityManager = $this->container->get('doctrine.orm.entity_manager');
         } catch (NotFoundExceptionInterface $e) {
@@ -77,8 +75,7 @@ class TestTaskFactory
             $taskValues['parameters'] = '';
         }
 
-        $taskType = $taskTypeService->fetch($taskValues['type']);
-        $task = $taskService->create($taskValues['url'], $taskType, $taskValues['parameters']);
+        $task = $taskService->create($taskValues['url'], $taskValues['type'], $taskValues['parameters']);
 
         if ($taskValues['state'] != self::DEFAULT_TASK_STATE) {
             $task->setState($taskValues['state']);
