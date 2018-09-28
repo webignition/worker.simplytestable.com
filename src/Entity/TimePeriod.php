@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -9,78 +10,54 @@ use Doctrine\ORM\Mapping as ORM;
 class TimePeriod
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private $id;
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(type="datetime", nullable=true)
      */
-    protected $startDateTime;
+    private $startDateTime;
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(type="datetime", nullable=true)
      */
-    protected $endDateTime;
+    private $endDateTime;
 
-    /**
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param \DateTime $startDateTime
-     *
-     * @return TimePeriod
-     */
-    public function setStartDateTime($startDateTime)
+    public function setStartDateTime(\DateTime $startDateTime)
     {
         $this->startDateTime = $startDateTime;
-
-        return $this;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getStartDateTime()
+    public function getStartDateTime(): \DateTime
     {
         return $this->startDateTime;
     }
 
-    /**
-     * @param \DateTime $endDateTime
-     *
-     * @return $this
-     */
-    public function setEndDateTime($endDateTime)
+    public function setEndDateTime(\DateTime $endDateTime)
     {
         $this->endDateTime = $endDateTime;
-
-        return $this;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getEndDateTime()
+    public function getEndDateTime(): ?\DateTime
     {
         return $this->endDateTime;
     }
 
-    /**
-     * @return boolean
-     */
-    public function hasEndDateTime()
+    public function hasEndDateTime(): bool
     {
         return !is_null($this->getEndDateTime());
     }

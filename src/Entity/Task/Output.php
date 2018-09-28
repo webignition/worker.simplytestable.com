@@ -4,136 +4,91 @@ namespace App\Entity\Task;
 
 use Doctrine\ORM\Mapping as ORM;
 use webignition\InternetMediaType\InternetMediaType;
+use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
 
 /**
  * @ORM\Entity
- * @ORM\Table(
- *     name="TaskOutput"
- * )
- *
+ * @ORM\Table(name="TaskOutput")
  */
 class Output
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private $id;
 
     /**
      * @var string
+     *
      * @ORM\Column(type="text", nullable=true)
      */
-    protected $output;
+    private $output;
 
     /**
      * @var InternetMediaType
      * @ORM\Column(type="text", nullable=true)
      */
-    protected $contentType;
+    private $contentType;
 
     /**
      * @var int
+     *
      * @ORM\Column(type="integer", nullable=false)
      */
     private $errorCount = 0;
 
     /**
      * @var int
+     *
      * @ORM\Column(type="integer", nullable=false)
      */
     private $warningCount = 0;
 
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param string $output
-     *
-     * @return $this
-     */
-    public function setOutput($output)
+    public function setOutput(?string $output)
     {
         $this->output = $output;
-
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getOutput()
+    public function getOutput(): ?string
     {
         return $this->output;
     }
 
-
-    /**
-     * @param InternetMediaType $contentType
-     *
-     * @return $this
-     */
-    public function setContentType(InternetMediaType $contentType)
+    public function setContentType(InternetMediaTypeInterface $contentType)
     {
         $this->contentType = $contentType;
-
-        return $this;
     }
 
-    /**
-     * @return InternetMediaType
-     */
-    public function getContentType()
+    public function getContentType(): InternetMediaTypeInterface
     {
         return $this->contentType;
     }
 
-    /**
-     * @param int $errorCount
-     *
-     * @return $this
-     */
-    public function setErrorCount($errorCount)
+    public function setErrorCount(int $errorCount)
     {
         $this->errorCount = $errorCount;
-
-        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getErrorCount()
+    public function getErrorCount(): int
     {
         return $this->errorCount;
     }
 
-    /**
-     * @param integer $warningCount
-     *
-     * @return $this
-     */
-    public function setWarningCount($warningCount)
+    public function setWarningCount(int $warningCount)
     {
         $this->warningCount = $warningCount;
-
-        return $this;
     }
 
-    /**
-     * @return integer
-     */
-    public function getWarningCount()
+    public function getWarningCount(): int
     {
         return $this->warningCount;
     }

@@ -8,9 +8,7 @@ use App\Model\Task\Parameters;
 
 /**
  * @ORM\Entity
- * @ORM\Table(
- *     name="Task"
- * )
+ * @ORM\Table(name="Task")
  * @ORM\Entity(repositoryClass="App\Repository\TaskRepository")
  */
 class Task implements \JsonSerializable
@@ -31,49 +29,49 @@ class Task implements \JsonSerializable
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private $id;
 
     /**
      * @var string
      *
      * @ORM\Column(type="text", nullable=false)
      */
-    protected $url;
+    private $url;
 
     /**
      * @var string
      *
      * @ORM\Column(name="state", nullable=false)
      */
-    protected $state;
+    private $state;
 
     /**
      * @var string
      *
      * @ORM\Column(name="tasktype", nullable=false)
      */
-    protected $type;
+    private $type;
 
     /**
      * @var TimePeriod
      *
      * @ORM\OneToOne(targetEntity="App\Entity\TimePeriod", cascade={"persist"})
      */
-    protected $timePeriod;
+    private $timePeriod;
 
     /**
      * @var Output
      *
      * @ORM\OneToOne(targetEntity="App\Entity\Task\Output", cascade={"persist"})
      */
-    protected $output;
+    private $output;
 
     /**
      * @var string
      *
      * @ORM\Column(type="text", nullable=true)
      */
-    protected $parameters;
+    private $parameters;
 
     /**
      * @var Parameters
