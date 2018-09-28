@@ -74,6 +74,14 @@ class Task implements \JsonSerializable
     private $parameters;
 
     /**
+     * @var Task
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Task\Task")
+     * @ORM\JoinColumn(name="parent_task_id", referencedColumnName="id", nullable=true)
+     */
+    private $parentTask;
+
+    /**
      * @var Parameters
      */
     private $parametersObject;
@@ -208,6 +216,16 @@ class Task implements \JsonSerializable
         }
 
         return filter_var($this->getParameter($parameterName), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    public function setParentTask(Task $parentTask)
+    {
+        $this->parentTask = $parentTask;
+    }
+
+    public function getParentTask(): ?Task
+    {
+        return $this->parentTask;
     }
 
     public function jsonSerialize(): array
