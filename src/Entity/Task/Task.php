@@ -2,6 +2,7 @@
 
 namespace App\Entity\Task;
 
+use App\Model\Task\Type;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\TimePeriod;
 use App\Model\Task\Parameters;
@@ -46,7 +47,7 @@ class Task implements \JsonSerializable
     private $state;
 
     /**
-     * @var string
+     * @var Type
      *
      * @ORM\Column(name="tasktype", nullable=false)
      */
@@ -111,12 +112,12 @@ class Task implements \JsonSerializable
         return $this->state;
     }
 
-    public function setType(string $type)
+    public function setType(Type $type)
     {
         $this->type = $type;
     }
 
-    public function getType(): string
+    public function getType(): Type
     {
         return $this->type;
     }
