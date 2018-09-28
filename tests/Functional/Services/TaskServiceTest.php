@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Services;
 
+use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use Doctrine\ORM\OptimisticLockException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -201,7 +202,10 @@ class TaskServiceTest extends AbstractBaseTestCase
         $entityManager = self::$container->get('doctrine.orm.entity_manager');
         $entityManager->detach($task);
 
-        $this->assertEquals($id, $this->taskService->getById($id)->getId());
+        $retrievedTask = $this->taskService->getById($id);
+
+        $this->assertEquals($id, $retrievedTask->getId());
+        $this->assertInstanceOf(Type::class, $retrievedTask->getType());
     }
 
     /**

@@ -99,6 +99,18 @@ class TaskService
         /* @var $task Task */
         $task = $this->taskRepository->find($id);
 
+        if (empty($task)) {
+            return null;
+        }
+
+        $taskTypeName = $this->taskRepository->getTypeById($task->getId());
+
+        if (empty($taskTypeName)) {
+            return null;
+        }
+
+        $task->setType($this->taskTypeFactory->create($taskTypeName));
+
         return $task;
     }
 

@@ -101,4 +101,20 @@ class TaskRepository extends EntityRepository
 
         return (int)$queryBuilder->getQuery()->getResult()[0][1];
     }
+
+    public function getTypeById(int $taskId): ?string
+    {
+        $queryBuilder = $this->createQueryBuilder('Task');
+        $queryBuilder->select('Task.type');
+        $queryBuilder->where('Task.id = :Id');
+        $queryBuilder->setParameter('Id', $taskId);
+
+        $result = $queryBuilder->getQuery()->getResult();
+
+        if (count($result) === 0) {
+            return null;
+        }
+
+        return $result[0]['type'];
+    }
 }
