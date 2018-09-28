@@ -3,6 +3,7 @@
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Task\Task;
+use App\Model\Task\TypeInterface;
 use App\Request\Task\CreateRequest;
 use App\Services\TaskFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -50,7 +51,7 @@ class TaskFactoryTest extends AbstractBaseTestCase
     {
         return [
             'default' => [
-                'taskType' => 'HTML validation',
+                'taskType' => TypeInterface::TYPE_HTML_VALIDATION,
                 'url' => 'http://example.com',
                 'parameters' => '',
             ],

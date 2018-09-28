@@ -47,22 +47,23 @@ class TaskService
     private $coreApplicationHttpClient;
 
     /**
-     * @param EntityManagerInterface $entityManager
-     * @param LoggerInterface $logger
-     * @param WorkerService $workerService
-     * @param CoreApplicationHttpClient $coreApplicationHttpClient
+     * @var TaskTypeFactory
      */
+    private $taskTypeFactory;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         WorkerService $workerService,
-        CoreApplicationHttpClient $coreApplicationHttpClient
+        CoreApplicationHttpClient $coreApplicationHttpClient,
+        TaskTypeFactory $taskTypeFactory
     ) {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
         $this->workerService = $workerService;
-
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
+        $this->taskTypeFactory = $taskTypeFactory;
+
         $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
@@ -71,7 +72,7 @@ class TaskService
         $task = new Task();
 
         $this->setQueued($task);
-        $task->setType($type);
+        $task->setType($this->taskTypeFactory->create($type));
         $task->setUrl($url);
         $task->setParameters($parameters);
 
