@@ -89,7 +89,7 @@ class ReportCompletionCommand extends Command
         $reportCompletionResult = $this->taskService->reportCompletion($task);
 
         if ($reportCompletionResult === true) {
-            $output->writeln('Reported task completion ['.$task->getId().']');
+            $output->writeln('Reported task completion [' .$task->getId().']');
 
             return 0;
         }

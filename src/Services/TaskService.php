@@ -7,7 +7,6 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use App\Entity\Task\Task;
-use App\Entity\Task\Type as TaskType;
 use Psr\Log\LoggerInterface;
 use App\Entity\TimePeriod;
 use App\Model\TaskDriver\Response as TaskDriverResponse;
@@ -67,14 +66,7 @@ class TaskService
         $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
-    /**
-     * @param string $url
-     * @param TaskType $type
-     * @param string $parameters
-     *
-     * @return Task
-     */
-    public function create($url, TaskType $type, $parameters)
+    public function create($url, string $type, string $parameters): Task
     {
         $task = new Task();
 
@@ -245,7 +237,7 @@ class TaskService
             'task_complete',
             [
                 'url' => base64_encode($task->getUrl()),
-                'type' => $task->getType()->getName(),
+                'type' => $task->getType(),
                 'parameter_hash' => $task->getParametersHash(),
             ],
             [

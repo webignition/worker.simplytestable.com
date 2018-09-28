@@ -2,13 +2,11 @@
 
 namespace App\Tests\Functional\Services\TaskDriver;
 
+use App\Model\Task\TypeInterface;
 use GuzzleHttp\Psr7\Response;
-use App\Services\HttpClientService;
 use App\Services\TaskDriver\HtmlValidationTaskDriver;
-use App\Services\TaskTypeService;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use App\Tests\Factory\TestTaskFactory;
-use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
 {
@@ -39,7 +37,7 @@ class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
      */
     protected function getTaskTypeString()
     {
-        return strtolower(TaskTypeService::HTML_VALIDATION_NAME);
+        return TypeInterface::TYPE_HTML_VALIDATION;
     }
 
     /**
@@ -307,6 +305,7 @@ class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         $this->taskDriver->perform($task);
 
+        /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
         $this->assertCount(2, $historicalRequests);
 
@@ -337,6 +336,7 @@ class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         $this->taskDriver->perform($task);
 
+        /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
         $this->assertCount(2, $historicalRequests);
 

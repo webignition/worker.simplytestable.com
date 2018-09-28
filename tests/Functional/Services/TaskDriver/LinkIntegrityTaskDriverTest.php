@@ -2,10 +2,10 @@
 
 namespace App\Tests\Functional\Services\TaskDriver;
 
+use App\Model\Task\TypeInterface;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskDriver\LinkCheckerConfigurationFactory;
 use App\Services\TaskDriver\LinkIntegrityTaskDriver;
-use App\Services\TaskTypeService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Factory\TestTaskFactory;
@@ -40,7 +40,7 @@ class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
      */
     protected function getTaskTypeString()
     {
-        return strtolower(TaskTypeService::CSS_VALIDATION_NAME);
+        return TypeInterface::TYPE_LINK_INTEGRITY;
     }
 
     /**

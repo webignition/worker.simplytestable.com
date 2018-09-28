@@ -2,12 +2,10 @@
 
 namespace App\Tests\Unit\Services\Request\Factory\Task;
 
-use Mockery\MockInterface;
+use App\Model\Task\TypeInterface;
 use App\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use App\Services\Request\Factory\Task\CreateRequestFactory;
-use App\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\Request;
-use App\Entity\Task\Type as TaskType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class CreateRequestCollectionFactoryTest extends \PHPUnit\Framework\TestCase
@@ -23,23 +21,7 @@ class CreateRequestCollectionFactoryTest extends \PHPUnit\Framework\TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $taskType = new TaskType();
-        $taskType->setName('foo');
-
-        /* @var TaskTypeService|MockInterface $taskTypeService */
-        $taskTypeService = \Mockery::mock(TaskTypeService::class);
-
-        $taskTypeService
-            ->shouldReceive('fetch')
-            ->with('foo')
-            ->andReturn($taskType);
-
-        $taskTypeService
-            ->shouldReceive('fetch')
-            ->with('bar')
-            ->andReturn(null);
-
-        $createRequestFactory = new CreateRequestFactory($requestStack, $taskTypeService);
+        $createRequestFactory = new CreateRequestFactory($requestStack);
         $createRequestCollectionFactory = new CreateRequestCollectionFactory($requestStack, $createRequestFactory);
         $createRequestCollection = $createRequestCollectionFactory->create();
 
@@ -69,7 +51,7 @@ class CreateRequestCollectionFactoryTest extends \PHPUnit\Framework\TestCase
                 'request' => new Request([], [
                     'tasks' => [
                         [
-                            'type' => 'foo',
+                            'type' => TypeInterface::TYPE_HTML_VALIDATION,
                             'url' => 'http://example.com/',
                         ],
                         [

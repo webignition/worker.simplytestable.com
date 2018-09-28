@@ -2,6 +2,7 @@
 
 namespace App\Tests\Unit\Services;
 
+use App\Model\Task\TypeInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -9,7 +10,6 @@ use App\Entity\Task\Task;
 use App\Repository\TaskRepository;
 use App\Services\CoreApplicationHttpClient;
 use App\Services\TaskService;
-use App\Services\TaskTypeService;
 use App\Services\WorkerService;
 
 /**
@@ -19,7 +19,7 @@ class TaskServiceTest extends \PHPUnit\Framework\TestCase
 {
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';
-    const DEFAULT_TASK_TYPE = TaskTypeService::HTML_VALIDATION_NAME;
+    const DEFAULT_TASK_TYPE = TypeInterface::TYPE_HTML_VALIDATION;
     const DEFAULT_TASK_STATE = Task::STATE_QUEUED;
 
     /**

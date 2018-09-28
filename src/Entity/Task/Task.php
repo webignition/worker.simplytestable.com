@@ -3,7 +3,6 @@
 namespace App\Entity\Task;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Task\Type as TaskType;
 use App\Entity\TimePeriod;
 use App\Model\Task\Parameters;
 
@@ -26,7 +25,7 @@ class Task implements \JsonSerializable
     const STATE_SKIPPED = 'skipped';
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -49,10 +48,9 @@ class Task implements \JsonSerializable
     protected $state;
 
     /**
-     * @var TaskType
+     * @var string
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Task\Type")
-     * @ORM\JoinColumn(name="tasktype_id", referencedColumnName="id", nullable=false)
+     * @ORM\Column(name="tasktype", nullable=false)
      */
     protected $type;
 
@@ -82,30 +80,17 @@ class Task implements \JsonSerializable
      */
     private $parametersObject;
 
-    /**
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param string $url
-     *
-     * @return Task
-     */
-    public function setUrl($url)
+    public function setUrl(string $url)
     {
         $this->url = $url;
-
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
@@ -120,114 +105,62 @@ class Task implements \JsonSerializable
         return $this->state;
     }
 
-    /**
-     * @param TaskType $type
-     *
-     * @return Task
-     */
-    public function setType(TaskType $type)
+    public function setType(string $type)
     {
         $this->type = $type;
-
-        return $this;
     }
 
-    /**
-     * @return TaskType
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @param TimePeriod $timePeriod
-     *
-     * @return Task
-     */
-    public function setTimePeriod(TimePeriod $timePeriod = null)
+    public function setTimePeriod(?TimePeriod $timePeriod)
     {
         $this->timePeriod = $timePeriod;
-
-        return $this;
     }
 
-    /**
-     * @return TimePeriod
-     */
-    public function getTimePeriod()
+    public function getTimePeriod(): TimePeriod
     {
         return $this->timePeriod;
     }
 
-    /**
-     * @param Output $output
-     *
-     * @return Task
-     */
     public function setOutput(Output $output)
     {
         $this->output = $output;
-
-        return $this;
     }
 
-    /**
-     * @return Output
-     */
-    public function getOutput()
+    public function getOutput(): Output
     {
         return $this->output;
     }
 
-    /**
-     * @return boolean
-     */
-    public function hasOutput()
+    public function hasOutput(): bool
     {
         return !is_null($this->output);
     }
 
-    /**
-     * @param string $parameters
-     *
-     * @return Task
-     */
-    public function setParameters($parameters)
+    public function setParameters(string $parameters)
     {
         $this->parameters = $parameters;
-
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getParameters()
+    public function getParameters(): string
     {
         return $this->parameters;
     }
 
-    /**
-     * @return string
-     */
-    public function getParametersHash()
+    public function getParametersHash(): string
     {
         return md5($this->getParameters());
     }
 
-    /**
-     * @return boolean
-     */
-    public function hasParameters()
+    public function hasParameters(): bool
     {
         return $this->getParameters() != '';
     }
 
-    /**
-     * @return array
-     */
-    public function getParametersArray()
+    public function getParametersArray(): array
     {
         $decodedParameters = json_decode($this->getParameters(), true);
 
@@ -238,10 +171,7 @@ class Task implements \JsonSerializable
         return $decodedParameters;
     }
 
-    /**
-     * @return Parameters
-     */
-    public function getParametersObject()
+    public function getParametersObject(): Parameters
     {
         if (empty($this->parametersObject)) {
             $this->parametersObject = new Parameters($this);
@@ -250,12 +180,7 @@ class Task implements \JsonSerializable
         return $this->parametersObject;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return boolean
-     */
-    public function hasParameter($name)
+    public function hasParameter(string $name): bool
     {
         $parameters = $this->getParametersArray();
 
@@ -267,22 +192,18 @@ class Task implements \JsonSerializable
      *
      * @return mixed
      */
-    public function getParameter($name)
+    public function getParameter(string $name)
     {
         if (!$this->hasParameter($name)) {
             return null;
         }
 
         $parameters = $this->getParametersArray();
+
         return $parameters[$name];
     }
 
-    /**
-     * @param string $parameterName
-     *
-     * @return boolean
-     */
-    public function isTrue($parameterName)
+    public function isTrue(string $parameterName): bool
     {
         if (!$this->hasParameter($parameterName)) {
             return false;
@@ -291,14 +212,11 @@ class Task implements \JsonSerializable
         return filter_var($this->getParameter($parameterName), FILTER_VALIDATE_BOOLEAN);
     }
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->getId(),
-            'type' => (string)$this->getType(),
+            'type' => $this->getType(),
             'url' => $this->getUrl(),
         ];
     }

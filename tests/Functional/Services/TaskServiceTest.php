@@ -2,13 +2,13 @@
 
 namespace App\Tests\Functional\Services;
 
+use App\Model\Task\TypeInterface;
 use Doctrine\ORM\OptimisticLockException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use App\Entity\Task\Task;
 use App\Services\HttpRetryMiddleware;
 use App\Services\TaskService;
-use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
@@ -24,18 +24,13 @@ class TaskServiceTest extends AbstractBaseTestCase
 {
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';
-    const DEFAULT_TASK_TYPE = TaskTypeService::HTML_VALIDATION_NAME;
+    const DEFAULT_TASK_TYPE = TypeInterface::TYPE_HTML_VALIDATION;
     const DEFAULT_TASK_STATE = Task::STATE_QUEUED;
 
     /**
      * @var TaskService
      */
     private $taskService;
-
-    /**
-     * @var TaskTypeService
-     */
-    private $taskTypeService;
 
     /**
      * @var TestTaskFactory
@@ -65,7 +60,6 @@ class TaskServiceTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->taskService = self::$container->get(TaskService::class);
-        $this->taskTypeService = self::$container->get(TaskTypeService::class);
         $this->testTaskFactory = new TestTaskFactory(self::$container);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
@@ -76,17 +70,16 @@ class TaskServiceTest extends AbstractBaseTestCase
      * @dataProvider createDataProvider
      *
      * @param $url
-     * @param $taskTypeName
+     * @param $taskType
      * @param $parameters
      */
-    public function testCreate($url, $taskTypeName, $parameters)
+    public function testCreate(string $url, string $taskType, string $parameters)
     {
-        $taskType = $this->taskTypeService->fetch($taskTypeName);
         $task = $this->taskService->create($url, $taskType, $parameters);
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals(Task::STATE_QUEUED, $task->getState());
         $this->assertEquals($url, $task->getUrl());
-        $this->assertEquals(strtolower($taskTypeName), strtolower($task->getType()));
+        $this->assertEquals(strtolower($taskType), strtolower($task->getType()));
         $this->assertEquals($parameters, $task->getParameters());
     }
     /**
@@ -97,22 +90,22 @@ class TaskServiceTest extends AbstractBaseTestCase
         return [
             'html validation default' => [
                 'url' => self::DEFAULT_TASK_URL,
-                'taskTypeName' => TaskTypeService::HTML_VALIDATION_NAME,
+                'taskTypeName' => TypeInterface::TYPE_HTML_VALIDATION,
                 'parameters' => self::DEFAULT_TASK_PARAMETERS,
             ],
             'css validation default' => [
                 'url' => self::DEFAULT_TASK_URL,
-                'taskTypeName' => TaskTypeService::CSS_VALIDATION_NAME,
+                'taskTypeName' => TypeInterface::TYPE_CSS_VALIDATION,
                 'parameters' => self::DEFAULT_TASK_PARAMETERS,
             ],
             'link integrity default' => [
                 'url' => self::DEFAULT_TASK_URL,
-                'taskTypeName' => TaskTypeService::LINK_INTEGRITY_NAME,
+                'taskTypeName' => TypeInterface::TYPE_LINK_INTEGRITY,
                 'parameters' => self::DEFAULT_TASK_PARAMETERS,
             ],
             'url discovery default' => [
                 'url' => self::DEFAULT_TASK_URL,
-                'taskTypeName' => TaskTypeService::URL_DISCOVERY_NAME,
+                'taskTypeName' => TypeInterface::TYPE_URL_DISCOVERY,
                 'parameters' => self::DEFAULT_TASK_PARAMETERS,
             ],
         ];
@@ -128,7 +121,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $existingTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
-            $this->taskTypeService->getHtmlValidationTaskType(),
+            TypeInterface::TYPE_HTML_VALIDATION,
             ''
         );
 
@@ -137,7 +130,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $newTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
-            $this->taskTypeService->getHtmlValidationTaskType(),
+            TypeInterface::TYPE_HTML_VALIDATION,
             ''
         );
         $this->assertEquals($existingTask->getId(), $newTask->getId());
@@ -322,7 +315,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $this->assertEquals('application/x-www-form-urlencoded', $lastRequest->getHeaderLine('content-type'));
         $this->assertEquals(
-            '/task/aHR0cDovL2V4YW1wbGUuY29tLw%3D%3D/HTML%20validation/d41d8cd98f00b204e9800998ecf8427e/complete/',
+            '/task/aHR0cDovL2V4YW1wbGUuY29tLw%3D%3D/html%20validation/d41d8cd98f00b204e9800998ecf8427e/complete/',
             $lastRequest->getUri()->getPath()
         );
 
@@ -365,12 +358,12 @@ class TaskServiceTest extends AbstractBaseTestCase
     {
         $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'state' => Task::STATE_QUEUED,
-            'type' => TaskTypeService::HTML_VALIDATION_NAME,
+            'type' => TypeInterface::TYPE_HTML_VALIDATION,
         ]));
 
         $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'state' => Task::STATE_IN_PROGRESS,
-            'type' => TaskTypeService::CSS_VALIDATION_NAME,
+            'type' => TypeInterface::TYPE_CSS_VALIDATION,
         ]));
 
         $this->assertEquals(2, $this->taskService->getInCompleteCount());

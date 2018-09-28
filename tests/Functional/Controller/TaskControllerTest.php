@@ -86,11 +86,11 @@ class TaskControllerTest extends AbstractControllerTest
                 ],
                 'expectedResponseTaskCollection' => [
                     [
-                        'type' => 'HTML validation',
+                        'type' => 'html validation',
                         'url' => 'http://example.com/',
                     ],
                     [
-                        'type' => 'CSS validation',
+                        'type' => 'css validation',
                         'url' => 'http://example.com/',
                     ],
                 ],
