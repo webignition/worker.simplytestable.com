@@ -68,9 +68,9 @@ class Output
         $this->contentType = $contentType;
     }
 
-    public function getContentType(): InternetMediaTypeInterface
+    public function getContentType(): string
     {
-        return $this->contentType;
+        return (string)$this->contentType;
     }
 
     public function setErrorCount(int $errorCount)

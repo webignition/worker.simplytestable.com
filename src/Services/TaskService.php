@@ -243,7 +243,7 @@ class TaskService
             [
                 'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
                 'output' => $task->getOutput()->getOutput(),
-                'contentType' => (string)$task->getOutput()->getContentType(),
+                'contentType' => $task->getOutput()->getContentType(),
                 'state' => 'task-' . $task->getState(),
                 'errorCount' => $task->getOutput()->getErrorCount(),
                 'warningCount' => $task->getOutput()->getWarningCount()
