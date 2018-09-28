@@ -15,59 +15,46 @@ class ThisWorker
     const STATE_MAINTENANCE_READ_ONLY = 'maintenance-read-only';
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private $id;
 
     /**
      * @var string
      *
      * @ORM\Column(type="string", unique=true, nullable=false)
      */
-    protected $hostname;
+    private $hostname;
 
     /**
      * @var string
      *
      * @ORM\Column(nullable=true)
      */
-    protected $state;
+    private $state;
 
     /**
      * @var string
      *
      * @ORM\Column(type="string", nullable=true)
      */
-    protected $activationToken;
+    private $activationToken;
 
-    /**
-     * @return integer
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param string $hostname
-     *
-     * @return $this
-     */
-    public function setHostname($hostname)
+    public function setHostname(string $hostname)
     {
         $this->hostname = $hostname;
-
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getHostname()
+    public function getHostname(): string
     {
         return $this->hostname;
     }
@@ -82,22 +69,12 @@ class ThisWorker
         return $this->state;
     }
 
-    /**
-     * @param string $activationToken
-     *
-     * @return $this
-     */
-    public function setActivationToken($activationToken)
+    public function setActivationToken(string $activationToken)
     {
         $this->activationToken = $activationToken;
-
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getActivationToken()
+    public function getActivationToken(): string
     {
         return $this->activationToken;
     }

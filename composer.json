@@ -37,6 +37,7 @@
         "webignition/html-validator-wrapper": ">=1,<2",
         "webignition/http-history-container": ">=0.3,<1",
         "webignition/internet-media-type": ">=1,<2.0",
+        "webignition/internet-media-type-interface": "^0.1",
         "webignition/resque-bundle": "dev-master",
         "webignition/url": ">=2,<3",
         "webignition/web-json-model": ">=3,<4",
