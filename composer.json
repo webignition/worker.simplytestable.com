@@ -12,7 +12,6 @@
         "chrisboulton/php-resque": "dev-master",
         "chrisboulton/php-resque-scheduler": "dev-master",
         "doctrine/doctrine-bundle": "^1.6",
-        "doctrine/doctrine-fixtures-bundle": "~3",
         "doctrine/doctrine-migrations-bundle": "~1.2",
         "doctrine/migrations": "~1.8",
         "doctrine/orm": "^2.6",
