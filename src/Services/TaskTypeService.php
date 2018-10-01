@@ -13,10 +13,10 @@ class TaskTypeService
 
     public function __construct(array $taskTypeProperties)
     {
-        foreach ($taskTypeProperties as $taskTypeName => $properties) {
-            $taskTypeId = strtolower($taskTypeName);
+        foreach ($taskTypeProperties as $name => $properties) {
+            $taskTypeId = $this->createTaskTypeId($name);
 
-            $this->taskTypes[$taskTypeId] = new Type($taskTypeId);
+            $this->taskTypes[$taskTypeId] = new Type($taskTypeId, $properties['selectable']);
         }
     }
 
@@ -26,11 +26,18 @@ class TaskTypeService
             return null;
         }
 
-        return new Type(strtolower($name));
+        $taskTypeId = $this->createTaskTypeId($name);
+
+        return $this->taskTypes[$taskTypeId];
     }
 
     private function isValid(string $name): bool
     {
         return array_key_exists(strtolower($name), $this->taskTypes);
+    }
+
+    private function createTaskTypeId(string $name): string
+    {
+        return trim(strtolower($name));
     }
 }

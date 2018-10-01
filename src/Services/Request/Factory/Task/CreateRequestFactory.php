@@ -46,6 +46,10 @@ class CreateRequestFactory
         $taskTypeValue = strtolower(trim($this->requestParameters->get(self::PARAMETER_TYPE)));
         $taskType = $this->taskTypeService->get($taskTypeValue);
 
+        if (!empty($taskType) && !$taskType->isSelectable()) {
+            $taskType = null;
+        }
+
         return new CreateRequest(
             $this->getStringValueFromRequestParameters(self::PARAMETER_URL),
             $taskType,

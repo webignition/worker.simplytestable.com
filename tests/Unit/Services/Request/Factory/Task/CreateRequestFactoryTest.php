@@ -25,7 +25,9 @@ class CreateRequestFactoryTest extends \PHPUnit\Framework\TestCase
         string $expectedParameters
     ) {
         $taskTypeService = new TaskTypeService([
-            TypeInterface::TYPE_HTML_VALIDATION => [],
+            TypeInterface::TYPE_HTML_VALIDATION => [
+                'selectable' => true,
+            ],
         ]);
 
 
@@ -65,6 +67,14 @@ class CreateRequestFactoryTest extends \PHPUnit\Framework\TestCase
                     'type' => TypeInterface::TYPE_HTML_VALIDATION,
                 ]),
                 'expectedTaskType' => TypeInterface::TYPE_HTML_VALIDATION,
+                'expectedUrl' => '',
+                'expectedParameters' => '',
+            ],
+            'non-selectable task type' => [
+                'request' => new Request([], [
+                    'type' => TypeInterface::TYPE_LINK_INTEGRITY_SINGLE_URL,
+                ]),
+                'expectedTaskType' => null,
                 'expectedUrl' => '',
                 'expectedParameters' => '',
             ],
