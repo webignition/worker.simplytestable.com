@@ -68,6 +68,15 @@ class MockFactory
                 ->with($callValues['with']);
         }
 
+        if (isset($calls['contains'])) {
+            $callValues = $calls['contains'];
+
+            $resqueQueueService
+                ->shouldReceive('contains')
+                ->withArgs($callValues['withArgs'])
+                ->andReturn($callValues['return']);
+        }
+
         return $resqueQueueService;
     }
 
