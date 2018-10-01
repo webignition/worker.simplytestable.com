@@ -2,35 +2,35 @@
 
 namespace App\Request\Task;
 
-use App\Services\TaskTypeValidator;
+use App\Model\Task\Type;
 
 class CreateRequest
 {
     /**
      * @var string
      */
-    private $taskType;
+    private $url;
 
     /**
-     * @var string
+     * @var Type
      */
-    private $url;
+    private $taskType;
 
     /**
      * @var string
      */
     private $parameters;
 
-    public function __construct(string $taskType, ?string $url, ?string $parameters)
+    public function __construct(string $url, ?Type $taskType, ?string $parameters)
     {
-        $this->taskType = $taskType;
         $this->url = trim($url);
+        $this->taskType = $taskType;
         $this->parameters = trim($parameters);
     }
 
     public function isValid(): bool
     {
-        if (!TaskTypeValidator::isValid($this->taskType)) {
+        if (empty($this->taskType)) {
             return false;
         }
 
@@ -41,7 +41,7 @@ class CreateRequest
         return true;
     }
 
-    public function getTaskType(): string
+    public function getTaskType(): Type
     {
         return $this->taskType;
     }

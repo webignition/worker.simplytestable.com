@@ -3,7 +3,7 @@
 namespace App\Tests\Unit\Services;
 
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypeFactory;
+use App\Services\TaskTypeService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -138,8 +138,8 @@ class TaskServiceTest extends \PHPUnit\Framework\TestCase
             $services[CoreApplicationHttpClient::class] = \Mockery::mock(CoreApplicationHttpClient::class);
         }
 
-        if (!isset($services[TaskTypeFactory::class])) {
-            $services[TaskTypeFactory::class] = new TaskTypeFactory();
+        if (!isset($services[TaskTypeService::class])) {
+            $services[TaskTypeService::class] = new TaskTypeService();
         }
 
         return new TaskService(
@@ -147,7 +147,7 @@ class TaskServiceTest extends \PHPUnit\Framework\TestCase
             $services[LoggerInterface::class],
             $services[WorkerService::class],
             $services[CoreApplicationHttpClient::class],
-            $services[TaskTypeFactory::class]
+            $services[TaskTypeService::class]
         );
     }
 
