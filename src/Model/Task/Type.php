@@ -14,10 +14,16 @@ class Type implements TypeInterface, \JsonSerializable
      */
     private $isSelectable;
 
-    public function __construct(string $name, bool $isSelectable)
+    /**
+     * @var Type
+     */
+    private $childType;
+
+    public function __construct(string $name, bool $isSelectable, ?Type $childType)
     {
         $this->name = $name;
         $this->isSelectable = $isSelectable;
+        $this->childType = $childType;
     }
 
     public function getName(): string
@@ -28,6 +34,11 @@ class Type implements TypeInterface, \JsonSerializable
     public function isSelectable(): bool
     {
         return $this->isSelectable;
+    }
+
+    public function getChildType(): ?Type
+    {
+        return $this->childType;
     }
 
     public function __toString(): string

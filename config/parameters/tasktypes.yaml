@@ -2,11 +2,16 @@ parameters:
   task_types:
     "html validation":
       selectable: true
+      child-type: ~
     "css validation":
       selectable: true
+      child-type: ~
     "url discovery":
       selectable: true
-    "link integrity":
-      selectable: true
+      child-type: ~
     "link integrity single-url":
       selectable: false
+      child-type: ~
+    "link integrity":
+      selectable: true
+      child-type: "link integrity single-url"
