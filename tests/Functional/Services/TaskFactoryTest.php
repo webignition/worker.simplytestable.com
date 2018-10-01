@@ -6,6 +6,7 @@ use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
 use App\Request\Task\CreateRequest;
 use App\Services\TaskFactory;
+use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
 
 class TaskFactoryTest extends AbstractBaseTestCase
@@ -28,18 +29,21 @@ class TaskFactoryTest extends AbstractBaseTestCase
     /**
      * @dataProvider createDataProvider
      *
-     * @param string $taskType
+     * @param string $taskTypeName
      * @param string $url
      * @param string $parameters
      */
-    public function testCreate($taskType, $url, $parameters)
+    public function testCreate($taskTypeName, $url, $parameters)
     {
-        $createRequest = new CreateRequest($taskType, $url, $parameters);
+        $taskTypeService = self::$container->get(TaskTypeService::class);
+        $taskType = $taskTypeService->get($taskTypeName);
+
+        $createRequest = new CreateRequest($url, $taskType, $parameters);
 
         $task = $this->taskFactory->createFromRequest($createRequest);
 
         $this->assertInstanceOf(Task::class, $task);
-        $this->assertEquals($taskType, $task->getType());
+        $this->assertEquals($taskTypeName, $task->getType());
         $this->assertEquals($url, $task->getUrl());
         $this->assertEquals($parameters, $task->getParameters());
     }

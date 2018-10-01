@@ -2,6 +2,7 @@
 
 namespace App\Tests\Unit\Request\Task;
 
+use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Request\Task\CreateRequest;
 
@@ -10,7 +11,7 @@ class CreateRequestTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider createDataProvider
      *
-     * @param string $taskType
+     * @param string $taskTypeName
      * @param string|null $url
      * @param string|null $parameters
      * @param bool $expectedIsValid
@@ -19,7 +20,7 @@ class CreateRequestTest extends \PHPUnit\Framework\TestCase
      * @param string $expectedParameters
      */
     public function testCreate(
-        string $taskType,
+        string $taskTypeName,
         ?string $url,
         ?string $parameters,
         bool $expectedIsValid,
@@ -27,7 +28,11 @@ class CreateRequestTest extends \PHPUnit\Framework\TestCase
         string $expectedUrl,
         string $expectedParameters
     ) {
-        $createRequest = new CreateRequest($taskType, $url, $parameters);
+        $taskType = empty($taskTypeName)
+            ? null
+            : new Type($taskTypeName);
+
+        $createRequest = new CreateRequest($url, $taskType, $parameters);
 
         $this->assertEquals($expectedIsValid, $createRequest->isValid());
         $this->assertEquals($expectedTaskType, $createRequest->getTaskType());
@@ -42,17 +47,17 @@ class CreateRequestTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'empty task type is invalid' => [
-                'taskType' => 'invalid task type',
+                'taskTypeName' => '',
                 'url' => 'http://example.com/',
                 'parameters' => null,
                 'expectedIsValid' => false,
-                'expectedTaskType' => 'invalid task type',
+                'expectedTaskType' => null,
                 'expectedUrl' => 'http://example.com/',
                 'expectedParameters' => '',
             ],
             'empty url is invalid' => [
-                'taskType' => TypeInterface::TYPE_HTML_VALIDATION,
-                'url' => null,
+                'taskTypeName' => TypeInterface::TYPE_HTML_VALIDATION,
+                'url' => '',
                 'parameters' => null,
                 'expectedIsValid' => false,
                 'expectedTaskType' => TypeInterface::TYPE_HTML_VALIDATION,
@@ -60,7 +65,7 @@ class CreateRequestTest extends \PHPUnit\Framework\TestCase
                 'expectedParameters' => '',
             ],
             'valid' => [
-                'taskType' => TypeInterface::TYPE_HTML_VALIDATION,
+                'taskTypeName' => TypeInterface::TYPE_HTML_VALIDATION,
                 'url' => 'http://example.com/',
                 'parameters' => null,
                 'expectedIsValid' => true,
@@ -69,7 +74,7 @@ class CreateRequestTest extends \PHPUnit\Framework\TestCase
                 'expectedParameters' => '',
             ],
             'valid with parameters' => [
-                'taskType' => TypeInterface::TYPE_HTML_VALIDATION,
+                'taskTypeName' => TypeInterface::TYPE_HTML_VALIDATION,
                 'url' => 'http://example.com/',
                 'parameters' => 'foo',
                 'expectedIsValid' => true,

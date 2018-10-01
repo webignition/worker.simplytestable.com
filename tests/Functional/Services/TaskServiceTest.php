@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
+use App\Services\TaskTypeService;
 use Doctrine\ORM\OptimisticLockException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
@@ -71,16 +72,18 @@ class TaskServiceTest extends AbstractBaseTestCase
      * @dataProvider createDataProvider
      *
      * @param $url
-     * @param $taskType
+     * @param $taskTypeName
      * @param $parameters
      */
-    public function testCreate(string $url, string $taskType, string $parameters)
+    public function testCreate(string $url, string $taskTypeName, string $parameters)
     {
-        $task = $this->taskService->create($url, $taskType, $parameters);
+        $taskTypeService = self::$container->get(TaskTypeService::class);
+
+        $task = $this->taskService->create($url, $taskTypeService->get($taskTypeName), $parameters);
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals(Task::STATE_QUEUED, $task->getState());
         $this->assertEquals($url, $task->getUrl());
-        $this->assertEquals(strtolower($taskType), strtolower($task->getType()));
+        $this->assertEquals(strtolower($taskTypeName), strtolower($task->getType()));
         $this->assertEquals($parameters, $task->getParameters());
     }
     /**
@@ -119,10 +122,11 @@ class TaskServiceTest extends AbstractBaseTestCase
     public function testCreateUsesExistingMatchingTask()
     {
         $entityManager = self::$container->get('doctrine.orm.entity_manager');
+        $taskTypeService = self::$container->get(TaskTypeService::class);
 
         $existingTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
-            TypeInterface::TYPE_HTML_VALIDATION,
+            $taskTypeService->get(TypeInterface::TYPE_HTML_VALIDATION),
             ''
         );
 
@@ -131,7 +135,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $newTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
-            TypeInterface::TYPE_HTML_VALIDATION,
+            $taskTypeService->get(TypeInterface::TYPE_HTML_VALIDATION),
             ''
         );
         $this->assertEquals($existingTask->getId(), $newTask->getId());

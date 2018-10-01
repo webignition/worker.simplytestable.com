@@ -139,7 +139,7 @@ class TaskServiceTest extends \PHPUnit\Framework\TestCase
         }
 
         if (!isset($services[TaskTypeService::class])) {
-            $services[TaskTypeService::class] = new TaskTypeService();
+            $services[TaskTypeService::class] = new TaskTypeService([]);
         }
 
         return new TaskService(

@@ -41,7 +41,7 @@ class CreateRequest
         return true;
     }
 
-    public function getTaskType(): Type
+    public function getTaskType(): ?Type
     {
         return $this->taskType;
     }

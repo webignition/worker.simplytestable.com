@@ -5,6 +5,7 @@ namespace App\Tests\Unit\Services\Request\Factory\Task;
 use App\Model\Task\TypeInterface;
 use App\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use App\Services\Request\Factory\Task\CreateRequestFactory;
+use App\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -18,10 +19,14 @@ class CreateRequestCollectionFactoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreate(Request $request, $expectedCollectionCount)
     {
+        $taskTypeService = new TaskTypeService([
+            TypeInterface::TYPE_HTML_VALIDATION => [],
+        ]);
+
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $createRequestFactory = new CreateRequestFactory($requestStack);
+        $createRequestFactory = new CreateRequestFactory($requestStack, $taskTypeService);
         $createRequestCollectionFactory = new CreateRequestCollectionFactory($requestStack, $createRequestFactory);
         $createRequestCollection = $createRequestCollectionFactory->create();
 
