@@ -25,3 +25,6 @@ services:
       - '@webignition\HttpHistoryContainer\Container'
       - '@Kevinrob\GuzzleCache\CacheMiddleware'
       - '@App\Tests\Services\HttpMockHandler'
+
+  App\Tests\TestServices\TaskFactory:
+    public: true

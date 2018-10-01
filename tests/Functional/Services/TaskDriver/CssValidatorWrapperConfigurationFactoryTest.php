@@ -4,8 +4,8 @@ namespace App\Tests\Functional\Services\TaskDriver;
 
 use App\Model\Task\TypeInterface;
 use App\Services\TaskDriver\CssValidatorWrapperConfigurationFactory;
-use App\Tests\Factory\TestTaskFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
+use App\Tests\TestServices\TaskFactory;
 use webignition\CssValidatorOutput\Parser\Configuration as OutputParserConfiguration;
 use webignition\CssValidatorWrapper\Configuration\Configuration as WrapperConfiguration;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
@@ -49,10 +49,10 @@ class CssValidatorWrapperConfigurationFactoryTest extends AbstractBaseTestCase
         $expectedOutputParserIgnoreVendorExtensionIssues,
         $expectedOutputParserReportVendorExtensionIssuesAsWarnings
     ) {
-        $testTaskFactory = new TestTaskFactory(self::$container);
+        $testTaskFactory = self::$container->get(TaskFactory::class);
 
         $task = $testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults([
+            TaskFactory::createTaskValuesFromDefaults([
                 'type' => TypeInterface::TYPE_CSS_VALIDATION,
                 'parameters' => json_encode($taskParameters),
             ])

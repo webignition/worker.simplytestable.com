@@ -5,6 +5,7 @@ namespace App\Tests\Functional\Services;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskTypeService;
+use App\Tests\TestServices\TaskFactory;
 use Doctrine\ORM\OptimisticLockException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
@@ -14,7 +15,6 @@ use App\Services\TaskService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
-use App\Tests\Factory\TestTaskFactory;
 use App\Tests\Services\HttpMockHandler;
 use App\Tests\Utility\File;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
@@ -35,7 +35,7 @@ class TaskServiceTest extends AbstractBaseTestCase
     private $taskService;
 
     /**
-     * @var TestTaskFactory
+     * @var TaskFactory
      */
     private $testTaskFactory;
 
@@ -62,7 +62,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->taskService = self::$container->get(TaskService::class);
-        $this->testTaskFactory = new TestTaskFactory(self::$container);
+        $this->testTaskFactory = self::$container->get(TaskFactory::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
         $this->httpRetryMiddleware = self::$container->get(HttpRetryMiddleware::class);
@@ -169,7 +169,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         return [
             'default' => [
-                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     new Response(200, ['content-type' => 'text/html']),
                     new Response(
@@ -181,14 +181,14 @@ class TaskServiceTest extends AbstractBaseTestCase
                 'expectedFinishedStateName' => Task::STATE_COMPLETED,
             ],
             'skipped' => [
-                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     new Response(200, ['content-type' => 'application/pdf']),
                 ],
                 'expectedFinishedStateName' => Task::STATE_SKIPPED,
             ],
             'failed, no retry available' => [
-                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     $notFoundResponse,
                     $notFoundResponse,
@@ -200,7 +200,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
     public function testGetById()
     {
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults());
         $id = $task->getId();
 
         $entityManager = self::$container->get('doctrine.orm.entity_manager');
@@ -217,7 +217,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testReportCompletionNoOutput()
     {
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
         $this->taskService->reportCompletion($task);
 
         $lastLogLine = File::tail(self::$container->get('kernel')->getLogDir() . '/test.log', 1);
@@ -251,7 +251,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
         $this->taskService->perform($task);
         $initialTaskState = $task->getState();
 
@@ -305,7 +305,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         ]);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
 
         $this->taskService->perform($task);
         $this->assertInternalType('int', $task->getId());
@@ -364,12 +364,12 @@ class TaskServiceTest extends AbstractBaseTestCase
 
     public function testGetIncompleteCount()
     {
-        $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
             'state' => Task::STATE_QUEUED,
             'type' => TypeInterface::TYPE_HTML_VALIDATION,
         ]));
 
-        $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
             'state' => Task::STATE_IN_PROGRESS,
             'type' => TypeInterface::TYPE_CSS_VALIDATION,
         ]));

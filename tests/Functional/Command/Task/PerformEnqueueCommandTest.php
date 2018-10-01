@@ -5,8 +5,8 @@ namespace App\Tests\Functional\Command\Task;
 use App\Command\Task\PerformEnqueueCommand;
 use App\Resque\Job\TaskPerformJob;
 use App\Services\Resque\QueueService;
+use App\Tests\TestServices\TaskFactory;
 use Symfony\Component\Console\Output\NullOutput;
-use App\Tests\Factory\TestTaskFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -18,7 +18,7 @@ class PerformEnqueueCommandTest extends AbstractBaseTestCase
      */
     public function testEnqueueTaskPerformJobs()
     {
-        $testTaskFactory = new TestTaskFactory(self::$container);
+        $testTaskFactory = self::$container->get(TaskFactory::class);
 
         $taskPropertyCollection = [
             [
@@ -37,7 +37,7 @@ class PerformEnqueueCommandTest extends AbstractBaseTestCase
 
         $tasks = array();
         foreach ($taskPropertyCollection as $taskProperties) {
-            $tasks[] = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults(
+            $tasks[] = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults(
                 $taskProperties
             ));
         }

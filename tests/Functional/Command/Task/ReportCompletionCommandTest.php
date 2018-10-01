@@ -6,9 +6,9 @@ use App\Command\Task\ReportCompletionCommand;
 use App\Services\TaskService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
-use App\Tests\Factory\TestTaskFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
+use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -55,9 +55,9 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $testTaskFactory = new TestTaskFactory(self::$container);
+        $testTaskFactory = self::$container->get(TaskFactory::class);
 
-        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
             'url' => 'http://example.com/',
             'type' => 'html validation',
         ]));

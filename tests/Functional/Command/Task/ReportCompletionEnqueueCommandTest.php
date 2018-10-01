@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Command\Task;
 
+use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Command\Task\ReportCompletionEnqueueCommand;
 use App\Resque\Job\TaskReportCompletionJob;
@@ -22,7 +23,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
     private $command;
 
     /**
-     * @var TestTaskFactory
+     * @var TaskFactory
      */
     private $testTaskFactory;
 
@@ -39,7 +40,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->command = self::$container->get(ReportCompletionEnqueueCommand::class);
-        $this->testTaskFactory = new TestTaskFactory(self::$container);
+        $this->testTaskFactory = self::$container->get(TaskFactory::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
 
@@ -52,7 +53,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
         self::$container->get(TaskService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
@@ -84,7 +85,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
         self::$container->get(TaskService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
