@@ -8,52 +8,22 @@ use App\Services\WorkerService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
 
-class ReportCompletionCommand extends Command
+class ReportCompletionCommand extends AbstractTaskCommand
 {
-    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
-    const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var TaskService
-     */
-    private $taskService;
-
-    /**
-     * @var WorkerService
-     */
-    private $workerService;
-
     /**
      * @var TaskCompletionReporter
      */
     private $taskCompletionReporter;
 
-    /**
-     * @param LoggerInterface $logger
-     * @param TaskService $taskService
-     * @param WorkerService $workerService
-     * @param TaskCompletionReporter $taskCompletionReporter
-     * @param string|null $name
-     */
     public function __construct(
         LoggerInterface $logger,
         TaskService $taskService,
         WorkerService $workerService,
-        TaskCompletionReporter $taskCompletionReporter,
-        $name = null
+        TaskCompletionReporter $taskCompletionReporter
     ) {
-        parent::__construct($name);
+        parent::__construct($logger, $taskService, $workerService);
 
-        $this->logger = $logger;
-        $this->taskService = $taskService;
-        $this->workerService = $workerService;
         $this->taskCompletionReporter = $taskCompletionReporter;
     }
 
@@ -65,8 +35,11 @@ class ReportCompletionCommand extends Command
         $this
             ->setName('simplytestable:task:reportcompletion')
             ->setDescription('Report back to the core application the completed status of a task')
-            ->addArgument('id', InputArgument::REQUIRED, 'id of task to report')
-            ->setHelp('Report back to the core application the completed status of a task');
+            ->addArgument('id', InputArgument::REQUIRED, 'id of task to report');
+    }
+
+    protected function handleWorkerMaintenanceReadOnlyMode()
+    {
     }
 
     /**
@@ -74,31 +47,15 @@ class ReportCompletionCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $worker = $this->workerService->get();
-
-        if ($worker->isMaintenanceReadOnly()) {
-            $output->writeln('Unable to report completion, worker application is in maintenance read-only mode');
-
-            return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
+        $parentReturnCode = parent::execute($input, $output);
+        if (self::RETURN_CODE_OK !== $parentReturnCode) {
+            return $parentReturnCode;
         }
 
-        $taskId = $input->getArgument('id');
-
-        $task = $this->taskService->getById($taskId);
-        if (is_null($task)) {
-            $this->logger->error(sprintf(
-                'TaskReportCompletionCommand::execute: [%s] does not exist',
-                $taskId
-            ));
-            $output->writeln(sprintf('[%s] does not exist', $taskId));
-
-            return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
-        }
-
-        $reportCompletionResult = $this->taskCompletionReporter->reportCompletion($task);
+        $reportCompletionResult = $this->taskCompletionReporter->reportCompletion($this->task);
 
         if ($reportCompletionResult === true) {
-            $output->writeln('Reported task completion [' .$task->getId().']');
+            $output->writeln('Reported task completion [' . $this->task->getId() . ']');
 
             return 0;
         }

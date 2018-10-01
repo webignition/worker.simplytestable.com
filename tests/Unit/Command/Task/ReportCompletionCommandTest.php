@@ -2,6 +2,7 @@
 
 namespace App\Tests\Unit\Command\Task;
 
+use App\Entity\Task\Task;
 use App\Entity\ThisWorker;
 use App\Services\TaskCompletionReporter;
 use Psr\Log\LoggerInterface;
@@ -29,10 +30,30 @@ class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
             ->shouldReceive('isMaintenanceReadOnly')
             ->andReturn(true);
 
+        $task = \Mockery::mock(Task::class);
+        $task
+            ->shouldReceive('getId')
+            ->andReturn(self::TASK_ID);
+
         $command = $this->createReportCompletionCommand([
+            TaskService::class => MockFactory::createTaskService([
+                'getById' => [
+                    'with' => self::TASK_ID,
+                    'return' => $task,
+                ],
+            ]),
             WorkerService::class => MockFactory::createWorkerService([
                 'get' => [
                     'return' => $worker,
+                ],
+            ]),
+            LoggerInterface::class => MockFactory::createLogger([
+                'error' => [
+                    'with' => sprintf(
+                        'simplytestable:task:reportcompletion::execute [%s]: '
+                        .'worker application is in maintenance read-only mode',
+                        self::TASK_ID
+                    ),
                 ],
             ]),
         ]);
@@ -71,7 +92,11 @@ class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
             ]),
             LoggerInterface::class => MockFactory::createLogger([
                 'error' => [
-                    'with' => 'TaskReportCompletionCommand::execute: [' . self::TASK_ID . '] does not exist',
+                    'with' => sprintf(
+                        'simplytestable:task:reportcompletion::execute [%s]: [%s] does not exist',
+                        self::TASK_ID,
+                        self::TASK_ID
+                    ),
                 ],
             ]),
         ]);

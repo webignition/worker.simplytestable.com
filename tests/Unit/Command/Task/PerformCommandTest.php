@@ -2,6 +2,8 @@
 
 namespace App\Tests\Unit\Command\Task;
 
+use App\Entity\Task\Task;
+use App\Entity\ThisWorker;
 use App\Services\TaskPerformer;
 use Psr\Log\LoggerInterface;
 use App\Command\Task\PerformCommand;
@@ -22,6 +24,60 @@ class PerformCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * @throws \Exception
      */
+    public function testRunInMaintenanceReadOnlyMode()
+    {
+        $worker = \Mockery::mock(ThisWorker::class);
+        $worker
+            ->shouldReceive('isMaintenanceReadOnly')
+            ->andReturn(true);
+
+        $task = \Mockery::mock(Task::class);
+        $task
+            ->shouldReceive('getId')
+            ->andReturn(self::TASK_ID);
+
+        $command = $this->createPerformCommand([
+            TaskService::class => MockFactory::createTaskService([
+                'getById' => [
+                    'with' => self::TASK_ID,
+                    'return' => $task,
+                ],
+            ]),
+            WorkerService::class => MockFactory::createWorkerService([
+                'get' => [
+                    'return' => $worker,
+                ],
+            ]),
+            LoggerInterface::class => MockFactory::createLogger([
+                'error' => [
+                    'with' => sprintf(
+                        'simplytestable:task:perform::execute [%s]: '
+                        .'worker application is in maintenance read-only mode',
+                        self::TASK_ID
+                    ),
+                ],
+            ]),
+            ResqueQueueService::class => MockFactory::createResqueQueueService([
+                'contains' => [
+                    'withArgs' => ['task-perform', ['id' => self::TASK_ID]],
+                    'return' => true,
+                ],
+            ]),
+        ]);
+
+        $returnCode = $command->run(new ArrayInput([
+            'id' => self::TASK_ID,
+        ]), new NullOutput());
+
+        $this->assertEquals(
+            PerformCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
+            $returnCode
+        );
+    }
+
+    /**
+     * @throws \Exception
+     */
     public function testRunWithInvalidTask()
     {
         $command = $this->createPerformCommand([
@@ -33,7 +89,11 @@ class PerformCommandTest extends \PHPUnit\Framework\TestCase
             ]),
             LoggerInterface::class => MockFactory::createLogger([
                 'error' => [
-                    'with' => 'TaskPerformCommand::execute: [' . self::TASK_ID . '] does not exist',
+                    'with' => sprintf(
+                        'simplytestable:task:perform::execute [%s]: [%s] does not exist',
+                        self::TASK_ID,
+                        self::TASK_ID
+                    ),
                 ],
             ]),
         ]);

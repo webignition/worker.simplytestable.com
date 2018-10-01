@@ -13,28 +13,10 @@ use App\Services\WorkerService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
 
-class PerformCommand extends Command
+class PerformCommand extends AbstractTaskCommand
 {
-    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
-    const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;
     const RETURN_CODE_TASK_SERVICE_RAISED_EXCEPTION = -6;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var TaskService
-     */
-    private $taskService;
-
-    /**
-     * @var WorkerService
-     */
-    private $workerService;
 
     /**
      * @var ResqueQueueService
@@ -46,27 +28,17 @@ class PerformCommand extends Command
      */
     private $taskPerformanceService;
 
-    /**
-     * @param LoggerInterface $logger
-     * @param TaskService $taskService
-     * @param WorkerService $workerService
-     * @param ResqueQueueService $resqueQueueService
-     * @param TaskPerformer $taskPerformanceService
-     * @param string|null $name
-     */
     public function __construct(
         LoggerInterface $logger,
         TaskService $taskService,
         WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
-        TaskPerformer $taskPerformanceService,
-        ?string $name = null
+        TaskPerformer $taskPerformanceService
     ) {
-        parent::__construct($name);
+        parent::__construct($logger, $taskService, $workerService);
 
         $this->logger = $logger;
         $this->taskService = $taskService;
-        $this->workerService = $workerService;
         $this->resqueQueueService = $resqueQueueService;
         $this->taskPerformanceService = $taskPerformanceService;
     }
@@ -79,8 +51,16 @@ class PerformCommand extends Command
         $this
             ->setName('simplytestable:task:perform')
             ->setDescription('Start a task')
-            ->addArgument('id', InputArgument::REQUIRED, 'id of task to start')
-            ->setHelp('Start a task');
+            ->addArgument('id', InputArgument::REQUIRED, 'id of task to start');
+    }
+
+    protected function handleWorkerMaintenanceReadOnlyMode()
+    {
+        $taskId = $this->task->getId();
+
+        if (!$this->resqueQueueService->contains('task-perform', ['id' => $taskId])) {
+            $this->resqueQueueService->enqueue(new TaskPerformJob(['id' => $taskId]));
+        }
     }
 
     /**
@@ -88,53 +68,21 @@ class PerformCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $taskId = $input->getArgument('id');
-
-        $task = $this->taskService->getById($taskId);
-
-        if (is_null($task)) {
-            $this->logger->error(sprintf(
-                'TaskPerformCommand::execute: [%s] does not exist',
-                $taskId
-            ));
-            $output->writeln('Unable to execute, task ' . $taskId . ' does not exist');
-
-            return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
+        $parentReturnCode = parent::execute($input, $output);
+        if (self::RETURN_CODE_OK !== $parentReturnCode) {
+            return $parentReturnCode;
         }
 
-        $this->logger->info(sprintf(
-            'TaskPerformCommand::execute: [%s] [%s]',
-            $task->getId(),
-            $task->getState()
-        ));
-
-        $worker = $this->workerService->get();
-
-        if ($worker->isMaintenanceReadOnly()) {
-            if (!$this->resqueQueueService->contains('task-perform', ['id' => $task->getId()])) {
-                $this->resqueQueueService->enqueue(new TaskPerformJob(['id' => $task->getId()]));
-            }
-
-            $output->writeln('Unable to perform task, worker application is in maintenance read-only mode');
-
-            return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
-        }
-
-        $this->taskPerformanceService->perform($task);
+        $taskId = $this->task->getId();
+        $this->taskPerformanceService->perform($this->task);
 
         if ($this->resqueQueueService->isEmpty('tasks-request')) {
             $this->resqueQueueService->enqueue(new TasksRequestJob());
         }
 
-        $this->resqueQueueService->enqueue(new TaskReportCompletionJob(['id' => $task->getId()]));
+        $this->resqueQueueService->enqueue(new TaskReportCompletionJob(['id' => $taskId]));
 
-        $output->writeln('Performed ['.$task->getId().']');
-        $this->logger->info(sprintf(
-            'TaskPerformCommand::Performed [%d] [%s] [%s]',
-            $task->getId(),
-            $task->getState(),
-            ($task->hasOutput() ? 'has output' : 'no output')
-        ));
+        $output->writeln('Performed [' . $taskId . ']');
 
         return 0;
     }

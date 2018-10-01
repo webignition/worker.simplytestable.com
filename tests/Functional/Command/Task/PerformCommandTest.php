@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Command\Task;
 
+use App\Entity\Task\Task;
 use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Command\Task\PerformCommand;
@@ -23,11 +24,29 @@ class PerformCommandTest extends AbstractBaseTestCase
      */
     private $command;
 
+    /**
+     * @var Task
+     */
+    private $task;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->command = self::$container->get(PerformCommand::class);
+        $testTaskFactory = self::$container->get(TaskFactory::class);
+
+        $this->task = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+            'url' => 'http://example.com/',
+            'type' => 'html validation',
+        ]));
+
+        $httpMockHandler = self::$container->get(HttpMockHandler::class);
+
+        $httpMockHandler->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
+        ]);
     }
 
     /**
@@ -35,15 +54,12 @@ class PerformCommandTest extends AbstractBaseTestCase
      */
     public function testRunInMaintenanceReadOnlyMode()
     {
-        $testTaskFactory = self::$container->get(TaskFactory::class);
         self::$container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
 
-        $task = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
-
         $returnCode = $this->command->run(
             new ArrayInput([
-                'id' => $task->getId(),
+                'id' => $this->task->getId(),
             ]),
             new NullOutput()
         );
@@ -52,7 +68,7 @@ class PerformCommandTest extends AbstractBaseTestCase
         $this->assertTrue(self::$container->get(QueueService::class)->contains(
             'task-perform',
             [
-                'id' => $task->getId()
+                'id' => $this->task->getId()
             ]
         ));
     }
@@ -60,27 +76,15 @@ class PerformCommandTest extends AbstractBaseTestCase
     /**
      * @throws \Exception
      */
-    public function testPerformSuccess()
+    public function testRunSuccess()
     {
-        $httpMockHandler = self::$container->get(HttpMockHandler::class);
         $resqueQueueService = self::$container->get(QueueService::class);
-        $testTaskFactory = self::$container->get(TaskFactory::class);
-
-        $httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ]);
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
-            'url' => 'http://example.com/',
-            'type' => 'html validation',
-        ]));
-
         $returnCode = $this->command->run(
             new ArrayInput([
-                'id' => $task->getId(),
+                'id' => $this->task->getId(),
             ]),
             new NullOutput()
         );
@@ -97,7 +101,7 @@ class PerformCommandTest extends AbstractBaseTestCase
         foreach ($expectedResqueJobs as $queueName => $data) {
             foreach ($data as $key => $value) {
                 if ($value == '{{ taskId }}') {
-                    $data[$key] = $task->getId();
+                    $data[$key] = $this->task->getId();
                 }
             }
 

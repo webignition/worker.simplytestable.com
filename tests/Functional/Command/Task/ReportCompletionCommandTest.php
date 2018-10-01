@@ -3,6 +3,7 @@
 namespace App\Tests\Functional\Command\Task;
 
 use App\Command\Task\ReportCompletionCommand;
+use App\Entity\Task\Task;
 use App\Services\TaskPerformer;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
@@ -29,6 +30,11 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
     private $httpMockHandler;
 
     /**
+     * @var Task
+     */
+    private $task;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -37,6 +43,17 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
 
         $this->command = self::$container->get(ReportCompletionCommand::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
+        $testTaskFactory = self::$container->get(TaskFactory::class);
+
+        $this->task = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+            'url' => 'http://example.com/',
+            'type' => 'html validation',
+        ]));
+
+        $this->httpMockHandler->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
+        ]);
     }
 
     /**
@@ -48,26 +65,15 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
      */
     public function testRun($responseFixtures, $expectedCommandReturnCode)
     {
-        $this->httpMockHandler->appendFixtures(array_merge([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ], $responseFixtures));
+        $this->httpMockHandler->appendFixtures($responseFixtures);
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $testTaskFactory = self::$container->get(TaskFactory::class);
-
-        $task = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
-            'url' => 'http://example.com/',
-            'type' => 'html validation',
-        ]));
-        $this->assertNotNull($task->getId());
-
-        self::$container->get(TaskPerformer::class)->perform($task);
-        $this->assertNotNull($task->getOutput()->getId());
+        self::$container->get(TaskPerformer::class)->perform($this->task);
+        $this->assertNotNull($this->task->getOutput()->getId());
 
         $returnCode = $this->command->run(new ArrayInput([
-            'id' => $task->getId()
+            'id' => $this->task->getId()
         ]), new NullOutput());
 
         $this->assertEquals(
@@ -98,25 +104,11 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
                 'expectedCommandReturnCode' => 404,
             ],
             'http 500' => [
-                'responseFixtures' => [
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                ],
+                'responseFixtures' => array_fill(0, 6, $internalServerErrorResponse),
                 'expectedCommandReturnCode' => 500,
             ],
             'curl 28' => [
-                'responseFixtures' => [
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                ],
+                'responseFixtures' => array_fill(0, 6, $curl28ConnectException),
                 'expectedCommandReturnCode' => 28,
             ],
         ];
