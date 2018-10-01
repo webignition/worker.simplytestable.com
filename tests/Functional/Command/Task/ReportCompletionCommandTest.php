@@ -3,7 +3,7 @@
 namespace App\Tests\Functional\Command\Task;
 
 use App\Command\Task\ReportCompletionCommand;
-use App\Services\TaskService;
+use App\Services\TaskPerformanceService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -63,7 +63,7 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
         ]));
         $this->assertNotNull($task->getId());
 
-        self::$container->get(TaskService::class)->perform($task);
+        self::$container->get(TaskPerformanceService::class)->perform($task);
         $this->assertNotNull($task->getOutput()->getId());
 
         $returnCode = $this->command->run(new ArrayInput([

@@ -54,7 +54,7 @@ services:
         $kernelProjectDirectory: '%kernel.project_dir%'
         $cacheDirectory: '%kernel.cache_dir%'
 
-    App\Services\TaskService:
+    App\Services\TaskPerformanceService:
       public: true
       calls:
         - [addTaskDriver, ['html validation', '@App\Services\TaskDriver\HtmlValidationTaskDriver']]
