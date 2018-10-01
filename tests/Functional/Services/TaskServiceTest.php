@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
+use App\Services\TaskPerformanceService;
 use App\Services\TaskTypeService;
 use App\Tests\TestServices\TaskFactory;
 use Doctrine\ORM\OptimisticLockException;
@@ -141,63 +142,6 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->assertEquals($existingTask->getId(), $newTask->getId());
     }
 
-    /**
-     * @dataProvider performDataProvider
-     *
-     * @param array $taskValues
-     * @param array $httpFixtures
-     * @param string $expectedFinishedStateName
-     */
-    public function testPerform($taskValues, $httpFixtures, $expectedFinishedStateName)
-    {
-        $this->httpMockHandler->appendFixtures($httpFixtures);
-        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
-
-        $task = $this->testTaskFactory->create($taskValues);
-
-        $this->taskService->perform($task);
-
-        $this->assertEquals($expectedFinishedStateName, $task->getState());
-    }
-
-    /**
-     * @return array
-     */
-    public function performDataProvider()
-    {
-        $notFoundResponse = new Response(404);
-
-        return [
-            'default' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body></body>'
-                    ),
-                ],
-                'expectedFinishedStateName' => Task::STATE_COMPLETED,
-            ],
-            'skipped' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'application/pdf']),
-                ],
-                'expectedFinishedStateName' => Task::STATE_SKIPPED,
-            ],
-            'failed, no retry available' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
-                'httpFixtures' => [
-                    $notFoundResponse,
-                    $notFoundResponse,
-                ],
-                'expectedFinishedStateName' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-            ],
-        ];
-    }
-
     public function testGetById()
     {
         $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults());
@@ -242,6 +186,8 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testReportCompletionFailure(array $responseFixtures, $expectedReturnValue)
     {
+        $taskPerformanceService = self::$container->get(TaskPerformanceService::class);
+
         $this->httpMockHandler->appendFixtures(array_merge([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
@@ -252,7 +198,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
-        $this->taskService->perform($task);
+        $taskPerformanceService->perform($task);
         $initialTaskState = $task->getState();
 
         $this->assertEquals($expectedReturnValue, $this->taskService->reportCompletion($task));
@@ -298,6 +244,8 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testReportCompletionSuccess($responseFixture)
     {
+        $taskPerformanceService = self::$container->get(TaskPerformanceService::class);
+
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
@@ -307,7 +255,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
 
-        $this->taskService->perform($task);
+        $taskPerformanceService->perform($task);
         $this->assertInternalType('int', $task->getId());
         $this->assertInternalType('int', $task->getOutput()->getId());
         $this->assertInternalType('int', $task->getTimePeriod()->getId());

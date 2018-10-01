@@ -2,6 +2,7 @@
 
 namespace App\Command\Task;
 
+use App\Services\TaskPerformanceService;
 use Psr\Log\LoggerInterface;
 use App\Resque\Job\TaskPerformJob;
 use App\Resque\Job\TaskReportCompletionJob;
@@ -41,10 +42,16 @@ class PerformCommand extends Command
     private $resqueQueueService;
 
     /**
+     * @var TaskPerformanceService
+     */
+    private $taskPerformanceService;
+
+    /**
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
      * @param ResqueQueueService $resqueQueueService
+     * @param TaskPerformanceService $taskPerformanceService
      * @param string|null $name
      */
     public function __construct(
@@ -52,7 +59,8 @@ class PerformCommand extends Command
         TaskService $taskService,
         WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
-        $name = null
+        TaskPerformanceService $taskPerformanceService,
+        ?string $name = null
     ) {
         parent::__construct($name);
 
@@ -60,6 +68,7 @@ class PerformCommand extends Command
         $this->taskService = $taskService;
         $this->workerService = $workerService;
         $this->resqueQueueService = $resqueQueueService;
+        $this->taskPerformanceService = $taskPerformanceService;
     }
 
     /**
@@ -111,7 +120,7 @@ class PerformCommand extends Command
             return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }
 
-        $this->taskService->perform($task);
+        $this->taskPerformanceService->perform($task);
 
         if ($this->resqueQueueService->isEmpty('tasks-request')) {
             $this->resqueQueueService->enqueue(new TasksRequestJob());

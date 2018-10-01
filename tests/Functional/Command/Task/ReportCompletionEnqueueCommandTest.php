@@ -2,17 +2,16 @@
 
 namespace App\Tests\Functional\Command\Task;
 
+use App\Services\TaskPerformanceService;
 use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Command\Task\ReportCompletionEnqueueCommand;
 use App\Resque\Job\TaskReportCompletionJob;
 use App\Tests\Services\HttpMockHandler;
 use App\Services\Resque\QueueService;
-use App\Services\TaskService;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
-use App\Tests\Factory\TestTaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 
 class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
@@ -54,7 +53,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
-        self::$container->get(TaskService::class)->perform($task);
+        self::$container->get(TaskPerformanceService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
 
@@ -86,7 +85,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
-        self::$container->get(TaskService::class)->perform($task);
+        self::$container->get(TaskPerformanceService::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
 
