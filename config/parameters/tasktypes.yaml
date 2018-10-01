@@ -1,6 +1,12 @@
 parameters:
   task_types:
     "html validation":
+      selectable: true
     "css validation":
+      selectable: true
     "url discovery":
+      selectable: true
     "link integrity":
+      selectable: true
+    "link integrity single-url":
+      selectable: false
