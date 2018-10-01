@@ -21,9 +21,7 @@ php:
   - 7.2
 
 before_install:
-  - echo $COMPOSER_BIN_DIR
-  - ls -la ~
-  - ls -la ~/.composer
+  - "mkdir -p ~/.composer"
   - cp .travis.composer.config.json ~/.composer/config.json
   - rm phpunit.xml.dist
   - mv phpunit.travis-ci.xml phpunit.xml.dist
