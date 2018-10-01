@@ -22,15 +22,15 @@ class TaskTypeService
 
     public function get(string $name): ?Type
     {
-        if ($this->isValid($name)) {
+        if (!$this->isValid($name)) {
             return null;
         }
 
         return new Type(strtolower($name));
     }
 
-    public function isValid(string $name): bool
+    private function isValid(string $name): bool
     {
-        return array_keys($this->taskTypes, strtolower($name));
+        return array_key_exists(strtolower($name), $this->taskTypes);
     }
 }

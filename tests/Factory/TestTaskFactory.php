@@ -3,6 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Model\Task\TypeInterface;
+use App\Services\TaskTypeService;
 use Doctrine\ORM\ORMException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -63,10 +64,12 @@ class TestTaskFactory
         $taskService = null;
         $stateService = null;
         $entityManager = null;
+        $taskTypeService = null;
 
         try {
             $taskService = $this->container->get(TaskService::class);
             $entityManager = $this->container->get('doctrine.orm.entity_manager');
+            $taskTypeService = $this->container->get(TaskTypeService::class);
         } catch (NotFoundExceptionInterface $e) {
         } catch (ContainerExceptionInterface $e) {
         }
@@ -75,7 +78,11 @@ class TestTaskFactory
             $taskValues['parameters'] = '';
         }
 
-        $task = $taskService->create($taskValues['url'], $taskValues['type'], $taskValues['parameters']);
+        $task = $taskService->create(
+            $taskValues['url'],
+            $taskTypeService->get($taskValues['type']),
+            $taskValues['parameters']
+        );
 
         if ($taskValues['state'] != self::DEFAULT_TASK_STATE) {
             $task->setState($taskValues['state']);
