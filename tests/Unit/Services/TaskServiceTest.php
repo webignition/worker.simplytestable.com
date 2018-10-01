@@ -145,7 +145,6 @@ class TaskServiceTest extends \PHPUnit\Framework\TestCase
         return new TaskService(
             $services[EntityManagerInterface::class],
             $services[LoggerInterface::class],
-            $services[WorkerService::class],
             $services[CoreApplicationHttpClient::class],
             $services[TaskTypeService::class]
         );

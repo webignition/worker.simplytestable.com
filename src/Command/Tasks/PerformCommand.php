@@ -2,7 +2,7 @@
 
 namespace App\Command\Tasks;
 
-use Doctrine\ORM\EntityManagerInterface;
+use App\Services\TaskPerformanceService;
 use Psr\Log\LoggerInterface;
 use App\Command\Task\PerformCommand as TaskPerformCommand;
 use App\Services\Resque\QueueService as ResqueQueueService;
@@ -34,19 +34,24 @@ class PerformCommand extends AbstractTaskCollectionCommand
     private $resqueQueueService;
 
     /**
-     * @param EntityManagerInterface $entityManager
+     * @var TaskPerformanceService
+     */
+    private $taskPerformanceService;
+
+    /**
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
      * @param ResqueQueueService $resqueQueueService
+     * @param TaskPerformanceService $taskPerformanceService
      * @param string|null $name
      */
     public function __construct(
-        EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         TaskService $taskService,
         WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
+        TaskPerformanceService $taskPerformanceService,
         $name = null
     ) {
         parent::__construct($name);
@@ -55,6 +60,7 @@ class PerformCommand extends AbstractTaskCollectionCommand
         $this->taskService = $taskService;
         $this->workerService = $workerService;
         $this->resqueQueueService = $resqueQueueService;
+        $this->taskPerformanceService = $taskPerformanceService;
     }
 
     /**
@@ -81,7 +87,8 @@ class PerformCommand extends AbstractTaskCollectionCommand
             $this->logger,
             $this->taskService,
             $this->workerService,
-            $this->resqueQueueService
+            $this->resqueQueueService,
+            $this->taskPerformanceService
         );
 
         $this->executeForCollection($taskIds, $performCommand, $output);

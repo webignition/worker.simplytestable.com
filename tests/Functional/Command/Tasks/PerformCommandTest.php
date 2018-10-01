@@ -10,7 +10,6 @@ use App\Services\Resque\QueueService;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
-use App\Tests\Factory\TestTaskFactory;
 use Symfony\Component\Console\Input\ArrayInput;
 use App\Tests\Services\HttpMockHandler;
 
