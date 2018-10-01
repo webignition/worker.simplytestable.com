@@ -30,7 +30,7 @@ class CreateRequestTest extends \PHPUnit\Framework\TestCase
     ) {
         $taskType = empty($taskTypeName)
             ? null
-            : new Type($taskTypeName, true);
+            : new Type($taskTypeName, true, null);
 
         $createRequest = new CreateRequest($url, $taskType, $parameters);
 

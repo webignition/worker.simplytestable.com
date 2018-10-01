@@ -16,7 +16,15 @@ class TaskTypeService
         foreach ($taskTypeProperties as $name => $properties) {
             $taskTypeId = $this->createTaskTypeId($name);
 
-            $this->taskTypes[$taskTypeId] = new Type($taskTypeId, $properties['selectable']);
+            $childType = empty($properties['child-type'])
+                ? null
+                : $this->get($properties['child-type']);
+
+            $this->taskTypes[$taskTypeId] = new Type(
+                $taskTypeId,
+                $properties['selectable'],
+                $childType
+            );
         }
     }
 
