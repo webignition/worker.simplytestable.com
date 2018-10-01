@@ -9,10 +9,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use App\Entity\Task\Task;
 use Psr\Log\LoggerInterface;
-use App\Entity\TimePeriod;
-use App\Model\TaskDriver\Response as TaskDriverResponse;
 use App\Repository\TaskRepository;
-use App\Services\TaskDriver\TaskDriver;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
 class TaskService
@@ -33,16 +30,6 @@ class TaskService
     private $logger;
 
     /**
-     * @var WorkerService
-     */
-    private $workerService;
-
-    /**
-     * @var TaskDriver[]
-     */
-    private $taskDrivers;
-
-    /**
      * @var CoreApplicationHttpClient
      */
     private $coreApplicationHttpClient;
@@ -55,13 +42,11 @@ class TaskService
     public function __construct(
         EntityManagerInterface $entityManager,
         LoggerInterface $logger,
-        WorkerService $workerService,
         CoreApplicationHttpClient $coreApplicationHttpClient,
         TaskTypeService $taskTypeFactory
     ) {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
-        $this->workerService = $workerService;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
         $this->taskTypeService = $taskTypeFactory;
 
@@ -128,80 +113,6 @@ class TaskService
         $task->setState(Task::STATE_QUEUED);
     }
 
-    public function setInProgress(Task $task)
-    {
-        $task->setState(Task::STATE_IN_PROGRESS);
-    }
-
-    /**
-     * @param Task $task
-     */
-    public function perform(Task $task)
-    {
-        $this->logger->info(sprintf(
-            'TaskService::perform: [%d] [%s] Initialising',
-            $task->getId(),
-            $task->getState()
-        ));
-
-        $taskDriver = $this->taskDrivers[strtolower($task->getType())];
-
-        $this->start($task);
-
-        $taskDriverResponse = $taskDriver->perform($task);
-
-        if (!$task->getTimePeriod()->hasEndDateTime()) {
-            $task->getTimePeriod()->setEndDateTime(new \DateTime());
-        }
-
-        $task->setOutput($taskDriverResponse->getTaskOutput());
-
-        $this->finish(
-            $task,
-            $this->getCompletionStateFromTaskDriverResponse($taskDriverResponse)
-        );
-    }
-
-    /**
-     * @param string $taskTypeName
-     * @param TaskDriver $taskDriver
-     */
-    public function addTaskDriver($taskTypeName, TaskDriver $taskDriver)
-    {
-        $this->taskDrivers[strtolower($taskTypeName)] = $taskDriver;
-    }
-
-    /**
-     * @param Task $task
-     *
-     * @return Task
-     */
-    private function start(Task $task)
-    {
-        $timePeriod = new TimePeriod();
-        $timePeriod->setStartDateTime(new \DateTime());
-        $task->setTimePeriod($timePeriod);
-        $this->setInProgress($task);
-
-        $this->entityManager->persist($task);
-        $this->entityManager->flush();
-
-        return $task;
-    }
-
-    private function getCompletionStateFromTaskDriverResponse(TaskDriverResponse $taskDriverResponse): string
-    {
-        if ($taskDriverResponse->hasBeenSkipped()) {
-            return Task::STATE_SKIPPED;
-        }
-
-        if ($taskDriverResponse->hasSucceeded()) {
-            return Task::STATE_COMPLETED;
-        }
-
-        return Task::STATE_FAILED_NO_RETRY_AVAILABLE;
-    }
-
     /**
      * @param Task $task
      */
@@ -213,16 +124,11 @@ class TaskService
         $isCompleted = Task::STATE_COMPLETED === $taskStateName;
 
         if (!($isCancelled || $isCompleted)) {
-            $this->finish($task, Task::STATE_CANCELLED);
+            $task->setState(Task::STATE_CANCELLED);
+
+            $this->entityManager->persist($task);
+            $this->entityManager->flush();
         }
-    }
-
-    private function finish(Task $task, string $state)
-    {
-        $task->setState($state);
-
-        $this->entityManager->persist($task);
-        $this->entityManager->flush();
     }
 
     /**
