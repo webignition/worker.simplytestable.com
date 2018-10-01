@@ -134,6 +134,6 @@ services:
     App\Command\Tasks\RequestCommand:
       public: true
 
-    App\Services\TaskTypeFactory:
+    App\Services\TaskTypeService:
       arguments:
         $taskTypeProperties: '%task_types%'
