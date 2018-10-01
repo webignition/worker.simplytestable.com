@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Model\Task\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
@@ -47,32 +48,32 @@ class TaskService
     private $coreApplicationHttpClient;
 
     /**
-     * @var TaskTypeFactory
+     * @var TaskTypeService
      */
-    private $taskTypeFactory;
+    private $taskTypeService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         WorkerService $workerService,
         CoreApplicationHttpClient $coreApplicationHttpClient,
-        TaskTypeFactory $taskTypeFactory
+        TaskTypeService $taskTypeFactory
     ) {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
         $this->workerService = $workerService;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
-        $this->taskTypeFactory = $taskTypeFactory;
+        $this->taskTypeService = $taskTypeFactory;
 
         $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
-    public function create($url, string $type, string $parameters): Task
+    public function create(string $url, Type $type, string $parameters): Task
     {
         $task = new Task();
 
         $this->setQueued($task);
-        $task->setType($this->taskTypeFactory->create($type));
+        $task->setType($type);
         $task->setUrl($url);
         $task->setParameters($parameters);
 
@@ -109,7 +110,7 @@ class TaskService
             return null;
         }
 
-        $task->setType($this->taskTypeFactory->create($taskTypeName));
+        $task->setType($this->taskTypeService->get($taskTypeName));
 
         return $task;
     }

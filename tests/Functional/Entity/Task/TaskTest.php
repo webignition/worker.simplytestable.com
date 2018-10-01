@@ -4,7 +4,7 @@ namespace App\Tests\Functional\Entity\Task;
 
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypeFactory;
+use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
@@ -15,10 +15,10 @@ class TaskTest extends AbstractBaseTestCase
     {
         $entityManager = self::$container->get(EntityManagerInterface::class);
 
-        /* @var TaskTypeFactory $taskTypeFactory */
-        $taskTypeFactory = self::$container->get(TaskTypeFactory::class);
+        /* @var TaskTypeService $taskTypeService */
+        $taskTypeService = self::$container->get(TaskTypeService::class);
 
-        $linkIntegrityTaskType = $taskTypeFactory->create(TypeInterface::TYPE_LINK_INTEGRITY);
+        $linkIntegrityTaskType = $taskTypeService->get(TypeInterface::TYPE_LINK_INTEGRITY);
 
         $parentTask = new Task();
         $parentTask->setUrl('http://example.com');

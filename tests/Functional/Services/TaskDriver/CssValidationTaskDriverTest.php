@@ -3,12 +3,12 @@
 namespace App\Tests\Functional\Services\TaskDriver;
 
 use App\Model\Task\TypeInterface;
+use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskDriver\CssValidationTaskDriver;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\CssValidatorFixtureFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
-use App\Tests\Factory\TestTaskFactory;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
 
 class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
@@ -68,7 +68,7 @@ class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults([
+            TaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
             ])
@@ -332,7 +332,7 @@ class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
             new Response(200, ['content-type' => 'text/css']),
         ]);
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -369,7 +369,7 @@ class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
             new Response(200, ['content-type' => 'text/css']),
         ]);
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));

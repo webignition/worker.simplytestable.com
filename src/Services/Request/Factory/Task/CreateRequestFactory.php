@@ -2,7 +2,9 @@
 
 namespace App\Services\Request\Factory\Task;
 
+use App\Model\Task\Type;
 use App\Request\Task\CreateRequest;
+use App\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -17,9 +19,15 @@ class CreateRequestFactory
      */
     private $requestParameters;
 
-    public function __construct(RequestStack $requestStack)
+    /**
+     * @var TaskTypeService
+     */
+    private $taskTypeService;
+
+    public function __construct(RequestStack $requestStack, TaskTypeService $taskTypeService)
     {
         $this->requestParameters = $requestStack->getCurrentRequest()->request;
+        $this->taskTypeService = $taskTypeService;
     }
 
     /**
@@ -35,16 +43,14 @@ class CreateRequestFactory
      */
     public function create()
     {
+        $taskTypeValue = strtolower(trim($this->requestParameters->get(self::PARAMETER_TYPE)));
+        $taskType = $this->taskTypeService->get($taskTypeValue);
+
         return new CreateRequest(
-            $this->getTaskTypeFromRequestParameters(),
             $this->getStringValueFromRequestParameters(self::PARAMETER_URL),
+            $taskType,
             $this->getStringValueFromRequestParameters(self::PARAMETER_PARAMETERS)
         );
-    }
-
-    private function getTaskTypeFromRequestParameters(): ?string
-    {
-        return trim($this->requestParameters->get(self::PARAMETER_TYPE));
     }
 
     /**

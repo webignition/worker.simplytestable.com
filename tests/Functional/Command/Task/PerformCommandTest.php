@@ -2,13 +2,13 @@
 
 namespace App\Tests\Functional\Command\Task;
 
+use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Command\Task\PerformCommand;
 use App\Services\Resque\QueueService;
 use App\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
-use App\Tests\Factory\TestTaskFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use App\Tests\Services\HttpMockHandler;
@@ -35,11 +35,11 @@ class PerformCommandTest extends AbstractBaseTestCase
      */
     public function testRunInMaintenanceReadOnlyMode()
     {
+        $testTaskFactory = self::$container->get(TaskFactory::class);
         self::$container->get(WorkerService::class)->setReadOnly();
         $this->clearRedis();
 
-        $testTaskFactory = new TestTaskFactory(self::$container);
-        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
+        $task = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
 
         $returnCode = $this->command->run(
             new ArrayInput([
@@ -64,6 +64,7 @@ class PerformCommandTest extends AbstractBaseTestCase
     {
         $httpMockHandler = self::$container->get(HttpMockHandler::class);
         $resqueQueueService = self::$container->get(QueueService::class);
+        $testTaskFactory = self::$container->get(TaskFactory::class);
 
         $httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
@@ -72,9 +73,7 @@ class PerformCommandTest extends AbstractBaseTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $testTaskFactory = new TestTaskFactory(self::$container);
-
-        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
             'url' => 'http://example.com/',
             'type' => 'html validation',
         ]));

@@ -1,0 +1,6 @@
+parameters:
+  task_types:
+    "html validation":
+    "css validation":
+    "url discovery":
+    "link integrity":

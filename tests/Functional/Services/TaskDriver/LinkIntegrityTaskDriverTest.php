@@ -3,12 +3,12 @@
 namespace App\Tests\Functional\Services\TaskDriver;
 
 use App\Model\Task\TypeInterface;
+use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskDriver\LinkCheckerConfigurationFactory;
 use App\Services\TaskDriver\LinkIntegrityTaskDriver;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
-use App\Tests\Factory\TestTaskFactory;
 use Psr\Http\Message\RequestInterface;
 
 class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
@@ -65,7 +65,7 @@ class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters),
         ]));
@@ -253,7 +253,7 @@ class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
             new Response(200),
         ]);
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -287,7 +287,7 @@ class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
             new Response(200),
         ]);
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));

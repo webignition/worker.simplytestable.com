@@ -3,10 +3,10 @@
 namespace App\Tests\Functional\Services\TaskDriver;
 
 use App\Model\Task\TypeInterface;
+use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskDriver\UrlDiscoveryTaskDriver;
 use App\Tests\Factory\HtmlDocumentFactory;
-use App\Tests\Factory\TestTaskFactory;
 
 class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
 {
@@ -59,7 +59,7 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults([
+            TaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
             ])
@@ -145,7 +145,7 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
             new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
         ]);
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -174,7 +174,7 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
             new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
         ]);
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters),
         ]));

@@ -1,17 +1,15 @@
 <?php
 
-namespace App\Tests\Factory;
+namespace App\Tests\TestServices;
 
 use App\Model\Task\TypeInterface;
-use Doctrine\ORM\ORMException;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
+use App\Services\TaskTypeService;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Entity\TimePeriod;
 use App\Services\TaskService;
 
-class TestTaskFactory
+class TaskFactory
 {
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';
@@ -29,16 +27,28 @@ class TestTaskFactory
     ];
 
     /**
-     * @var ContainerInterface
+     * @var EntityManagerInterface
      */
-    private $container;
+    private $entityManager;
 
     /**
-     * @param ContainerInterface $container
+     * @var TaskService
      */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    private $taskService;
+
+    /**
+     * @var TaskTypeService
+     */
+    private $taskTypeService;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        TaskService $taskService,
+        TaskTypeService $taskTypeService
+    ) {
+        $this->entityManager = $entityManager;
+        $this->taskService = $taskService;
+        $this->taskTypeService = $taskTypeService;
     }
 
 
@@ -60,22 +70,15 @@ class TestTaskFactory
      */
     public function create($taskValues)
     {
-        $taskService = null;
-        $stateService = null;
-        $entityManager = null;
-
-        try {
-            $taskService = $this->container->get(TaskService::class);
-            $entityManager = $this->container->get('doctrine.orm.entity_manager');
-        } catch (NotFoundExceptionInterface $e) {
-        } catch (ContainerExceptionInterface $e) {
-        }
-
         if (!isset($taskValues['parameters'])) {
             $taskValues['parameters'] = '';
         }
 
-        $task = $taskService->create($taskValues['url'], $taskValues['type'], $taskValues['parameters']);
+        $task = $this->taskService->create(
+            $taskValues['url'],
+            $this->taskTypeService->get($taskValues['type']),
+            $taskValues['parameters']
+        );
 
         if ($taskValues['state'] != self::DEFAULT_TASK_STATE) {
             $task->setState($taskValues['state']);
@@ -88,11 +91,8 @@ class TestTaskFactory
             $task->setTimePeriod($timePeriod);
         }
 
-        try {
-            $entityManager->persist($task);
-            $entityManager->flush();
-        } catch (ORMException $e) {
-        }
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
 
         return $task;
     }
