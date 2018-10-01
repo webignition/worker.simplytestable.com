@@ -6,12 +6,9 @@ use App\Model\Task\TypeInterface;
 use App\Services\TaskTypeService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use App\Entity\Task\Task;
 use App\Repository\TaskRepository;
-use App\Services\CoreApplicationHttpClient;
 use App\Services\TaskService;
-use App\Services\WorkerService;
 
 /**
  * @group TaskService
@@ -126,26 +123,12 @@ class TaskServiceTest extends \PHPUnit\Framework\TestCase
             $services[EntityManagerInterface::class] = $entityManager;
         }
 
-        if (!isset($services[LoggerInterface::class])) {
-            $services[LoggerInterface::class] = \Mockery::mock(LoggerInterface::class);
-        }
-
-        if (!isset($services[WorkerService::class])) {
-            $services[WorkerService::class] = \Mockery::mock(WorkerService::class);
-        }
-
-        if (!isset($services[CoreApplicationHttpClient::class])) {
-            $services[CoreApplicationHttpClient::class] = \Mockery::mock(CoreApplicationHttpClient::class);
-        }
-
         if (!isset($services[TaskTypeService::class])) {
             $services[TaskTypeService::class] = new TaskTypeService([]);
         }
 
         return new TaskService(
             $services[EntityManagerInterface::class],
-            $services[LoggerInterface::class],
-            $services[CoreApplicationHttpClient::class],
             $services[TaskTypeService::class]
         );
     }

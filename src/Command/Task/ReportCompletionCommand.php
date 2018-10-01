@@ -1,6 +1,7 @@
 <?php
 namespace App\Command\Task;
 
+use App\Services\TaskCompletionReporter;
 use Psr\Log\LoggerInterface;
 use App\Services\TaskService;
 use App\Services\WorkerService;
@@ -30,15 +31,22 @@ class ReportCompletionCommand extends Command
     private $workerService;
 
     /**
+     * @var TaskCompletionReporter
+     */
+    private $taskCompletionReporter;
+
+    /**
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
+     * @param TaskCompletionReporter $taskCompletionReporter
      * @param string|null $name
      */
     public function __construct(
         LoggerInterface $logger,
         TaskService $taskService,
         WorkerService $workerService,
+        TaskCompletionReporter $taskCompletionReporter,
         $name = null
     ) {
         parent::__construct($name);
@@ -46,6 +54,7 @@ class ReportCompletionCommand extends Command
         $this->logger = $logger;
         $this->taskService = $taskService;
         $this->workerService = $workerService;
+        $this->taskCompletionReporter = $taskCompletionReporter;
     }
 
     /**
@@ -86,7 +95,7 @@ class ReportCompletionCommand extends Command
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
         }
 
-        $reportCompletionResult = $this->taskService->reportCompletion($task);
+        $reportCompletionResult = $this->taskCompletionReporter->reportCompletion($task);
 
         if ($reportCompletionResult === true) {
             $output->writeln('Reported task completion [' .$task->getId().']');

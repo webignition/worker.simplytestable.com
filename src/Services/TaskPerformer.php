@@ -8,7 +8,7 @@ use App\Entity\TimePeriod;
 use App\Model\TaskDriver\Response as TaskDriverResponse;
 use App\Services\TaskDriver\TaskDriver;
 
-class TaskPerformanceService
+class TaskPerformer
 {
     /**
      * @var EntityManagerInterface

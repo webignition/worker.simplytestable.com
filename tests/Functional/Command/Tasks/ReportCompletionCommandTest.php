@@ -2,7 +2,7 @@
 
 namespace App\Tests\Functional\Command\Tasks;
 
-use App\Services\TaskPerformanceService;
+use App\Services\TaskPerformer;
 use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Command\Tasks\ReportCompletionCommand;
@@ -56,7 +56,7 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
         ]));
         $this->assertNotNull($task->getId());
 
-        self::$container->get(TaskPerformanceService::class)->perform($task);
+        self::$container->get(TaskPerformer::class)->perform($task);
         $this->assertNotNull($task->getOutput()->getId());
 
         $returnCode = $this->command->run(

@@ -2,7 +2,7 @@
 
 namespace App\Tests\Functional\Command\Task;
 
-use App\Services\TaskPerformanceService;
+use App\Services\TaskPerformer;
 use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Command\Task\ReportCompletionEnqueueCommand;
@@ -53,7 +53,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
-        self::$container->get(TaskPerformanceService::class)->perform($task);
+        self::$container->get(TaskPerformer::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
 
@@ -85,7 +85,7 @@ class ReportCompletionEnqueueCommandTest extends AbstractBaseTestCase
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
-        self::$container->get(TaskPerformanceService::class)->perform($task);
+        self::$container->get(TaskPerformer::class)->perform($task);
 
         $this->assertTrue($this->clearRedis());
 
