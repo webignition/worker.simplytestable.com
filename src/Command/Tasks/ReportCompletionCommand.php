@@ -1,70 +1,36 @@
 <?php
+
 namespace App\Command\Tasks;
 
-use App\Services\TaskCompletionReporter;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use App\Command\Task\ReportCompletionCommand as TaskReportCompletionCommand;
 use App\Entity\Task\Task;
 use App\Repository\TaskRepository;
-use App\Services\TaskService;
-use App\Services\WorkerService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ReportCompletionCommand extends AbstractTaskCollectionCommand
 {
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var TaskService
-     */
-    private $taskService;
-
-    /**
-     * @var WorkerService
-     */
-    private $workerService;
-
-    /**
      * @var TaskRepository
      */
     private $taskRepository;
 
-    /**
-     * @var TaskCompletionReporter
-     */
-    private $taskCompletionReporter;
+    private $taskReportCompletionCommand;
 
-    /**
-     * @param EntityManagerInterface $entityManager
-     * @param LoggerInterface $logger
-     * @param TaskService $taskService
-     * @param WorkerService $workerService
-     * @param TaskCompletionReporter $taskCompletionReporter
-     * @param string|null $name
-     */
     public function __construct(
         EntityManagerInterface $entityManager,
-        LoggerInterface $logger,
-        TaskService $taskService,
-        WorkerService $workerService,
-        TaskCompletionReporter $taskCompletionReporter,
-        $name = null
+        TaskReportCompletionCommand $taskReportCompletionCommand
     ) {
-        parent::__construct($name);
+        parent::__construct(null);
 
-        $this->logger = $logger;
-        $this->taskService = $taskService;
-        $this->workerService = $workerService;
-        $this->taskCompletionReporter = $taskCompletionReporter;
-
+        $this->taskReportCompletionCommand = $taskReportCompletionCommand;
         $this->taskRepository = $entityManager->getRepository(Task::class);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -81,14 +47,7 @@ class ReportCompletionCommand extends AbstractTaskCollectionCommand
         $taskIds = $this->taskRepository->getIdsWithOutput();
         $output->writeln(count($taskIds).' tasks with output ready to report completion');
 
-        $reportCompletionCommand = new TaskReportCompletionCommand(
-            $this->logger,
-            $this->taskService,
-            $this->workerService,
-            $this->taskCompletionReporter
-        );
-
-        $this->executeForCollection($taskIds, $reportCompletionCommand, $output);
+        $this->executeForCollection($taskIds, $this->taskReportCompletionCommand, $output);
 
         return 0;
     }
