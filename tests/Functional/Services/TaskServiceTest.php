@@ -4,7 +4,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskPerformanceService;
+use App\Services\TaskPerformer;
 use App\Services\TaskTypeService;
 use App\Tests\TestServices\TaskFactory;
 use Doctrine\ORM\OptimisticLockException;
@@ -186,7 +186,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testReportCompletionFailure(array $responseFixtures, $expectedReturnValue)
     {
-        $taskPerformanceService = self::$container->get(TaskPerformanceService::class);
+        $taskPerformanceService = self::$container->get(TaskPerformer::class);
 
         $this->httpMockHandler->appendFixtures(array_merge([
             new Response(200, ['content-type' => 'text/html']),
@@ -244,7 +244,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testReportCompletionSuccess($responseFixture)
     {
-        $taskPerformanceService = self::$container->get(TaskPerformanceService::class);
+        $taskPerformanceService = self::$container->get(TaskPerformer::class);
 
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),

@@ -2,7 +2,7 @@
 
 namespace App\Command\Task;
 
-use App\Services\TaskPerformanceService;
+use App\Services\TaskPerformer;
 use Psr\Log\LoggerInterface;
 use App\Resque\Job\TaskPerformJob;
 use App\Resque\Job\TaskReportCompletionJob;
@@ -42,7 +42,7 @@ class PerformCommand extends Command
     private $resqueQueueService;
 
     /**
-     * @var TaskPerformanceService
+     * @var TaskPerformer
      */
     private $taskPerformanceService;
 
@@ -51,7 +51,7 @@ class PerformCommand extends Command
      * @param TaskService $taskService
      * @param WorkerService $workerService
      * @param ResqueQueueService $resqueQueueService
-     * @param TaskPerformanceService $taskPerformanceService
+     * @param TaskPerformer $taskPerformanceService
      * @param string|null $name
      */
     public function __construct(
@@ -59,7 +59,7 @@ class PerformCommand extends Command
         TaskService $taskService,
         WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
-        TaskPerformanceService $taskPerformanceService,
+        TaskPerformer $taskPerformanceService,
         ?string $name = null
     ) {
         parent::__construct($name);

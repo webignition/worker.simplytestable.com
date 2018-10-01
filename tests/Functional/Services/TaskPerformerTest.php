@@ -3,7 +3,7 @@
 namespace App\Tests\Functional\Services;
 
 use App\Model\Task\TypeInterface;
-use App\Services\TaskPerformanceService;
+use App\Services\TaskPerformer;
 use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Entity\Task\Task;
@@ -11,7 +11,7 @@ use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use App\Tests\Services\HttpMockHandler;
 
-class TaskPerformanceServiceTest extends AbstractBaseTestCase
+class TaskPerformerTest extends AbstractBaseTestCase
 {
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';
@@ -19,9 +19,9 @@ class TaskPerformanceServiceTest extends AbstractBaseTestCase
     const DEFAULT_TASK_STATE = Task::STATE_QUEUED;
 
     /**
-     * @var TaskPerformanceService
+     * @var TaskPerformer
      */
-    private $taskPerformanceService;
+    private $taskPerformer;
 
     /**
      * @var TaskFactory
@@ -40,7 +40,7 @@ class TaskPerformanceServiceTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->taskPerformanceService = self::$container->get(TaskPerformanceService::class);
+        $this->taskPerformer = self::$container->get(TaskPerformer::class);
         $this->testTaskFactory = self::$container->get(TaskFactory::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
@@ -59,7 +59,7 @@ class TaskPerformanceServiceTest extends AbstractBaseTestCase
 
         $task = $this->testTaskFactory->create($taskValues);
 
-        $this->taskPerformanceService->perform($task);
+        $this->taskPerformer->perform($task);
 
         $this->assertEquals($expectedFinishedStateName, $task->getState());
     }

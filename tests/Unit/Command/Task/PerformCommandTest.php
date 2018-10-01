@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\Command\Task;
 
-use App\Services\TaskPerformanceService;
+use App\Services\TaskPerformer;
 use Psr\Log\LoggerInterface;
 use App\Command\Task\PerformCommand;
 use App\Services\TaskService;
@@ -72,8 +72,8 @@ class PerformCommandTest extends \PHPUnit\Framework\TestCase
             $services[ResqueQueueService::class] = MockFactory::createResqueQueueService();
         }
 
-        if (!isset($services[TaskPerformanceService::class])) {
-            $services[TaskPerformanceService::class] = \Mockery::mock(TaskPerformanceService::class);
+        if (!isset($services[TaskPerformer::class])) {
+            $services[TaskPerformer::class] = \Mockery::mock(TaskPerformer::class);
         }
 
         return new PerformCommand(
@@ -81,7 +81,7 @@ class PerformCommandTest extends \PHPUnit\Framework\TestCase
             $services[TaskService::class],
             $services[WorkerService::class],
             $services[ResqueQueueService::class],
-            $services[TaskPerformanceService::class]
+            $services[TaskPerformer::class]
         );
     }
 
