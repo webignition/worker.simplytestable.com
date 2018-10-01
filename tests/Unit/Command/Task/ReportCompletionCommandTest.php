@@ -3,6 +3,7 @@
 namespace App\Tests\Unit\Command\Task;
 
 use App\Entity\ThisWorker;
+use App\Services\TaskCompletionReporter;
 use Psr\Log\LoggerInterface;
 use App\Command\Task\ReportCompletionCommand;
 use App\Services\TaskService;
@@ -104,10 +105,15 @@ class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
             $services[WorkerService::class] = MockFactory::createWorkerService();
         }
 
+        if (!isset($services[TaskCompletionReporter::class])) {
+            $services[TaskCompletionReporter::class] = \Mockery::mock(TaskCompletionReporter::class);
+        }
+
         return new ReportCompletionCommand(
             $services[LoggerInterface::class],
             $services[TaskService::class],
-            $services[WorkerService::class]
+            $services[WorkerService::class],
+            $services[TaskCompletionReporter::class]
         );
     }
 

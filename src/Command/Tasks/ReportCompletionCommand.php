@@ -1,6 +1,7 @@
 <?php
 namespace App\Command\Tasks;
 
+use App\Services\TaskCompletionReporter;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use App\Command\Task\ReportCompletionCommand as TaskReportCompletionCommand;
@@ -34,10 +35,16 @@ class ReportCompletionCommand extends AbstractTaskCollectionCommand
     private $taskRepository;
 
     /**
+     * @var TaskCompletionReporter
+     */
+    private $taskCompletionReporter;
+
+    /**
      * @param EntityManagerInterface $entityManager
      * @param LoggerInterface $logger
      * @param TaskService $taskService
      * @param WorkerService $workerService
+     * @param TaskCompletionReporter $taskCompletionReporter
      * @param string|null $name
      */
     public function __construct(
@@ -45,6 +52,7 @@ class ReportCompletionCommand extends AbstractTaskCollectionCommand
         LoggerInterface $logger,
         TaskService $taskService,
         WorkerService $workerService,
+        TaskCompletionReporter $taskCompletionReporter,
         $name = null
     ) {
         parent::__construct($name);
@@ -52,6 +60,7 @@ class ReportCompletionCommand extends AbstractTaskCollectionCommand
         $this->logger = $logger;
         $this->taskService = $taskService;
         $this->workerService = $workerService;
+        $this->taskCompletionReporter = $taskCompletionReporter;
 
         $this->taskRepository = $entityManager->getRepository(Task::class);
     }
@@ -75,7 +84,8 @@ class ReportCompletionCommand extends AbstractTaskCollectionCommand
         $reportCompletionCommand = new TaskReportCompletionCommand(
             $this->logger,
             $this->taskService,
-            $this->workerService
+            $this->workerService,
+            $this->taskCompletionReporter
         );
 
         $this->executeForCollection($taskIds, $reportCompletionCommand, $output);
