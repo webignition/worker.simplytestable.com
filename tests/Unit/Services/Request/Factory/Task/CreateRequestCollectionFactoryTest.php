@@ -20,7 +20,9 @@ class CreateRequestCollectionFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreate(Request $request, $expectedCollectionCount)
     {
         $taskTypeService = new TaskTypeService([
-            TypeInterface::TYPE_HTML_VALIDATION => [],
+            TypeInterface::TYPE_HTML_VALIDATION => [
+                'selectable' => true,
+            ],
         ]);
 
         $requestStack = new RequestStack();
