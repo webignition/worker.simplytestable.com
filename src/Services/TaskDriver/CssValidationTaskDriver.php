@@ -2,7 +2,6 @@
 
 namespace App\Services\TaskDriver;
 
-use QueryPath\Exception as QueryPathException;
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
@@ -15,6 +14,7 @@ use webignition\CssValidatorOutput\Parser\InvalidValidatorOutputException;
 use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
+use webignition\WebPageInspector\UnparseableContentTypeException;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
@@ -84,9 +84,9 @@ class CssValidationTaskDriver extends AbstractWebPageTaskDriver
     /**
      * {@inheritdoc}
      *
-     * @throws QueryPathException
      * @throws InvalidValidatorOutputException
      * @throws InternetMediaTypeParseException
+     * @throws UnparseableContentTypeException
      */
     protected function performValidation(WebPage $webPage)
     {

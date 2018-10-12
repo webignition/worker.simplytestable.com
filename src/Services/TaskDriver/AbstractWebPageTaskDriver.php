@@ -2,7 +2,6 @@
 
 namespace App\Services\TaskDriver;
 
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
@@ -76,7 +75,6 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
      *
      * @throws InternetMediaTypeParseException
      * @throws TransportException
-     * @throws GuzzleException
      */
     protected function execute(Task $task)
     {
@@ -123,7 +121,6 @@ abstract class AbstractWebPageTaskDriver extends TaskDriver
      *
      * @throws InternetMediaTypeParseException
      * @throws TransportException
-     * @throws GuzzleException
      */
     private function retrieveWebPage()
     {

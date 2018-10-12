@@ -2,7 +2,6 @@
 
 namespace App\Services\TaskDriver;
 
-use QueryPath\Exception as QueryPathException;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use webignition\HtmlValidator\Output\Parser\Configuration as HtmlValidatorOutputParserConfiguration;
@@ -69,8 +68,6 @@ class HtmlValidationTaskDriver extends AbstractWebPageTaskDriver
 
     /**
      * {@inheritdoc}
-     *
-     * @throws QueryPathException
      */
     protected function performValidation(WebPage $webPage)
     {

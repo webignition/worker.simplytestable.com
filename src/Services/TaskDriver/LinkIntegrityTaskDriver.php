@@ -5,7 +5,6 @@ namespace App\Services\TaskDriver;
 use App\Model\LinkIntegrityResult;
 use App\Model\LinkIntegrityResultCollection;
 use GuzzleHttp\Exception\GuzzleException;
-use QueryPath\Exception as QueryPathException;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
@@ -73,7 +72,6 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
      * {@inheritdoc}
      *
      * @throws GuzzleException
-     * @throws QueryPathException
      */
     protected function performValidation(WebPage $webPage)
     {
@@ -110,8 +108,8 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
 
     /**
      * @param WebPage $webPage
+     *
      * @return array
-     * @throws QueryPathException
      */
     private function findWebPageLinks(WebPage $webPage): array
     {
