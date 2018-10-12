@@ -4,7 +4,6 @@ namespace App\Services\TaskDriver;
 
 use App\Model\LinkIntegrityResult;
 use App\Model\LinkIntegrityResultCollection;
-use GuzzleHttp\Exception\GuzzleException;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
@@ -70,8 +69,6 @@ class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
 
     /**
      * {@inheritdoc}
-     *
-     * @throws GuzzleException
      */
     protected function performValidation(WebPage $webPage)
     {

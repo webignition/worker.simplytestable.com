@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1749abe9a6a03e921149290b2d41337a",
+    "content-hash": "37588f6520fd3c635ea4206559703c02",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4023,16 +4023,16 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "3.1",
+            "version": "3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "5685cb60f7a0e6dd4d44172fbedd9a289452e9b7"
+                "reference": "15231bcaba63a4e367fdd871689d7153f56fd159"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/5685cb60f7a0e6dd4d44172fbedd9a289452e9b7",
-                "reference": "5685cb60f7a0e6dd4d44172fbedd9a289452e9b7",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/15231bcaba63a4e367fdd871689d7153f56fd159",
+                "reference": "15231bcaba63a4e367fdd871689d7153f56fd159",
                 "shasum": ""
             },
             "require": {
@@ -4073,7 +4073,7 @@
                 "html",
                 "link"
             ],
-            "time": "2018-10-12T06:34:47+00:00"
+            "time": "2018-10-12T11:54:37+00:00"
         },
         {
             "name": "webignition/html-document-link-finder",
@@ -4723,16 +4723,16 @@
         },
         {
             "name": "webignition/url-health-checker",
-            "version": "2.0",
+            "version": "2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/url-health-checker.git",
-                "reference": "12de9db230ca3a13a6488b1b5b10ead673052c19"
+                "reference": "17efa3a4cb6f112c5dfcf10392676e71b623811f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/url-health-checker/zipball/12de9db230ca3a13a6488b1b5b10ead673052c19",
-                "reference": "12de9db230ca3a13a6488b1b5b10ead673052c19",
+                "url": "https://api.github.com/repos/webignition/url-health-checker/zipball/17efa3a4cb6f112c5dfcf10392676e71b623811f",
+                "reference": "17efa3a4cb6f112c5dfcf10392676e71b623811f",
                 "shasum": ""
             },
             "require": {
@@ -4770,7 +4770,7 @@
                 "health",
                 "url"
             ],
-            "time": "2018-09-26T18:36:20+00:00"
+            "time": "2018-10-12T11:20:21+00:00"
         },
         {
             "name": "webignition/web-json-model",

@@ -30,7 +30,7 @@
         "webignition/guzzle-curl-exception": ">=1,<2",
         "webignition/guzzle-http-authentication-middleware": ">=0.1,<1",
         "webignition/guzzle-request-headers-middleware": ">=0.1,<1",
-        "webignition/html-document-link-checker": "^3.1",
+        "webignition/html-document-link-checker": ">=3.2,<4",
         "webignition/html-document-link-finder": ">=4,<5",
         "webignition/html-document-type": ">=0.1.1,<1.0",
         "webignition/html-validator-output-parser": ">=1.2,<2",
