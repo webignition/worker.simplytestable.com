@@ -2,7 +2,6 @@
 
 namespace App\Services\TaskDriver;
 
-use QueryPath\Exception as QueryPathException;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
@@ -41,8 +40,6 @@ class UrlDiscoveryTaskDriver extends AbstractWebPageTaskDriver
 
     /**
      * {@inheritdoc}
-     *
-     * @throws QueryPathException
      */
     protected function performValidation(WebPage $webPage)
     {

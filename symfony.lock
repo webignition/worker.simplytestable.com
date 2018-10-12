@@ -95,9 +95,6 @@
     "kevinrob/guzzle-cache-middleware": {
         "version": "v3.2.1"
     },
-    "masterminds/html5": {
-        "version": "2.3.0"
-    },
     "mockery/mockery": {
         "version": "1.1.0"
     },
@@ -176,9 +173,6 @@
     "psr/simple-cache": {
         "version": "1.0.1"
     },
-    "querypath/querypath": {
-        "version": "3.0.5"
-    },
     "sebastian/code-unit-reverse-lookup": {
         "version": "1.0.1"
     },
@@ -241,6 +235,9 @@
             "version": "3.3",
             "ref": "e3868d2f4a5104f19f844fe551099a00c6562527"
         }
+    },
+    "symfony/css-selector": {
+        "version": "v4.1.6"
     },
     "symfony/debug": {
         "version": "v4.1.1"
@@ -389,6 +386,12 @@
     "webignition/resque-bundle": {
         "version": "dev-master"
     },
+    "webignition/stream-factory": {
+        "version": "0.1"
+    },
+    "webignition/stream-factory-interface": {
+        "version": "0.2"
+    },
     "webignition/string-parser": {
         "version": "0.2.3"
     },
@@ -400,6 +403,9 @@
     },
     "webignition/web-json-model": {
         "version": "3.1.1"
+    },
+    "webignition/web-page-inspector": {
+        "version": "0.5"
     },
     "webignition/web-page-model": {
         "version": "3.1.1"

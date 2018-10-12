@@ -31,7 +31,7 @@ class CssValidatorWrapperConfigurationFactory
      */
     public function create(Task $task, $urlToValidate, $contentToValidate)
     {
-        $vendorExtensionsParameter = $task->getParameter('vendor-extensions');
+        $vendorExtensionsParameter = (string)$task->getParameter('vendor-extensions');
 
         $vendorExtensionSeverityLevel = VendorExtensionSeverityLevel::isValid($vendorExtensionsParameter)
             ? $task->getParameter('vendor-extensions')
