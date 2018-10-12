@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "37588f6520fd3c635ea4206559703c02",
+    "content-hash": "26e3084135a4a4f557022b1e82ed710f",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4876,20 +4876,21 @@
         },
         {
             "name": "webignition/web-page-model",
-            "version": "5.1",
+            "version": "5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/web-page-model.git",
-                "reference": "f102746e95613e5654b94c7bf7c99ec2da9ac3dd"
+                "reference": "44b17bb66fbac3649448946d46e64ea48b3e4f37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/f102746e95613e5654b94c7bf7c99ec2da9ac3dd",
-                "reference": "f102746e95613e5654b94c7bf7c99ec2da9ac3dd",
+                "url": "https://api.github.com/repos/webignition/web-page-model/zipball/44b17bb66fbac3649448946d46e64ea48b3e4f37",
+                "reference": "44b17bb66fbac3649448946d46e64ea48b3e4f37",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2.0",
+                "webignition/absolute-url-deriver": ">=1.5.2,<2",
                 "webignition/character-set-list": "^0.2",
                 "webignition/internet-media-type": "^2",
                 "webignition/internet-media-type-interface": "^0.4",
@@ -4925,7 +4926,7 @@
                 "model",
                 "webpage"
             ],
-            "time": "2018-10-10T11:20:47+00:00"
+            "time": "2018-10-12T16:00:49+00:00"
         },
         {
             "name": "webignition/web-resource-interfaces",
