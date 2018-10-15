@@ -6,6 +6,7 @@ use App\Entity\Task\Task;
 use App\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use App\Services\Request\Factory\Task\CancelRequestFactory;
 use App\Services\Request\Factory\Task\CreateRequestFactory;
+use App\Services\Resque\QueueService;
 use App\Tests\TestServices\TaskFactory;
 
 /**
@@ -21,6 +22,8 @@ class TaskControllerTest extends AbstractControllerTest
      */
     public function testCreateCollectionAction($postData, $expectedResponseTaskCollection)
     {
+        $resqueQueueService = self::$container->get(QueueService::class);
+
         $this->client->request(
             'POST',
             $this->router->generate('task_create_collection'),
@@ -41,6 +44,13 @@ class TaskControllerTest extends AbstractControllerTest
             $this->assertInternalType('int', $responseTask['id']);
             $this->assertEquals($expectedResponseTask['type'], $responseTask['type']);
             $this->assertEquals($expectedResponseTask['url'], $responseTask['url']);
+
+            $this->assertTrue($resqueQueueService->contains(
+                'task-prepare',
+                [
+                    'id' => $responseTask['id'],
+                ]
+            ));
         }
     }
 

@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\Resque\Job\TaskPrepareJob;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Model\TaskCollection;
-use App\Resque\Job\TaskPerformJob;
 use App\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use App\Services\Request\Factory\Task\CancelRequestFactory;
 use App\Services\Request\Factory\Task\CreateRequestCollectionFactory;
@@ -80,7 +80,7 @@ class TaskController extends AbstractController
         $this->entityManager->flush();
 
         foreach ($tasks as $task) {
-            $resqueQueueService->enqueue(new TaskPerformJob(['id' => $task->getId()]));
+            $resqueQueueService->enqueue(new TaskPrepareJob(['id' => $task->getId()]));
         }
 
         return new JsonResponse($tasks->jsonSerialize());
