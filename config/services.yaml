@@ -125,6 +125,9 @@ services:
       public: true
 
     # For retrieval of commands from container in resque jobs
+    App\Command\Task\PrepareCommand:
+      public: true
+
     App\Command\Task\PerformCommand:
       public: true
 
@@ -137,3 +140,7 @@ services:
     App\Services\TaskTypeService:
       arguments:
         $taskTypeProperties: '%task_types%'
+
+    App\Services\TaskTypePreparer\Factory:
+      arguments:
+        $taskPreparers: []
