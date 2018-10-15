@@ -28,3 +28,6 @@ services:
 
   App\Tests\TestServices\TaskFactory:
     public: true
+
+  App\Services\TaskTypePreparer\Factory:
+    public: true

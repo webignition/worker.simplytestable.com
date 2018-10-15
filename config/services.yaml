@@ -137,3 +137,7 @@ services:
     App\Services\TaskTypeService:
       arguments:
         $taskTypeProperties: '%task_types%'
+
+    App\Services\TaskTypePreparer\Factory:
+      arguments:
+        $taskPreparers: ~
