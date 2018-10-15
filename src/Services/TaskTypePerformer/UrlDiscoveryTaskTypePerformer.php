@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services\TaskDriver;
+namespace App\Services\TaskTypePerformer;
 
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 use webignition\WebResource\WebPage\WebPage;
 
-class UrlDiscoveryTaskDriver extends AbstractWebPageTaskDriver
+class UrlDiscoveryTaskTypePerformer extends AbstractWebPageTaskTypePerformer
 {
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
 

@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Tests\Functional\Services\TaskDriver;
+namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use App\Services\TaskDriver\TaskDriver;
+use App\Services\TaskTypePerformer\TaskTypePerformer;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Services\HttpMockHandler;
 use webignition\WebResource\Exception\TransportException;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-abstract class AbstractWebPageTaskDriverTest extends AbstractBaseTestCase
+abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
 {
     /**
      * @var TaskFactory
@@ -43,9 +43,9 @@ abstract class AbstractWebPageTaskDriverTest extends AbstractBaseTestCase
     }
 
     /**
-     * @return TaskDriver
+     * @return TaskTypePerformer
      */
-    abstract protected function getTaskDriver();
+    abstract protected function getTaskTypePerformer();
 
     /**
      * @return string
@@ -98,7 +98,7 @@ abstract class AbstractWebPageTaskDriverTest extends AbstractBaseTestCase
         $this->expectExceptionMessage('foo');
         $this->expectExceptionCode(0);
 
-        $this->getTaskDriver()->perform($task);
+        $this->getTaskTypePerformer()->perform($task);
     }
 
     /**
@@ -123,17 +123,17 @@ abstract class AbstractWebPageTaskDriverTest extends AbstractBaseTestCase
             TaskFactory::createTaskValuesFromDefaults()
         );
 
-        $taskDriver = $this->getTaskDriver();
+        $taskTypePerformer = $this->getTaskTypePerformer();
 
-        $taskDriverResponse = $taskDriver->perform($task);
+        $response = $taskTypePerformer->perform($task);
 
-        $this->assertEquals($expectedWebResourceRetrievalHasSucceeded, $taskDriverResponse->hasSucceeded());
-        $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
-        $this->assertEquals($expectedErrorCount, $taskDriverResponse->getErrorCount());
+        $this->assertEquals($expectedWebResourceRetrievalHasSucceeded, $response->hasSucceeded());
+        $this->assertEquals($expectedIsRetryable, $response->isRetryable());
+        $this->assertEquals($expectedErrorCount, $response->getErrorCount());
 
         $this->assertEquals(
             $expectedTaskOutput,
-            json_decode($taskDriverResponse->getTaskOutput()->getOutput(), true)
+            json_decode($response->getTaskOutput()->getOutput(), true)
         );
     }
 

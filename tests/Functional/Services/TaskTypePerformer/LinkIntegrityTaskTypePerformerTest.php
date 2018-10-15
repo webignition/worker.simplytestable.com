@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Tests\Functional\Services\TaskDriver;
+namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Model\Task\TypeInterface;
 use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
-use App\Services\TaskDriver\LinkCheckerConfigurationFactory;
-use App\Services\TaskDriver\LinkIntegrityTaskDriver;
+use App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory;
+use App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
 use Psr\Http\Message\RequestInterface;
 
-class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
+class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
     /**
-     * @var LinkIntegrityTaskDriver
+     * @var LinkIntegrityTaskTypePerformer
      */
-    private $taskDriver;
+    private $taskTypePerformer;
 
     /**
      * {@inheritdoc}
@@ -24,15 +24,15 @@ class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = self::$container->get(LinkIntegrityTaskDriver::class);
+        $this->taskTypePerformer = self::$container->get(LinkIntegrityTaskTypePerformer::class);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getTaskDriver()
+    protected function getTaskTypePerformer()
     {
-        return $this->taskDriver;
+        return $this->taskTypePerformer;
     }
 
     /**
@@ -70,13 +70,13 @@ class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
             'parameters' => json_encode($taskParameters),
         ]));
 
-        $taskDriverResponse = $this->taskDriver->perform($task);
+        $response = $this->taskTypePerformer->perform($task);
 
-        $this->assertEquals($expectedHasSucceeded, $taskDriverResponse->hasSucceeded());
-        $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
-        $this->assertEquals($expectedErrorCount, $taskDriverResponse->getErrorCount());
-        $this->assertEquals($expectedWarningCount, $taskDriverResponse->getWarningCount());
-        $this->assertEquals($expectedDecodedOutput, json_decode($taskDriverResponse->getTaskOutput()->getOutput()));
+        $this->assertEquals($expectedHasSucceeded, $response->hasSucceeded());
+        $this->assertEquals($expectedIsRetryable, $response->isRetryable());
+        $this->assertEquals($expectedErrorCount, $response->getErrorCount());
+        $this->assertEquals($expectedWarningCount, $response->getWarningCount());
+        $this->assertEquals($expectedDecodedOutput, json_decode($response->getTaskOutput()->getOutput()));
     }
 
     /**
@@ -258,7 +258,7 @@ class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->taskDriver->perform($task);
+        $this->taskTypePerformer->perform($task);
 
         /* @var RequestInterface[]|array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
@@ -292,7 +292,7 @@ class LinkIntegrityTaskDriverTest extends AbstractWebPageTaskDriverTest
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->taskDriver->perform($task);
+        $this->taskTypePerformer->perform($task);
 
         /* @var RequestInterface[]|array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();

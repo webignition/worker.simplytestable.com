@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\TaskDriver;
+namespace App\Services\TaskTypePerformer;
 
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
@@ -19,7 +19,7 @@ use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class CssValidationTaskDriver extends AbstractWebPageTaskDriver
+class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
 {
     /**
      * @var CssValidatorWrapper

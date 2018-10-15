@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Tests\Functional\Services\TaskDriver;
+namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Model\Task\TypeInterface;
 use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
-use App\Services\TaskDriver\UrlDiscoveryTaskDriver;
+use App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer;
 use App\Tests\Factory\HtmlDocumentFactory;
 
-class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
+class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
     /**
-     * @var UrlDiscoveryTaskDriver
+     * @var UrlDiscoveryTaskTypePerformer
      */
-    private $taskDriver;
+    private $taskTypePerformer;
 
     /**
      * {@inheritdoc}
@@ -21,15 +21,15 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = self::$container->get(UrlDiscoveryTaskDriver::class);
+        $this->taskTypePerformer = self::$container->get(UrlDiscoveryTaskTypePerformer::class);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getTaskDriver()
+    protected function getTaskTypePerformer()
     {
-        return $this->taskDriver;
+        return $this->taskTypePerformer;
     }
 
     /**
@@ -65,11 +65,11 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
             ])
         );
 
-        $taskDriverResponse = $this->taskDriver->perform($task);
+        $response = $this->taskTypePerformer->perform($task);
 
-        $this->assertEquals($expectedHasSucceeded, $taskDriverResponse->hasSucceeded());
-        $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
-        $this->assertEquals($expectedDecodedOutput, json_decode($taskDriverResponse->getTaskOutput()->getOutput()));
+        $this->assertEquals($expectedHasSucceeded, $response->hasSucceeded());
+        $this->assertEquals($expectedIsRetryable, $response->isRetryable());
+        $this->assertEquals($expectedDecodedOutput, json_decode($response->getTaskOutput()->getOutput()));
     }
 
     /**
@@ -150,7 +150,7 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->taskDriver->perform($task);
+        $this->taskTypePerformer->perform($task);
 
         /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
@@ -179,7 +179,7 @@ class UrlDiscoveryTaskDriverTest extends AbstractWebPageTaskDriverTest
             'parameters' => json_encode($taskParameters),
         ]));
 
-        $this->taskDriver->perform($task);
+        $this->taskTypePerformer->perform($task);
 
         /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();

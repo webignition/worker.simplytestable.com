@@ -57,10 +57,10 @@ services:
     App\Services\TaskPerformer:
       public: true
       calls:
-        - [addTaskDriver, ['html validation', '@App\Services\TaskDriver\HtmlValidationTaskDriver']]
-        - [addTaskDriver, ['css validation', '@App\Services\TaskDriver\CssValidationTaskDriver']]
-        - [addTaskDriver, ['link integrity', '@App\Services\TaskDriver\LinkIntegrityTaskDriver']]
-        - [addTaskDriver, ['url discovery', '@App\Services\TaskDriver\UrlDiscoveryTaskDriver']]
+        - [addTaskTypePerformer, ['html validation', '@App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer']]
+        - [addTaskTypePerformer, ['css validation', '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer']]
+        - [addTaskTypePerformer, ['link integrity', '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer']]
+        - [addTaskTypePerformer, ['url discovery', '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer']]
 
     App\Services\TasksService:
       public: true
@@ -92,15 +92,15 @@ services:
     GuzzleHttp\Client:
       factory: 'App\Services\HttpClientService:getHttpClient'
 
-    App\Services\TaskDriver\HtmlValidationTaskDriver:
+    App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer:
       arguments:
         $validatorPath: '%env(HTML_VALIDATOR_PATH)%'
 
-    App\Services\TaskDriver\CssValidatorWrapperConfigurationFactory:
+    App\Services\TaskTypePerformer\CssValidatorWrapperConfigurationFactory:
       arguments:
         - '%env(CSS_VALIDATOR_JAR_PATH)%'
 
-    App\Services\TaskDriver\LinkCheckerConfigurationFactory:
+    App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory:
       arguments:
         - '%link_integrity_user_agents%'
 

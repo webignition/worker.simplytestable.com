@@ -1,5 +1,5 @@
 <?php
-namespace App\Model\TaskDriver;
+namespace App\Model\TaskTypePerformer;
 
 use App\Entity\Task\Output as TaskOutput;
 

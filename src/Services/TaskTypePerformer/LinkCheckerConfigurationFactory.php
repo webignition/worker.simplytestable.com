@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\TaskDriver;
+namespace App\Services\TaskTypePerformer;
 
 use App\Entity\Task\Task;
 use webignition\HtmlDocument\LinkChecker\Configuration;

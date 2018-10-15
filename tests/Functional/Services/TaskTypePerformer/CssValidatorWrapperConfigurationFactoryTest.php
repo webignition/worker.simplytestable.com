@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Tests\Functional\Services\TaskDriver;
+namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Model\Task\TypeInterface;
-use App\Services\TaskDriver\CssValidatorWrapperConfigurationFactory;
+use App\Services\TaskTypePerformer\CssValidatorWrapperConfigurationFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\TestServices\TaskFactory;
 use webignition\CssValidatorOutput\Parser\Configuration as OutputParserConfiguration;

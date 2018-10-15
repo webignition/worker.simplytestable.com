@@ -5,8 +5,8 @@ namespace App\Services;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Entity\TimePeriod;
-use App\Model\TaskDriver\Response as TaskDriverResponse;
-use App\Services\TaskDriver\TaskDriver;
+use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
+use App\Services\TaskTypePerformer\TaskTypePerformer;
 
 class TaskPerformer
 {
@@ -16,34 +16,34 @@ class TaskPerformer
     private $entityManager;
 
     /**
-     * @var TaskDriver[]
+     * @var TaskTypePerformer[]
      */
-    private $taskDrivers;
+    private $taskTypePerformers;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
     }
 
-    public function addTaskDriver(string $taskTypeName, TaskDriver $taskDriver)
+    public function addTaskTypePerformer(string $taskTypeName, TaskTypePerformer $taskTypePerformer)
     {
-        $this->taskDrivers[strtolower($taskTypeName)] = $taskDriver;
+        $this->taskTypePerformers[strtolower($taskTypeName)] = $taskTypePerformer;
     }
 
     public function perform(Task $task)
     {
-        $taskDriver = $this->taskDrivers[strtolower($task->getType())];
+        $taskTypePerformer = $this->taskTypePerformers[strtolower($task->getType())];
 
         $this->start($task);
 
-        $taskDriverResponse = $taskDriver->perform($task);
+        $response = $taskTypePerformer->perform($task);
 
         if (!$task->getTimePeriod()->hasEndDateTime()) {
             $task->getTimePeriod()->setEndDateTime(new \DateTime());
         }
 
-        $task->setOutput($taskDriverResponse->getTaskOutput());
-        $task->setState($this->getCompletionStateFromTaskDriverResponse($taskDriverResponse));
+        $task->setOutput($response->getTaskOutput());
+        $task->setState($this->getCompletionStateFromResponse($response));
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
@@ -60,13 +60,13 @@ class TaskPerformer
         $this->entityManager->flush();
     }
 
-    private function getCompletionStateFromTaskDriverResponse(TaskDriverResponse $taskDriverResponse): string
+    private function getCompletionStateFromResponse(TaskTypePerformerResponse $response): string
     {
-        if ($taskDriverResponse->hasBeenSkipped()) {
+        if ($response->hasBeenSkipped()) {
             return Task::STATE_SKIPPED;
         }
 
-        if ($taskDriverResponse->hasSucceeded()) {
+        if ($response->hasSucceeded()) {
             return Task::STATE_COMPLETED;
         }
 

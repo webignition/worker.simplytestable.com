@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Tests\Functional\Services\TaskDriver;
+namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Model\Task\TypeInterface;
 use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
-use App\Services\TaskDriver\CssValidationTaskDriver;
+use App\Services\TaskTypePerformer\CssValidationTaskTypePerformer;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\CssValidatorFixtureFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
 
-class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
+class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
     /**
-     * @var CssValidationTaskDriver
+     * @var CssValidationTaskTypePerformer
      */
-    private $taskDriver;
+    private $taskTypePerformer;
 
     /**
      * {@inheritdoc}
@@ -24,15 +24,15 @@ class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = self::$container->get(CssValidationTaskDriver::class);
+        $this->taskTypePerformer = self::$container->get(CssValidationTaskTypePerformer::class);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getTaskDriver()
+    protected function getTaskTypePerformer()
     {
-        return $this->taskDriver;
+        return $this->taskTypePerformer;
     }
 
     /**
@@ -76,13 +76,13 @@ class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         CssValidatorFixtureFactory::set($cssValidatorOutput);
 
-        $taskDriverResponse = $this->taskDriver->perform($task);
+        $response = $this->taskTypePerformer->perform($task);
 
-        $this->assertEquals($expectedHasSucceeded, $taskDriverResponse->hasSucceeded());
-        $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
-        $this->assertEquals($expectedErrorCount, $taskDriverResponse->getErrorCount());
-        $this->assertEquals($expectedWarningCount, $taskDriverResponse->getWarningCount());
-        $this->assertEquals($expectedDecodedOutput, json_decode($taskDriverResponse->getTaskOutput()->getOutput()));
+        $this->assertEquals($expectedHasSucceeded, $response->hasSucceeded());
+        $this->assertEquals($expectedIsRetryable, $response->isRetryable());
+        $this->assertEquals($expectedErrorCount, $response->getErrorCount());
+        $this->assertEquals($expectedWarningCount, $response->getWarningCount());
+        $this->assertEquals($expectedDecodedOutput, json_decode($response->getTaskOutput()->getOutput()));
     }
 
     /**
@@ -339,7 +339,7 @@ class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         CssValidatorFixtureFactory::set(CssValidatorFixtureFactory::load('no-messages'));
 
-        $this->taskDriver->perform($task);
+        $this->taskTypePerformer->perform($task);
 
         /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
@@ -376,7 +376,7 @@ class CssValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         CssValidatorFixtureFactory::set(CssValidatorFixtureFactory::load('no-messages'));
 
-        $this->taskDriver->perform($task);
+        $this->taskTypePerformer->perform($task);
 
         /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();

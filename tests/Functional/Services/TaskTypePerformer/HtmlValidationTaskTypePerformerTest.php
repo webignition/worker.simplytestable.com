@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Tests\Functional\Services\TaskDriver;
+namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Model\Task\TypeInterface;
 use App\Tests\TestServices\TaskFactory;
 use GuzzleHttp\Psr7\Response;
-use App\Services\TaskDriver\HtmlValidationTaskDriver;
+use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 
-class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
+class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
     /**
-     * @var HtmlValidationTaskDriver
+     * @var HtmlValidationTaskTypePerformer
      */
-    private $taskDriver;
+    private $taskTypePerformer;
 
     /**
      * {@inheritdoc}
@@ -21,15 +21,15 @@ class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
     protected function setUp()
     {
         parent::setUp();
-        $this->taskDriver = self::$container->get(HtmlValidationTaskDriver::class);
+        $this->taskTypePerformer = self::$container->get(HtmlValidationTaskTypePerformer::class);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getTaskDriver()
+    protected function getTaskTypePerformer()
     {
-        return $this->taskDriver;
+        return $this->taskTypePerformer;
     }
 
     /**
@@ -57,14 +57,14 @@ class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
             TaskFactory::createTaskValuesFromDefaults()
         );
 
-        $taskDriverResponse = $this->taskDriver->perform($task);
+        $response = $this->taskTypePerformer->perform($task);
 
-        $this->assertEquals(1, $taskDriverResponse->getErrorCount());
+        $this->assertEquals(1, $response->getErrorCount());
         $this->assertEquals([
             'messages' => [
                 $expectedOutputMessage,
             ],
-        ], json_decode($taskDriverResponse->getTaskOutput()->getOutput(), true));
+        ], json_decode($response->getTaskOutput()->getOutput(), true));
     }
 
     /**
@@ -146,15 +146,15 @@ class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
 
         HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
 
-        $taskDriverResponse = $this->taskDriver->perform($task);
+        $response = $this->taskTypePerformer->perform($task);
 
-        $this->assertEquals($expectedHasSucceeded, $taskDriverResponse->hasSucceeded());
-        $this->assertEquals($expectedIsRetryable, $taskDriverResponse->isRetryable());
-        $this->assertEquals($expectedErrorCount, $taskDriverResponse->getErrorCount());
+        $this->assertEquals($expectedHasSucceeded, $response->hasSucceeded());
+        $this->assertEquals($expectedIsRetryable, $response->isRetryable());
+        $this->assertEquals($expectedErrorCount, $response->getErrorCount());
 
         $this->assertEquals(
             $expectedDecodedOutput,
-            json_decode($taskDriverResponse->getTaskOutput()->getOutput(), true)
+            json_decode($response->getTaskOutput()->getOutput(), true)
         );
     }
 
@@ -303,7 +303,7 @@ class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->taskDriver->perform($task);
+        $this->taskTypePerformer->perform($task);
 
         /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
@@ -334,7 +334,7 @@ class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
             'parameters' => json_encode($taskParameters),
         ]));
 
-        $this->taskDriver->perform($task);
+        $this->taskTypePerformer->perform($task);
 
         /* @var array $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
@@ -378,7 +378,7 @@ class HtmlValidationTaskDriverTest extends AbstractWebPageTaskDriverTest
             TaskFactory::createTaskValuesFromDefaults()
         );
 
-        $this->taskDriver->perform($task);
+        $this->taskTypePerformer->perform($task);
     }
 
     /**
