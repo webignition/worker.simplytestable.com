@@ -143,4 +143,5 @@ services:
 
     App\Services\TaskTypePreparer\Factory:
       arguments:
-        $taskPreparers: []
+        $taskPreparers:
+          - '@App\Services\TaskTypePreparer\LinkIntegrityTaskTypePreparer'
