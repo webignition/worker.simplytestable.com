@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\TaskDriver;
+namespace App\Services\TaskTypePerformer;
 
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
@@ -14,7 +14,7 @@ use webignition\HtmlDocumentType\Validator as DoctypeValidator;
 use webignition\HtmlDocumentType\Factory as DoctypeFactory;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class HtmlValidationTaskDriver extends AbstractWebPageTaskDriver
+class HtmlValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
 {
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
 

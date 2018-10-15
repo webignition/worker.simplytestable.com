@@ -1,29 +1,29 @@
 <?php
 
-namespace App\Services\TaskDriver;
+namespace App\Services\TaskTypePerformer;
 
 use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
-use App\Model\TaskDriver\Response as TaskDriverResponse;
+use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use webignition\InternetMediaType\InternetMediaType;
 
-abstract class TaskDriver
+abstract class TaskTypePerformer
 {
     const OUTPUT_STARTING_STATE = 'taskoutput-queued';
 
     /**
-     * @var TaskDriverResponse
+     * @var TaskTypePerformerResponse
      */
     protected $response = null;
 
     /**
      * @param Task $task
      *
-     * @return TaskDriverResponse
+     * @return TaskTypePerformerResponse
      */
     public function perform(Task $task)
     {
-        $this->response = new TaskDriverResponse();
+        $this->response = new TaskTypePerformerResponse();
 
         $rawOutput = $this->execute($task);
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\TaskDriver;
+namespace App\Services\TaskTypePerformer;
 
 use App\Model\LinkIntegrityResult;
 use App\Model\LinkIntegrityResultCollection;
@@ -15,7 +15,7 @@ use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkFinderConfiguration;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
-class LinkIntegrityTaskDriver extends AbstractWebPageTaskDriver
+class LinkIntegrityTaskTypePerformer extends AbstractWebPageTaskTypePerformer
 {
     const COOKIES_PARAMETER_NAME = 'cookies';
 

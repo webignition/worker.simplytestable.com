@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\TaskDriver;
+namespace App\Services\TaskTypePerformer;
 
 use GuzzleHttp\Psr7\Request;
 use App\Entity\Task\Task;
@@ -15,7 +15,7 @@ use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResourceInterfaces\WebResourceInterface;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-abstract class AbstractWebPageTaskDriver extends TaskDriver
+abstract class AbstractWebPageTaskTypePerformer extends TaskTypePerformer
 {
     const CURL_CODE_INVALID_URL = 3;
     const CURL_CODE_TIMEOUT = 28;
