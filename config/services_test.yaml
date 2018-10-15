@@ -31,3 +31,6 @@ services:
 
   App\Services\TaskTypePreparer\Factory:
     public: true
+
+  App\Services\TaskPreparer:
+    public: true
