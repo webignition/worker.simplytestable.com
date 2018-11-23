@@ -5,7 +5,7 @@ namespace App\Tests\Functional\Services;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskTypeService;
-use App\Tests\TestServices\TaskFactory;
+use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\OptimisticLockException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;

@@ -2,7 +2,7 @@
 
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
-use App\Tests\TestServices\TaskFactory;
+use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -16,7 +16,7 @@ use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
 {
     /**
-     * @var TaskFactory
+     * @var TestTaskFactory
      */
     protected $testTaskFactory;
 
@@ -37,7 +37,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $this->testTaskFactory = self::$container->get(TaskFactory::class);
+        $this->testTaskFactory = self::$container->get(TestTaskFactory::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
@@ -91,7 +91,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         ]);
 
         $task = $this->testTaskFactory->create(
-            TaskFactory::createTaskValuesFromDefaults()
+            TestTaskFactory::createTaskValuesFromDefaults()
         );
 
         $this->expectException(TransportException::class);
@@ -120,7 +120,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         $this->httpMockHandler->appendFixtures($httpResponseFixtures);
 
         $task = $this->testTaskFactory->create(
-            TaskFactory::createTaskValuesFromDefaults()
+            TestTaskFactory::createTaskValuesFromDefaults()
         );
 
         $taskTypePerformer = $this->getTaskTypePerformer();
@@ -149,18 +149,18 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         return [
             'http too many redirects' => [
                 'httpResponseFixtures' => [
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '2']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '3']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '4']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '5']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '6']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '2']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '3']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '4']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '5']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '6']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '4']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '5']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '6']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '4']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '5']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '6']),
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,
                 'expectedIsRetryable' => false,
@@ -177,18 +177,18 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
             ],
             'http redirect loop' => [
                 'httpResponseFixtures' => [
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '2']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '3']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL]),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '2']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '2']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '3']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL]),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TaskFactory::DEFAULT_TASK_URL . '2']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL]),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL]),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
+                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
 
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => false,

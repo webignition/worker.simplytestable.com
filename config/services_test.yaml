@@ -26,5 +26,5 @@ services:
       - '@Kevinrob\GuzzleCache\CacheMiddleware'
       - '@App\Tests\Services\HttpMockHandler'
 
-  App\Tests\TestServices\TaskFactory:
+  App\Tests\Services\TestTaskFactory:
     public: true

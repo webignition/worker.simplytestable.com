@@ -3,7 +3,7 @@
 namespace App\Tests\Functional\Command\Task;
 
 use App\Entity\Task\Task;
-use App\Tests\TestServices\TaskFactory;
+use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Command\Task\PerformCommand;
 use App\Services\Resque\QueueService;
@@ -34,9 +34,9 @@ class PerformCommandTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->command = self::$container->get(PerformCommand::class);
-        $testTaskFactory = self::$container->get(TaskFactory::class);
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
 
-        $this->task = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+        $this->task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'url' => 'http://example.com/',
             'type' => 'html validation',
         ]));

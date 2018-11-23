@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\TestServices;
+namespace App\Tests\Services;
 
 use App\Model\Task\TypeInterface;
 use App\Services\TaskTypeService;
@@ -9,7 +9,7 @@ use App\Entity\Task\Task;
 use App\Entity\TimePeriod;
 use App\Services\TaskService;
 
-class TaskFactory
+class TestTaskFactory
 {
     const DEFAULT_TASK_URL = 'http://example.com/';
     const DEFAULT_TASK_PARAMETERS = '';

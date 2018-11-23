@@ -5,7 +5,7 @@ namespace App\Tests\Functional\Services;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskPreparer;
-use App\Tests\TestServices\TaskFactory;
+use App\Tests\Services\TestTaskFactory;
 use App\Entity\Task\Task;
 use App\Tests\Functional\AbstractBaseTestCase;
 
@@ -22,7 +22,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
     private $taskPreparer;
 
     /**
-     * @var TaskFactory
+     * @var TestTaskFactory
      */
     private $testTaskFactory;
 
@@ -34,7 +34,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->taskPreparer = self::$container->get(TaskPreparer::class);
-        $this->testTaskFactory = self::$container->get(TaskFactory::class);
+        $this->testTaskFactory = self::$container->get(TestTaskFactory::class);
     }
 
     /**
@@ -58,23 +58,23 @@ class TaskPreparerTest extends AbstractBaseTestCase
     {
         return [
             'html validation' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    TaskFactory::DEFAULT_TASK_TYPE => Type::TYPE_HTML_VALIDATION,
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::DEFAULT_TASK_TYPE => Type::TYPE_HTML_VALIDATION,
                 ]),
             ],
             'css validation' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    TaskFactory::DEFAULT_TASK_TYPE => Type::TYPE_CSS_VALIDATION,
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::DEFAULT_TASK_TYPE => Type::TYPE_CSS_VALIDATION,
                 ]),
             ],
             'link integrity' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    TaskFactory::DEFAULT_TASK_TYPE => Type::TYPE_LINK_INTEGRITY,
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::DEFAULT_TASK_TYPE => Type::TYPE_LINK_INTEGRITY,
                 ]),
             ],
             'url discovery' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([
-                    TaskFactory::DEFAULT_TASK_TYPE => Type::TYPE_URL_DISCOVERY,
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    TestTaskFactory::DEFAULT_TASK_TYPE => Type::TYPE_URL_DISCOVERY,
                 ]),
             ],
         ];

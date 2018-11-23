@@ -4,7 +4,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Model\Task\TypeInterface;
 use App\Services\TaskPerformer;
-use App\Tests\TestServices\TaskFactory;
+use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Entity\Task\Task;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -24,7 +24,7 @@ class TaskPerformerTest extends AbstractBaseTestCase
     private $taskPerformer;
 
     /**
-     * @var TaskFactory
+     * @var TestTaskFactory
      */
     private $testTaskFactory;
 
@@ -41,7 +41,7 @@ class TaskPerformerTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->taskPerformer = self::$container->get(TaskPerformer::class);
-        $this->testTaskFactory = self::$container->get(TaskFactory::class);
+        $this->testTaskFactory = self::$container->get(TestTaskFactory::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
 
@@ -73,7 +73,7 @@ class TaskPerformerTest extends AbstractBaseTestCase
 
         return [
             'default' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     new Response(200, ['content-type' => 'text/html']),
                     new Response(
@@ -85,14 +85,14 @@ class TaskPerformerTest extends AbstractBaseTestCase
                 'expectedFinishedStateName' => Task::STATE_COMPLETED,
             ],
             'skipped' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     new Response(200, ['content-type' => 'application/pdf']),
                 ],
                 'expectedFinishedStateName' => Task::STATE_SKIPPED,
             ],
             'failed, no retry available' => [
-                'taskValues' => TaskFactory::createTaskValuesFromDefaults([]),
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([]),
                 'httpFixtures' => [
                     $notFoundResponse,
                     $notFoundResponse,
