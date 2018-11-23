@@ -2,17 +2,20 @@
 
 namespace App\Tests\Unit\Services;
 
+use App\Exception\Services\TasksService\RequestException;
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use App\Services\CoreApplicationHttpClient;
-use App\Services\CoreApplicationRouter;
-use App\Services\HttpClientService;
 use App\Services\TaskService;
 use App\Services\TasksService;
-use App\Services\UrlService;
 use App\Services\WorkerService;
 
 class TasksServiceTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @throws RequestException
+     * @throws GuzzleException
+     */
     public function testRequestNotWithinThreshold()
     {
         $workerProcessCount = 1;
