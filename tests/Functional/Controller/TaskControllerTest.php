@@ -7,7 +7,7 @@ use App\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use App\Services\Request\Factory\Task\CancelRequestFactory;
 use App\Services\Request\Factory\Task\CreateRequestFactory;
 use App\Services\Resque\QueueService;
-use App\Tests\TestServices\TaskFactory;
+use App\Tests\Services\TestTaskFactory;
 
 /**
  * @group Controller/TaskController
@@ -110,9 +110,9 @@ class TaskControllerTest extends AbstractControllerTest
 
     public function testCancelAction()
     {
-        $testTaskFactory = self::$container->get(TaskFactory::class);
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
 
-        $task = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults());
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
         $this->assertEquals(Task::STATE_QUEUED, $task->getState());
 
         $this->client->request(
@@ -131,14 +131,14 @@ class TaskControllerTest extends AbstractControllerTest
 
     public function testCancelCollectionAction()
     {
-        $testTaskFactory = self::$container->get(TaskFactory::class);
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
 
         $taskIds = [];
         $tasks = [];
-        $tasks[] = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'html validation',
         ]));
-        $tasks[] = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+        $tasks[] = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => 'css validation',
         ]));
 

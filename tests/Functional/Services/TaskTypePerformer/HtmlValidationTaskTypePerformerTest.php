@@ -3,7 +3,7 @@
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Model\Task\TypeInterface;
-use App\Tests\TestServices\TaskFactory;
+use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
@@ -54,7 +54,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         ]);
 
         $task = $this->testTaskFactory->create(
-            TaskFactory::createTaskValuesFromDefaults()
+            TestTaskFactory::createTaskValuesFromDefaults()
         );
 
         $response = $this->taskTypePerformer->perform($task);
@@ -141,7 +141,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         ]);
 
         $task = $this->testTaskFactory->create(
-            TaskFactory::createTaskValuesFromDefaults()
+            TestTaskFactory::createTaskValuesFromDefaults()
         );
 
         HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
@@ -298,7 +298,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -329,7 +329,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters),
         ]));
@@ -375,7 +375,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create(
-            TaskFactory::createTaskValuesFromDefaults()
+            TestTaskFactory::createTaskValuesFromDefaults()
         );
 
         $this->taskTypePerformer->perform($task);

@@ -3,7 +3,7 @@
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Model\Task\TypeInterface;
-use App\Tests\TestServices\TaskFactory;
+use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory;
 use App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer;
@@ -65,7 +65,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters),
         ]));
@@ -253,7 +253,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             new Response(200),
         ]);
 
-        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
@@ -287,7 +287,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             new Response(200),
         ]);
 
-        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));

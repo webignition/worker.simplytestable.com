@@ -2,7 +2,7 @@
 
 namespace App\Tests\Functional\Command\Tasks;
 
-use App\Tests\TestServices\TaskFactory;
+use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Command\Tasks\PerformCommand;
 use App\Entity\Task\Task;
@@ -31,9 +31,9 @@ class PerformCommandTest extends AbstractBaseTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $testTaskFactory = self::$container->get(TaskFactory::class);
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
 
-        $task = $testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'url' => 'http://example.com/',
             'type' => 'html validation',
         ]));

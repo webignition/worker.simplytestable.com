@@ -5,7 +5,7 @@ namespace App\Tests\Functional\Services;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskTypeService;
-use App\Tests\TestServices\TaskFactory;
+use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\OptimisticLockException;
 use App\Entity\Task\Task;
 use App\Services\TaskService;
@@ -27,7 +27,7 @@ class TaskServiceTest extends AbstractBaseTestCase
     private $taskService;
 
     /**
-     * @var TaskFactory
+     * @var TestTaskFactory
      */
     private $testTaskFactory;
 
@@ -39,7 +39,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->taskService = self::$container->get(TaskService::class);
-        $this->testTaskFactory = self::$container->get(TaskFactory::class);
+        $this->testTaskFactory = self::$container->get(TestTaskFactory::class);
     }
 
     /**
@@ -117,7 +117,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
     public function testGetById()
     {
-        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults());
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
         $id = $task->getId();
 
         $entityManager = self::$container->get('doctrine.orm.entity_manager');
@@ -131,12 +131,12 @@ class TaskServiceTest extends AbstractBaseTestCase
 
     public function testGetIncompleteCount()
     {
-        $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+        $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'state' => Task::STATE_QUEUED,
             'type' => TypeInterface::TYPE_HTML_VALIDATION,
         ]));
 
-        $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([
+        $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'state' => Task::STATE_IN_PROGRESS,
             'type' => TypeInterface::TYPE_CSS_VALIDATION,
         ]));

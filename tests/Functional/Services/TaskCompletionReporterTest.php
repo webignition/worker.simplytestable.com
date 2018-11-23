@@ -5,7 +5,7 @@ namespace App\Tests\Functional\Services;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskCompletionReporter;
 use App\Services\TaskPerformer;
-use App\Tests\TestServices\TaskFactory;
+use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use App\Entity\Task\Task;
@@ -30,7 +30,7 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
     private $taskCompletionReporter;
 
     /**
-     * @var TaskFactory
+     * @var TestTaskFactory
      */
     private $testTaskFactory;
 
@@ -57,7 +57,7 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->taskCompletionReporter = self::$container->get(TaskCompletionReporter::class);
-        $this->testTaskFactory = self::$container->get(TaskFactory::class);
+        $this->testTaskFactory = self::$container->get(TestTaskFactory::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
         $this->httpRetryMiddleware = self::$container->get(HttpRetryMiddleware::class);
@@ -68,7 +68,7 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
      */
     public function testReportCompletionNoOutput()
     {
-        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $this->taskCompletionReporter->reportCompletion($task);
 
         $lastLogLine = File::tail(self::$container->get('kernel')->getLogDir() . '/test.log', 1);
@@ -104,7 +104,7 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
         $taskPerformanceService->perform($task);
         $initialTaskState = $task->getState();
 
@@ -160,7 +160,7 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
         ]);
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->testTaskFactory->create(TaskFactory::createTaskValuesFromDefaults([]));
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
 
         $taskPerformanceService->perform($task);
         $this->assertInternalType('int', $task->getId());
