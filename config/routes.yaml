@@ -18,22 +18,6 @@ task_cancel_collection:
     path:  /task/cancel/collection/
     defaults: { _controller: App\Controller\TaskController::cancelCollectionAction, _format: json  }
 
-disable_readonly:
-    path: /maintenance/disable-read-only/
-    defaults: { _controller: App\Controller\MaintenanceController::disableReadOnlyAction, _format: json n }
-
-enable_readonly:
-    path: /maintenance/enable-read-only/
-    defaults: { _controller: App\Controller\MaintenanceController::enableReadOnlyAction, _format: json  }
-
-leave_readonly:
-    path: /maintenance/leave-read-only/
-    defaults: { _controller: App\Controller\MaintenanceController::leaveReadOnlyAction, _format: json  }
-
-task_perform_enqueue:
-    path: /maintenance/task-perform-enqueue/
-    defaults: { _controller: App\Controller\MaintenanceController::taskPerformEnqueueAction, _format: json  }
-
 tasks_notify:
     path: /tasks/notify/
     defaults: { _controller: App\Controller\TasksController::notifyAction, _format: json  }
