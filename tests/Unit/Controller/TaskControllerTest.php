@@ -43,26 +43,6 @@ class TaskControllerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCancelCollectionActionInMaintenanceReadOnlyMode()
-    {
-        $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(true);
-
-        $this->expectException(ServiceUnavailableHttpException::class);
-
-        $taskController = $this->createTaskController([
-            WorkerService::class => MockFactory::createWorkerService([
-                'get' => [
-                    'return' => $worker,
-                ],
-            ]),
-        ]);
-
-        $taskController->cancelAction(MockFactory::createCancelRequestFactory());
-    }
-
     public function testCancelActionWithInvalidRequest()
     {
         $worker = \Mockery::mock(ThisWorker::class);

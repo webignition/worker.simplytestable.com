@@ -93,11 +93,6 @@ class TaskController extends AbstractController
      */
     public function cancelAction(CancelRequestFactory $cancelRequestFactory)
     {
-        $worker = $this->workerService->get();
-        if ($worker->isMaintenanceReadOnly()) {
-            throw new ServiceUnavailableHttpException();
-        }
-
         $cancelRequest = $cancelRequestFactory->create();
 
         if (!$cancelRequest->isValid()) {
