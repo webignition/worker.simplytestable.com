@@ -93,9 +93,4 @@ class ThisWorker
     {
         return self::STATE_ACTIVE == $this->state;
     }
-
-    public function isMaintenanceReadOnly(): bool
-    {
-        return self::STATE_MAINTENANCE_READ_ONLY == $this->state;
-    }
 }
