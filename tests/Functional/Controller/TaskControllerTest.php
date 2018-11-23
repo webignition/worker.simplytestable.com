@@ -16,6 +16,7 @@ use App\Tests\Services\TestTaskFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @group Controller/TaskController
@@ -44,7 +45,6 @@ class TaskControllerTest extends AbstractControllerTest
         $response = $taskController->createCollectionAction(
             $createRequestCollectionFactory,
             $taskFactory,
-            \Mockery::mock(QueueService::class),
             \Mockery::mock(EventDispatcherInterface::class)
         );
 
@@ -101,17 +101,14 @@ class TaskControllerTest extends AbstractControllerTest
         $taskController = self::$container->get(TaskController::class);
 
         $eventDispatcher = \Mockery::spy(EventDispatcherInterface::class);
-        $resqueQueueService = \Mockery::spy(QueueService::class);
 
         $response = $taskController->createCollectionAction(
             $createRequestCollectionFactory,
             $taskFactory,
-            $resqueQueueService,
             $eventDispatcher
         );
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('application/json', $response->headers->get('content-type'));
+        $this->assertCreateCollectionActionResponse($response);
 
         $decodedResponseContent = json_decode($response->getContent(), true);
 
@@ -135,21 +132,6 @@ class TaskControllerTest extends AbstractControllerTest
             $taskIds[] = $taskId;
             $expectedTaskPrepareJobs[] = new TaskPrepareJob(['id' => $taskId]);
         }
-
-        $taskPrepareJobIndex = 0;
-
-        $resqueQueueService
-            ->shouldHaveReceived('enqueue')
-            ->withArgs(function (TaskPrepareJob $taskPrepareJob) use (&$taskPrepareJobIndex, $expectedTaskPrepareJobs) {
-                $expectedTaskPrepareJob = $expectedTaskPrepareJobs[$taskPrepareJobIndex];
-
-                $this->assertEquals($expectedTaskPrepareJob->queue, $taskPrepareJob->queue);
-                $this->assertEquals($expectedTaskPrepareJob->args, $taskPrepareJob->args);
-
-                $taskPrepareJobIndex++;
-
-                return true;
-            });
 
         $taskIndex = 0;
 
@@ -201,6 +183,46 @@ class TaskControllerTest extends AbstractControllerTest
                 ],
             ],
         ];
+    }
+
+    /**
+     * @dataProvider createCollectionActionTasksCreatedDataProvider
+     *
+     * @param array $postData
+     * @param array $expectedTaskCollection
+     */
+    public function testCreateCollectionActionIntegration(array $postData, array $expectedTaskCollection)
+    {
+        $resqueQueueService = self::$container->get(QueueService::class);
+
+        $this->client->request(
+            'POST',
+            $this->router->generate('task_create_collection'),
+            $postData
+        );
+
+        $response = $this->client->getResponse();
+
+        $this->assertCreateCollectionActionResponse($response);
+
+        $decodedResponseContent = json_decode($response->getContent(), true);
+
+        $this->assertCount(count($expectedTaskCollection), $decodedResponseContent);
+
+        foreach ($decodedResponseContent as $taskIndex => $responseTask) {
+            $taskId = $responseTask['id'];
+
+            $expectedResponseTask = $expectedTaskCollection[$taskIndex];
+            $this->assertEquals($expectedResponseTask['type'], $responseTask['type']);
+            $this->assertEquals($expectedResponseTask['url'], $responseTask['url']);
+
+            $this->assertTrue($resqueQueueService->contains(
+                'task-prepare',
+                [
+                    'id' => $taskId,
+                ]
+            ));
+        }
     }
 
     public function testCancelAction()
@@ -257,5 +279,23 @@ class TaskControllerTest extends AbstractControllerTest
         foreach ($tasks as $task) {
             $this->assertEquals(Task::STATE_CANCELLED, $task->getState());
         }
+    }
+
+    private function assertCreateCollectionActionResponse(Response $response)
+    {
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('application/json', $response->headers->get('content-type'));
+
+        $decodedResponseContent = json_decode($response->getContent(), true);
+
+        $this->assertNotNull($decodedResponseContent);
+        $this->assertInternalType('array', $decodedResponseContent);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->clearRedis();
     }
 }
