@@ -70,14 +70,6 @@ class RequestCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $worker = $this->workerService->get();
-
-        if ($worker->isMaintenanceReadOnly()) {
-            $this->requeue();
-
-            return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
-        }
-
         try {
             if ($this->tasksService->request($input->getArgument('limit'))) {
                 return self::RETURN_CODE_OK;
