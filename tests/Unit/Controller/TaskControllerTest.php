@@ -10,7 +10,6 @@ use App\Request\Task\CancelRequest;
 use App\Services\TaskService;
 use App\Services\WorkerService;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use App\Tests\Factory\MockFactory;
 
 /**
@@ -18,30 +17,6 @@ use App\Tests\Factory\MockFactory;
  */
 class TaskControllerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCreateCollectionActionInMaintenanceReadOnlyMode()
-    {
-        $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(true);
-
-        $taskController = $this->createTaskController([
-            WorkerService::class => MockFactory::createWorkerService([
-                'get' => [
-                    'return' => $worker,
-                ],
-            ]),
-        ]);
-
-        $this->expectException(ServiceUnavailableHttpException::class);
-
-        $taskController->createCollectionAction(
-            MockFactory::createCreateRequestCollectionFactory(),
-            MockFactory::createTaskFactory(),
-            MockFactory::createResqueQueueService()
-        );
-    }
-
     public function testCancelActionWithInvalidRequest()
     {
         $worker = \Mockery::mock(ThisWorker::class);
@@ -88,7 +63,6 @@ class TaskControllerTest extends \PHPUnit\Framework\TestCase
 
         return new TaskController(
             $entityManager,
-            $services[WorkerService::class],
             $services[TaskService::class]
         );
     }

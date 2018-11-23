@@ -11,11 +11,9 @@ use App\Services\Request\Factory\Task\CreateRequestCollectionFactory;
 use App\Services\Resque\QueueService;
 use App\Services\TaskFactory;
 use App\Services\TaskService;
-use App\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class TaskController extends AbstractController
 {
@@ -25,27 +23,13 @@ class TaskController extends AbstractController
     private $entityManager;
 
     /**
-     * @var WorkerService
-     */
-    private $workerService;
-
-    /**
      * @var TaskService
      */
     private $taskService;
 
-    /**
-     * @param EntityManagerInterface $entityManager
-     * @param WorkerService $workerService
-     * @param TaskService $taskService
-     */
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        WorkerService $workerService,
-        TaskService $taskService
-    ) {
+    public function __construct(EntityManagerInterface $entityManager, TaskService $taskService)
+    {
         $this->entityManager = $entityManager;
-        $this->workerService = $workerService;
         $this->taskService = $taskService;
     }
 
@@ -61,11 +45,6 @@ class TaskController extends AbstractController
         TaskFactory $taskFactory,
         QueueService $resqueQueueService
     ) {
-        $worker = $this->workerService->get();
-        if ($worker->isMaintenanceReadOnly()) {
-            throw new ServiceUnavailableHttpException();
-        }
-
         $createCollectionRequest = $createRequestCollectionFactory->create();
 
         $tasks = new TaskCollection();
