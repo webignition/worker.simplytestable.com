@@ -26,6 +26,10 @@ class TaskPreparer
 
     public function prepare(Task $task)
     {
+        $task->setState(Task::STATE_PREPARING);
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
+
         $taskTypePreparer = $this->taskTypePreparerFactory->getPreparer($task->getType());
 
         if ($taskTypePreparer) {
