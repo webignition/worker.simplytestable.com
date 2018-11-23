@@ -35,9 +35,6 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
     public function runDataProvider(): array
     {
         $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(false);
 
         return [
             'success' => [
