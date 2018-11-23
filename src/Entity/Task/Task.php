@@ -15,6 +15,7 @@ use App\Model\Task\Parameters;
 class Task implements \JsonSerializable
 {
     const STATE_QUEUED = 'queued';
+    const STATE_PREPARING = 'preparing';
     const STATE_PREPARED = 'prepared';
     const STATE_IN_PROGRESS = 'in-progress';
     const STATE_COMPLETED = 'completed';
