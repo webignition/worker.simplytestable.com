@@ -9,7 +9,6 @@ use App\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class VerifyController extends AbstractController
 {
@@ -21,11 +20,6 @@ class VerifyController extends AbstractController
      */
     public function indexAction(WorkerService $workerService, VerifyRequestFactory $verifyRequestFactory)
     {
-        $worker = $workerService->get();
-        if ($worker->isMaintenanceReadOnly()) {
-            throw new ServiceUnavailableHttpException();
-        }
-
         $verifyRequest = $verifyRequestFactory->create();
 
         if (!$verifyRequest->isValid()) {

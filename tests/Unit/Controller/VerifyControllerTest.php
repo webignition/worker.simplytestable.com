@@ -6,7 +6,6 @@ use App\Controller\VerifyController;
 use App\Entity\ThisWorker;
 use App\Request\VerifyRequest;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use App\Tests\Factory\MockFactory;
 
 /**
@@ -14,26 +13,6 @@ use App\Tests\Factory\MockFactory;
  */
 class VerifyControllerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testIndexActionInMaintenanceReadOnlyMode()
-    {
-        $this->expectException(ServiceUnavailableHttpException::class);
-
-        $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(true);
-
-        $verifyController = new VerifyController();
-        $verifyController->indexAction(
-            MockFactory::createWorkerService([
-                'get' => [
-                    'return' => $worker,
-                ],
-            ]),
-            MockFactory::createVerifyRequestFactory()
-        );
-    }
-
     public function testIndexActionWithInvalidRequest()
     {
         $verifyRequest = new VerifyRequest(null, null);
