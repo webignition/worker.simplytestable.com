@@ -4,12 +4,12 @@ namespace App\Tests\Unit\Controller;
 
 use App\Entity\ThisWorker;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\OptimisticLockException;
 use Mockery\MockInterface;
 use App\Controller\TaskController;
 use App\Request\Task\CancelRequest;
 use App\Services\TaskService;
 use App\Services\WorkerService;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use App\Tests\Factory\MockFactory;
@@ -39,7 +39,8 @@ class TaskControllerTest extends \PHPUnit\Framework\TestCase
         $taskController->createCollectionAction(
             MockFactory::createCreateRequestCollectionFactory(),
             MockFactory::createTaskFactory(),
-            MockFactory::createResqueQueueService()
+            MockFactory::createResqueQueueService(),
+            \Mockery::mock(EventDispatcherInterface::class)
         );
     }
 
