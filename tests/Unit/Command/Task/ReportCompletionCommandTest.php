@@ -2,7 +2,6 @@
 
 namespace App\Tests\Unit\Command\Task;
 
-use App\Entity\Task\Task;
 use App\Entity\ThisWorker;
 use App\Services\TaskCompletionReporter;
 use Psr\Log\LoggerInterface;
@@ -19,54 +18,6 @@ use Symfony\Component\Console\Input\ArrayInput;
 class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
 {
     const TASK_ID = 1;
-
-    /**
-     * @throws \Exception
-     */
-    public function testRunInMaintenanceReadOnlyMode()
-    {
-        $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(true);
-
-        $task = \Mockery::mock(Task::class);
-        $task
-            ->shouldReceive('getId')
-            ->andReturn(self::TASK_ID);
-
-        $command = $this->createReportCompletionCommand([
-            TaskService::class => MockFactory::createTaskService([
-                'getById' => [
-                    'with' => self::TASK_ID,
-                    'return' => $task,
-                ],
-            ]),
-            WorkerService::class => MockFactory::createWorkerService([
-                'get' => [
-                    'return' => $worker,
-                ],
-            ]),
-            LoggerInterface::class => MockFactory::createLogger([
-                'error' => [
-                    'with' => sprintf(
-                        'simplytestable:task:reportcompletion::execute [%s]: '
-                        .'worker application is in maintenance read-only mode',
-                        self::TASK_ID
-                    ),
-                ],
-            ]),
-        ]);
-
-        $returnCode = $command->run(new ArrayInput([
-            'id' => self::TASK_ID,
-        ]), new NullOutput());
-
-        $this->assertEquals(
-            ReportCompletionCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
-            $returnCode
-        );
-    }
 
     /**
      * @throws \Exception

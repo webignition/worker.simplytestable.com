@@ -2,7 +2,6 @@
 
 namespace App\Command\Task;
 
-use App\Resque\Job\TaskPrepareJob;
 use App\Services\TaskPreparer;
 use Psr\Log\LoggerInterface;
 use App\Resque\Job\TaskPerformJob;
@@ -49,15 +48,6 @@ class PrepareCommand extends AbstractTaskCommand
             ->setName('simplytestable:task:prepare')
             ->setDescription('Prepare a task')
             ->addArgument('id', InputArgument::REQUIRED, 'id of task to prepare');
-    }
-
-    protected function handleWorkerMaintenanceReadOnlyMode()
-    {
-        $taskId = $this->task->getId();
-
-        if (!$this->resqueQueueService->contains('task-prepare', ['id' => $taskId])) {
-            $this->resqueQueueService->enqueue(new TaskPrepareJob(['id' => $taskId]));
-        }
     }
 
     /**
