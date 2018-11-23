@@ -165,11 +165,6 @@ class WorkerService
         $this->setState(ThisWorker::STATE_ACTIVE);
     }
 
-    public function setReadOnly()
-    {
-        $this->setState(ThisWorker::STATE_MAINTENANCE_READ_ONLY);
-    }
-
     /**
      * @param string $stateName
      */

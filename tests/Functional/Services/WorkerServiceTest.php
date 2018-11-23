@@ -157,22 +157,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider stateNameDataProvider
-     *
-     * @param string $stateName
-     *
-     * @throws ORMException
-     */
-    public function testSetReadOnly($stateName)
-    {
-        $worker = $this->workerService->get();
-        $this->setWorkerState($worker, $stateName);
-
-        $this->workerService->setReadOnly();
-        $this->assertEquals(ThisWorker::STATE_MAINTENANCE_READ_ONLY, $worker->getState());
-    }
-
-    /**
      * @return array
      */
     public function stateNameDataProvider()
