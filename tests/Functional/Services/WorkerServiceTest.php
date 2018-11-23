@@ -171,9 +171,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
             'active' => [
                 ThisWorker::STATE_ACTIVE,
             ],
-            'maintenance-read-only' => [
-                ThisWorker::STATE_MAINTENANCE_READ_ONLY,
-            ],
         ];
     }
 
@@ -211,10 +208,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
             'active' => [
                 'stateName' => ThisWorker::STATE_ACTIVE,
                 'expectedWorkerState' => ThisWorker::STATE_ACTIVE,
-            ],
-            'maintenance-read-only' => [
-                'stateName' => ThisWorker::STATE_MAINTENANCE_READ_ONLY,
-                'expectedWorkerState' => ThisWorker::STATE_MAINTENANCE_READ_ONLY,
             ],
         ];
     }
