@@ -12,7 +12,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class AbstractTaskCommand extends Command
 {
-    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;
     const RETURN_CODE_OK = 0;
 

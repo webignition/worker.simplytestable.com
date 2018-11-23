@@ -8,7 +8,6 @@ use Symfony\Component\Console\Command\Command;
 
 class WorkerActivateCommand extends Command
 {
-    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_UNKNOWN_ERROR = -2;
     const RETURN_CODE_FAILED_DUE_TO_WRONG_STATE = -3;
 
