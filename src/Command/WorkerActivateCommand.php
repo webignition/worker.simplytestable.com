@@ -47,13 +47,6 @@ class WorkerActivateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $worker = $this->workerService->get();
-
-        if ($worker->isMaintenanceReadOnly()) {
-            $output->writeln('Unable to activate, worker application is in maintenance read-only mode');
-            return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
-        }
-
         $activationResult = $this->workerService->activate();
         if ($activationResult === 0) {
             return 0;
