@@ -113,11 +113,6 @@ class TaskController extends AbstractController
      */
     public function cancelCollectionAction(CancelRequestCollectionFactory $cancelRequestCollectionFactory)
     {
-        $worker = $this->workerService->get();
-        if ($worker->isMaintenanceReadOnly()) {
-            throw new ServiceUnavailableHttpException();
-        }
-
         $cancelCollectionRequest = $cancelRequestCollectionFactory->create();
 
         $cancelledTaskCount = 0;

@@ -4,7 +4,6 @@ namespace App\Tests\Unit\Controller;
 
 use App\Entity\ThisWorker;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\OptimisticLockException;
 use Mockery\MockInterface;
 use App\Controller\TaskController;
 use App\Request\Task\CancelRequest;
@@ -67,26 +66,6 @@ class TaskControllerTest extends \PHPUnit\Framework\TestCase
                 'return' => $cancelRequest,
             ],
         ]));
-    }
-
-    public function testCancelCollectionActionWithInvalidRequest()
-    {
-        $this->expectException(ServiceUnavailableHttpException::class);
-
-        $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(true);
-
-        $taskController = $this->createTaskController([
-            WorkerService::class => MockFactory::createWorkerService([
-                'get' => [
-                    'return' => $worker,
-                ],
-            ]),
-        ]);
-
-        $taskController->cancelCollectionAction(MockFactory::createCancelRequestCollectionFactory());
     }
 
     /**
