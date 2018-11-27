@@ -48,6 +48,10 @@ services:
       tags:
         - { name: kernel.cache_warmer, priority: 0 }
 
+    App\EventListener\TaskCreatedEventListener:
+      tags:
+      - { name: kernel.event_listener, event: task.created }
+
     App\Services\CoreApplicationRouter:
       arguments:
         $baseUrl: '%env(CORE_URL)%'
