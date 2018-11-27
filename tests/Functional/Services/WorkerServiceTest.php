@@ -157,22 +157,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider stateNameDataProvider
-     *
-     * @param string $stateName
-     *
-     * @throws ORMException
-     */
-    public function testSetReadOnly($stateName)
-    {
-        $worker = $this->workerService->get();
-        $this->setWorkerState($worker, $stateName);
-
-        $this->workerService->setReadOnly();
-        $this->assertEquals(ThisWorker::STATE_MAINTENANCE_READ_ONLY, $worker->getState());
-    }
-
-    /**
      * @return array
      */
     public function stateNameDataProvider()
@@ -186,9 +170,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
             ],
             'active' => [
                 ThisWorker::STATE_ACTIVE,
-            ],
-            'maintenance-read-only' => [
-                ThisWorker::STATE_MAINTENANCE_READ_ONLY,
             ],
         ];
     }
@@ -227,10 +208,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
             'active' => [
                 'stateName' => ThisWorker::STATE_ACTIVE,
                 'expectedWorkerState' => ThisWorker::STATE_ACTIVE,
-            ],
-            'maintenance-read-only' => [
-                'stateName' => ThisWorker::STATE_MAINTENANCE_READ_ONLY,
-                'expectedWorkerState' => ThisWorker::STATE_MAINTENANCE_READ_ONLY,
             ],
         ];
     }

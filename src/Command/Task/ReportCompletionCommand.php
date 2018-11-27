@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Command\Task;
 
 use App\Services\TaskCompletionReporter;
@@ -36,10 +37,6 @@ class ReportCompletionCommand extends AbstractTaskCommand
             ->setName('simplytestable:task:reportcompletion')
             ->setDescription('Report back to the core application the completed status of a task')
             ->addArgument('id', InputArgument::REQUIRED, 'id of task to report');
-    }
-
-    protected function handleWorkerMaintenanceReadOnlyMode()
-    {
     }
 
     /**

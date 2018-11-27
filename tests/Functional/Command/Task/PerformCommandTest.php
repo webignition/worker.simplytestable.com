@@ -7,7 +7,6 @@ use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Command\Task\PerformCommand;
 use App\Services\Resque\QueueService;
-use App\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -47,30 +46,6 @@ class PerformCommandTest extends AbstractBaseTestCase
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
         ]);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function testRunInMaintenanceReadOnlyMode()
-    {
-        self::$container->get(WorkerService::class)->setReadOnly();
-        $this->clearRedis();
-
-        $returnCode = $this->command->run(
-            new ArrayInput([
-                'id' => $this->task->getId(),
-            ]),
-            new NullOutput()
-        );
-
-        $this->assertEquals(PerformCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE, $returnCode);
-        $this->assertTrue(self::$container->get(QueueService::class)->contains(
-            'task-perform',
-            [
-                'id' => $this->task->getId()
-            ]
-        ));
     }
 
     /**

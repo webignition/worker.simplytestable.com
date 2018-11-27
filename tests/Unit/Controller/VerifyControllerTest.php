@@ -6,7 +6,6 @@ use App\Controller\VerifyController;
 use App\Entity\ThisWorker;
 use App\Request\VerifyRequest;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use App\Tests\Factory\MockFactory;
 
 /**
@@ -14,34 +13,9 @@ use App\Tests\Factory\MockFactory;
  */
 class VerifyControllerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testIndexActionInMaintenanceReadOnlyMode()
-    {
-        $this->expectException(ServiceUnavailableHttpException::class);
-
-        $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(true);
-
-        $verifyController = new VerifyController();
-        $verifyController->indexAction(
-            MockFactory::createWorkerService([
-                'get' => [
-                    'return' => $worker,
-                ],
-            ]),
-            MockFactory::createVerifyRequestFactory()
-        );
-    }
-
     public function testIndexActionWithInvalidRequest()
     {
         $verifyRequest = new VerifyRequest(null, null);
-
-        $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(false);
 
         $this->expectException(BadRequestHttpException::class);
 
@@ -49,7 +23,7 @@ class VerifyControllerTest extends \PHPUnit\Framework\TestCase
         $verifyController->indexAction(
             MockFactory::createWorkerService([
                 'get' => [
-                    'return' => $worker,
+                    'return' => \Mockery::mock(ThisWorker::class),
                 ],
             ]),
             MockFactory::createVerifyRequestFactory([
@@ -64,9 +38,7 @@ class VerifyControllerTest extends \PHPUnit\Framework\TestCase
     {
         $verifyRequest = new VerifyRequest('foo', 'invalid-token');
         $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(false);
+
         $worker
             ->shouldReceive('getHostname')
             ->andReturn('foo');

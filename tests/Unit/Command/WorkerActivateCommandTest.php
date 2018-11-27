@@ -15,55 +15,13 @@ use Symfony\Component\Console\Input\ArrayInput;
 class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @throws \Exception
-     */
-    public function testRunInMaintenanceReadOnlyMode()
-    {
-        $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(true);
-
-        $command = $this->createWorkerActivateCommand([
-            WorkerService::class => MockFactory::createWorkerService([
-                'get' => [
-                    'return' => $worker,
-                ]
-            ]),
-        ]);
-
-        $returnCode = $command->run(new ArrayInput([]), new NullOutput());
-
-        $this->assertEquals(
-            WorkerActivateCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE,
-            $returnCode
-        );
-    }
-
-    /**
-     * @param array $services
-     *
-     * @return WorkerActivateCommand
-     */
-    private function createWorkerActivateCommand($services = [])
-    {
-        if (!isset($services[WorkerService::class])) {
-            $services[WorkerService::class] = MockFactory::createWorkerService();
-        }
-
-        return new WorkerActivateCommand(
-            $services[WorkerService::class]
-        );
-    }
-
-    /**
      * @dataProvider runDataProvider
      *
      * @param WorkerService $workerService
      * @param int $expectedReturnCode
      * @throws \Exception
      */
-    public function testRun(WorkerService $workerService, $expectedReturnCode)
+    public function testRun(WorkerService $workerService, int $expectedReturnCode)
     {
         $command = $this->createWorkerActivateCommand([
             WorkerService::class => $workerService,
@@ -74,15 +32,9 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedReturnCode, $returnCode);
     }
 
-    /**
-     * @return array
-     */
-    public function runDataProvider()
+    public function runDataProvider(): array
     {
         $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(false);
 
         return [
             'success' => [
@@ -132,9 +84,17 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    private function createWorkerActivateCommand(array $services = []): WorkerActivateCommand
+    {
+        if (!isset($services[WorkerService::class])) {
+            $services[WorkerService::class] = MockFactory::createWorkerService();
+        }
+
+        return new WorkerActivateCommand(
+            $services[WorkerService::class]
+        );
+    }
+
     protected function tearDown()
     {
         parent::tearDown();

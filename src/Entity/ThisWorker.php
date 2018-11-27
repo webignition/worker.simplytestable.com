@@ -12,7 +12,6 @@ class ThisWorker
     const STATE_ACTIVE = 'active';
     const STATE_AWAITING_ACTIVATION_VERIFICATION = 'awaiting-activation-verification';
     const STATE_NEW = 'new';
-    const STATE_MAINTENANCE_READ_ONLY = 'maintenance-read-only';
 
     /**
      * @var int
@@ -92,10 +91,5 @@ class ThisWorker
     public function isActive(): bool
     {
         return self::STATE_ACTIVE == $this->state;
-    }
-
-    public function isMaintenanceReadOnly(): bool
-    {
-        return self::STATE_MAINTENANCE_READ_ONLY == $this->state;
     }
 }

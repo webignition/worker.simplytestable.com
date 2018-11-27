@@ -6,7 +6,6 @@ use App\Command\Task\PrepareCommand;
 use App\Entity\Task\Task;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\Resque\QueueService;
-use App\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -37,30 +36,6 @@ class PrepareCommandTest extends AbstractBaseTestCase
             'url' => 'http://example.com/',
             'type' => 'html validation',
         ]));
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function testRunInMaintenanceReadOnlyMode()
-    {
-        self::$container->get(WorkerService::class)->setReadOnly();
-        $this->clearRedis();
-
-        $returnCode = $this->command->run(
-            new ArrayInput([
-                'id' => $this->task->getId(),
-            ]),
-            new NullOutput()
-        );
-
-        $this->assertEquals(PrepareCommand::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE, $returnCode);
-        $this->assertTrue(self::$container->get(QueueService::class)->contains(
-            'task-prepare',
-            [
-                'id' => $this->task->getId()
-            ]
-        ));
     }
 
     /**

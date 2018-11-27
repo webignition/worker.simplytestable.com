@@ -12,7 +12,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class AbstractTaskCommand extends Command
 {
-    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = -1;
     const RETURN_CODE_TASK_DOES_NOT_EXIST = -2;
     const RETURN_CODE_OK = 0;
 
@@ -45,8 +44,6 @@ abstract class AbstractTaskCommand extends Command
         $this->workerService = $workerService;
     }
 
-    abstract protected function handleWorkerMaintenanceReadOnlyMode();
-
     /**
      * {@inheritdoc}
      */
@@ -67,19 +64,6 @@ abstract class AbstractTaskCommand extends Command
             $output->writeln($taskIdDoesNotExistMessage);
 
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
-        }
-
-        $worker = $this->workerService->get();
-        if ($worker->isMaintenanceReadOnly()) {
-            $this->logger->error(sprintf(
-                '%s::execute [%s]: worker application is in maintenance read-only mode',
-                $this->getName(),
-                $this->task->getId()
-            ));
-
-            $this->handleWorkerMaintenanceReadOnlyMode();
-
-            return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
         }
 
         return self::RETURN_CODE_OK;

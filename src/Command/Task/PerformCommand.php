@@ -4,7 +4,6 @@ namespace App\Command\Task;
 
 use App\Services\TaskPerformer;
 use Psr\Log\LoggerInterface;
-use App\Resque\Job\TaskPerformJob;
 use App\Resque\Job\TaskReportCompletionJob;
 use App\Resque\Job\TasksRequestJob;
 use App\Services\Resque\QueueService as ResqueQueueService;
@@ -52,15 +51,6 @@ class PerformCommand extends AbstractTaskCommand
             ->setName('simplytestable:task:perform')
             ->setDescription('Start a task')
             ->addArgument('id', InputArgument::REQUIRED, 'id of task to start');
-    }
-
-    protected function handleWorkerMaintenanceReadOnlyMode()
-    {
-        $taskId = $this->task->getId();
-
-        if (!$this->resqueQueueService->contains('task-perform', ['id' => $taskId])) {
-            $this->resqueQueueService->enqueue(new TaskPerformJob(['id' => $taskId]));
-        }
     }
 
     /**

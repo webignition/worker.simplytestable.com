@@ -16,7 +16,6 @@ class RequestCommand extends Command
 {
     const RETURN_CODE_OK = 0;
     const RETURN_CODE_FAILED = 1;
-    const RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE = 2;
     const RETURN_CODE_TASK_WORKLOAD_EXCEEDS_REQUEST_THRESHOLD = 3;
 
     /**
@@ -70,14 +69,6 @@ class RequestCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $worker = $this->workerService->get();
-
-        if ($worker->isMaintenanceReadOnly()) {
-            $this->requeue();
-
-            return self::RETURN_CODE_IN_MAINTENANCE_READ_ONLY_MODE;
-        }
-
         try {
             if ($this->tasksService->request($input->getArgument('limit'))) {
                 return self::RETURN_CODE_OK;
