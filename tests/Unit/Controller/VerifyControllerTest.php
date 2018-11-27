@@ -17,18 +17,13 @@ class VerifyControllerTest extends \PHPUnit\Framework\TestCase
     {
         $verifyRequest = new VerifyRequest(null, null);
 
-        $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(false);
-
         $this->expectException(BadRequestHttpException::class);
 
         $verifyController = new VerifyController();
         $verifyController->indexAction(
             MockFactory::createWorkerService([
                 'get' => [
-                    'return' => $worker,
+                    'return' => \Mockery::mock(ThisWorker::class),
                 ],
             ]),
             MockFactory::createVerifyRequestFactory([
@@ -43,9 +38,7 @@ class VerifyControllerTest extends \PHPUnit\Framework\TestCase
     {
         $verifyRequest = new VerifyRequest('foo', 'invalid-token');
         $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(false);
+
         $worker
             ->shouldReceive('getHostname')
             ->andReturn('foo');

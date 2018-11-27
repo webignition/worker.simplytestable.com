@@ -24,15 +24,10 @@ class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
      */
     public function testRunForInvalidTask()
     {
-        $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(false);
-
         $command = $this->createReportCompletionCommand([
             WorkerService::class => MockFactory::createWorkerService([
                 'get' => [
-                    'return' => $worker,
+                    'return' => \Mockery::mock(ThisWorker::class),
                 ],
             ]),
             TaskService::class => MockFactory::createTaskService([

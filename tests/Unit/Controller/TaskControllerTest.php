@@ -19,17 +19,12 @@ class TaskControllerTest extends \PHPUnit\Framework\TestCase
 {
     public function testCancelActionWithInvalidRequest()
     {
-        $worker = \Mockery::mock(ThisWorker::class);
-        $worker
-            ->shouldReceive('isMaintenanceReadOnly')
-            ->andReturn(false);
-
         $this->expectException(BadRequestHttpException::class);
 
         $taskController = $this->createTaskController([
             WorkerService::class => MockFactory::createWorkerService([
                 'get' => [
-                    'return' => $worker,
+                    'return' => \Mockery::mock(ThisWorker::class),
                 ],
             ]),
         ]);
