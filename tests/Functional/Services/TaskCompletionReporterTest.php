@@ -331,64 +331,6 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
         ];
     }
 
-
-//    /**
-//     * @dataProvider reportCompletionFailureDataProvider
-//     *
-//     * @param array $responseFixtures
-//     * @param int $expectedReturnValue
-//     *
-//     * @throws GuzzleException
-//     */
-//    public function testReportCompletionFailure()
-//    {
-////        $taskPerformanceService = self::$container->get(TaskPerformer::class);
-////
-////        $this->httpMockHandler->appendFixtures(array_merge([
-////            new Response(200, ['content-type' => 'text/html']),
-////            new Response(200, ['content-type' => 'text/html'], '<!doctype html><html>'),
-////        ], $responseFixtures));
-////
-////        $this->httpRetryMiddleware->disable();
-////
-////        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
-////
-////        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([]));
-////        $taskPerformanceService->perform($task);
-////        $initialTaskState = $task->getState();
-////
-////        $this->assertEquals($expectedReturnValue, $this->taskCompletionReporter->reportCompletion($task));
-////        $this->assertEquals($initialTaskState, $task->getState());
-////        $this->assertInternalType('int', $task->getId());
-////        $this->assertInternalType('int', $task->getOutput()->getId());
-////        $this->assertInternalType('int', $task->getTimePeriod()->getId());
-//    }
-//
-//    /**
-//     * @return array
-//     */
-//    public function reportCompletionFailureDataProvider()
-//    {
-//        return [
-//            'http 404' => [
-//                'responseFixture' => new Response(404),
-//                'expectedReturnValue' => 404,
-//            ],
-////            'http 500' => [
-////                'responseFixtures' => [
-////                    new Response(500),
-////                ],
-////                'expectedReturnValue' => 500,
-////            ],
-////            'curl 28' => [
-////                'responseFixtures' => [
-////                    ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
-////                ],
-////                'expectedReturnValue' => 28,
-////            ],
-//        ];
-//    }
-
     private function createTask(
         string $url,
         string $state,

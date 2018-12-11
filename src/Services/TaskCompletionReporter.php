@@ -60,10 +60,7 @@ class TaskCompletionReporter
         try {
             $this->coreApplicationHttpClient->send($request);
 
-            $this->eventDispatcher->dispatch(
-                TaskEvent::TYPE_REPORTED_COMPLETION,
-                new TaskReportCompletionSuccessEvent($task)
-            );
+            $this->dispatchSuccessEvent($task);
         } catch (ConnectException $connectException) {
             $curlExceptionFactory = new CurlExceptionFactory();
 
@@ -75,35 +72,44 @@ class TaskCompletionReporter
                 $statusCode = $curlExceptionFactory::fromConnectException($connectException)->getCurlCode();
             }
 
-            $this->eventDispatcher->dispatch(
-                TaskEvent::TYPE_REPORTED_COMPLETION,
-                new TaskReportCompletionFailureEvent($task, $failureType, $statusCode, (string)$request->getUri())
-            );
+            $this->dispatchFailureEvent($task, $failureType, $statusCode, (string) $request->getUri());
 
             return false;
         } catch (BadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
 
             if (410 === $response->getStatusCode()) {
-                $this->eventDispatcher->dispatch(
-                    TaskEvent::TYPE_REPORTED_COMPLETION,
-                    new TaskReportCompletionSuccessEvent($task)
-                );
-            } else {
-                $this->eventDispatcher->dispatch(
-                    TaskEvent::TYPE_REPORTED_COMPLETION,
-                    new TaskReportCompletionFailureEvent(
-                        $task,
-                        TaskReportCompletionFailureEvent::FAILURE_TYPE_HTTP,
-                        $response->getStatusCode(),
-                        (string)$request->getUri()
-                    )
-                );
+                $this->dispatchSuccessEvent($task);
 
-                return false;
+                return true;
             }
+
+            $this->dispatchFailureEvent(
+                $task,
+                TaskReportCompletionFailureEvent::FAILURE_TYPE_HTTP,
+                $response->getStatusCode(),
+                (string) $request->getUri()
+            );
+
+            return false;
         }
 
         return true;
+    }
+
+    private function dispatchSuccessEvent(Task $task)
+    {
+        $this->eventDispatcher->dispatch(
+            TaskEvent::TYPE_REPORTED_COMPLETION,
+            new TaskReportCompletionSuccessEvent($task)
+        );
+    }
+
+    private function dispatchFailureEvent(Task $task, string $failureType, int $statusCode, string $requestUrl)
+    {
+        $this->eventDispatcher->dispatch(
+            TaskEvent::TYPE_REPORTED_COMPLETION,
+            new TaskReportCompletionFailureEvent($task, $failureType, $statusCode, $requestUrl)
+        );
     }
 }
