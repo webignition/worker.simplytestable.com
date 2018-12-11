@@ -56,6 +56,10 @@ services:
       tags:
         - { name: kernel.event_listener, event: task.prepared }
 
+    App\EventListener\TaskPerformedEventListener:
+      tags:
+        - { name: kernel.event_listener, event: task.performed }
+
     App\Services\CoreApplicationRouter:
       arguments:
         $baseUrl: '%env(CORE_URL)%'
