@@ -4,7 +4,6 @@ namespace App\Command\Task;
 
 use App\Services\TaskPerformer;
 use Psr\Log\LoggerInterface;
-use App\Resque\Job\TaskReportCompletionJob;
 use App\Resque\Job\TasksRequestJob;
 use App\Services\Resque\QueueService as ResqueQueueService;
 use App\Services\TaskService;
@@ -25,21 +24,21 @@ class PerformCommand extends AbstractTaskCommand
     /**
      * @var TaskPerformer
      */
-    private $taskPerformanceService;
+    private $taskPerformer;
 
     public function __construct(
         LoggerInterface $logger,
         TaskService $taskService,
         WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
-        TaskPerformer $taskPerformanceService
+        TaskPerformer $taskPerformer
     ) {
         parent::__construct($logger, $taskService, $workerService);
 
         $this->logger = $logger;
         $this->taskService = $taskService;
         $this->resqueQueueService = $resqueQueueService;
-        $this->taskPerformanceService = $taskPerformanceService;
+        $this->taskPerformer = $taskPerformer;
     }
 
     /**
@@ -64,13 +63,11 @@ class PerformCommand extends AbstractTaskCommand
         }
 
         $taskId = $this->task->getId();
-        $this->taskPerformanceService->perform($this->task);
+        $this->taskPerformer->perform($this->task);
 
         if ($this->resqueQueueService->isEmpty('tasks-request')) {
             $this->resqueQueueService->enqueue(new TasksRequestJob());
         }
-
-        $this->resqueQueueService->enqueue(new TaskReportCompletionJob(['id' => $taskId]));
 
         $output->writeln('Performed [' . $taskId . ']');
 

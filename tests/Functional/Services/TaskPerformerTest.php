@@ -2,14 +2,17 @@
 
 namespace App\Tests\Functional\Services;
 
+use App\Event\TaskEvent;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskPerformer;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Entity\Task\Task;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use App\Tests\Services\HttpMockHandler;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TaskPerformerTest extends AbstractBaseTestCase
 {
@@ -58,6 +61,24 @@ class TaskPerformerTest extends AbstractBaseTestCase
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $task = $this->testTaskFactory->create($taskValues);
+
+        $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
+        $eventDispatcher
+            ->shouldReceive('dispatch')
+            ->once()
+            ->withArgs(function (string $eventName, TaskEvent $taskEvent) use ($task) {
+                $this->assertEquals(TaskEvent::TYPE_PERFORMED, $eventName);
+                $this->assertSame($task, $taskEvent->getTask());
+
+                return true;
+            });
+
+        ObjectPropertySetter::setProperty(
+            $this->taskPerformer,
+            TaskPerformer::class,
+            'eventDispatcher',
+            $eventDispatcher
+        );
 
         $this->taskPerformer->perform($task);
 

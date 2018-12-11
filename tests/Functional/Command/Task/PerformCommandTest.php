@@ -3,12 +3,14 @@
 namespace App\Tests\Functional\Command\Task;
 
 use App\Entity\Task\Task;
+use App\Resque\Job\TasksRequestJob;
+use App\Services\TaskPerformer;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Command\Task\PerformCommand;
 use App\Services\Resque\QueueService;
 use Symfony\Component\Console\Output\NullOutput;
-use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use App\Tests\Services\HttpMockHandler;
@@ -55,7 +57,13 @@ class PerformCommandTest extends AbstractBaseTestCase
     {
         $resqueQueueService = self::$container->get(QueueService::class);
 
-        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
+        $taskPerformer = \Mockery::mock(TaskPerformer::class);
+        $taskPerformer
+            ->shouldReceive('perform')
+            ->once()
+            ->with($this->task);
+
+        ObjectPropertySetter::setProperty($this->command, PerformCommand::class, 'taskPerformer', $taskPerformer);
 
         $returnCode = $this->command->run(
             new ArrayInput([
@@ -65,24 +73,7 @@ class PerformCommandTest extends AbstractBaseTestCase
         );
 
         $this->assertEquals(0, $returnCode);
-
-        $expectedResqueJobs = [
-            'tasks-request' => [],
-            'task-report-completion' => [
-                'id' => '{{ taskId }}',
-            ],
-        ];
-
-        foreach ($expectedResqueJobs as $queueName => $data) {
-            foreach ($data as $key => $value) {
-                if ($value == '{{ taskId }}') {
-                    $data[$key] = $this->task->getId();
-                }
-            }
-
-            $this->assertFalse($resqueQueueService->isEmpty($queueName));
-            $this->assertTrue($resqueQueueService->contains($queueName, $data));
-        }
+        $this->assertFalse($resqueQueueService->isEmpty(TasksRequestJob::QUEUE_NAME));
     }
 
     /**
