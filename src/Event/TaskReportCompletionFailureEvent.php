@@ -6,6 +6,8 @@ use App\Entity\Task\Task;
 
 class TaskReportCompletionFailureEvent extends AbstractTaskReportCompletionEvent
 {
+    const SUCCEEDED = false;
+
     const FAILURE_TYPE_HTTP = 'http';
     const FAILURE_TYPE_CURL = 'curl';
 
@@ -15,7 +17,7 @@ class TaskReportCompletionFailureEvent extends AbstractTaskReportCompletionEvent
 
     public function __construct(Task $task, string $failureType, int $statusCode, string $requestUrl)
     {
-        parent::__construct($task, self::STATUS_FAILED);
+        parent::__construct($task, self::SUCCEEDED);
 
         $this->failureType = $failureType;
         $this->statusCode = $statusCode;

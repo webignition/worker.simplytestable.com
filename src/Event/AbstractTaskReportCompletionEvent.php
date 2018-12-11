@@ -6,20 +6,17 @@ use App\Entity\Task\Task;
 
 abstract class AbstractTaskReportCompletionEvent extends TaskEvent
 {
-    const STATUS_SUCCEEDED = 'succeeded';
-    const STATUS_FAILED = 'failed';
+    private $succeeded;
 
-    private $status;
-
-    public function __construct(Task $task, string $status)
+    public function __construct(Task $task, bool $succeeded)
     {
         parent::__construct($task);
 
-        $this->status = $status;
+        $this->succeeded = $succeeded;
     }
 
-    public function getStatus(): string
+    public function isSucceeded(): bool
     {
-        return $this->status;
+        return $this->succeeded;
     }
 }

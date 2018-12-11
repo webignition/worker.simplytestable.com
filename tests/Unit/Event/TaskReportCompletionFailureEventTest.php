@@ -21,6 +21,7 @@ class TaskReportCompletionFailureEventTest extends \PHPUnit\Framework\TestCase
 
         $event = new TaskReportCompletionFailureEvent($task, $failureType, $statusCode, $requestUrl);
 
+        $this->assertSame(false, $event->isSucceeded());
         $this->assertSame($task, $event->getTask());
         $this->assertSame($failureType, $event->getFailureType());
         $this->assertSame($requestUrl, $event->getRequestUrl());
