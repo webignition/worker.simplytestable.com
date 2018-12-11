@@ -3,6 +3,7 @@
 namespace App\Command\Task;
 
 use App\Services\TaskCompletionReporter;
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use App\Services\TaskService;
 use App\Services\WorkerService;
@@ -12,6 +13,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ReportCompletionCommand extends AbstractTaskCommand
 {
+    const RETURN_CODE_FAILED = 1;
+
     /**
      * @var TaskCompletionReporter
      */
@@ -41,6 +44,8 @@ class ReportCompletionCommand extends AbstractTaskCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @throws GuzzleException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -57,12 +62,8 @@ class ReportCompletionCommand extends AbstractTaskCommand
             return 0;
         }
 
-        if (strlen($reportCompletionResult) === 3) {
-            $output->writeln('Report completion failed, HTTP response '.$reportCompletionResult);
-        } else {
-            $output->writeln('Report completion failed, CURL error '.$reportCompletionResult);
-        }
+        $output->writeln('Report completion failed, see log for details ');
 
-        return $reportCompletionResult;
+        return self::RETURN_CODE_FAILED;
     }
 }
