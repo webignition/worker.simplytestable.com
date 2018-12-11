@@ -10,6 +10,7 @@ class TaskReportCompletionFailureEvent extends AbstractTaskReportCompletionEvent
 
     const FAILURE_TYPE_HTTP = 'http';
     const FAILURE_TYPE_CURL = 'curl';
+    const FAILURE_TYPE_UNKNOWN = 'unknown';
 
     private $failureType;
     private $statusCode;

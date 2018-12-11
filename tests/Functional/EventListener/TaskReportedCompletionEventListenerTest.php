@@ -122,6 +122,20 @@ class TaskReportedCompletionEventListenerTest extends AbstractTaskEventListenerT
                     'status_code' => 28,
                 ],
             ],
+            'unknown' => [
+                'event' => new TaskReportCompletionFailureEvent(
+                    $task,
+                    TaskReportCompletionFailureEvent::FAILURE_TYPE_UNKNOWN,
+                    0,
+                    'http://core-app/'
+                ),
+                'expectedLogMessage' => 'task-report-completion failed: [' . self::TASK_ID . ']',
+                'expectedLogContext' => [
+                    'request_url' => 'http://core-app/',
+                    'failure_type' => TaskReportCompletionFailureEvent::FAILURE_TYPE_UNKNOWN,
+                    'status_code' => 0,
+                ],
+            ],
         ];
     }
 
