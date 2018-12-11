@@ -60,6 +60,10 @@ services:
       tags:
         - { name: kernel.event_listener, event: task.performed }
 
+    App\EventListener\TaskReportedCompletionEventListener:
+      tags:
+        - { name: kernel.event_listener, event: task.reported-completion }
+
     App\Services\CoreApplicationRouter:
       arguments:
         $baseUrl: '%env(CORE_URL)%'
