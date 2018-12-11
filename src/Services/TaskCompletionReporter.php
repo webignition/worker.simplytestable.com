@@ -2,124 +2,100 @@
 
 namespace App\Services;
 
-use Doctrine\ORM\EntityManagerInterface;
+use App\Event\TaskEvent;
+use App\Event\TaskReportCompletionFailureEvent;
+use App\Event\TaskReportCompletionSuccessEvent;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use App\Entity\Task\Task;
-use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
 class TaskCompletionReporter
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var CoreApplicationHttpClient
-     */
     private $coreApplicationHttpClient;
+    private $eventDispatcher;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-        LoggerInterface $logger,
-        CoreApplicationHttpClient $coreApplicationHttpClient
+        CoreApplicationHttpClient $coreApplicationHttpClient,
+        EventDispatcherInterface $eventDispatcher
     ) {
-        $this->entityManager = $entityManager;
-        $this->logger = $logger;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * @param Task $task
      *
-     * @return boolean|int
-     *
      * @throws GuzzleException
      */
     public function reportCompletion(Task $task)
     {
-        $this->logger->info(sprintf(
-            'TaskService::reportCompletion: Initialising [%d]',
-            $task->getId()
-        ));
-
         if (!$task->hasOutput()) {
-            $this->logger->info(sprintf(
-                'TaskService::reportCompletion: Task state is [%s], we can\'t report back just yet',
-                $task->getState()
-            ));
-            return true;
+            return;
         }
+
+        $taskOutput = $task->getOutput();
 
         $request = $this->coreApplicationHttpClient->createPostRequest(
             'task_complete',
             [
                 'url' => base64_encode($task->getUrl()),
-                'type' => $task->getType(),
+                'type' => (string)$task->getType(),
                 'parameter_hash' => $task->getParametersHash(),
             ],
             [
                 'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
-                'output' => $task->getOutput()->getOutput(),
-                'contentType' => $task->getOutput()->getContentType(),
+                'output' => $taskOutput->getOutput(),
+                'contentType' => $taskOutput->getContentType(),
                 'state' => 'task-' . $task->getState(),
-                'errorCount' => $task->getOutput()->getErrorCount(),
-                'warningCount' => $task->getOutput()->getWarningCount()
+                'errorCount' => $taskOutput->getErrorCount(),
+                'warningCount' => $taskOutput->getWarningCount()
             ]
         );
 
         try {
-            $response = $this->coreApplicationHttpClient->send($request);
+            $this->coreApplicationHttpClient->send($request);
 
-            $this->logger->notice(sprintf(
-                'TaskService::reportCompletion: %s: %s %s',
-                (string)$request->getUri(),
-                $response->getStatusCode(),
-                $response->getReasonPhrase()
-            ));
+            $this->eventDispatcher->dispatch(
+                TaskEvent::TYPE_REPORTED_COMPLETION,
+                new TaskReportCompletionSuccessEvent($task)
+            );
         } catch (ConnectException $connectException) {
             $curlExceptionFactory = new CurlExceptionFactory();
 
+            $failureType = TaskReportCompletionFailureEvent::FAILURE_TYPE_UNKNOWN;
+            $statusCode = 0;
+
             if ($curlExceptionFactory::isCurlException($connectException)) {
-                return $curlExceptionFactory::fromConnectException($connectException)->getCurlCode();
+                $failureType = TaskReportCompletionFailureEvent::FAILURE_TYPE_CURL;
+                $statusCode = $curlExceptionFactory::fromConnectException($connectException)->getCurlCode();
             }
 
-            throw $connectException;
+            $this->eventDispatcher->dispatch(
+                TaskEvent::TYPE_REPORTED_COMPLETION,
+                new TaskReportCompletionFailureEvent($task, $failureType, $statusCode, (string)$request->getUri())
+            );
         } catch (BadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
 
-            if ($response->getStatusCode() !== 410) {
-                $this->logger->error(sprintf(
-                    'TaskService::reportCompletion: Completion reporting failed for [%i] [%s]',
-                    $task->getId(),
-                    $task->getUrl()
-                ));
-
-                $this->logger->error(sprintf(
-                    'TaskService::reportCompletion: [%i] %s: %s %s',
-                    $task->getId(),
-                    (string)$request->getUri(),
-                    $response->getStatusCode(),
-                    $response->getReasonPhrase()
-                ));
-
-                return $response->getStatusCode();
+            if (410 === $response->getStatusCode()) {
+                $this->eventDispatcher->dispatch(
+                    TaskEvent::TYPE_REPORTED_COMPLETION,
+                    new TaskReportCompletionSuccessEvent($task)
+                );
+            } else {
+                $this->eventDispatcher->dispatch(
+                    TaskEvent::TYPE_REPORTED_COMPLETION,
+                    new TaskReportCompletionFailureEvent(
+                        $task,
+                        TaskReportCompletionFailureEvent::FAILURE_TYPE_HTTP,
+                        $response->getStatusCode(),
+                        (string)$request->getUri()
+                    )
+                );
             }
         }
-
-        $this->entityManager->remove($task);
-        $this->entityManager->remove($task->getOutput());
-        $this->entityManager->remove($task->getTimePeriod());
-        $this->entityManager->flush();
-
-        return true;
     }
 }
