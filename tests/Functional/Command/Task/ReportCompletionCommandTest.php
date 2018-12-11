@@ -4,13 +4,11 @@ namespace App\Tests\Functional\Command\Task;
 
 use App\Command\Task\ReportCompletionCommand;
 use App\Entity\Task\Task;
-use App\Services\TaskPerformer;
-use App\Tests\Factory\ConnectExceptionFactory;
-use App\Tests\Factory\HtmlValidatorFixtureFactory;
+use App\Services\TaskCompletionReporter;
 use App\Tests\Functional\AbstractBaseTestCase;
-use App\Tests\Services\HttpMockHandler;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
-use GuzzleHttp\Psr7\Response;
+use Mockery\MockInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -25,11 +23,6 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
     private $command;
 
     /**
-     * @var HttpMockHandler
-     */
-    private $httpMockHandler;
-
-    /**
      * @var Task
      */
     private $task;
@@ -42,83 +35,61 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->command = self::$container->get(ReportCompletionCommand::class);
-        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $testTaskFactory = self::$container->get(TestTaskFactory::class);
 
         $this->task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'url' => 'http://example.com/',
             'type' => 'html validation',
         ]));
-
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ]);
     }
 
     /**
      * @dataProvider runDataProvider
      *
-     * @param array $responseFixtures
-     * @param int $expectedCommandReturnCode
+     * @param bool $taskCompletionReporterReturnValue
+     * @param int $expectedCommandReturnValue
+     *
      * @throws \Exception
      */
-    public function testRun($responseFixtures, $expectedCommandReturnCode)
+    public function testRun(bool $taskCompletionReporterReturnValue, int $expectedCommandReturnValue)
     {
-        $this->httpMockHandler->appendFixtures($responseFixtures);
+        /* @var TaskCompletionReporter|MockInterface $taskCompletionReporter */
+        $taskCompletionReporter = \Mockery::mock(TaskCompletionReporter::class);
+        $taskCompletionReporter
+            ->shouldReceive('reportCompletion')
+            ->with($this->task)
+            ->once()
+            ->andReturn($taskCompletionReporterReturnValue);
 
-        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
-
-        self::$container->get(TaskPerformer::class)->perform($this->task);
-        $this->assertNotNull($this->task->getOutput()->getId());
+        ObjectPropertySetter::setProperty(
+            $this->command,
+            ReportCompletionCommand::class,
+            'taskCompletionReporter',
+            $taskCompletionReporter
+        );
 
         $returnCode = $this->command->run(new ArrayInput([
             'id' => $this->task->getId()
         ]), new NullOutput());
 
         $this->assertEquals(
-            $expectedCommandReturnCode,
+            $expectedCommandReturnValue,
             $returnCode
         );
     }
 
-    /**
-     * @return array
-     */
-    public function runDataProvider()
+    public function runDataProvider(): array
     {
-        $internalServerErrorResponse = new Response(500);
-        $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
-
         return [
-            'http 200' => [
-                'responseFixtures' => [
-                    new Response(200),
-                ],
-                'expectedCommandReturnCode' => 0,
+            'success' => [
+                'taskCompletionReporterReturnValue' => true,
+                'expectedCommandReturnValue' => 0,
             ],
-            'http 404' => [
-                'responseFixtures' => [
-                    new Response(404),
-                ],
-                'expectedCommandReturnCode' => 404,
-            ],
-            'http 500' => [
-                'responseFixtures' => array_fill(0, 6, $internalServerErrorResponse),
-                'expectedCommandReturnCode' => 500,
-            ],
-            'curl 28' => [
-                'responseFixtures' => array_fill(0, 6, $curl28ConnectException),
-                'expectedCommandReturnCode' => 28,
+            'failure' => [
+                'taskCompletionReporterReturnValue' => false,
+                'expectedCommandReturnValue' => ReportCompletionCommand::RETURN_CODE_FAILED,
             ],
         ];
-    }
-
-    protected function assertPostConditions()
-    {
-        parent::assertPostConditions();
-
-        $this->assertEquals(0, $this->httpMockHandler->count());
     }
 
     /**
