@@ -122,7 +122,9 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
                 return true;
             });
 
-        $this->taskCompletionReporter->reportCompletion($task);
+        $returnValue = $this->taskCompletionReporter->reportCompletion($task);
+
+        $this->assertTrue($returnValue);
     }
 
     /**
@@ -238,7 +240,9 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
                 return true;
             });
 
-        $this->taskCompletionReporter->reportCompletion($task);
+        $returnValue = $this->taskCompletionReporter->reportCompletion($task);
+
+        $this->assertFalse($returnValue);
     }
 
     /**

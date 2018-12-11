@@ -28,12 +28,14 @@ class TaskCompletionReporter
     /**
      * @param Task $task
      *
+     * @return bool
+     *
      * @throws GuzzleException
      */
     public function reportCompletion(Task $task)
     {
         if (!$task->hasOutput()) {
-            return;
+            return true;
         }
 
         $taskOutput = $task->getOutput();
@@ -77,6 +79,8 @@ class TaskCompletionReporter
                 TaskEvent::TYPE_REPORTED_COMPLETION,
                 new TaskReportCompletionFailureEvent($task, $failureType, $statusCode, (string)$request->getUri())
             );
+
+            return false;
         } catch (BadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
 
@@ -95,7 +99,11 @@ class TaskCompletionReporter
                         (string)$request->getUri()
                     )
                 );
+
+                return false;
             }
         }
+
+        return true;
     }
 }
