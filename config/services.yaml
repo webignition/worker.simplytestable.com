@@ -48,6 +48,22 @@ services:
       tags:
         - { name: kernel.cache_warmer, priority: 0 }
 
+    App\EventListener\TaskCreatedEventListener:
+      tags:
+      - { name: kernel.event_listener, event: task.created }
+
+    App\EventListener\TaskPreparedEventListener:
+      tags:
+        - { name: kernel.event_listener, event: task.prepared }
+
+    App\EventListener\TaskPerformedEventListener:
+      tags:
+        - { name: kernel.event_listener, event: task.performed }
+
+    App\EventListener\TaskReportedCompletionEventListener:
+      tags:
+        - { name: kernel.event_listener, event: task.reported-completion }
+
     App\Services\CoreApplicationRouter:
       arguments:
         $baseUrl: '%env(CORE_URL)%'

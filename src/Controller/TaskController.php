@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
-use App\Resque\Job\TaskPrepareJob;
+use App\Event\TaskEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Model\TaskCollection;
 use App\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use App\Services\Request\Factory\Task\CancelRequestFactory;
 use App\Services\Request\Factory\Task\CreateRequestCollectionFactory;
-use App\Services\Resque\QueueService;
 use App\Services\TaskFactory;
 use App\Services\TaskService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -36,14 +36,14 @@ class TaskController extends AbstractController
     /**
      * @param CreateRequestCollectionFactory $createRequestCollectionFactory
      * @param TaskFactory $taskFactory
-     * @param QueueService $resqueQueueService
+     * @param EventDispatcherInterface $eventDispatcher
      *
      * @return JsonResponse
      */
     public function createCollectionAction(
         CreateRequestCollectionFactory $createRequestCollectionFactory,
         TaskFactory $taskFactory,
-        QueueService $resqueQueueService
+        EventDispatcherInterface $eventDispatcher
     ) {
         $createCollectionRequest = $createRequestCollectionFactory->create();
 
@@ -59,7 +59,7 @@ class TaskController extends AbstractController
         $this->entityManager->flush();
 
         foreach ($tasks as $task) {
-            $resqueQueueService->enqueue(new TaskPrepareJob(['id' => $task->getId()]));
+            $eventDispatcher->dispatch(TaskEvent::TYPE_CREATED, new TaskEvent($task));
         }
 
         return new JsonResponse($tasks->jsonSerialize());

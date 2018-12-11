@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Tests\Functional\Command\Task;
+namespace App\Tests\Integration\Command\Task;
 
 use App\Command\Task\PrepareCommand;
 use App\Entity\Task\Task;
-use App\Services\TaskPreparer;
-use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
+use App\Services\Resque\QueueService;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -44,14 +43,6 @@ class PrepareCommandTest extends AbstractBaseTestCase
      */
     public function testRunSuccess()
     {
-        $taskPreparer = \Mockery::mock(TaskPreparer::class);
-        $taskPreparer
-            ->shouldReceive('prepare')
-            ->once()
-            ->with($this->task);
-
-        ObjectPropertySetter::setProperty($this->command, PrepareCommand::class, 'taskPreparer', $taskPreparer);
-
         $this->assertEquals(Task::STATE_QUEUED, $this->task->getState());
 
         $returnCode = $this->command->run(
@@ -62,6 +53,14 @@ class PrepareCommandTest extends AbstractBaseTestCase
         );
 
         $this->assertEquals(0, $returnCode);
+        $this->assertEquals(Task::STATE_PREPARED, $this->task->getState());
+
+        $this->assertTrue(self::$container->get(QueueService::class)->contains(
+            'task-perform',
+            [
+                'id' => $this->task->getId()
+            ]
+        ));
     }
 
     /**

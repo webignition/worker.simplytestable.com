@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Event\TaskEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Entity\TimePeriod;
 use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use App\Services\TaskTypePerformer\TaskTypePerformer;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TaskPerformer
 {
@@ -16,13 +18,19 @@ class TaskPerformer
     private $entityManager;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * @var TaskTypePerformer[]
      */
     private $taskTypePerformers;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, EventDispatcherInterface $eventDispatcher)
     {
         $this->entityManager = $entityManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function addTaskTypePerformer(string $taskTypeName, TaskTypePerformer $taskTypePerformer)
@@ -37,6 +45,8 @@ class TaskPerformer
         $this->start($task);
 
         $response = $taskTypePerformer->perform($task);
+
+        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORMED, new TaskEvent($task));
 
         if (!$task->getTimePeriod()->hasEndDateTime()) {
             $task->getTimePeriod()->setEndDateTime(new \DateTime());

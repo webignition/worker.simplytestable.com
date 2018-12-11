@@ -4,8 +4,6 @@ namespace App\Command\Task;
 
 use App\Services\TaskPreparer;
 use Psr\Log\LoggerInterface;
-use App\Resque\Job\TaskPerformJob;
-use App\Services\Resque\QueueService as ResqueQueueService;
 use App\Services\TaskService;
 use App\Services\WorkerService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -14,28 +12,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PrepareCommand extends AbstractTaskCommand
 {
-    /**
-     * @var ResqueQueueService
-     */
-    private $resqueQueueService;
-
-    /**
-     * @var TaskPreparer
-     */
     private $taskPreparer;
 
     public function __construct(
         LoggerInterface $logger,
         TaskService $taskService,
         WorkerService $workerService,
-        ResqueQueueService $resqueQueueService,
         TaskPreparer $taskPreparer
     ) {
         parent::__construct($logger, $taskService, $workerService);
 
         $this->logger = $logger;
         $this->taskService = $taskService;
-        $this->resqueQueueService = $resqueQueueService;
         $this->taskPreparer = $taskPreparer;
     }
 
@@ -63,9 +51,7 @@ class PrepareCommand extends AbstractTaskCommand
         $taskId = $this->task->getId();
         $this->taskPreparer->prepare($this->task);
 
-        $this->resqueQueueService->enqueue(new TaskPerformJob(['id' => $taskId]));
-
-        $output->writeln('Prepared [' . $taskId . ']');
+        $output->writeln('Prepare started [' . $taskId . ']');
 
         return 0;
     }

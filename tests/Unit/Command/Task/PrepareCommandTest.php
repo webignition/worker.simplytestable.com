@@ -10,7 +10,6 @@ use App\Services\WorkerService;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\MockFactory;
-use App\Services\Resque\QueueService as ResqueQueueService;
 
 /**
  * @group Command/Task/PrepareCommand
@@ -72,10 +71,6 @@ class PrepareCommandTest extends \PHPUnit\Framework\TestCase
             $services[WorkerService::class] = MockFactory::createWorkerService();
         }
 
-        if (!isset($services[ResqueQueueService::class])) {
-            $services[ResqueQueueService::class] = MockFactory::createResqueQueueService();
-        }
-
         if (!isset($services[TaskPreparer::class])) {
             $services[TaskPreparer::class] = \Mockery::mock(TaskPreparer::class);
         }
@@ -84,7 +79,6 @@ class PrepareCommandTest extends \PHPUnit\Framework\TestCase
             $services[LoggerInterface::class],
             $services[TaskService::class],
             $services[WorkerService::class],
-            $services[ResqueQueueService::class],
             $services[TaskPreparer::class]
         );
     }

@@ -2,12 +2,15 @@
 
 namespace App\Tests\Functional\Services;
 
+use App\Event\TaskEvent;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskPreparer;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use App\Entity\Task\Task;
 use App\Tests\Functional\AbstractBaseTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TaskPreparerTest extends AbstractBaseTestCase
 {
@@ -38,13 +41,31 @@ class TaskPreparerTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider prepareDataProvider
+     * @dataProvider prepareNoTaskTypePreparerDataProvider
      *
      * @param array $taskValues
      */
-    public function testPrepare($taskValues)
+    public function testPrepareNoTaskTypePreparer($taskValues)
     {
         $task = $this->testTaskFactory->create($taskValues);
+
+        $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
+        $eventDispatcher
+            ->shouldReceive('dispatch')
+            ->once()
+            ->withArgs(function (string $eventName, TaskEvent $taskEvent) use ($task) {
+                $this->assertEquals(TaskEvent::TYPE_PREPARED, $eventName);
+                $this->assertSame($task, $taskEvent->getTask());
+
+                return true;
+            });
+
+        ObjectPropertySetter::setProperty(
+            $this->taskPreparer,
+            TaskPreparer::class,
+            'eventDispatcher',
+            $eventDispatcher
+        );
 
         $this->taskPreparer->prepare($task);
 
@@ -54,7 +75,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
     /**
      * @return array
      */
-    public function prepareDataProvider()
+    public function prepareNoTaskTypePreparerDataProvider()
     {
         return [
             'html validation' => [
