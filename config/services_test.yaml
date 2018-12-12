@@ -27,3 +27,6 @@ services:
     public: true
     arguments:
       $stateResourcePath: '%kernel.project_dir%/config/state/%kernel.environment%'
+
+  App\Services\SourceFactory:
+    public: true
