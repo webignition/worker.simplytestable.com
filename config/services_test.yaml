@@ -22,3 +22,8 @@ services:
 
   App\Tests\Services\TestTaskFactory:
     public: true
+
+  App\Services\ApplicationState:
+    public: true
+    arguments:
+      $stateResourcePath: '%kernel.project_dir%/config/state/%kernel.environment%'

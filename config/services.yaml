@@ -163,3 +163,7 @@ services:
     App\Services\TaskTypePreparer\Factory:
       arguments:
         $taskPreparers: []
+
+    App\Services\ApplicationState:
+      arguments:
+        $stateResourcePath: '%kernel.project_dir%/config/state/%kernel.environment%'
