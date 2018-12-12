@@ -3,27 +3,24 @@
 namespace App\Controller;
 
 use App\Model\HttpCacheStats;
+use App\Services\ApplicationConfiguration;
+use App\Services\ApplicationState;
 use App\Services\HttpCache;
-use App\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class StatusController extends AbstractController
 {
-    /**
-     * @param WorkerService $workerService
-     * @param HttpCache $httpCache
-     *
-     * @return JsonResponse
-     */
-    public function indexAction(WorkerService $workerService, HttpCache $httpCache)
-    {
-        $status = array();
-        $worker = $workerService->get();
-
-        $status['hostname'] = $worker->getHostname();
-        $status['state'] = $worker->getState();
-        $status['version'] = $this->getLatestGitHash();
+    public function indexAction(
+        ApplicationConfiguration $applicationConfiguration,
+        ApplicationState $applicationState,
+        HttpCache $httpCache
+    ): JsonResponse {
+        $status = [
+            'hostname' => $applicationConfiguration->getHostname(),
+            'state' => $applicationState->get(),
+            'version' => $this->getLatestGitHash(),
+        ];
 
         if ($httpCache->has()) {
             $httpCacheStats = new HttpCacheStats($httpCache->get()->getStats());
@@ -33,10 +30,7 @@ class StatusController extends AbstractController
         return new JsonResponse($status);
     }
 
-    /**
-     * @return string
-     */
-    private function getLatestGitHash()
+    private function getLatestGitHash(): string
     {
         return trim(shell_exec("git log | head -1 | awk {'print $2;'}"));
     }

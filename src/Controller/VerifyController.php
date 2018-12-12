@@ -2,8 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\ThisWorker;
-use App\Request\VerifyRequest;
+use App\Services\ApplicationConfiguration;
 use App\Services\Request\Factory\VerifyRequestFactory;
 use App\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,45 +11,22 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class VerifyController extends AbstractController
 {
-    /**
-     * @param WorkerService $workerService
-     * @param VerifyRequestFactory $verifyRequestFactory
-     *
-     * @return JsonResponse
-     */
-    public function indexAction(WorkerService $workerService, VerifyRequestFactory $verifyRequestFactory)
-    {
+    public function indexAction(
+        ApplicationConfiguration $applicationConfiguration,
+        WorkerService $workerService,
+        VerifyRequestFactory $verifyRequestFactory
+    ): JsonResponse {
         $verifyRequest = $verifyRequestFactory->create();
 
-        if (!$verifyRequest->isValid()) {
-            throw new BadRequestHttpException();
-        }
+        $isRequestHostnameValid = $applicationConfiguration->getHostname() !== $verifyRequest->getHostname();
+        $isRequestTokenValid = $applicationConfiguration->getToken() !== $verifyRequest->getToken();
 
-        if (!$this->doesVerifyRequestMatchWorker($workerService->get(), $verifyRequest)) {
+        if (!$verifyRequest->isValid() || !$isRequestHostnameValid || !$isRequestTokenValid) {
             throw new BadRequestHttpException();
         }
 
         $workerService->verify();
 
         return new JsonResponse();
-    }
-
-    /**
-     * @param ThisWorker $worker
-     * @param VerifyRequest $verifyRequest
-     *
-     * @return bool
-     */
-    private function doesVerifyRequestMatchWorker(ThisWorker $worker, VerifyRequest $verifyRequest)
-    {
-        if ($worker->getHostname() != $verifyRequest->getHostname()) {
-            return false;
-        }
-
-        if ($worker->getActivationToken() != $verifyRequest->getToken()) {
-            return false;
-        }
-
-        return true;
     }
 }

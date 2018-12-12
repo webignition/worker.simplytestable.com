@@ -15,6 +15,7 @@ env:
     - WORKER_PROCESS_COUNT=5
     - MAX_TASKS_REQUEST_FACTOR=2
     - RESQUE_PREFIX=worker
+    - TOKEN=7451f5f1f3028d4ed4dd1315b3a933c9
 
 language: php
 php:

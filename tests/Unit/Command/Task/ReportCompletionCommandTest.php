@@ -2,12 +2,10 @@
 
 namespace App\Tests\Unit\Command\Task;
 
-use App\Entity\ThisWorker;
 use App\Services\TaskCompletionReporter;
 use Psr\Log\LoggerInterface;
 use App\Command\Task\ReportCompletionCommand;
 use App\Services\TaskService;
-use App\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\MockFactory;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -25,11 +23,6 @@ class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
     public function testRunForInvalidTask()
     {
         $command = $this->createReportCompletionCommand([
-            WorkerService::class => MockFactory::createWorkerService([
-                'get' => [
-                    'return' => \Mockery::mock(ThisWorker::class),
-                ],
-            ]),
             TaskService::class => MockFactory::createTaskService([
                 'getById' => [
                     'with' => self::TASK_ID,
@@ -57,12 +50,7 @@ class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param array $services
-     *
-     * @return ReportCompletionCommand
-     */
-    private function createReportCompletionCommand($services = [])
+    private function createReportCompletionCommand(array $services = []): ReportCompletionCommand
     {
         if (!isset($services[LoggerInterface::class])) {
             $services[LoggerInterface::class] = MockFactory::createLogger();
@@ -72,10 +60,6 @@ class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
             $services[TaskService::class] = MockFactory::createTaskService();
         }
 
-        if (!isset($services[WorkerService::class])) {
-            $services[WorkerService::class] = MockFactory::createWorkerService();
-        }
-
         if (!isset($services[TaskCompletionReporter::class])) {
             $services[TaskCompletionReporter::class] = \Mockery::mock(TaskCompletionReporter::class);
         }
@@ -83,7 +67,6 @@ class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
         return new ReportCompletionCommand(
             $services[LoggerInterface::class],
             $services[TaskService::class],
-            $services[WorkerService::class],
             $services[TaskCompletionReporter::class]
         );
     }

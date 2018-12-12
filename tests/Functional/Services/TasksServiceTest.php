@@ -162,7 +162,14 @@ class TasksServiceTest extends AbstractBaseTestCase
         $postedData = [];
         parse_str(urldecode($lastRequest->getBody()->getContents()), $postedData);
 
-        $this->assertEquals($expectedLimit, $postedData['limit']);
+        $this->assertEquals(
+            [
+                'worker_hostname' => self::$container->getParameter('hostname'),
+                'worker_token' => self::$container->getParameter('token'),
+                'limit' => $expectedLimit,
+            ],
+            $postedData
+        );
     }
 
     /**

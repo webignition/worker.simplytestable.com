@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional;
 
+use App\Services\ApplicationState;
 use App\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -20,7 +21,7 @@ abstract class AbstractBaseTestCase extends WebTestCase
     {
         $this->client = static::createClient();
 
-        self::$container->get(WorkerService::class)->setActive();
+        self::$container->get(ApplicationState::class)->set(ApplicationState::STATE_ACTIVE);
         self::$container->get('doctrine')->getConnection()->beginTransaction();
     }
 

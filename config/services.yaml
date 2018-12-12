@@ -7,6 +7,8 @@ imports:
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+  hostname: '%env(HOSTNAME)%'
+  token: '%env(TOKEN)%'
   curl_options:
     CURLOPT_SSL_VERIFYPEER: false
     CURLOPT_SSL_VERIFYHOST: false
@@ -84,12 +86,6 @@ services:
         - [setWorkerProcessCount, ['%env(WORKER_PROCESS_COUNT)%']]
         - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
 
-    App\Services\WorkerService:
-      public: true
-      arguments:
-        $salt: '%kernel.secret%'
-        $hostname: '%env(HOSTNAME)%'
-
     GuzzleHttp\Cookie\CookieJarInterface:
       class: GuzzleHttp\Cookie\CookieJar
 
@@ -160,3 +156,13 @@ services:
     App\Services\TaskTypePreparer\Factory:
       arguments:
         $taskPreparers: []
+
+    App\Services\ApplicationState:
+      arguments:
+        $stateResourcePath: '%kernel.project_dir%/config/state/%kernel.environment%'
+
+    App\Services\ApplicationConfiguration:
+      public: true
+      arguments:
+        $hostname: '%hostname%'
+        $token: '%token%'

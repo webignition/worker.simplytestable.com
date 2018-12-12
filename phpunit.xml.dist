@@ -19,6 +19,7 @@
         <env name="WORKER_PROCESS_COUNT" value="5"/>
         <env name="MAX_TASKS_REQUEST_FACTOR" value="2"/>
         <env name="RESQUE_PREFIX" value="worker"/>
+        <env name="TOKEN" value="7451f5f1f3028d4ed4dd1315b3a933c9"/>
 
         <!-- ###+ doctrine/doctrine-bundle ### -->
         <!-- Format described at http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url -->

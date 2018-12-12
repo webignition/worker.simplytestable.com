@@ -2,26 +2,17 @@
 
 namespace App\Services;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
-use App\Entity\ThisWorker;
 use Psr\Log\LoggerInterface;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptionFactory;
 
 class WorkerService
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var EntityRepository
-     */
-    private $entityRepository;
+    const STATE_ACTIVE = 'active';
+    const STATE_AWAITING_ACTIVATION_VERIFICATION = 'awaiting-activation-verification';
+    const STATE_NEW = 'new';
 
     /**
      * @var LoggerInterface
@@ -29,64 +20,30 @@ class WorkerService
     private $logger;
 
     /**
-     * @var string
-     */
-    private $salt;
-
-    /**
-     * @var string
-     */
-    private $hostname;
-
-    /**
      * @var CoreApplicationHttpClient
      */
     private $coreApplicationHttpClient;
 
+    /**
+     * @var ApplicationState
+     */
+    private $applicationState;
+
+    /**
+     * @var ApplicationConfiguration
+     */
+    private $applicationConfiguration;
+
     public function __construct(
-        string $salt,
-        string $hostname,
-        EntityManagerInterface $entityManager,
         LoggerInterface $logger,
-        CoreApplicationHttpClient $coreApplicationHttpClient
+        CoreApplicationHttpClient $coreApplicationHttpClient,
+        ApplicationState $applicationState,
+        ApplicationConfiguration $applicationConfiguration
     ) {
-        $this->entityManager = $entityManager;
         $this->logger = $logger;
-        $this->salt = $salt;
-        $this->hostname = $hostname;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
-
-        $this->entityRepository = $entityManager->getRepository(ThisWorker::class);
-    }
-
-    /**
-     * @return ThisWorker
-     */
-    public function get()
-    {
-        $workers = $this->entityRepository->findAll();
-        if (empty($workers)) {
-            $this->create();
-            $workers = $this->entityRepository->findAll();
-        }
-
-        return $workers[0];
-    }
-
-    /**
-     * @return ThisWorker
-     */
-    private function create()
-    {
-        $thisWorker = new ThisWorker();
-        $thisWorker->setHostname($this->hostname);
-        $thisWorker->setState(ThisWorker::STATE_NEW);
-        $thisWorker->setActivationToken(md5($this->salt . $this->hostname));
-
-        $this->entityManager->persist($thisWorker);
-        $this->entityManager->flush();
-
-        return $thisWorker;
+        $this->applicationState = $applicationState;
+        $this->applicationConfiguration = $applicationConfiguration;
     }
 
     /**
@@ -101,9 +58,7 @@ class WorkerService
     {
         $this->logger->info("WorkerService::activate: Initialising");
 
-        $thisWorker = $this->get();
-
-        if (!$thisWorker->isNew()) {
+        if (self::STATE_NEW !== $this->applicationState->get()) {
             $this->logger->info("WorkerService::activate: This worker is not new and cannot be activated");
 
             return 0;
@@ -113,8 +68,8 @@ class WorkerService
             'worker_activate',
             [],
             [
-                'hostname' => $thisWorker->getHostname(),
-                'token' => $thisWorker->getActivationToken()
+                'hostname' => $this->applicationConfiguration->getHostname(),
+                'token' => $this->applicationConfiguration->getToken(),
             ]
         );
 
@@ -155,40 +110,15 @@ class WorkerService
             return $responseCode;
         }
 
-        $this->setState(ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION);
+        $this->applicationState->set(ApplicationState::STATE_AWAITING_ACTIVATION_VERIFICATION);
 
         return 0;
     }
 
-    public function setActive()
-    {
-        $this->setState(ThisWorker::STATE_ACTIVE);
-    }
-
-    /**
-     * @param string $stateName
-     */
-    private function setState($stateName)
-    {
-        $thisWorker = $this->get();
-        $thisWorker->setState($stateName);
-
-        $this->entityManager->persist($thisWorker);
-        $this->entityManager->flush();
-    }
-
     public function verify()
     {
-        $thisWorker = $this->get();
-
-        if (!$thisWorker->isAwaitingActivationVerification()) {
-            $this->logger->info("WorkerService::verify: This worker is not awaiting activation verification");
-
-            return true;
+        if (self::STATE_AWAITING_ACTIVATION_VERIFICATION === $this->applicationState->get()) {
+            $this->applicationState->set(ApplicationState::STATE_ACTIVE);
         }
-
-        $this->setState(ThisWorker::STATE_ACTIVE);
-
-        return true;
     }
 }

@@ -17,9 +17,9 @@ class TasksService
     private $logger;
 
     /**
-     * @var WorkerService $workerService
+     * @var ApplicationConfiguration
      */
-    private $workerService;
+    private $applicationConfiguration;
 
     /**
      * @var TaskService
@@ -43,18 +43,18 @@ class TasksService
 
     /**
      * @param LoggerInterface $logger
-     * @param WorkerService $workerService
+     * @param ApplicationConfiguration $applicationConfiguration
      * @param TaskService $taskService
      * @param CoreApplicationHttpClient $coreApplicationHttpClient
      */
     public function __construct(
         LoggerInterface $logger,
-        WorkerService $workerService,
+        ApplicationConfiguration $applicationConfiguration,
         TaskService $taskService,
         CoreApplicationHttpClient $coreApplicationHttpClient
     ) {
         $this->logger = $logger;
-        $this->workerService = $workerService;
+        $this->applicationConfiguration = $applicationConfiguration;
         $this->taskService = $taskService;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
     }
@@ -109,8 +109,8 @@ class TasksService
             'tasks_request',
             [],
             [
-                'worker_hostname' => $this->workerService->get()->getHostname(),
-                'worker_token' => $this->workerService->get()->getActivationToken(),
+                'worker_hostname' => $this->applicationConfiguration->getHostname(),
+                'worker_token' => $this->applicationConfiguration->getToken(),
                 'limit' => $this->getLimit($requestedLimit)
             ]
         );
