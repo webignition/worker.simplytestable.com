@@ -123,37 +123,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider getDataProvider
-     *
-     * @param bool $hasWorker
-     *
-     * @throws ORMException
-     */
-    public function testGet($hasWorker)
-    {
-        if (!$hasWorker) {
-            $this->removeWorker();
-        }
-
-        $this->workerService->get();
-    }
-
-    /**
-     * @return array
-     */
-    public function getDataProvider()
-    {
-        return [
-            'create' => [
-                'hasWorker' => false,
-            ],
-            'get' => [
-                'hasWorker' => true,
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider verifyDataProvider
      *
      * @param string $applicationState
@@ -193,19 +162,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
     public function testGetToken()
     {
         $this->assertSame(self::$container->getParameter('token'), $this->workerService->getToken());
-    }
-
-    /**
-     * @throws ORMException
-     */
-    private function removeWorker()
-    {
-        $entityManager = self::$container->get('doctrine.orm.entity_manager');
-        $entities = $entityManager->getRepository(ThisWorker::class)->findAll();
-        if (!empty($entities)) {
-            $entityManager->remove($entities[0]);
-            $entityManager->flush();
-        }
     }
 
     protected function assertPostConditions()

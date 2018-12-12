@@ -2,12 +2,9 @@
 
 namespace App\Services;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
-use App\Entity\ThisWorker;
 use Psr\Log\LoggerInterface;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptionFactory;
 
@@ -18,24 +15,9 @@ class WorkerService
     const STATE_NEW = 'new';
 
     /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var EntityRepository
-     */
-    private $entityRepository;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
-
-    /**
-     * @var string
-     */
-    private $salt;
 
     /**
      * @var string
@@ -58,23 +40,17 @@ class WorkerService
     private $applicationState;
 
     public function __construct(
-        string $salt,
         string $hostname,
         string $token,
-        EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         CoreApplicationHttpClient $coreApplicationHttpClient,
         ApplicationState $applicationState
     ) {
-        $this->entityManager = $entityManager;
         $this->logger = $logger;
-        $this->salt = $salt;
         $this->hostname = $hostname;
         $this->token = $token;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
         $this->applicationState = $applicationState;
-
-        $this->entityRepository = $entityManager->getRepository(ThisWorker::class);
     }
 
     public function getHostname(): string
@@ -85,38 +61,6 @@ class WorkerService
     public function getToken(): string
     {
         return $this->token;
-    }
-
-    /**
-     * @return ThisWorker
-     */
-    public function get()
-    {
-        $workers = $this->entityRepository->findAll();
-        if (empty($workers)) {
-            $this->create();
-            $workers = $this->entityRepository->findAll();
-        }
-
-        return $workers[0];
-    }
-
-    /**
-     * @return ThisWorker
-     */
-    private function create()
-    {
-        $this->applicationState->set(ApplicationState::STATE_NEW);
-
-        $thisWorker = new ThisWorker();
-        $thisWorker->setHostname($this->hostname);
-        $thisWorker->setState(ThisWorker::STATE_NEW);
-        $thisWorker->setActivationToken(md5($this->salt . $this->hostname));
-
-        $this->entityManager->persist($thisWorker);
-        $this->entityManager->flush();
-
-        return $thisWorker;
     }
 
     /**
