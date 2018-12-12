@@ -3,9 +3,7 @@
 namespace App\Tests\Functional\Controller;
 
 use App\Controller\VerifyController;
-use App\Entity\ThisWorker;
 use App\Services\Request\Factory\VerifyRequestFactory;
-use App\Services\WorkerService;
 
 /**
  * @group Controller/VerifyController

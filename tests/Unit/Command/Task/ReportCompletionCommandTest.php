@@ -2,7 +2,6 @@
 
 namespace App\Tests\Unit\Command\Task;
 
-use App\Entity\ThisWorker;
 use App\Services\TaskCompletionReporter;
 use Psr\Log\LoggerInterface;
 use App\Command\Task\ReportCompletionCommand;
@@ -25,11 +24,6 @@ class ReportCompletionCommandTest extends \PHPUnit\Framework\TestCase
     public function testRunForInvalidTask()
     {
         $command = $this->createReportCompletionCommand([
-            WorkerService::class => MockFactory::createWorkerService([
-                'get' => [
-                    'return' => \Mockery::mock(ThisWorker::class),
-                ],
-            ]),
             TaskService::class => MockFactory::createTaskService([
                 'getById' => [
                     'with' => self::TASK_ID,
