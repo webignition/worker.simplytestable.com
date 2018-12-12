@@ -50,26 +50,6 @@ class ApplicationState
         return $this->state;
     }
 
-    public function isActive()
-    {
-        return $this->isState(self::STATE_ACTIVE);
-    }
-
-    public function isAwaitingActivationVerification()
-    {
-        return $this->isState(self::STATE_AWAITING_ACTIVATION_VERIFICATION);
-    }
-
-    public function isNew()
-    {
-        return $this->isState(self::STATE_NEW);
-    }
-
-    private function isState(string $state)
-    {
-        return $state === $this->get();
-    }
-
     private function readState(): string
     {
         $state = self::STATE_NEW;

@@ -51,7 +51,7 @@ class ApplicationStateTest extends AbstractBaseTestCase
      * @param string $state
      * @param string $expectedState
      */
-    public function testSetGet($state, $expectedState)
+    public function testSetGet(string $state, string $expectedState)
     {
         $returnValue = $this->applicationState->set($state);
 
@@ -61,10 +61,7 @@ class ApplicationStateTest extends AbstractBaseTestCase
         $this->applicationState->set(ApplicationState::DEFAULT_STATE);
     }
 
-    /**
-     * @return array
-     */
-    public function setGetDataProvider()
+    public function setGetDataProvider(): array
     {
         return [
             ApplicationState::STATE_ACTIVE => [
@@ -90,66 +87,5 @@ class ApplicationStateTest extends AbstractBaseTestCase
 
         $this->assertFalse($returnValue);
         $this->assertEquals($previousState, $this->applicationState->get());
-    }
-
-    /**
-     * @dataProvider isInStateDataProvider
-     *
-     * @param string $state
-     * @param bool $expectedIsActive
-     * @param bool $expectedIsAwaitingActivationVerification
-     * @param bool $expectedIsNew
-     */
-    public function testIsInState(
-        $state,
-        $expectedIsActive,
-        $expectedIsAwaitingActivationVerification,
-        $expectedIsNew
-    ) {
-        $this->applicationState->set($state);
-
-        $this->assertEquals(
-            $expectedIsActive,
-            $this->applicationState->isActive()
-        );
-
-        $this->assertEquals(
-            $expectedIsAwaitingActivationVerification,
-            $this->applicationState->isAwaitingActivationVerification()
-        );
-
-        $this->assertEquals(
-            $expectedIsNew,
-            $this->applicationState->isNew()
-        );
-
-        $this->applicationState->set(ApplicationState::DEFAULT_STATE);
-    }
-
-    /**
-     * @return array
-     */
-    public function isInStateDataProvider()
-    {
-        return [
-            ApplicationState::STATE_ACTIVE => [
-                'state' => ApplicationState::STATE_ACTIVE,
-                'expectedIsActive' => true,
-                'expectedIsAwaitingActivationVerification' => false,
-                'expectedIsNew' => false,
-            ],
-            ApplicationState::STATE_AWAITING_ACTIVATION_VERIFICATION => [
-                'state' => ApplicationState::STATE_AWAITING_ACTIVATION_VERIFICATION,
-                'expectedIsInActiveState' => false,
-                'expectedIsAwaitingActivationVerification' => true,
-                'expectedIsNew' => false,
-            ],
-            ApplicationState::STATE_NEW => [
-                'state' => ApplicationState::STATE_NEW,
-                'expectedIsInActiveState' => false,
-                'expectedIsAwaitingActivationVerification' => false,
-                'expectedIsNew' => true,
-            ],
-        ];
     }
 }
