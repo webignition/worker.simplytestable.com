@@ -89,7 +89,6 @@ services:
     App\Services\WorkerService:
       public: true
       arguments:
-        $salt: '%kernel.secret%'
         $hostname: '%hostname%'
         $token: '%token%'
 
