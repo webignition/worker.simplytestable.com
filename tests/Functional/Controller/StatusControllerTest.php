@@ -2,10 +2,14 @@
 
 namespace App\Tests\Functional\Controller;
 
+use App\Services\ApplicationState;
+
 class StatusControllerTest extends AbstractControllerTest
 {
     public function testIndexAction()
     {
+        $applicationState = self::$container->get(ApplicationState::class);
+
         $this->client->request('GET', $this->router->generate('status'));
         $response = $this->client->getResponse();
 
@@ -15,5 +19,6 @@ class StatusControllerTest extends AbstractControllerTest
         $responseData = json_decode($response->getContent(), true);
 
         $this->assertSame(self::$container->getParameter('hostname'), $responseData['hostname']);
+        $this->assertSame($applicationState->get(), $responseData['state']);
     }
 }

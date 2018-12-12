@@ -52,13 +52,19 @@ class WorkerService
      */
     private $coreApplicationHttpClient;
 
+    /**
+     * @var ApplicationState
+     */
+    private $applicationState;
+
     public function __construct(
         string $salt,
         string $hostname,
         string $token,
         EntityManagerInterface $entityManager,
         LoggerInterface $logger,
-        CoreApplicationHttpClient $coreApplicationHttpClient
+        CoreApplicationHttpClient $coreApplicationHttpClient,
+        ApplicationState $applicationState
     ) {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
@@ -66,6 +72,7 @@ class WorkerService
         $this->hostname = $hostname;
         $this->token = $token;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
+        $this->applicationState = $applicationState;
 
         $this->entityRepository = $entityManager->getRepository(ThisWorker::class);
     }
@@ -99,6 +106,8 @@ class WorkerService
      */
     private function create()
     {
+        $this->applicationState->set(ApplicationState::STATE_NEW);
+
         $thisWorker = new ThisWorker();
         $thisWorker->setHostname($this->hostname);
         $thisWorker->setState(ThisWorker::STATE_NEW);
@@ -122,9 +131,7 @@ class WorkerService
     {
         $this->logger->info("WorkerService::activate: Initialising");
 
-        $thisWorker = $this->get();
-
-        if (self::STATE_NEW !== $thisWorker->getState()) {
+        if (self::STATE_NEW !== $this->applicationState->get()) {
             $this->logger->info("WorkerService::activate: This worker is not new and cannot be activated");
 
             return 0;
@@ -176,40 +183,15 @@ class WorkerService
             return $responseCode;
         }
 
-        $this->setState(ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION);
+        $this->applicationState->set(ApplicationState::STATE_AWAITING_ACTIVATION_VERIFICATION);
 
         return 0;
     }
 
-    public function setActive()
-    {
-        $this->setState(ThisWorker::STATE_ACTIVE);
-    }
-
-    /**
-     * @param string $stateName
-     */
-    private function setState($stateName)
-    {
-        $thisWorker = $this->get();
-        $thisWorker->setState($stateName);
-
-        $this->entityManager->persist($thisWorker);
-        $this->entityManager->flush();
-    }
-
     public function verify()
     {
-        $thisWorker = $this->get();
-
-        if (self::STATE_AWAITING_ACTIVATION_VERIFICATION !== $thisWorker->getState()) {
-            $this->logger->info("WorkerService::verify: This worker is not awaiting activation verification");
-
-            return true;
+        if (self::STATE_AWAITING_ACTIVATION_VERIFICATION === $this->applicationState->get()) {
+            $this->applicationState->set(ApplicationState::STATE_ACTIVE);
         }
-
-        $this->setState(ThisWorker::STATE_ACTIVE);
-
-        return true;
     }
 }
