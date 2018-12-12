@@ -2,6 +2,7 @@
 
 namespace App\Entity\Task;
 
+use App\Entity\CachedResource;
 use App\Model\Task\Type;
 use Doctrine\ORM\Mapping as ORM;
 use App\Model\Task\Parameters;
@@ -91,6 +92,13 @@ class Task implements \JsonSerializable
     private $parentTask;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(type="array")
+     */
+    private $resourceIndex = [];
+
+    /**
      * @var Parameters
      */
     private $parametersObject;
@@ -166,6 +174,20 @@ class Task implements \JsonSerializable
     public function getParentTask(): ?Task
     {
         return $this->parentTask;
+    }
+
+    public function addResource(CachedResource $resource)
+    {
+        $key = $resource->getId();
+
+        if (!array_key_exists($key, $this->resourceIndex)) {
+            $this->resourceIndex[$key] = $resource->getUrl();
+        }
+    }
+
+    public function getResourceIndex(): array
+    {
+        return $this->resourceIndex;
     }
 
     public function setStartDateTime(\DateTime $startDateTime)
