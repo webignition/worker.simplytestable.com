@@ -86,12 +86,6 @@ services:
         - [setWorkerProcessCount, ['%env(WORKER_PROCESS_COUNT)%']]
         - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
 
-    App\Services\WorkerService:
-      public: true
-      arguments:
-        $hostname: '%hostname%'
-        $token: '%token%'
-
     GuzzleHttp\Cookie\CookieJarInterface:
       class: GuzzleHttp\Cookie\CookieJar
 
@@ -166,3 +160,9 @@ services:
     App\Services\ApplicationState:
       arguments:
         $stateResourcePath: '%kernel.project_dir%/config/state/%kernel.environment%'
+
+    App\Services\ApplicationConfiguration:
+      public: true
+      arguments:
+        $hostname: '%hostname%'
+        $token: '%token%'

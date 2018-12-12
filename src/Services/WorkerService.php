@@ -20,16 +20,6 @@ class WorkerService
     private $logger;
 
     /**
-     * @var string
-     */
-    private $hostname;
-
-    /**
-     * @var string
-     */
-    private $token;
-
-    /**
      * @var CoreApplicationHttpClient
      */
     private $coreApplicationHttpClient;
@@ -39,28 +29,21 @@ class WorkerService
      */
     private $applicationState;
 
+    /**
+     * @var ApplicationConfiguration
+     */
+    private $applicationConfiguration;
+
     public function __construct(
-        string $hostname,
-        string $token,
         LoggerInterface $logger,
         CoreApplicationHttpClient $coreApplicationHttpClient,
-        ApplicationState $applicationState
+        ApplicationState $applicationState,
+        ApplicationConfiguration $applicationConfiguration
     ) {
         $this->logger = $logger;
-        $this->hostname = $hostname;
-        $this->token = $token;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
         $this->applicationState = $applicationState;
-    }
-
-    public function getHostname(): string
-    {
-        return $this->hostname;
-    }
-
-    public function getToken(): string
-    {
-        return $this->token;
+        $this->applicationConfiguration = $applicationConfiguration;
     }
 
     /**
@@ -85,8 +68,8 @@ class WorkerService
             'worker_activate',
             [],
             [
-                'hostname' => $this->getHostname(),
-                'token' => $this->getToken(),
+                'hostname' => $this->applicationConfiguration->getHostname(),
+                'token' => $this->applicationConfiguration->getToken(),
             ]
         );
 

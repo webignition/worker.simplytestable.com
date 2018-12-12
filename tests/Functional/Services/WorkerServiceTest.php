@@ -152,16 +152,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
         ];
     }
 
-    public function testGetHostname()
-    {
-        $this->assertSame(self::$container->getParameter('hostname'), $this->workerService->getHostname());
-    }
-
-    public function testGetToken()
-    {
-        $this->assertSame(self::$container->getParameter('token'), $this->workerService->getToken());
-    }
-
     protected function assertPostConditions()
     {
         parent::assertPostConditions();

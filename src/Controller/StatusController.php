@@ -3,21 +3,21 @@
 namespace App\Controller;
 
 use App\Model\HttpCacheStats;
+use App\Services\ApplicationConfiguration;
 use App\Services\ApplicationState;
 use App\Services\HttpCache;
-use App\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class StatusController extends AbstractController
 {
     public function indexAction(
-        WorkerService $workerService,
+        ApplicationConfiguration $applicationConfiguration,
         ApplicationState $applicationState,
         HttpCache $httpCache
     ): JsonResponse {
         $status = [
-            'hostname' => $workerService->getHostname(),
+            'hostname' => $applicationConfiguration->getHostname(),
             'state' => $applicationState->get(),
             'version' => $this->getLatestGitHash(),
         ];

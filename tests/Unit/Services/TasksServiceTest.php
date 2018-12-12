@@ -3,12 +3,12 @@
 namespace App\Tests\Unit\Services;
 
 use App\Exception\Services\TasksService\RequestException;
+use App\Services\ApplicationConfiguration;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use App\Services\CoreApplicationHttpClient;
 use App\Services\TaskService;
 use App\Services\TasksService;
-use App\Services\WorkerService;
 
 class TasksServiceTest extends \PHPUnit\Framework\TestCase
 {
@@ -45,8 +45,8 @@ class TasksServiceTest extends \PHPUnit\Framework\TestCase
             $services[LoggerInterface::class] = \Mockery::mock(LoggerInterface::class);
         }
 
-        if (!isset($services[WorkerService::class])) {
-            $services[WorkerService::class] = \Mockery::mock(WorkerService::class);
+        if (!isset($services[ApplicationConfiguration::class])) {
+            $services[ApplicationConfiguration::class] = \Mockery::mock(ApplicationConfiguration::class);
         }
 
         if (!isset($services[TaskService::class])) {
@@ -59,7 +59,7 @@ class TasksServiceTest extends \PHPUnit\Framework\TestCase
 
         return new TasksService(
             $services[LoggerInterface::class],
-            $services[WorkerService::class],
+            $services[ApplicationConfiguration::class],
             $services[TaskService::class],
             $services[CoreApplicationHttpClient::class]
         );
