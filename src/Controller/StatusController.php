@@ -21,7 +21,7 @@ class StatusController extends AbstractController
         $status = array();
         $worker = $workerService->get();
 
-        $status['hostname'] = $worker->getHostname();
+        $status['hostname'] = $workerService->getHostname();
         $status['state'] = $worker->getState();
         $status['version'] = $this->getLatestGitHash();
 
