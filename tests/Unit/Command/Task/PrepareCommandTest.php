@@ -6,7 +6,6 @@ use App\Command\Task\PrepareCommand;
 use App\Services\TaskPreparer;
 use Psr\Log\LoggerInterface;
 use App\Services\TaskService;
-use App\Services\WorkerService;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\MockFactory;
@@ -52,12 +51,7 @@ class PrepareCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param array $services
-     *
-     * @return PrepareCommand
-     */
-    private function createPerformCommand($services = [])
+    private function createPerformCommand(array $services = []): PrepareCommand
     {
         if (!isset($services[LoggerInterface::class])) {
             $services[LoggerInterface::class] = MockFactory::createLogger();
@@ -67,10 +61,6 @@ class PrepareCommandTest extends \PHPUnit\Framework\TestCase
             $services[TaskService::class] = MockFactory::createTaskService();
         }
 
-        if (!isset($services[WorkerService::class])) {
-            $services[WorkerService::class] = MockFactory::createWorkerService();
-        }
-
         if (!isset($services[TaskPreparer::class])) {
             $services[TaskPreparer::class] = \Mockery::mock(TaskPreparer::class);
         }
@@ -78,7 +68,6 @@ class PrepareCommandTest extends \PHPUnit\Framework\TestCase
         return new PrepareCommand(
             $services[LoggerInterface::class],
             $services[TaskService::class],
-            $services[WorkerService::class],
             $services[TaskPreparer::class]
         );
     }

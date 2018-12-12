@@ -6,7 +6,6 @@ use App\Services\TaskCompletionReporter;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use App\Services\TaskService;
-use App\Services\WorkerService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,10 +22,9 @@ class ReportCompletionCommand extends AbstractTaskCommand
     public function __construct(
         LoggerInterface $logger,
         TaskService $taskService,
-        WorkerService $workerService,
         TaskCompletionReporter $taskCompletionReporter
     ) {
-        parent::__construct($logger, $taskService, $workerService);
+        parent::__construct($logger, $taskService);
 
         $this->taskCompletionReporter = $taskCompletionReporter;
     }

@@ -6,7 +6,6 @@ use App\Services\TaskPerformer;
 use Psr\Log\LoggerInterface;
 use App\Command\Task\PerformCommand;
 use App\Services\TaskService;
-use App\Services\WorkerService;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\MockFactory;
@@ -53,12 +52,7 @@ class PerformCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param array $services
-     *
-     * @return PerformCommand
-     */
-    private function createPerformCommand($services = [])
+    private function createPerformCommand(array $services = []): PerformCommand
     {
         if (!isset($services[LoggerInterface::class])) {
             $services[LoggerInterface::class] = MockFactory::createLogger();
@@ -66,10 +60,6 @@ class PerformCommandTest extends \PHPUnit\Framework\TestCase
 
         if (!isset($services[TaskService::class])) {
             $services[TaskService::class] = MockFactory::createTaskService();
-        }
-
-        if (!isset($services[WorkerService::class])) {
-            $services[WorkerService::class] = MockFactory::createWorkerService();
         }
 
         if (!isset($services[ResqueQueueService::class])) {
@@ -83,7 +73,6 @@ class PerformCommandTest extends \PHPUnit\Framework\TestCase
         return new PerformCommand(
             $services[LoggerInterface::class],
             $services[TaskService::class],
-            $services[WorkerService::class],
             $services[ResqueQueueService::class],
             $services[TaskPerformer::class]
         );

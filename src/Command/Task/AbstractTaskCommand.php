@@ -4,7 +4,6 @@ namespace App\Command\Task;
 
 use App\Entity\Task\Task;
 use App\Services\TaskService;
-use App\Services\WorkerService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,22 +25,16 @@ abstract class AbstractTaskCommand extends Command
     protected $taskService;
 
     /**
-     * @var WorkerService
-     */
-    protected $workerService;
-
-    /**
      * @var Task
      */
     protected $task;
 
-    public function __construct(LoggerInterface $logger, TaskService $taskService, WorkerService $workerService)
+    public function __construct(LoggerInterface $logger, TaskService $taskService)
     {
         parent::__construct(null);
 
         $this->logger = $logger;
         $this->taskService = $taskService;
-        $this->workerService = $workerService;
     }
 
     /**
