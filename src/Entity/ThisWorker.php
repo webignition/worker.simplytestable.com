@@ -77,9 +77,4 @@ class ThisWorker
     {
         return $this->activationToken;
     }
-
-    public function isActive(): bool
-    {
-        return self::STATE_ACTIVE == $this->state;
-    }
 }
