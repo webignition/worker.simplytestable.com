@@ -7,7 +7,6 @@ use Psr\Log\LoggerInterface;
 use App\Resque\Job\TasksRequestJob;
 use App\Services\Resque\QueueService as ResqueQueueService;
 use App\Services\TaskService;
-use App\Services\WorkerService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,11 +28,10 @@ class PerformCommand extends AbstractTaskCommand
     public function __construct(
         LoggerInterface $logger,
         TaskService $taskService,
-        WorkerService $workerService,
         ResqueQueueService $resqueQueueService,
         TaskPerformer $taskPerformer
     ) {
-        parent::__construct($logger, $taskService, $workerService);
+        parent::__construct($logger, $taskService);
 
         $this->logger = $logger;
         $this->taskService = $taskService;
