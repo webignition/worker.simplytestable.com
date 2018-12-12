@@ -13,6 +13,10 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptio
 
 class WorkerService
 {
+    const STATE_ACTIVE = 'active';
+    const STATE_AWAITING_ACTIVATION_VERIFICATION = 'awaiting-activation-verification';
+    const STATE_NEW = 'new';
+
     /**
      * @var EntityManagerInterface
      */
@@ -120,7 +124,7 @@ class WorkerService
 
         $thisWorker = $this->get();
 
-        if (!$thisWorker->isNew()) {
+        if (self::STATE_NEW !== $thisWorker->getState()) {
             $this->logger->info("WorkerService::activate: This worker is not new and cannot be activated");
 
             return 0;
@@ -198,7 +202,7 @@ class WorkerService
     {
         $thisWorker = $this->get();
 
-        if (!$thisWorker->isAwaitingActivationVerification()) {
+        if (self::STATE_AWAITING_ACTIVATION_VERIFICATION !== $thisWorker->getState()) {
             $this->logger->info("WorkerService::verify: This worker is not awaiting activation verification");
 
             return true;

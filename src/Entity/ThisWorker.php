@@ -77,19 +77,4 @@ class ThisWorker
     {
         return $this->activationToken;
     }
-
-    public function isNew(): bool
-    {
-        return  self::STATE_NEW == $this->state;
-    }
-
-    public function isAwaitingActivationVerification(): bool
-    {
-        return self::STATE_AWAITING_ACTIVATION_VERIFICATION == $this->state;
-    }
-
-    public function isActive(): bool
-    {
-        return self::STATE_ACTIVE == $this->state;
-    }
 }
