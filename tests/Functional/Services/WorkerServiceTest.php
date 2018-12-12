@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Services;
 
+use App\Services\ApplicationState;
 use Doctrine\ORM\ORMException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
@@ -30,6 +31,11 @@ class WorkerServiceTest extends AbstractBaseTestCase
     private $httpHistoryContainer;
 
     /**
+     * @var ApplicationState
+     */
+    private $applicationState;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -39,16 +45,15 @@ class WorkerServiceTest extends AbstractBaseTestCase
         $this->workerService = self::$container->get(WorkerService::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
+        $this->applicationState = self::$container->get(ApplicationState::class);
     }
 
     /**
      * @throws GuzzleException
-     * @throws ORMException
      */
     public function testActivateWhenNotNew()
     {
-        $worker = $this->workerService->get();
-        $this->setWorkerState($worker, ThisWorker::STATE_ACTIVE);
+        $this->applicationState->set(ApplicationState::STATE_ACTIVE);
 
         $this->assertEquals(0, $this->workerService->activate());
     }
@@ -58,24 +63,22 @@ class WorkerServiceTest extends AbstractBaseTestCase
      *
      * @param array $httpFixtures
      * @param int $expectedReturnCode
-     * @param string $expectedWorkerState
+     * @param string $expectedApplicationState
      *
      * @throws GuzzleException
-     * @throws ORMException
      */
-    public function testActivate(array $httpFixtures, $expectedReturnCode, $expectedWorkerState)
+    public function testActivate(array $httpFixtures, int $expectedReturnCode, string $expectedApplicationState)
     {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $worker = $this->workerService->get();
-        $this->setWorkerState($worker, ThisWorker::STATE_NEW);
+        $this->applicationState->set(ApplicationState::STATE_NEW);
 
         $this->assertEquals(
             $expectedReturnCode,
             $this->workerService->activate()
         );
 
-        $this->assertEquals($expectedWorkerState, $worker->getState());
+        $this->assertEquals($expectedApplicationState, $this->applicationState->get());
 
         $lastRequest = $this->httpHistoryContainer->getLastRequest();
         $this->assertEquals('application/x-www-form-urlencoded', $lastRequest->getHeaderLine('content-type'));
@@ -92,10 +95,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function activateDataProvider()
+    public function activateDataProvider(): array
     {
         $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
 
@@ -105,26 +105,19 @@ class WorkerServiceTest extends AbstractBaseTestCase
                     new Response(200),
                 ],
                 'expectedReturnCode' => 0,
-                'expectedWorkerState' => ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION,
+                'expectedApplicationState' => ApplicationState::STATE_AWAITING_ACTIVATION_VERIFICATION,
             ],
             'failure http 404' => [
                 'httpFixtures' => [
                     new Response(404),
                 ],
                 'expectedReturnCode' => 404,
-                'expectedWorkerState' => ThisWorker::STATE_NEW,
+                'expectedApplicationState' => ApplicationState::STATE_NEW,
             ],
             'failure curl 28' => [
-                'httpFixtures' => [
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                ],
+                'httpFixtures' => array_fill(0, 6, $curl28ConnectException),
                 'expectedReturnCode' => 28,
-                'expectedWorkerState' => ThisWorker::STATE_NEW,
+                'expectedApplicationState' => ApplicationState::STATE_NEW,
             ],
         ];
     }
@@ -161,74 +154,33 @@ class WorkerServiceTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider stateNameDataProvider
-     *
-     * @param string $stateName
-     *
-     * @throws ORMException
-     */
-    public function testSetActive($stateName)
-    {
-        $worker = $this->workerService->get();
-        $this->setWorkerState($worker, $stateName);
-
-        $this->workerService->setActive();
-
-        $this->assertEquals(ThisWorker::STATE_ACTIVE, $worker->getState());
-    }
-
-    /**
-     * @return array
-     */
-    public function stateNameDataProvider()
-    {
-        return [
-            'new' => [
-                ThisWorker::STATE_NEW,
-            ],
-            'awaiting-activation-verification' => [
-                ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION,
-            ],
-            'active' => [
-                ThisWorker::STATE_ACTIVE,
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider verifyDataProvider
      *
-     * @param string $stateName
-     * @param string $expectedWorkerState
-     *
-     * @throws ORMException
+     * @param string $applicationState
+     * @param string $expectedApplicationState
      */
-    public function testVerify($stateName, $expectedWorkerState)
+    public function testVerify(string $applicationState, string $expectedApplicationState)
     {
-        $worker = $this->workerService->get();
-        $this->setWorkerState($worker, $stateName);
+        $this->applicationState->set($applicationState);
 
         $this->workerService->verify();
-        $this->assertEquals($expectedWorkerState, $worker->getState());
+        $this->assertEquals($expectedApplicationState, $this->applicationState->get());
     }
 
-    /**
-     * @return array
-     */
-    public function verifyDataProvider()
+    public function verifyDataProvider(): array
     {
         return [
             'new' => [
-                'stateName' => ThisWorker::STATE_NEW,
-                'expectedWorkerState' => ThisWorker::STATE_NEW,
+                'applicationState' => ThisWorker::STATE_NEW,
+                'expectedApplicationState' => ThisWorker::STATE_NEW,
             ],
             'awaiting-activation-verification' => [
-                'stateName' => ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION,
-                'expectedWorkerState' => ThisWorker::STATE_ACTIVE,
+                'applicationState' => ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION,
+                'expectedApplicationState' => ThisWorker::STATE_ACTIVE,
             ],
             'active' => [
-                'stateName' => ThisWorker::STATE_ACTIVE,
-                'expectedWorkerState' => ThisWorker::STATE_ACTIVE,
+                'applicationState' => ThisWorker::STATE_ACTIVE,
+                'expectedApplicationState' => ThisWorker::STATE_ACTIVE,
             ],
         ];
     }
