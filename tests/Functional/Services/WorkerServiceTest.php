@@ -10,6 +10,7 @@ use App\Services\WorkerService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Services\HttpMockHandler;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class WorkerServiceTest extends AbstractBaseTestCase
 {
@@ -24,6 +25,11 @@ class WorkerServiceTest extends AbstractBaseTestCase
     private $httpMockHandler;
 
     /**
+     * @var HttpHistoryContainer
+     */
+    private $httpHistoryContainer;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -32,6 +38,7 @@ class WorkerServiceTest extends AbstractBaseTestCase
 
         $this->workerService = self::$container->get(WorkerService::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
+        $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
 
     /**
@@ -69,6 +76,20 @@ class WorkerServiceTest extends AbstractBaseTestCase
         );
 
         $this->assertEquals($expectedWorkerState, $worker->getState());
+
+        $lastRequest = $this->httpHistoryContainer->getLastRequest();
+        $this->assertEquals('application/x-www-form-urlencoded', $lastRequest->getHeaderLine('content-type'));
+
+        $postedData = [];
+        parse_str(urldecode($lastRequest->getBody()->getContents()), $postedData);
+
+        $this->assertEquals(
+            [
+                'hostname' => self::$container->getParameter('hostname'),
+                'token' => self::$container->getParameter('token'),
+            ],
+            $postedData
+        );
     }
 
     /**
@@ -210,6 +231,16 @@ class WorkerServiceTest extends AbstractBaseTestCase
                 'expectedWorkerState' => ThisWorker::STATE_ACTIVE,
             ],
         ];
+    }
+
+    public function testGetHostname()
+    {
+        $this->assertSame(self::$container->getParameter('hostname'), $this->workerService->getHostname());
+    }
+
+    public function testGetToken()
+    {
+        $this->assertSame(self::$container->getParameter('token'), $this->workerService->getToken());
     }
 
     /**

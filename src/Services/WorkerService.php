@@ -39,6 +39,11 @@ class WorkerService
     private $hostname;
 
     /**
+     * @var string
+     */
+    private $token;
+
+    /**
      * @var CoreApplicationHttpClient
      */
     private $coreApplicationHttpClient;
@@ -46,6 +51,7 @@ class WorkerService
     public function __construct(
         string $salt,
         string $hostname,
+        string $token,
         EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         CoreApplicationHttpClient $coreApplicationHttpClient
@@ -54,9 +60,20 @@ class WorkerService
         $this->logger = $logger;
         $this->salt = $salt;
         $this->hostname = $hostname;
+        $this->token = $token;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
 
         $this->entityRepository = $entityManager->getRepository(ThisWorker::class);
+    }
+
+    public function getHostname(): string
+    {
+        return $this->hostname;
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
     }
 
     /**
@@ -113,8 +130,8 @@ class WorkerService
             'worker_activate',
             [],
             [
-                'hostname' => $thisWorker->getHostname(),
-                'token' => $thisWorker->getActivationToken()
+                'hostname' => $this->getHostname(),
+                'token' => $this->getToken(),
             ]
         );
 

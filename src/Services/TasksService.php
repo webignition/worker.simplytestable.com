@@ -109,8 +109,8 @@ class TasksService
             'tasks_request',
             [],
             [
-                'worker_hostname' => $this->workerService->get()->getHostname(),
-                'worker_token' => $this->workerService->get()->getActivationToken(),
+                'worker_hostname' => $this->workerService->getHostname(),
+                'worker_token' => $this->workerService->getToken(),
                 'limit' => $this->getLimit($requestedLimit)
             ]
         );
