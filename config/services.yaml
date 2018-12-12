@@ -166,3 +166,9 @@ services:
     App\Services\ApplicationState:
       arguments:
         $stateResourcePath: '%kernel.project_dir%/config/state/%kernel.environment%'
+
+    App\Services\ApplicationConfiguration:
+      public: true
+      arguments:
+        $hostname: '%hostname%'
+        $token: '%token%'
