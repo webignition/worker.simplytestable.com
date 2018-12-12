@@ -202,7 +202,7 @@ class WorkerService
     {
         $thisWorker = $this->get();
 
-        if (!$thisWorker->isAwaitingActivationVerification()) {
+        if (self::STATE_AWAITING_ACTIVATION_VERIFICATION === $thisWorker->getState()) {
             $this->logger->info("WorkerService::verify: This worker is not awaiting activation verification");
 
             return true;
