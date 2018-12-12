@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Services\ApplicationState;
 use App\Tests\Functional\AbstractBaseTestCase;
+use App\Tests\Services\ObjectPropertySetter;
 
 class ApplicationStateTest extends AbstractBaseTestCase
 {
@@ -24,6 +25,13 @@ class ApplicationStateTest extends AbstractBaseTestCase
 
     public function testGetWithNoStateFile()
     {
+        ObjectPropertySetter::setProperty(
+            $this->applicationState,
+            ApplicationState::class,
+            'state',
+            null
+        );
+
         $path = sprintf(
             '%s/config/state/%s',
             self::$container->getParameter('kernel.project_dir'),
