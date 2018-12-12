@@ -72,7 +72,7 @@ class ApplicationState
 
     private function readState(): string
     {
-        $state = self::DEFAULT_STATE;
+        $state = self::STATE_NEW;
 
         if (file_exists($this->stateResourcePath)) {
             $state = trim(file_get_contents($this->stateResourcePath));

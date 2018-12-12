@@ -22,6 +22,21 @@ class ApplicationStateTest extends AbstractBaseTestCase
         $this->applicationState = self::$container->get(ApplicationState::class);
     }
 
+    public function testGetWithNoStateFile()
+    {
+        $path = sprintf(
+            '%s/config/state/%s',
+            self::$container->getParameter('kernel.project_dir'),
+            self::$container->getParameter('kernel.environment')
+        );
+
+        if (file_exists($path)) {
+            unlink($path);
+        }
+
+        $this->assertEquals(ApplicationState::STATE_NEW, $this->applicationState->get());
+    }
+
     /**
      * @dataProvider setGetDataProvider
      *
