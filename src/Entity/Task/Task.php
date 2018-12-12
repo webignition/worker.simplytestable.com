@@ -248,9 +248,19 @@ class Task implements \JsonSerializable
         }
     }
 
+    /**
+     * @return Source[]
+     */
     public function getSources(): array
     {
-        return $this->sources;
+        $sources = [];
+
+        foreach ($this->sources as $sourceData) {
+            $source = Source::fromArray($sourceData);
+            $sources[$source->getUrl()] = $source;
+        }
+
+        return $sources;
     }
 
     public function jsonSerialize(): array

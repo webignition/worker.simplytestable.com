@@ -110,26 +110,10 @@ class TaskTest extends AbstractBaseTestCase
         $this->entityManager->flush();
 
         $expectedTaskSources = [
-            $htmlUrl => [
-                'url' => $htmlUrl,
-                'type' => Source::TYPE_CACHED_RESOURCE,
-                'value' => $htmlResource->getId(),
-            ],
-            $httpUnavailableUrl => [
-                'url' => $httpUnavailableUrl,
-                'type' => Source::TYPE_UNAVAILABLE,
-                'value' => 'http:404',
-            ],
-            $curlUnavailableUrl => [
-                'url' => $curlUnavailableUrl,
-                'type' => Source::TYPE_UNAVAILABLE,
-                'value' => 'curl:28',
-            ],
-            $unknownUnavailableUrl => [
-                'url' => $unknownUnavailableUrl,
-                'type' => Source::TYPE_UNAVAILABLE,
-                'value' => 'unknown:0',
-            ],
+            $htmlUrl => new Source($htmlUrl, Source::TYPE_CACHED_RESOURCE, $htmlResource->getId()),
+            $httpUnavailableUrl => new Source($httpUnavailableUrl, Source::TYPE_UNAVAILABLE, 'http:404'),
+            $curlUnavailableUrl => new Source($curlUnavailableUrl, Source::TYPE_UNAVAILABLE, 'curl:28'),
+            $unknownUnavailableUrl => new Source($unknownUnavailableUrl, Source::TYPE_UNAVAILABLE, 'unknown:0'),
         ];
 
         $this->assertEquals($expectedTaskSources, $task->getSources());
