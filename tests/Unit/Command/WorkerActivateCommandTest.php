@@ -3,7 +3,6 @@
 namespace App\Tests\Unit\Command;
 
 use App\Command\WorkerActivateCommand;
-use App\Entity\ThisWorker;
 use App\Services\WorkerService;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\MockFactory;
@@ -34,14 +33,9 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
 
     public function runDataProvider(): array
     {
-        $worker = \Mockery::mock(ThisWorker::class);
-
         return [
             'success' => [
                 'workerService'=> MockFactory::createWorkerService([
-                    'get' => [
-                        'return' => $worker,
-                    ],
                     'activate' => [
                         'return' => 0,
                     ],
@@ -50,9 +44,6 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
             ],
             'unknown error' => [
                 'workerService'=> MockFactory::createWorkerService([
-                    'get' => [
-                        'return' => $worker,
-                    ],
                     'activate' => [
                         'return' => 1,
                     ],
@@ -61,9 +52,6 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
             ],
             'http 404' => [
                 'workerService'=> MockFactory::createWorkerService([
-                    'get' => [
-                        'return' => $worker,
-                    ],
                     'activate' => [
                         'return' => 404,
                     ],
@@ -72,9 +60,6 @@ class WorkerActivateCommandTest extends \PHPUnit\Framework\TestCase
             ],
             'curl 28' => [
                 'workerService'=> MockFactory::createWorkerService([
-                    'get' => [
-                        'return' => $worker,
-                    ],
                     'activate' => [
                         'return' => 28,
                     ],

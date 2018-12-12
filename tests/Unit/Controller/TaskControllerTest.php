@@ -2,13 +2,11 @@
 
 namespace App\Tests\Unit\Controller;
 
-use App\Entity\ThisWorker;
 use Doctrine\ORM\EntityManagerInterface;
 use Mockery\MockInterface;
 use App\Controller\TaskController;
 use App\Request\Task\CancelRequest;
 use App\Services\TaskService;
-use App\Services\WorkerService;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use App\Tests\Factory\MockFactory;
 
@@ -21,13 +19,7 @@ class TaskControllerTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $taskController = $this->createTaskController([
-            WorkerService::class => MockFactory::createWorkerService([
-                'get' => [
-                    'return' => \Mockery::mock(ThisWorker::class),
-                ],
-            ]),
-        ]);
+        $taskController = $this->createTaskController();
 
         $cancelRequest = new CancelRequest(null);
 
@@ -45,10 +37,6 @@ class TaskControllerTest extends \PHPUnit\Framework\TestCase
      */
     private function createTaskController($services = [])
     {
-        if (!isset($services[WorkerService::class])) {
-            $services[WorkerService::class] = MockFactory::createWorkerService();
-        }
-
         if (!isset($services[TaskService::class])) {
             $services[TaskService::class] = MockFactory::createTaskService();
         }

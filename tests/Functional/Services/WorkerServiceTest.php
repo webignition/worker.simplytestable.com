@@ -3,10 +3,8 @@
 namespace App\Tests\Functional\Services;
 
 use App\Services\ApplicationState;
-use Doctrine\ORM\ORMException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
-use App\Entity\ThisWorker;
 use App\Services\WorkerService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\ConnectExceptionFactory;
@@ -140,16 +138,16 @@ class WorkerServiceTest extends AbstractBaseTestCase
     {
         return [
             'new' => [
-                'applicationState' => ThisWorker::STATE_NEW,
-                'expectedApplicationState' => ThisWorker::STATE_NEW,
+                'applicationState' => ApplicationState::STATE_NEW,
+                'expectedApplicationState' => ApplicationState::STATE_NEW,
             ],
             'awaiting-activation-verification' => [
-                'applicationState' => ThisWorker::STATE_AWAITING_ACTIVATION_VERIFICATION,
-                'expectedApplicationState' => ThisWorker::STATE_ACTIVE,
+                'applicationState' => ApplicationState::STATE_AWAITING_ACTIVATION_VERIFICATION,
+                'expectedApplicationState' => ApplicationState::STATE_ACTIVE,
             ],
             'active' => [
-                'applicationState' => ThisWorker::STATE_ACTIVE,
-                'expectedApplicationState' => ThisWorker::STATE_ACTIVE,
+                'applicationState' => ApplicationState::STATE_ACTIVE,
+                'expectedApplicationState' => ApplicationState::STATE_ACTIVE,
             ],
         ];
     }
