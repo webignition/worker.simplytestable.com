@@ -196,21 +196,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
     }
 
     /**
-     * @param ThisWorker $worker
-     * @param string $stateName
-     *
-     * @throws ORMException
-     */
-    private function setWorkerState(ThisWorker $worker, $stateName)
-    {
-        $entityManager = self::$container->get('doctrine.orm.entity_manager');
-
-        $worker->setState($stateName);
-        $entityManager->persist($worker);
-        $entityManager->flush();
-    }
-
-    /**
      * @throws ORMException
      */
     private function removeWorker()
