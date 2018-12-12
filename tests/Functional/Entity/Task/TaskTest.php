@@ -4,7 +4,9 @@ namespace App\Tests\Functional\Entity\Task;
 
 use App\Entity\CachedResource;
 use App\Entity\Task\Task;
+use App\Model\Source;
 use App\Model\Task\TypeInterface;
+use App\Services\SourceFactory;
 use App\Services\TaskService;
 use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -65,6 +67,13 @@ class TaskTest extends AbstractBaseTestCase
 
     public function testResourceIndexPopulateAndRetrieve()
     {
+        $htmlUrl = 'http://example.com';
+        $httpUnavailableUrl = 'http://example.com/404';
+        $curlUnavailableUrl = 'http://example.com/timeout';
+        $unknownUnavailableUrl = 'http://example.com/unknown';
+
+        $sourceFactory = self::$container->get(SourceFactory::class);
+
         $task = $this->taskService->create(
             'http://example.com/',
             $this->taskTypeService->get(TypeInterface::TYPE_HTML_VALIDATION),
@@ -77,33 +86,35 @@ class TaskTest extends AbstractBaseTestCase
         $this->assertNotNull($task->getId());
 
         $htmlResource = new CachedResource();
-        $htmlResource->setUrl('http://example.com/');
+        $htmlResource->setUrl($htmlUrl);
         $htmlResource->setBody('<doctype html><html lang="en"></html>');
 
-        $cssResource = new CachedResource();
-        $cssResource->setUrl('http://example.com/style.css');
-        $cssResource->setBody('css');
-
         $this->entityManager->persist($htmlResource);
-        $this->entityManager->persist($cssResource);
         $this->entityManager->flush();
 
         $this->assertNotNull($htmlResource->getId());
-        $this->assertNotNull($cssResource->getId());
 
-        $task->addResource($htmlResource);
-        $task->addResource($cssResource);
+        $htmlSource = $sourceFactory->fromCachedResource($htmlResource);
+        $httpUnavailableSource = $sourceFactory->createHttpFailedSource($httpUnavailableUrl, 404);
+        $curlUnavailableResource = $sourceFactory->createCurlFailedSource($curlUnavailableUrl, 28);
+        $unknownUnavailableResource = $sourceFactory->createUnknownFailedSource($unknownUnavailableUrl);
+
+        $task->addSource($htmlSource);
+        $task->addSource($httpUnavailableSource);
+        $task->addSource($curlUnavailableResource);
+        $task->addSource($unknownUnavailableResource);
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
-        $this->assertEquals(
-            [
-                $htmlResource->getId() => $htmlResource->getUrl(),
-                $cssResource->getId() => $cssResource->getUrl(),
-            ],
-            $task->getResourceIndex()
-        );
+        $expectedTaskSources = [
+            $htmlUrl => new Source($htmlUrl, Source::TYPE_CACHED_RESOURCE, $htmlResource->getId()),
+            $httpUnavailableUrl => new Source($httpUnavailableUrl, Source::TYPE_UNAVAILABLE, 'http:404'),
+            $curlUnavailableUrl => new Source($curlUnavailableUrl, Source::TYPE_UNAVAILABLE, 'curl:28'),
+            $unknownUnavailableUrl => new Source($unknownUnavailableUrl, Source::TYPE_UNAVAILABLE, 'unknown:0'),
+        ];
+
+        $this->assertEquals($expectedTaskSources, $task->getSources());
 
         $taskId = $task->getId();
 
@@ -111,12 +122,6 @@ class TaskTest extends AbstractBaseTestCase
 
         $retievedTask = $this->entityManager->find(Task::class, $taskId);
 
-        $this->assertEquals(
-            [
-                $htmlResource->getId() => $htmlResource->getUrl(),
-                $cssResource->getId() => $cssResource->getUrl(),
-            ],
-            $retievedTask->getResourceIndex()
-        );
+        $this->assertEquals($expectedTaskSources, $retievedTask->getSources());
     }
 }
