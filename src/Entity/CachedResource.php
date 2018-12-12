@@ -26,6 +26,13 @@ class CachedResource
     private $url = '';
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="text")
+     */
+    private $contentType = '';
+
+    /**
      * @var CachedResource|string
      *
      * @ORM\Column(type="blob")
@@ -45,6 +52,16 @@ class CachedResource
     public function getUrl(): string
     {
         return $this->url;
+    }
+
+    public function setContentType(string $contentType)
+    {
+        $this->contentType = $contentType;
+    }
+
+    public function getContentType(): string
+    {
+        return $this->contentType;
     }
 
     public function setBody(string $body)
