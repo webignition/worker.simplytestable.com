@@ -101,4 +101,27 @@ class CachedResourceTest extends AbstractBaseTestCase
 
         $this->entityManager->flush();
     }
+
+    public function testCreateStatic()
+    {
+        $url = 'http://example.com/';
+        $contentType = 'text/plain';
+        $body = 'body content';
+
+        $resource = CachedResource::create($url, $contentType, $body);
+
+        $this->entityManager->persist($resource);
+        $this->entityManager->flush();
+
+        $id = $resource->getId();
+
+        $this->entityManager->clear();
+
+        /* @var CachedResource $retrievedResource */
+        $retrievedResource = $this->entityManager->find(CachedResource::class, $id);
+
+        $this->assertEquals($url, $retrievedResource->getUrl());
+        $this->assertEquals($contentType, $retrievedResource->getContentType());
+        $this->assertEquals($body, stream_get_contents($retrievedResource->getBody()));
+    }
 }

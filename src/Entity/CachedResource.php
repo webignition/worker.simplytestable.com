@@ -52,6 +52,21 @@ class CachedResource
      */
     private $body = '';
 
+    public static function create(string $url, string $contentType, $body = ''): CachedResource
+    {
+        if (null === $body) {
+            $body = '';
+        }
+
+        $cachedResouce = new static();
+        $cachedResouce->url = $url;
+        $cachedResouce->urlHash = md5($url);
+        $cachedResouce->contentType = $contentType;
+        $cachedResouce->body = $body;
+
+        return $cachedResouce;
+    }
+
     public function getId(): ?string
     {
         return $this->id;
