@@ -46,6 +46,9 @@ class SourceFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($id, $source->getValue());
         $this->assertNull($source->getFailureType());
         $this->assertNull($source->getFailureCode());
+        $this->assertTrue($source->isCachedResource());
+        $this->assertFalse($source->isUnavailable());
+        $this->assertFalse($source->isInvalid());
     }
 
     public function testCreateHttpFailedSource()
@@ -61,6 +64,9 @@ class SourceFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('http:404', $source->getValue());
         $this->assertEquals(Source::FAILURE_TYPE_HTTP, $source->getFailureType());
         $this->assertEquals($statusCode, $source->getFailureCode());
+        $this->assertFalse($source->isCachedResource());
+        $this->assertTrue($source->isUnavailable());
+        $this->assertFalse($source->isInvalid());
     }
 
     public function testCreateCurlFailedSource()
@@ -76,6 +82,9 @@ class SourceFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('curl:28', $source->getValue());
         $this->assertEquals(Source::FAILURE_TYPE_CURL, $source->getFailureType());
         $this->assertEquals($curlCode, $source->getFailureCode());
+        $this->assertFalse($source->isCachedResource());
+        $this->assertTrue($source->isUnavailable());
+        $this->assertFalse($source->isInvalid());
     }
 
     public function testCreateUnknownSource()
@@ -90,6 +99,26 @@ class SourceFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('unknown:0', $source->getValue());
         $this->assertEquals(Source::FAILURE_TYPE_UNKNOWN, $source->getFailureType());
         $this->assertEquals(0, $source->getFailureCode());
+        $this->assertFalse($source->isCachedResource());
+        $this->assertTrue($source->isUnavailable());
+        $this->assertFalse($source->isInvalid());
+    }
+
+    public function createInvalidSource()
+    {
+        $url = 'http://example.com/';
+
+        $source = $this->sourceFactory->createInvalidSource($url, Source::MESSAGE_INVALID_CONTENT_TYPE);
+
+        $this->assertInstanceOf(Source::class, $source);
+        $this->assertEquals($url, $source->getUrl());
+        $this->assertEquals(Source::TYPE_INVALID, $source->getType());
+        $this->assertEquals('invalid:invalid-content-type', $source->getValue());
+        $this->assertEquals(Source::FAILURE_TYPE_UNKNOWN, $source->getFailureType());
+        $this->assertEquals(0, $source->getFailureCode());
+        $this->assertFalse($source->isCachedResource());
+        $this->assertFalse($source->isUnavailable());
+        $this->assertTrue($source->isInvalid());
     }
 
     /**
