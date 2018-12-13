@@ -8,4 +8,5 @@ interface TaskPreparerInterface
 {
     public function prepare(Task $task): bool;
     public function handles(string $taskType): bool;
+    public function getPriority(): int;
 }
