@@ -2,6 +2,8 @@
 
 namespace App\Services\TaskTypePreparer;
 
+use App\Model\TaskPreparerCollection;
+
 class Factory
 {
     /**
@@ -14,14 +16,16 @@ class Factory
         $this->taskPreparers = $taskPreparers;
     }
 
-    public function getPreparer(string $taskType): ?TaskPreparerInterface
+    public function getPreparers(string $taskType): TaskPreparerCollection
     {
+        $taskPreparers = [];
+
         foreach ($this->taskPreparers as $taskPreparer) {
             if ($taskPreparer->handles($taskType)) {
-                return $taskPreparer;
+                $taskPreparers[] = $taskPreparer;
             }
         }
 
-        return null;
+        return new TaskPreparerCollection($taskPreparers);
     }
 }

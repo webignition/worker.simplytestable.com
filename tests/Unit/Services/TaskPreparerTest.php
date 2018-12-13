@@ -5,6 +5,7 @@ namespace App\Tests\Unit\Services;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use App\Model\Task\Type;
+use App\Model\TaskPreparerCollection;
 use App\Services\TaskPreparer;
 use App\Services\TaskTypePreparer\Factory;
 use App\Services\TaskTypePreparer\TaskPreparerInterface;
@@ -14,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TaskPreparerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testPrepareHasTaskTypePreparer()
+    public function testPrepareHasTaskPreparer()
     {
         $task = $this->createTask(Type::TYPE_HTML_VALIDATION);
 
@@ -33,7 +34,16 @@ class TaskPreparerTest extends \PHPUnit\Framework\TestCase
             ->once()
             ->with($task);
 
-        $taskTypePreparerFactory = $this->createTaskTypePreparerFactory($task, $taskTypePreparer);
+        $taskTypePreparer
+            ->shouldReceive('getPriority')
+            ->once()
+            ->andReturn(1);
+
+        $taskPreparerCollection = new TaskPreparerCollection([
+            $taskTypePreparer,
+        ]);
+
+        $taskTypePreparerFactory = $this->createTaskTypePreparerFactory($task, $taskPreparerCollection);
 
         $taskPreparer = new TaskPreparer($entityManager, $taskTypePreparerFactory, $eventDispatcher);
 
@@ -54,7 +64,7 @@ class TaskPreparerTest extends \PHPUnit\Framework\TestCase
         /* @var EventDispatcherInterface|MockInterface $eventDispatcher */
         $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
 
-        $taskTypePreparerFactory = $this->createTaskTypePreparerFactory($task, null);
+        $taskTypePreparerFactory = $this->createTaskTypePreparerFactory($task, new TaskPreparerCollection([]));
 
         $eventDispatcher
             ->shouldReceive('dispatch')
@@ -103,7 +113,7 @@ class TaskPreparerTest extends \PHPUnit\Framework\TestCase
         $taskTypePreparerFactory = \Mockery::mock(Factory::class);
 
         $taskTypePreparerFactory
-            ->shouldReceive('getPreparer')
+            ->shouldReceive('getPreparers')
             ->once()
             ->with($task->getType()->getName())
             ->andReturn($getPreparerReturnValue);

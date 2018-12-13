@@ -30,10 +30,12 @@ class TaskPreparer
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
-        $taskTypePreparer = $this->taskTypePreparerFactory->getPreparer($task->getType());
+        $taskPreparerCollection = $this->taskTypePreparerFactory->getPreparers($task->getType());
 
-        if ($taskTypePreparer) {
-            $taskTypePreparer->prepare($task);
+        if (count($taskPreparerCollection)) {
+            foreach ($taskPreparerCollection as $taskPreparer) {
+                $taskPreparer->prepare($task);
+            }
         } else {
             $this->eventDispatcher->dispatch(TaskEvent::TYPE_PREPARED, new TaskEvent($task));
 
