@@ -85,9 +85,7 @@ class TaskTest extends AbstractBaseTestCase
 
         $this->assertNotNull($task->getId());
 
-        $htmlResource = new CachedResource();
-        $htmlResource->setUrl($htmlUrl);
-        $htmlResource->setBody('<doctype html><html lang="en"></html>');
+        $htmlResource = CachedResource::create($htmlUrl, 'text/html', '<doctype html><html lang="en"></html>');
 
         $this->entityManager->persist($htmlResource);
         $this->entityManager->flush();

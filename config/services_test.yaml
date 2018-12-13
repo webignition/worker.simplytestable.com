@@ -42,3 +42,6 @@ services:
         - 'text/xml'
         - 'application/xhtml+xml'
       $allowUnknownResourceTypes: false
+
+  App\Services\CachedResourceManager:
+    public: true

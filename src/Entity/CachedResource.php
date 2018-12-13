@@ -6,6 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
+ * @ORM\Table(
+ *    uniqueConstraints={
+ *        @ORM\UniqueConstraint(name="hash_url_unique", columns={"urlHash"})
+ *    }
+ * )
  */
 class CachedResource
 {
@@ -28,6 +34,13 @@ class CachedResource
     /**
      * @var string
      *
+     * @ORM\Column(type="string", length=32)
+     */
+    private $urlHash;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(type="text")
      */
     private $contentType = '';
@@ -39,14 +52,29 @@ class CachedResource
      */
     private $body = '';
 
+    public static function create(string $url, string $contentType, $body = ''): CachedResource
+    {
+        if (null === $body) {
+            $body = '';
+        }
+
+        $cachedResouce = new static();
+        $cachedResouce->url = $url;
+        $cachedResouce->urlHash = static::createUrlHash($url);
+        $cachedResouce->contentType = $contentType;
+        $cachedResouce->body = $body;
+
+        return $cachedResouce;
+    }
+
+    public static function createUrlHash(string $url): string
+    {
+        return md5($url);
+    }
+
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function setUrl(string $url)
-    {
-        $this->url = $url;
     }
 
     public function getUrl(): string
@@ -54,19 +82,9 @@ class CachedResource
         return $this->url;
     }
 
-    public function setContentType(string $contentType)
-    {
-        $this->contentType = $contentType;
-    }
-
     public function getContentType(): string
     {
         return $this->contentType;
-    }
-
-    public function setBody(string $body)
-    {
-        $this->body = $body;
     }
 
     /**
