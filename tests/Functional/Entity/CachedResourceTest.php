@@ -30,11 +30,7 @@ class CachedResourceTest extends AbstractBaseTestCase
      */
     public function testCreate(string $url, string $contentType, string $body)
     {
-        $resource = new CachedResource();
-
-        $resource->setUrl($url);
-        $resource->setContentType($contentType);
-        $resource->setBody($body);
+        $resource = CachedResource::create($url, $contentType, $body);
 
         $this->assertEquals($url, $resource->getUrl());
         $this->assertEquals($contentType, $resource->getContentType());
@@ -80,48 +76,16 @@ class CachedResourceTest extends AbstractBaseTestCase
     {
         $url = 'http://example.com/';
 
-        $resource1 = new CachedResource();
-
-        $resource1->setUrl($url);
-        $resource1->setContentType('text/plan');
-        $resource1->setBody('');
+        $resource1 = CachedResource::create($url, 'text/plain', '');
 
         $this->entityManager->persist($resource1);
         $this->entityManager->flush();
 
-        $resource2 = new CachedResource();
-
-        $resource2->setUrl($url);
-        $resource2->setContentType('text/plan');
-        $resource2->setBody('');
-
+        $resource2 = CachedResource::create($url, 'text/html', 'html content');
         $this->entityManager->persist($resource2);
 
         $this->expectException(UniqueConstraintViolationException::class);
 
         $this->entityManager->flush();
-    }
-
-    public function testCreateStatic()
-    {
-        $url = 'http://example.com/';
-        $contentType = 'text/plain';
-        $body = 'body content';
-
-        $resource = CachedResource::create($url, $contentType, $body);
-
-        $this->entityManager->persist($resource);
-        $this->entityManager->flush();
-
-        $id = $resource->getId();
-
-        $this->entityManager->clear();
-
-        /* @var CachedResource $retrievedResource */
-        $retrievedResource = $this->entityManager->find(CachedResource::class, $id);
-
-        $this->assertEquals($url, $retrievedResource->getUrl());
-        $this->assertEquals($contentType, $retrievedResource->getContentType());
-        $this->assertEquals($body, stream_get_contents($retrievedResource->getBody()));
     }
 }

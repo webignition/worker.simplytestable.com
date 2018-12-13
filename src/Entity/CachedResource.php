@@ -72,30 +72,14 @@ class CachedResource
         return $this->id;
     }
 
-    public function setUrl(string $url)
-    {
-        $this->url = $url;
-        $this->urlHash = md5($url);
-    }
-
     public function getUrl(): string
     {
         return $this->url;
     }
 
-    public function setContentType(string $contentType)
-    {
-        $this->contentType = $contentType;
-    }
-
     public function getContentType(): string
     {
         return $this->contentType;
-    }
-
-    public function setBody(string $body)
-    {
-        $this->body = $body;
     }
 
     /**
