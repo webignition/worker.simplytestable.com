@@ -16,17 +16,6 @@ class Factory
         $this->taskPreparers = $taskPreparers;
     }
 
-    public function getPreparer(string $taskType): ?TaskPreparerInterface
-    {
-        foreach ($this->taskPreparers as $taskPreparer) {
-            if ($taskPreparer->handles($taskType)) {
-                return $taskPreparer;
-            }
-        }
-
-        return null;
-    }
-
     public function getPreparers(string $taskType): TaskPreparerCollection
     {
         $taskPreparers = [];
