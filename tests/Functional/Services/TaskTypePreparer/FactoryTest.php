@@ -24,16 +24,18 @@ class FactoryTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider getPreparerDataProvider
+     * @dataProvider getPreparersDataProvider
      *
      * @param string $taskType
      */
-    public function testGetPreparer(string $taskType)
+    public function testGetPreparers(string $taskType)
     {
-        $this->assertNull($this->factory->getPreparer($taskType));
+        $preparers = $this->factory->getPreparers($taskType);
+
+        $this->assertCount(0, $preparers);
     }
 
-    public function getPreparerDataProvider()
+    public function getPreparersDataProvider()
     {
         return [
             'html validation' => [

@@ -4,7 +4,7 @@ namespace App\Model;
 
 use App\Services\TaskTypePreparer\TaskPreparerInterface;
 
-class TaskPreparerCollection implements \Iterator
+class TaskPreparerCollection implements \Iterator, \Countable
 {
     /**
      * @var TaskPreparerInterface[]
@@ -47,6 +47,11 @@ class TaskPreparerCollection implements \Iterator
     public function valid(): bool
     {
         return isset($this->preparers[$this->position]);
+    }
+
+    public function count(): int
+    {
+        return count($this->preparers);
     }
 
     private function sort()
