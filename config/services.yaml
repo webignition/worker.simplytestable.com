@@ -116,12 +116,30 @@ services:
       arguments:
         - '%link_integrity_user_agents%'
 
-    App\Services\WebResourceRetrieverFactory:
-      arguments:
-          - '@GuzzleHttp\Client'
-
     webignition\WebResource\Retriever:
-      factory: 'App\Services\WebResourceRetrieverFactory:create'
+      class: webignition\WebResource\Retriever
+      arguments:
+        $httpClient: '@GuzzleHttp\Client'
+        $allowedContentTypes:
+          - 'text/html'
+          - 'application/xml'
+          - 'text/xml'
+          - 'application/xhtml+xml'
+          - 'text/javascript'
+          - 'application/javascript'
+          - 'application/x-javascript'
+        $allowUnknownResourceTypes: false
+
+    app.services.web-resource-retriever.web-page:
+      class: webignition\WebResource\Retriever
+      arguments:
+        $httpClient: '@GuzzleHttp\Client'
+        $allowedContentTypes:
+          - 'text/html'
+          - 'application/xml'
+          - 'text/xml'
+          - 'application/xhtml+xml'
+        $allowUnknownResourceTypes: false
 
     webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
 
