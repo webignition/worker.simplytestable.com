@@ -6,6 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
+ * @ORM\Table(
+ *    uniqueConstraints={
+ *        @ORM\UniqueConstraint(name="hash_url_unique", columns={"urlHash"})
+ *    }
+ * )
  */
 class CachedResource
 {
@@ -24,6 +30,13 @@ class CachedResource
      * @ORM\Column(type="text")
      */
     private $url = '';
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=32)
+     */
+    private $urlHash;
 
     /**
      * @var string
@@ -47,6 +60,7 @@ class CachedResource
     public function setUrl(string $url)
     {
         $this->url = $url;
+        $this->urlHash = md5($url);
     }
 
     public function getUrl(): string

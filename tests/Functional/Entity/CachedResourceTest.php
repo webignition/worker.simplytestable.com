@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Entity;
 
 use App\Entity\CachedResource;
 use App\Tests\Functional\AbstractBaseTestCase;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CachedResourceTest extends AbstractBaseTestCase
@@ -73,5 +74,31 @@ class CachedResourceTest extends AbstractBaseTestCase
                 'body' => '내 호버크라프트는 뱀장어로 가득하다',
             ],
         ];
+    }
+
+    public function testUrlIsUnique()
+    {
+        $url = 'http://example.com/';
+
+        $resource1 = new CachedResource();
+
+        $resource1->setUrl($url);
+        $resource1->setContentType('text/plan');
+        $resource1->setBody('');
+
+        $this->entityManager->persist($resource1);
+        $this->entityManager->flush();
+
+        $resource2 = new CachedResource();
+
+        $resource2->setUrl($url);
+        $resource2->setContentType('text/plan');
+        $resource2->setBody('');
+
+        $this->entityManager->persist($resource2);
+
+        $this->expectException(UniqueConstraintViolationException::class);
+
+        $this->entityManager->flush();
     }
 }
