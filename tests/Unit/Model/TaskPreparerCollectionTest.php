@@ -5,7 +5,7 @@ namespace App\Tests\Unit\Model;
 use App\Model\TaskPreparerCollection;
 use App\Services\TaskTypePreparer\TaskPreparerInterface;
 
-class TaskTypePreparerCollectionTest extends \PHPUnit\Framework\TestCase
+class TaskPreparerCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider
@@ -15,7 +15,7 @@ class TaskTypePreparerCollectionTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreate(array $preparers, array $expectedPreparerOrder)
     {
-        $taskTypePreparerCollection = new TaskPreparerCollection($preparers);
+        $taskPreparerCollection = new TaskPreparerCollection($preparers);
 
         $expectedSortedPreparerHashes = [];
         foreach ($expectedPreparerOrder as $preparerId) {
@@ -23,7 +23,7 @@ class TaskTypePreparerCollectionTest extends \PHPUnit\Framework\TestCase
         }
 
         $sortedPreparerHashes = [];
-        foreach ($taskTypePreparerCollection as $preparerIndex => $taskPreparer) {
+        foreach ($taskPreparerCollection as $preparerIndex => $taskPreparer) {
             $sortedPreparerHashes[] = spl_object_hash($taskPreparer);
         }
 
