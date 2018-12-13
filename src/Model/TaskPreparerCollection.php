@@ -4,7 +4,7 @@ namespace App\Model;
 
 use App\Services\TaskTypePreparer\TaskPreparerInterface;
 
-class TaskTypePreparerCollection implements \Iterator
+class TaskPreparerCollection implements \Iterator
 {
     /**
      * @var TaskPreparerInterface[]
@@ -15,7 +15,6 @@ class TaskTypePreparerCollection implements \Iterator
      * @var int
      */
     private $position = 0;
-
 
     public function __construct(array $preparers)
     {
@@ -35,7 +34,7 @@ class TaskTypePreparerCollection implements \Iterator
         return $this->preparers[$this->position];
     }
 
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -45,7 +44,7 @@ class TaskTypePreparerCollection implements \Iterator
         ++$this->position;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->preparers[$this->position]);
     }

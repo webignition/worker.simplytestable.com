@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\Model;
 
-use App\Model\TaskTypePreparerCollection;
+use App\Model\TaskPreparerCollection;
 use App\Services\TaskTypePreparer\TaskPreparerInterface;
 
 class TaskTypePreparerCollectionTest extends \PHPUnit\Framework\TestCase
@@ -15,7 +15,7 @@ class TaskTypePreparerCollectionTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreate(array $preparers, array $expectedPreparerOrder)
     {
-        $taskTypePreparerCollection = new TaskTypePreparerCollection($preparers);
+        $taskTypePreparerCollection = new TaskPreparerCollection($preparers);
 
         $expectedSortedPreparerHashes = [];
         foreach ($expectedPreparerOrder as $preparerId) {
