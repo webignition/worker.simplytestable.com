@@ -6,10 +6,13 @@ class Source
 {
     const TYPE_CACHED_RESOURCE = 'cached-resource';
     const TYPE_UNAVAILABLE = 'unavailable';
+    const TYPE_INVALID = 'invalid';
 
     const FAILURE_TYPE_HTTP = 'http';
     const FAILURE_TYPE_CURL = 'curl';
     const FAILURE_TYPE_UNKNOWN = 'unknown';
+
+    const MESSAGE_INVALID_CONTENT_TYPE = 'invalid-content-type';
 
     /**
      * @var string
@@ -65,6 +68,11 @@ class Source
     public function isUnavailable(): bool
     {
         return self::TYPE_UNAVAILABLE === $this->type;
+    }
+
+    public function isInvalid(): bool
+    {
+        return self::TYPE_INVALID === $this->type;
     }
 
     public function getFailureType(): ?string

@@ -31,6 +31,15 @@ class SourceFactory
         return $this->createUnavailableSource($url, Source::FAILURE_TYPE_UNKNOWN, 0);
     }
 
+    public function createInvalidSource(string $url, string $message): Source
+    {
+        return new Source(
+            $url,
+            Source::TYPE_INVALID,
+            'invalid' . ':' . $message
+        );
+    }
+
     private function createUnavailableSource(string $url, string $failureType, int $failureCode): Source
     {
         return new Source(
