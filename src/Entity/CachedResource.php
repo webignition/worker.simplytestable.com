@@ -60,11 +60,16 @@ class CachedResource
 
         $cachedResouce = new static();
         $cachedResouce->url = $url;
-        $cachedResouce->urlHash = md5($url);
+        $cachedResouce->urlHash = static::createUrlHash($url);
         $cachedResouce->contentType = $contentType;
         $cachedResouce->body = $body;
 
         return $cachedResouce;
+    }
+
+    public static function createUrlHash(string $url): string
+    {
+        return md5($url);
     }
 
     public function getId(): ?string
