@@ -30,3 +30,15 @@ services:
 
   App\Services\SourceFactory:
     public: true
+
+  app.services.web-resource-retriever.web-page:
+    public: true
+    class: webignition\WebResource\Retriever
+    arguments:
+      $httpClient: '@GuzzleHttp\Client'
+      $allowedContentTypes:
+        - 'text/html'
+        - 'application/xml'
+        - 'text/xml'
+        - 'application/xhtml+xml'
+      $allowUnknownResourceTypes: false
