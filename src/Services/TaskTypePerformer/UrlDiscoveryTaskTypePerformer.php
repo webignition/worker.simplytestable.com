@@ -50,9 +50,9 @@ class UrlDiscoveryTaskTypePerformer extends AbstractWebPageTaskTypePerformer
             LinkUrlFinderConfiguration::CONFIG_KEY_IGNORE_FRAGMENT_IN_URL_COMPARISON => true,
         ]);
 
-        $urlScope = $this->task->getParameter('scope');
+        $urlScope = $this->task->getParametersObject()->get('scope');
         if ($urlScope) {
-            $configuration->setUrlScope($this->task->getParameter('scope'));
+            $configuration->setUrlScope($urlScope);
         }
 
         $finder = new HtmlDocumentLinkUrlFinder();

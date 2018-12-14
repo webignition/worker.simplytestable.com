@@ -182,11 +182,6 @@ class Task implements \JsonSerializable
         return $this->parametersObject;
     }
 
-    public function getParameter(string $name)
-    {
-        return $this->getParametersArray()[$name] ?? null;
-    }
-
     public function setParentTask(Task $parentTask)
     {
         $this->parentTask = $parentTask;
