@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Model\Task\DecoratedTask;
 use App\Model\Task\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
@@ -34,10 +35,9 @@ class TaskService
 
     public function create(string $url, Type $type, string $parameters): Task
     {
-        $task = Task::create($url, $parameters);
+        $task = Task::create($type, $url, $parameters);
 
         $this->setQueued($task);
-        $task->setType($type);
 
         $existingTask = $this->taskRepository->findOneBy([
             'state' => $task->getState(),
@@ -45,11 +45,9 @@ class TaskService
             'url' => $task->getUrl()
         ]);
 
-        if (!empty($existingTask)) {
-            return $existingTask;
-        }
-
-        return $task;
+        return $existingTask
+            ? new DecoratedTask($existingTask, $type)
+            : $task;
     }
 
     /**
@@ -67,14 +65,11 @@ class TaskService
         }
 
         $taskTypeName = $this->taskRepository->getTypeById($task->getId());
-
         if (empty($taskTypeName)) {
             return null;
         }
 
-        $task->setType($this->taskTypeService->get($taskTypeName));
-
-        return $task;
+        return new DecoratedTask($task, $this->taskTypeService->get($taskTypeName));
     }
 
     /**

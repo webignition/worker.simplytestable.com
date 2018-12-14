@@ -2,6 +2,8 @@
 
 namespace App\Tests\Functional\Services;
 
+use App\Model\Task\Type;
+use App\Services\TaskTypeService;
 use GuzzleHttp\Cookie\CookieJarInterface;
 use Mockery\Mock;
 use App\Entity\Task\Task;
@@ -23,7 +25,9 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
 
     public function testConfigureForTaskNoCookiesNoHttpAuthentication()
     {
-        $task = Task::create('http://example.com/');
+        $taskType = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
+
+        $task = Task::create($taskType, 'http://example.com/');
         $userAgentString = 'Foo User Agent';
 
         /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
@@ -64,7 +68,9 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
      */
     public function testConfigureForTaskHasCookies(array $taskParameters, array $expectedCookieStrings)
     {
-        $task = Task::create('http://example.com/', json_encode($taskParameters));
+        $taskType = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
+
+        $task = Task::create($taskType, 'http://example.com/', json_encode($taskParameters));
 
         $userAgentString = 'Foo User Agent';
 
@@ -154,7 +160,9 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
         array $taskParameters,
         array $expectedHttpAuthenticationCredentials
     ) {
-        $task = Task::create('http://example.com/', json_encode($taskParameters));
+        $taskType = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
+
+        $task = Task::create($taskType, 'http://example.com/', json_encode($taskParameters));
         $userAgentString = 'Foo User Agent';
 
         /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
@@ -236,18 +244,5 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
                 ],
             ],
         ];
-    }
-
-    /**
-     * @param array $parametersArray
-     * @param string $url
-     *
-     * @return Task
-     */
-    private function createTask(array $parametersArray, $url = '')
-    {
-        $task = Task::create($url, json_encode($parametersArray));
-
-        return $task;
     }
 }

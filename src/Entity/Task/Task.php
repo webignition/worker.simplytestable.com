@@ -100,10 +100,11 @@ class Task implements \JsonSerializable
         return $this->id;
     }
 
-    public static function create(string $url, string $parameters = ''): Task
+    public static function create(Type $type, string $url, string $parameters = ''): Task
     {
         $task = new static();
 
+        $task->type = $type;
         $task->url = $url;
         $task->parameters = $parameters;
 
@@ -123,11 +124,6 @@ class Task implements \JsonSerializable
     public function getState(): string
     {
         return $this->state;
-    }
-
-    public function setType(Type $type)
-    {
-        $this->type = $type;
     }
 
     public function getType(): Type
