@@ -177,3 +177,7 @@ services:
       arguments:
         $hostname: '%hostname%'
         $token: '%token%'
+
+    App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
+      arguments:
+        $priority: 100
