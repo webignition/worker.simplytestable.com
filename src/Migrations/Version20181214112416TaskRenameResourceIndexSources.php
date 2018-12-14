@@ -8,14 +8,14 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20181212144715CreateCachedResource extends AbstractMigration
+final class Version20181214112416TaskRenameResourceIndexSources extends AbstractMigration
 {
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('CREATE TABLE CachedResource (id CHAR(36) NOT NULL COMMENT \'(DC2Type:guid)\', url LONGTEXT NOT NULL, body LONGBLOB NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE Task CHANGE resourceindex sources LONGTEXT NOT NULL COMMENT \'(DC2Type:array)\'');
     }
 
     public function down(Schema $schema) : void
@@ -23,6 +23,6 @@ final class Version20181212144715CreateCachedResource extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('DROP TABLE CachedResource');
+        $this->addSql('ALTER TABLE Task CHANGE sources resourceIndex LONGTEXT NOT NULL COLLATE utf8_general_ci COMMENT \'(DC2Type:array)\'');
     }
 }
