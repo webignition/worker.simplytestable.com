@@ -48,9 +48,7 @@ class TaskPerformer
 
         $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORMED, new TaskEvent($task));
 
-        if (!$task->getTimePeriod()->hasEndDateTime()) {
-            $task->getTimePeriod()->setEndDateTime(new \DateTime());
-        }
+        $task->setEndDateTime(new \DateTime());
 
         $task->setOutput($response->getTaskOutput());
         $task->setState($this->getCompletionStateFromResponse($response));
