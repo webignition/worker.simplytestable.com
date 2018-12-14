@@ -62,7 +62,7 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->assertEquals(Task::STATE_QUEUED, $task->getState());
         $this->assertEquals($url, $task->getUrl());
         $this->assertEquals(strtolower($taskTypeName), strtolower($task->getType()));
-        $this->assertEquals(new Parameters($parametersArray, $url), $task->getParametersObject());
+        $this->assertEquals(new Parameters($parametersArray, $url), $task->getParameters());
     }
     /**
      * @return array

@@ -48,7 +48,7 @@ class TaskFactoryTest extends AbstractBaseTestCase
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals($taskTypeName, $task->getType());
         $this->assertEquals($url, $task->getUrl());
-        $this->assertEquals(new Parameters($parametersArray, $url), $task->getParametersObject());
+        $this->assertEquals(new Parameters($parametersArray, $url), $task->getParameters());
     }
 
     /**

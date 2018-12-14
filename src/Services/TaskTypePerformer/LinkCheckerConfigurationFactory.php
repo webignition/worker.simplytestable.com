@@ -44,12 +44,12 @@ class LinkCheckerConfigurationFactory
             Configuration::KEY_IGNORE_FRAGMENT_IN_URL_COMPARISON => true,
         ];
 
-        $excludedUrls = $task->getParametersObject()->get(self::EXCLUDED_URLS_PARAMETER_NAME);
+        $excludedUrls = $task->getParameters()->get(self::EXCLUDED_URLS_PARAMETER_NAME);
         if ($excludedUrls) {
             $configurationValues[Configuration::KEY_URLS_TO_EXCLUDE] = $excludedUrls;
         }
 
-        $excludedDomains = $task->getParametersObject()->get(self::EXCLUDED_DOMAINS_PARAMETER_NAME);
+        $excludedDomains = $task->getParameters()->get(self::EXCLUDED_DOMAINS_PARAMETER_NAME);
         if ($excludedDomains) {
             $configurationValues[Configuration::KEY_DOMAINS_TO_EXCLUDE] = $excludedDomains;
         }
