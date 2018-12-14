@@ -100,9 +100,16 @@ class Task implements \JsonSerializable
         return $this->id;
     }
 
-    public function setUrl(string $url)
+    public static function create(Type $type, string $url, string $parameters = ''): Task
     {
-        $this->url = $url;
+        $task = new static();
+
+        $task->type = $type;
+        $task->url = $url;
+        $task->state = Task::STATE_QUEUED;
+        $task->parameters = $parameters;
+
+        return $task;
     }
 
     public function getUrl(): string
@@ -120,11 +127,6 @@ class Task implements \JsonSerializable
         return $this->state;
     }
 
-    public function setType(Type $type)
-    {
-        $this->type = $type;
-    }
-
     public function getType(): Type
     {
         return $this->type;
@@ -135,19 +137,9 @@ class Task implements \JsonSerializable
         $this->output = $output;
     }
 
-    public function getOutput(): Output
+    public function getOutput(): ?Output
     {
         return $this->output;
-    }
-
-    public function hasOutput(): bool
-    {
-        return !is_null($this->output);
-    }
-
-    public function setParameters(string $parameters)
-    {
-        $this->parameters = $parameters;
     }
 
     public function getParametersHash(): string

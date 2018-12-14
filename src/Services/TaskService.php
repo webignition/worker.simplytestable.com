@@ -6,6 +6,7 @@ use App\Model\Task\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Repository\TaskRepository;
+use ReflectionClass;
 
 class TaskService
 {
@@ -34,30 +35,26 @@ class TaskService
 
     public function create(string $url, Type $type, string $parameters): Task
     {
-        $task = new Task();
-
-        $this->setQueued($task);
-        $task->setType($type);
-        $task->setUrl($url);
-        $task->setParameters($parameters);
+        $task = Task::create($type, $url, $parameters);
 
         $existingTask = $this->taskRepository->findOneBy([
             'state' => $task->getState(),
-            'type' => $task->getType(),
+            'type' => (string) $task->getType(),
             'url' => $task->getUrl()
         ]);
 
-        if (!empty($existingTask)) {
-            return $existingTask;
+        if ($existingTask) {
+            $this->setTaskType($existingTask, $type);
         }
 
-        return $task;
+        return $existingTask ?? $task;
     }
 
     /**
      * @param int $id
      *
      * @return Task
+     *
      */
     public function getById($id)
     {
@@ -69,14 +66,23 @@ class TaskService
         }
 
         $taskTypeName = $this->taskRepository->getTypeById($task->getId());
-
         if (empty($taskTypeName)) {
             return null;
         }
 
-        $task->setType($this->taskTypeService->get($taskTypeName));
+        $this->setTaskType($task, $this->taskTypeService->get($taskTypeName));
 
         return $task;
+    }
+
+    private function setTaskType(Task $task, Type $type)
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $reflector = new ReflectionClass(Task::class);
+        $property = $reflector->getProperty('type');
+        $property->setAccessible(true);
+        $property->setValue($task, $type);
+        $property->setAccessible(false);
     }
 
     /**
@@ -85,11 +91,6 @@ class TaskService
     public function getQueuedTaskIds()
     {
         return $this->taskRepository->getIdsByState(Task::STATE_QUEUED);
-    }
-
-    public function setQueued(Task $task)
-    {
-        $task->setState(Task::STATE_QUEUED);
     }
 
     /**

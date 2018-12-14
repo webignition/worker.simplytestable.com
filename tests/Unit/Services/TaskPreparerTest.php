@@ -17,7 +17,7 @@ class TaskPreparerTest extends \PHPUnit\Framework\TestCase
 {
     public function testPrepareHasTaskPreparer()
     {
-        $task = $this->createTask(Type::TYPE_HTML_VALIDATION);
+        $task = Task::create(new Type(Type::TYPE_HTML_VALIDATION, true, null), 'http://example.com');
 
         $entityManager = $this->createEntityManager([
             Task::STATE_PREPARING,
@@ -54,7 +54,7 @@ class TaskPreparerTest extends \PHPUnit\Framework\TestCase
 
     public function testStateProgression()
     {
-        $task = $this->createTask(Type::TYPE_HTML_VALIDATION);
+        $task = Task::create(new Type(Type::TYPE_HTML_VALIDATION, true, null), 'http://example.com');
 
         $entityManager = $this->createEntityManager([
             Task::STATE_PREPARING,
@@ -119,14 +119,6 @@ class TaskPreparerTest extends \PHPUnit\Framework\TestCase
             ->andReturn($getPreparerReturnValue);
 
         return $taskTypePreparerFactory;
-    }
-
-    private function createTask(string $type): Task
-    {
-        $task = new Task();
-        $task->setType(new Type($type, true, null));
-
-        return $task;
     }
 
     /**
