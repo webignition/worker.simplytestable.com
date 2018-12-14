@@ -3,6 +3,7 @@
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Task\Task;
+use App\Model\Task\Parameters;
 use App\Model\Task\TypeInterface;
 use App\Request\Task\CreateRequest;
 use App\Services\TaskFactory;
@@ -42,10 +43,12 @@ class TaskFactoryTest extends AbstractBaseTestCase
 
         $task = $this->taskFactory->createFromRequest($createRequest);
 
+        $parametersArray = json_decode($parameters, true) ?? [];
+
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals($taskTypeName, $task->getType());
         $this->assertEquals($url, $task->getUrl());
-        $this->assertEquals($parameters, $task->getParameters());
+        $this->assertEquals(new Parameters($parametersArray, $url), $task->getParameters());
     }
 
     /**
@@ -54,10 +57,17 @@ class TaskFactoryTest extends AbstractBaseTestCase
     public function createDataProvider()
     {
         return [
-            'default' => [
+            'empty parameters' => [
                 'taskType' => TypeInterface::TYPE_HTML_VALIDATION,
                 'url' => 'http://example.com',
                 'parameters' => '',
+            ],
+            'non-empty parameters' => [
+                'taskType' => TypeInterface::TYPE_HTML_VALIDATION,
+                'url' => 'http://example.com',
+                'parameters' => json_encode([
+                    'foo' => 'bar',
+                ])
             ],
         ];
     }

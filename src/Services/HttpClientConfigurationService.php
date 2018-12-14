@@ -45,7 +45,7 @@ class HttpClientConfigurationService
      */
     public function configureForTask(Task $task, $userAgentString)
     {
-        $parametersObject = $task->getParametersObject();
+        $parametersObject = $task->getParameters();
 
         $cookies = $parametersObject->getCookies();
         if (!empty($cookies)) {

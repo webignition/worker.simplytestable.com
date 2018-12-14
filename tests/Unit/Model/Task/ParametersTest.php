@@ -2,8 +2,6 @@
 
 namespace App\Tests\Unit\Model\Task;
 
-use Mockery\Mock;
-use App\Entity\Task\Task;
 use App\Model\Task\Parameters;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 
@@ -17,8 +15,7 @@ class ParametersTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetCookies(array $taskParametersArray, array $expectedCookieStrings)
     {
-        $task = $this->createTask($taskParametersArray);
-        $parametersObject = new Parameters($task);
+        $parametersObject = new Parameters($taskParametersArray, '');
 
         $cookies = $parametersObject->getCookies();
 
@@ -120,8 +117,7 @@ class ParametersTest extends \PHPUnit\Framework\TestCase
         array $taskParametersArray,
         array $expectedHttpAuthenticationCredentialsValues
     ) {
-        $task = $this->createTask($taskParametersArray, $taskUrl);
-        $parametersObject = new Parameters($task);
+        $parametersObject = new Parameters($taskParametersArray, $taskUrl);
 
         $httpAuthenticationCredentials = $parametersObject->getHttpAuthenticationCredentials();
 
@@ -219,26 +215,13 @@ class ParametersTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $taskParametersArray
-     * @param string $url
-     *
-     * @return Mock|Task
-     */
-    private function createTask(array $taskParametersArray, $url = '')
+    public function testGet()
     {
-        /* @var Mock|Task $task */
-        $task = \Mockery::mock(Task::class);
-        $task
-            ->shouldReceive('getParametersArray')
-            ->andReturn($taskParametersArray);
+        $parameters = new Parameters([
+            'foo' => 'bar',
+        ], '');
 
-        if (!empty($url)) {
-            $task
-                ->shouldReceive('getUrl')
-                ->andReturn($url);
-        }
-
-        return $task;
+        $this->assertNull($parameters->get('fizz'));
+        $this->assertEquals('bar', $parameters->get('foo'));
     }
 }

@@ -150,71 +150,20 @@ class Task implements \JsonSerializable
         $this->parameters = $parameters;
     }
 
-    public function getParameters(): string
-    {
-        return $this->parameters;
-    }
-
     public function getParametersHash(): string
     {
-        return md5($this->getParameters());
+        return md5($this->parameters);
     }
 
-    public function hasParameters(): bool
-    {
-        return $this->getParameters() != '';
-    }
-
-    public function getParametersArray(): array
-    {
-        $decodedParameters = json_decode($this->getParameters(), true);
-
-        if (!is_array($decodedParameters)) {
-            $decodedParameters = [];
-        }
-
-        return $decodedParameters;
-    }
-
-    public function getParametersObject(): Parameters
+    public function getParameters(): Parameters
     {
         if (empty($this->parametersObject)) {
-            $this->parametersObject = new Parameters($this);
+            $parametersArray = json_decode($this->parameters, true) ?? [];
+
+            $this->parametersObject = new Parameters($parametersArray, $this->url);
         }
 
         return $this->parametersObject;
-    }
-
-    public function hasParameter(string $name): bool
-    {
-        $parameters = $this->getParametersArray();
-
-        return isset($parameters[$name]);
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return mixed
-     */
-    public function getParameter(string $name)
-    {
-        if (!$this->hasParameter($name)) {
-            return null;
-        }
-
-        $parameters = $this->getParametersArray();
-
-        return $parameters[$name];
-    }
-
-    public function isTrue(string $parameterName): bool
-    {
-        if (!$this->hasParameter($parameterName)) {
-            return false;
-        }
-
-        return filter_var($this->getParameter($parameterName), FILTER_VALIDATE_BOOLEAN);
     }
 
     public function setParentTask(Task $parentTask)

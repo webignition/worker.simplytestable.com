@@ -31,10 +31,10 @@ class CssValidatorWrapperConfigurationFactory
      */
     public function create(Task $task, $urlToValidate, $contentToValidate)
     {
-        $vendorExtensionsParameter = (string)$task->getParameter('vendor-extensions');
+        $vendorExtensionsParameter = (string)$task->getParameters()->get('vendor-extensions');
 
         $vendorExtensionSeverityLevel = VendorExtensionSeverityLevel::isValid($vendorExtensionsParameter)
-            ? $task->getParameter('vendor-extensions')
+            ? $task->getParameters()->get('vendor-extensions')
             : VendorExtensionSeverityLevel::LEVEL_WARN;
 
         return new WrapperConfiguration([
@@ -55,10 +55,9 @@ class CssValidatorWrapperConfigurationFactory
      */
     private function createOutputParserConfiguration(Task $task, $vendorExtensionSeverityLevel)
     {
-        $ignoreWarnings = $task->getParameter('ignore-warnings');
-        $domainsToIgnore = $task->hasParameter('domains-to-ignore')
-            ? $task->getParameter('domains-to-ignore')
-            : [];
+        $ignoreWarnings = $task->getParameters()->get('ignore-warnings');
+        $domainsToIgnore = $task->getParameters()->get('domains-to-ignore') ?? [];
+
         $ignoreVendorExtensionIssues = VendorExtensionSeverityLevel::LEVEL_IGNORE === $vendorExtensionSeverityLevel;
         $reportVendorExensionIssuesAsWarnings =
             VendorExtensionSeverityLevel::LEVEL_WARN === $vendorExtensionSeverityLevel;
