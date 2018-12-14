@@ -245,8 +245,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
      */
     private function createTask(array $parametersArray, $url = '')
     {
-        $task = new Task();
-        $task->setUrl($url);
+        $task = Task::create($url);
         $task->setParameters(json_encode($parametersArray));
 
         return $task;

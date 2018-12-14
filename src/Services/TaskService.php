@@ -34,11 +34,10 @@ class TaskService
 
     public function create(string $url, Type $type, string $parameters): Task
     {
-        $task = new Task();
+        $task = Task::create($url);
 
         $this->setQueued($task);
         $task->setType($type);
-        $task->setUrl($url);
         $task->setParameters($parameters);
 
         $existingTask = $this->taskRepository->findOneBy([

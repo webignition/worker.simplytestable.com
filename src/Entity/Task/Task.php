@@ -100,9 +100,13 @@ class Task implements \JsonSerializable
         return $this->id;
     }
 
-    public function setUrl(string $url)
+    public static function create(string $url): Task
     {
-        $this->url = $url;
+        $task = new static();
+
+        $task->url = $url;
+
+        return $task;
     }
 
     public function getUrl(): string
