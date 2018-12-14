@@ -4,7 +4,6 @@ namespace App\Services;
 
 use GuzzleHttp\Client as HttpClient;
 use webignition\WebResource\Retriever;
-use webignition\WebResource\WebPage\WebPage;
 
 class WebResourceRetrieverFactory
 {
@@ -28,18 +27,12 @@ class WebResourceRetrieverFactory
      */
     public function create()
     {
-        $allowedContentTypes = array_merge(
-            WebPage::getModelledContentTypeStrings(),
-            [
-                'text/javascript',
-                'application/javascript',
-                'application/x-javascript',
-            ]
-        );
-
         return new Retriever(
             $this->httpClient,
-            $allowedContentTypes,
+            [
+                'text/html',
+                'application/xhtml+xml',
+            ],
             self::ALLOW_UNKNOWN_RESOURCE_TYPES
         );
     }

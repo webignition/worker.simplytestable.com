@@ -363,9 +363,49 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                     ],
                 ]
             ],
-            'incorrect resource type' => [
+            'incorrect resource type: application/pdf' => [
                 'httpResponseFixtures' => [
                     new Response(200, ['content-type' => 'application/pdf']),
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => true,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 0,
+                'expectedTaskOutput' =>
+                    null
+            ],
+            'incorrect resource type: text/javascript' => [
+                'httpResponseFixtures' => [
+                    new Response(200, ['content-type' => 'text/javascript']),
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => true,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 0,
+                'expectedTaskOutput' =>
+                    null
+            ],
+            'incorrect resource type: application/javascript' => [
+                'httpResponseFixtures' => [
+                    new Response(200, ['content-type' => 'application/javascript']),
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => true,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 0,
+                'expectedTaskOutput' =>
+                    null
+            ],
+            'incorrect resource type: application/xml' => [
+                'httpResponseFixtures' => [
+                    new Response(200, ['content-type' => 'application/xml']),
+                ],
+                'expectedWebResourceRetrievalHasSucceeded' => true,
+                'expectedIsRetryable' => false,
+                'expectedErrorCount' => 0,
+                'expectedTaskOutput' =>
+                    null
+            ],
+            'incorrect resource type: text/xml' => [
+                'httpResponseFixtures' => [
+                    new Response(200, ['content-type' => 'text/xml']),
                 ],
                 'expectedWebResourceRetrievalHasSucceeded' => true,
                 'expectedIsRetryable' => false,
