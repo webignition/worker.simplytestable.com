@@ -94,24 +94,6 @@ class TaskService
     }
 
     /**
-     * @param Task $task
-     */
-    public function cancel(Task $task)
-    {
-        $taskStateName = $task->getState();
-
-        $isCancelled = Task::STATE_CANCELLED === $taskStateName;
-        $isCompleted = Task::STATE_COMPLETED === $taskStateName;
-
-        if (!($isCancelled || $isCompleted)) {
-            $task->setState(Task::STATE_CANCELLED);
-
-            $this->entityManager->persist($task);
-            $this->entityManager->flush();
-        }
-    }
-
-    /**
      * @return int
      */
     public function getInCompleteCount()
