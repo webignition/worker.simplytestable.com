@@ -148,8 +148,6 @@ services:
         $httpClient: '@GuzzleHttp\Client'
         $allowedContentTypes:
           - 'text/html'
-          - 'application/xml'
-          - 'text/xml'
           - 'application/xhtml+xml'
         $allowUnknownResourceTypes: false
 
