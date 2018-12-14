@@ -71,12 +71,6 @@ class WebPageWebResourceRetrieverTest extends AbstractBaseTestCase
             'text/html' => [
                 'responseContentType' => 'text/html',
             ],
-            'application/xml' => [
-                'responseContentType' => 'application/xml',
-            ],
-            'text/xml' => [
-                'responseContentType' => 'text/xml',
-            ],
             'application/xhtml+xml' => [
                 'responseContentType' => 'application/xhtml+xml',
             ],
