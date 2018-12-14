@@ -111,6 +111,18 @@ class Task implements \JsonSerializable
         return $task;
     }
 
+    public static function createWithId(int $id, Type $type, string $url, string $parameters = ''): Task
+    {
+        $task = new static();
+
+        $task->id = $id;
+        $task->type = $type;
+        $task->url = $url;
+        $task->parameters = $parameters;
+
+        return $task;
+    }
+
     public function getUrl(): string
     {
         return $this->url;

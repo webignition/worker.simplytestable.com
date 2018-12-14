@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Model\Task\DecoratedTask;
 use App\Model\Task\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Repository\TaskRepository;
+use ReflectionClass;
 
 class TaskService
 {
@@ -45,15 +45,18 @@ class TaskService
             'url' => $task->getUrl()
         ]);
 
-        return $existingTask
-            ? new DecoratedTask($existingTask, $type)
-            : $task;
+        if ($existingTask) {
+            $this->setTaskType($existingTask, $type);
+        }
+
+        return $existingTask ?? $task;
     }
 
     /**
      * @param int $id
      *
      * @return Task
+     *
      */
     public function getById($id)
     {
@@ -69,7 +72,19 @@ class TaskService
             return null;
         }
 
-        return new DecoratedTask($task, $this->taskTypeService->get($taskTypeName));
+        $this->setTaskType($task, $this->taskTypeService->get($taskTypeName));
+
+        return $task;
+    }
+
+    private function setTaskType(Task $task, Type $type)
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $reflector = new ReflectionClass(Task::class);
+        $property = $reflector->getProperty('type');
+        $property->setAccessible(true);
+        $property->setValue($task, $type);
+        $property->setAccessible(false);
     }
 
     /**
