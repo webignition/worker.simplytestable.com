@@ -56,9 +56,4 @@ class TimePeriod
     {
         return $this->endDateTime;
     }
-
-    public function hasEndDateTime(): bool
-    {
-        return !is_null($this->getEndDateTime());
-    }
 }
