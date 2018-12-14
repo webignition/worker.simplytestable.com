@@ -17,7 +17,11 @@ class TaskPreparerTest extends \PHPUnit\Framework\TestCase
 {
     public function testPrepareHasTaskPreparer()
     {
-        $task = Task::create(new Type(Type::TYPE_HTML_VALIDATION, true, null), 'http://example.com');
+        $task = Task::create(
+            new Type(Type::TYPE_HTML_VALIDATION, true, null),
+            'http://example.com',
+            Task::STATE_QUEUED
+        );
 
         $entityManager = $this->createEntityManager([
             Task::STATE_PREPARING,
@@ -54,7 +58,11 @@ class TaskPreparerTest extends \PHPUnit\Framework\TestCase
 
     public function testStateProgression()
     {
-        $task = Task::create(new Type(Type::TYPE_HTML_VALIDATION, true, null), 'http://example.com');
+        $task = Task::create(
+            new Type(Type::TYPE_HTML_VALIDATION, true, null),
+            'http://example.com',
+            Task::STATE_QUEUED
+        );
 
         $entityManager = $this->createEntityManager([
             Task::STATE_PREPARING,

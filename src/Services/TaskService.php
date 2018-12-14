@@ -35,9 +35,7 @@ class TaskService
 
     public function create(string $url, Type $type, string $parameters): Task
     {
-        $task = Task::create($type, $url, $parameters);
-
-        $this->setQueued($task);
+        $task = Task::create($type, $url, Task::STATE_QUEUED, $parameters);
 
         $existingTask = $this->taskRepository->findOneBy([
             'state' => $task->getState(),
@@ -93,11 +91,6 @@ class TaskService
     public function getQueuedTaskIds()
     {
         return $this->taskRepository->getIdsByState(Task::STATE_QUEUED);
-    }
-
-    public function setQueued(Task $task)
-    {
-        $task->setState(Task::STATE_QUEUED);
     }
 
     /**
