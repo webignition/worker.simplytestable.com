@@ -100,11 +100,12 @@ class Task implements \JsonSerializable
         return $this->id;
     }
 
-    public static function create(string $url): Task
+    public static function create(string $url, string $parameters = ''): Task
     {
         $task = new static();
 
         $task->url = $url;
+        $task->parameters = $parameters;
 
         return $task;
     }
@@ -139,14 +140,9 @@ class Task implements \JsonSerializable
         $this->output = $output;
     }
 
-    public function getOutput(): Output
+    public function getOutput(): ?Output
     {
         return $this->output;
-    }
-
-    public function setParameters(string $parameters)
-    {
-        $this->parameters = $parameters;
     }
 
     public function getParametersHash(): string

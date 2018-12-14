@@ -23,7 +23,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
 
     public function testConfigureForTaskNoCookiesNoHttpAuthentication()
     {
-        $task = $this->createTask([], 'http://example.com/');
+        $task = Task::create('http://example.com/');
         $userAgentString = 'Foo User Agent';
 
         /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
@@ -64,7 +64,8 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
      */
     public function testConfigureForTaskHasCookies(array $taskParameters, array $expectedCookieStrings)
     {
-        $task = $this->createTask($taskParameters, 'http://example.com/');
+        $task = Task::create('http://example.com/', json_encode($taskParameters));
+
         $userAgentString = 'Foo User Agent';
 
         /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
@@ -153,7 +154,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
         array $taskParameters,
         array $expectedHttpAuthenticationCredentials
     ) {
-        $task = $this->createTask($taskParameters, 'http://example.com/');
+        $task = Task::create('http://example.com/', json_encode($taskParameters));
         $userAgentString = 'Foo User Agent';
 
         /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
@@ -245,8 +246,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
      */
     private function createTask(array $parametersArray, $url = '')
     {
-        $task = Task::create($url);
-        $task->setParameters(json_encode($parametersArray));
+        $task = Task::create($url, json_encode($parametersArray));
 
         return $task;
     }
