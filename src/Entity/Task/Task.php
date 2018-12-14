@@ -174,7 +174,9 @@ class Task implements \JsonSerializable
     public function getParametersObject(): Parameters
     {
         if (empty($this->parametersObject)) {
-            $this->parametersObject = new Parameters($this);
+            $parametersArray = json_decode($this->getParameters(), true) ?? [];
+
+            $this->parametersObject = new Parameters($parametersArray, $this->url);
         }
 
         return $this->parametersObject;

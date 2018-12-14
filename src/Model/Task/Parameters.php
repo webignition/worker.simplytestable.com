@@ -3,7 +3,6 @@
 namespace App\Model\Task;
 
 use GuzzleHttp\Cookie\SetCookie;
-use App\Entity\Task\Task;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 use webignition\NormalisedUrl\NormalisedUrl;
 
@@ -14,22 +13,19 @@ class Parameters
     const PARAMETER_HTTP_AUTH_PASSWORD = 'http-auth-password';
 
     /**
-     * @var Task
-     */
-    private $task;
-
-    /**
      * @var array
      */
     private $parameters = [];
 
     /**
-     * @param Task $task
+     * @var string
      */
-    public function __construct(Task $task)
+    private $taskUrl;
+
+    public function __construct(array $parameters, string $taskUrl)
     {
-        $this->task = $task;
-        $this->parameters = $task->getParametersArray();
+        $this->parameters = $parameters;
+        $this->taskUrl = $taskUrl;
     }
 
     /**
@@ -73,9 +69,14 @@ class Parameters
             ? $this->parameters[self::PARAMETER_HTTP_AUTH_PASSWORD]
             : null;
 
-        $taskUrl = new NormalisedUrl($this->task->getUrl());
+        $taskUrl = new NormalisedUrl($this->taskUrl);
 
         return new HttpAuthenticationCredentials($username, $password, $taskUrl->getHost());
+    }
+
+    public function get(string $key)
+    {
+        return $this->parameters[$key] ?? null;
     }
 
     /**
