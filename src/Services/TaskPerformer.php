@@ -44,6 +44,9 @@ class TaskPerformer
         $task->setStartDateTime(new \DateTime());
         $task->setState(Task::STATE_IN_PROGRESS);
 
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
+
         $response = $taskTypePerformer->perform($task);
 
         $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORMED, new TaskEvent($task));
