@@ -49,8 +49,8 @@ class Output
     private $warningCount = 0;
 
     public static function create(
-        string $content,
-        InternetMediaTypeInterface $contentType,
+        ?string $content = null,
+        ?InternetMediaTypeInterface $contentType = null,
         ?int $errorCount = 0,
         ?int $warningCount = 0
     ): Output {
