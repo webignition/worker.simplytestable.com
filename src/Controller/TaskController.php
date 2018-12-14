@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Model\TaskCollection;
@@ -78,7 +79,9 @@ class TaskController extends AbstractController
             throw new BadRequestHttpException();
         }
 
-        $this->taskService->cancel($cancelRequest->getTask());
+        $task = $cancelRequest->getTask();
+        $task->setState(Task::STATE_CANCELLED);
+
         $this->entityManager->remove($cancelRequest->getTask());
         $this->entityManager->flush();
 
@@ -96,7 +99,9 @@ class TaskController extends AbstractController
 
         $cancelledTaskCount = 0;
         foreach ($cancelCollectionRequest->getCancelRequests() as $cancelRequest) {
-            $this->taskService->cancel($cancelRequest->getTask());
+            $task = $cancelRequest->getTask();
+            $task->setState(Task::STATE_CANCELLED);
+
             $this->entityManager->remove($cancelRequest->getTask());
             $cancelledTaskCount++;
         }
