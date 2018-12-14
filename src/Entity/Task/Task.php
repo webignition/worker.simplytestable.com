@@ -160,11 +160,6 @@ class Task implements \JsonSerializable
         return md5($this->getParameters());
     }
 
-    public function hasParameters(): bool
-    {
-        return $this->getParameters() != '';
-    }
-
     public function getParametersArray(): array
     {
         $decodedParameters = json_decode($this->getParameters(), true);
