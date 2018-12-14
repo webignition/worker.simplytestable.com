@@ -66,8 +66,6 @@ class TestTaskFactory
      * @param string[] $taskValues
      *
      * @return Task
-     *
-     * @throws \Exception
      */
     public function create($taskValues)
     {

@@ -56,9 +56,8 @@ class CssValidatorWrapperConfigurationFactory
     private function createOutputParserConfiguration(Task $task, $vendorExtensionSeverityLevel)
     {
         $ignoreWarnings = $task->getParameter('ignore-warnings');
-        $domainsToIgnore = $task->hasParameter('domains-to-ignore')
-            ? $task->getParameter('domains-to-ignore')
-            : [];
+        $domainsToIgnore = $task->getParameter('domains-to-ignore') ?? [];
+
         $ignoreVendorExtensionIssues = VendorExtensionSeverityLevel::LEVEL_IGNORE === $vendorExtensionSeverityLevel;
         $reportVendorExensionIssuesAsWarnings =
             VendorExtensionSeverityLevel::LEVEL_WARN === $vendorExtensionSeverityLevel;
