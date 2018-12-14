@@ -150,20 +150,15 @@ class Task implements \JsonSerializable
         $this->parameters = $parameters;
     }
 
-    public function getParameters(): string
-    {
-        return $this->parameters;
-    }
-
     public function getParametersHash(): string
     {
-        return md5($this->getParameters());
+        return md5($this->parameters);
     }
 
     public function getParametersObject(): Parameters
     {
         if (empty($this->parametersObject)) {
-            $parametersArray = json_decode($this->getParameters(), true) ?? [];
+            $parametersArray = json_decode($this->parameters, true) ?? [];
 
             $this->parametersObject = new Parameters($parametersArray, $this->url);
         }

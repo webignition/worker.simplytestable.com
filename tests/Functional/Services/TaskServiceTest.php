@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Services;
 
+use App\Model\Task\Parameters;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskTypeService;
@@ -54,11 +55,14 @@ class TaskServiceTest extends AbstractBaseTestCase
         $taskTypeService = self::$container->get(TaskTypeService::class);
 
         $task = $this->taskService->create($url, $taskTypeService->get($taskTypeName), $parameters);
+
+        $parametersArray = json_decode($parameters, true) ?? [];
+
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals(Task::STATE_QUEUED, $task->getState());
         $this->assertEquals($url, $task->getUrl());
         $this->assertEquals(strtolower($taskTypeName), strtolower($task->getType()));
-        $this->assertEquals($parameters, $task->getParameters());
+        $this->assertEquals(new Parameters($parametersArray, $url), $task->getParametersObject());
     }
     /**
      * @return array
@@ -85,6 +89,13 @@ class TaskServiceTest extends AbstractBaseTestCase
                 'url' => self::DEFAULT_TASK_URL,
                 'taskTypeName' => TypeInterface::TYPE_URL_DISCOVERY,
                 'parameters' => self::DEFAULT_TASK_PARAMETERS,
+            ],
+            'url discovery with parameters' => [
+                'url' => self::DEFAULT_TASK_URL,
+                'taskTypeName' => TypeInterface::TYPE_URL_DISCOVERY,
+                'parameters' => json_encode([
+                    'foo' => 'bar',
+                ]),
             ],
         ];
     }
