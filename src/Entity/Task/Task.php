@@ -143,11 +143,6 @@ class Task implements \JsonSerializable
         $this->timePeriod = $timePeriod;
     }
 
-    public function getTimePeriod(): TimePeriod
-    {
-        return $this->timePeriod;
-    }
-
     public function setOutput(Output $output)
     {
         $this->output = $output;

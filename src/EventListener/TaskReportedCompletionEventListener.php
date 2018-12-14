@@ -25,7 +25,6 @@ class TaskReportedCompletionEventListener
         if ($taskReportCompletionEvent->isSucceeded()) {
             $this->entityManager->remove($task);
             $this->entityManager->remove($task->getOutput());
-            $this->entityManager->remove($task->getTimePeriod());
             $this->entityManager->flush();
         } else {
             /* @var TaskReportCompletionFailureEvent $taskReportCompletionEvent */
