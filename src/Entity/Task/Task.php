@@ -77,6 +77,20 @@ class Task implements \JsonSerializable
     private $parameters;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $startDateTime;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $endDateTime;
+
+    /**
      * @var Task
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\Task\Task")
@@ -229,6 +243,26 @@ class Task implements \JsonSerializable
     public function getParentTask(): ?Task
     {
         return $this->parentTask;
+    }
+
+    public function setStartDateTime(\DateTime $startDateTime)
+    {
+        $this->startDateTime = $startDateTime;
+    }
+
+    public function getStartDateTime(): \DateTime
+    {
+        return $this->startDateTime;
+    }
+
+    public function setEndDateTime(\DateTime $endDateTime)
+    {
+        $this->endDateTime = $endDateTime;
+    }
+
+    public function getEndDateTime(): ?\DateTime
+    {
+        return $this->endDateTime;
     }
 
     public function jsonSerialize(): array
