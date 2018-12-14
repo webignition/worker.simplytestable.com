@@ -48,14 +48,25 @@ class Output
      */
     private $warningCount = 0;
 
+    public static function create(
+        ?string $content = null,
+        ?InternetMediaTypeInterface $contentType = null,
+        ?int $errorCount = 0,
+        ?int $warningCount = 0
+    ): Output {
+        $output = new static();
+
+        $output->output = $content;
+        $output->contentType = $contentType;
+        $output->errorCount = $errorCount;
+        $output->warningCount = $warningCount;
+
+        return $output;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setOutput(?string $output)
-    {
-        $this->output = $output;
     }
 
     public function getOutput(): ?string
@@ -63,29 +74,14 @@ class Output
         return $this->output;
     }
 
-    public function setContentType(InternetMediaTypeInterface $contentType)
-    {
-        $this->contentType = $contentType;
-    }
-
     public function getContentType(): string
     {
         return (string)$this->contentType;
     }
 
-    public function setErrorCount(int $errorCount)
-    {
-        $this->errorCount = $errorCount;
-    }
-
     public function getErrorCount(): int
     {
         return $this->errorCount;
-    }
-
-    public function setWarningCount(int $warningCount)
-    {
-        $this->warningCount = $warningCount;
     }
 
     public function getWarningCount(): int

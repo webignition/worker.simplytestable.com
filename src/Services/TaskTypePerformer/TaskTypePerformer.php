@@ -27,13 +27,12 @@ abstract class TaskTypePerformer
 
         $rawOutput = $this->execute($task);
 
-        $output = new TaskOutput();
-        $output->setOutput($rawOutput);
-        $output->setContentType($this->getOutputContentType());
-        $output->setErrorCount($this->response->getErrorCount());
-        $output->setWarningCount($this->response->getWarningCount());
-
-        $this->response->setTaskOutput($output);
+        $this->response->setTaskOutput(TaskOutput::create(
+            $rawOutput,
+            $this->getOutputContentType(),
+            $this->response->getErrorCount(),
+            $this->response->getWarningCount()
+        ));
 
         return $this->response;
     }
