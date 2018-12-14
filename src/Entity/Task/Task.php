@@ -208,15 +208,6 @@ class Task implements \JsonSerializable
         return $parameters[$name];
     }
 
-    public function isTrue(string $parameterName): bool
-    {
-        if (!$this->hasParameter($parameterName)) {
-            return false;
-        }
-
-        return filter_var($this->getParameter($parameterName), FILTER_VALIDATE_BOOLEAN);
-    }
-
     public function setParentTask(Task $parentTask)
     {
         $this->parentTask = $parentTask;
