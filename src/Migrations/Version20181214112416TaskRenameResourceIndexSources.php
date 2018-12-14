@@ -8,7 +8,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20181212180636TaskRenameResourceIndexSources extends AbstractMigration
+final class Version20181214112416TaskRenameResourceIndexSources extends AbstractMigration
 {
     public function up(Schema $schema) : void
     {

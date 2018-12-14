@@ -8,7 +8,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20181214112416AddCachedResourceUrlHash extends AbstractMigration
+final class Version20181214112417AddCachedResourceUrlHash extends AbstractMigration
 {
     public function up(Schema $schema) : void
     {
