@@ -8,14 +8,15 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20181212180636TaskRenameResourceIndexSources extends AbstractMigration
+final class Version20181214112417AddCachedResourceUrlHash extends AbstractMigration
 {
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE Task CHANGE resourceindex sources LONGTEXT NOT NULL COMMENT \'(DC2Type:array)\'');
+        $this->addSql('ALTER TABLE CachedResource ADD urlHash VARCHAR(32) NOT NULL');
+        $this->addSql('CREATE UNIQUE INDEX hash_url_unique ON CachedResource (urlHash)');
     }
 
     public function down(Schema $schema) : void
@@ -23,6 +24,7 @@ final class Version20181212180636TaskRenameResourceIndexSources extends Abstract
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE Task CHANGE sources resourceIndex LONGTEXT NOT NULL COLLATE utf8_general_ci COMMENT \'(DC2Type:array)\'');
+        $this->addSql('DROP INDEX hash_url_unique ON CachedResource');
+        $this->addSql('ALTER TABLE CachedResource DROP urlHash');
     }
 }

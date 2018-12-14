@@ -8,15 +8,14 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20181213171328AddCachedResourceUrlHash extends AbstractMigration
+final class Version20181214112413CreateCachedResource extends AbstractMigration
 {
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE CachedResource ADD urlHash VARCHAR(32) NOT NULL');
-        $this->addSql('CREATE UNIQUE INDEX hash_url_unique ON CachedResource (urlHash)');
+        $this->addSql('CREATE TABLE CachedResource (id CHAR(36) NOT NULL COMMENT \'(DC2Type:guid)\', url LONGTEXT NOT NULL, body LONGBLOB NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
     }
 
     public function down(Schema $schema) : void
@@ -24,7 +23,6 @@ final class Version20181213171328AddCachedResourceUrlHash extends AbstractMigrat
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('DROP INDEX hash_url_unique ON CachedResource');
-        $this->addSql('ALTER TABLE CachedResource DROP urlHash');
+        $this->addSql('DROP TABLE CachedResource');
     }
 }
