@@ -4,7 +4,6 @@ namespace App\Entity\Task;
 
 use App\Model\Task\Type;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\TimePeriod;
 use App\Model\Task\Parameters;
 
 /**
@@ -54,13 +53,6 @@ class Task implements \JsonSerializable
      * @ORM\Column(name="tasktype", nullable=false)
      */
     private $type;
-
-    /**
-     * @var TimePeriod
-     *
-     * @ORM\OneToOne(targetEntity="App\Entity\TimePeriod", cascade={"persist"})
-     */
-    private $timePeriod;
 
     /**
      * @var Output
@@ -136,11 +128,6 @@ class Task implements \JsonSerializable
     public function getType(): Type
     {
         return $this->type;
-    }
-
-    public function setTimePeriod(?TimePeriod $timePeriod)
-    {
-        $this->timePeriod = $timePeriod;
     }
 
     public function setOutput(Output $output)
