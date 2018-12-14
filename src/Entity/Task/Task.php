@@ -144,11 +144,6 @@ class Task implements \JsonSerializable
         return $this->output;
     }
 
-    public function hasOutput(): bool
-    {
-        return !is_null($this->output);
-    }
-
     public function setParameters(string $parameters)
     {
         $this->parameters = $parameters;

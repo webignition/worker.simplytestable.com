@@ -34,11 +34,11 @@ class TaskCompletionReporter
      */
     public function reportCompletion(Task $task)
     {
-        if (!$task->hasOutput()) {
+        $taskOutput = $task->getOutput();
+
+        if (null === $taskOutput) {
             return true;
         }
-
-        $taskOutput = $task->getOutput();
 
         $request = $this->coreApplicationHttpClient->createPostRequest(
             'task_complete',
