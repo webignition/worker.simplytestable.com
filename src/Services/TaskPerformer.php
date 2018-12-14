@@ -41,7 +41,8 @@ class TaskPerformer
     {
         $taskTypePerformer = $this->taskTypePerformers[strtolower($task->getType())];
 
-        $this->start($task);
+        $task->setStartDateTime(new \DateTime());
+        $task->setState(Task::STATE_IN_PROGRESS);
 
         $response = $taskTypePerformer->perform($task);
 
@@ -53,15 +54,6 @@ class TaskPerformer
 
         $task->setOutput($response->getTaskOutput());
         $task->setState($this->getCompletionStateFromResponse($response));
-
-        $this->entityManager->persist($task);
-        $this->entityManager->flush();
-    }
-
-    private function start(Task $task)
-    {
-        $task->setStartDateTime(new \DateTime());
-        $task->setState(Task::STATE_IN_PROGRESS);
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
