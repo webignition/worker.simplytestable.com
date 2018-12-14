@@ -27,7 +27,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
     {
         $taskType = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
 
-        $task = Task::create($taskType, 'http://example.com/', Task::STATE_QUEUED);
+        $task = Task::create($taskType, 'http://example.com/');
         $userAgentString = 'Foo User Agent';
 
         /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
@@ -70,7 +70,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
     {
         $taskType = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
 
-        $task = Task::create($taskType, 'http://example.com/', Task::STATE_QUEUED, json_encode($taskParameters));
+        $task = Task::create($taskType, 'http://example.com/', json_encode($taskParameters));
 
         $userAgentString = 'Foo User Agent';
 
@@ -162,7 +162,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
     ) {
         $taskType = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
 
-        $task = Task::create($taskType, 'http://example.com/', Task::STATE_QUEUED, json_encode($taskParameters));
+        $task = Task::create($taskType, 'http://example.com/', json_encode($taskParameters));
         $userAgentString = 'Foo User Agent';
 
         /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */

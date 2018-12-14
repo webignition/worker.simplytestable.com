@@ -338,7 +338,8 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
         string $parameters,
         \DateTime $endDateTime
     ): Task {
-        $task = Task::create(new Type($type, true, null), $url, $state, $parameters);
+        $task = Task::create(new Type($type, true, null), $url, $parameters);
+        $task->setState($state);
 
         $task->setOutput(Output::create($outputValues['output'], $outputValues['contentType']));
         $task->setEndDateTime($endDateTime);

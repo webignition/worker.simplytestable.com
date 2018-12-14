@@ -20,12 +20,13 @@ class TaskTest extends AbstractBaseTestCase
 
         $linkIntegrityTaskType = $taskTypeService->get(TypeInterface::TYPE_LINK_INTEGRITY);
 
-        $parentTask = Task::create($linkIntegrityTaskType, 'http://example.com', Task::STATE_IN_PROGRESS);
+        $parentTask = Task::create($linkIntegrityTaskType, 'http://example.com');
+        $parentTask->setState(Task::STATE_IN_PROGRESS);
 
-        $childTask1 = Task::create($linkIntegrityTaskType, 'http://example.com/one', Task::STATE_QUEUED);
+        $childTask1 = Task::create($linkIntegrityTaskType, 'http://example.com/one');
         $childTask1->setParentTask($parentTask);
 
-        $childTask2 = Task::create($linkIntegrityTaskType, 'http://example.com/two', Task::STATE_QUEUED);
+        $childTask2 = Task::create($linkIntegrityTaskType, 'http://example.com/two');
         $childTask2->setParentTask($parentTask);
 
         try {

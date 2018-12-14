@@ -35,11 +35,11 @@ class TaskService
 
     public function create(string $url, Type $type, string $parameters): Task
     {
-        $task = Task::create($type, $url, Task::STATE_QUEUED, $parameters);
+        $task = Task::create($type, $url, $parameters);
 
         $existingTask = $this->taskRepository->findOneBy([
             'state' => $task->getState(),
-            'type' => $task->getType(),
+            'type' => (string) $task->getType(),
             'url' => $task->getUrl()
         ]);
 

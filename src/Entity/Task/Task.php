@@ -100,13 +100,13 @@ class Task implements \JsonSerializable
         return $this->id;
     }
 
-    public static function create(Type $type, string $url, string $state, string $parameters = ''): Task
+    public static function create(Type $type, string $url, string $parameters = ''): Task
     {
         $task = new static();
 
         $task->type = $type;
         $task->url = $url;
-        $task->state = $state;
+        $task->state = Task::STATE_QUEUED;
         $task->parameters = $parameters;
 
         return $task;
