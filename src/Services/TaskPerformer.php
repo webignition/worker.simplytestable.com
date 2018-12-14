@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Event\TaskEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
-use App\Entity\TimePeriod;
 use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use App\Services\TaskTypePerformer\TaskTypePerformer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -42,29 +41,17 @@ class TaskPerformer
     {
         $taskTypePerformer = $this->taskTypePerformers[strtolower($task->getType())];
 
-        $this->start($task);
+        $task->setStartDateTime(new \DateTime());
+        $task->setState(Task::STATE_IN_PROGRESS);
 
         $response = $taskTypePerformer->perform($task);
 
         $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORMED, new TaskEvent($task));
 
-        if (!$task->getTimePeriod()->hasEndDateTime()) {
-            $task->getTimePeriod()->setEndDateTime(new \DateTime());
-        }
+        $task->setEndDateTime(new \DateTime());
 
         $task->setOutput($response->getTaskOutput());
         $task->setState($this->getCompletionStateFromResponse($response));
-
-        $this->entityManager->persist($task);
-        $this->entityManager->flush();
-    }
-
-    private function start(Task $task)
-    {
-        $timePeriod = new TimePeriod();
-        $timePeriod->setStartDateTime(new \DateTime());
-        $task->setTimePeriod($timePeriod);
-        $task->setState(Task::STATE_IN_PROGRESS);
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();

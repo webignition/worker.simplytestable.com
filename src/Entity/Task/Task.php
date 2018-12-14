@@ -4,7 +4,6 @@ namespace App\Entity\Task;
 
 use App\Model\Task\Type;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\TimePeriod;
 use App\Model\Task\Parameters;
 
 /**
@@ -56,13 +55,6 @@ class Task implements \JsonSerializable
     private $type;
 
     /**
-     * @var TimePeriod
-     *
-     * @ORM\OneToOne(targetEntity="App\Entity\TimePeriod", cascade={"persist"})
-     */
-    private $timePeriod;
-
-    /**
      * @var Output
      *
      * @ORM\OneToOne(targetEntity="App\Entity\Task\Output", cascade={"persist"})
@@ -75,6 +67,20 @@ class Task implements \JsonSerializable
      * @ORM\Column(type="text", nullable=true)
      */
     private $parameters;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $startDateTime;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $endDateTime;
 
     /**
      * @var Task
@@ -122,16 +128,6 @@ class Task implements \JsonSerializable
     public function getType(): Type
     {
         return $this->type;
-    }
-
-    public function setTimePeriod(?TimePeriod $timePeriod)
-    {
-        $this->timePeriod = $timePeriod;
-    }
-
-    public function getTimePeriod(): TimePeriod
-    {
-        return $this->timePeriod;
     }
 
     public function setOutput(Output $output)
@@ -229,6 +225,26 @@ class Task implements \JsonSerializable
     public function getParentTask(): ?Task
     {
         return $this->parentTask;
+    }
+
+    public function setStartDateTime(\DateTime $startDateTime)
+    {
+        $this->startDateTime = $startDateTime;
+    }
+
+    public function getStartDateTime(): \DateTime
+    {
+        return $this->startDateTime;
+    }
+
+    public function setEndDateTime(\DateTime $endDateTime)
+    {
+        $this->endDateTime = $endDateTime;
+    }
+
+    public function getEndDateTime(): ?\DateTime
+    {
+        return $this->endDateTime;
     }
 
     public function jsonSerialize(): array

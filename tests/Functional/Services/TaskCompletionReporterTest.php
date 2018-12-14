@@ -3,7 +3,6 @@
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Task\Output;
-use App\Entity\TimePeriod;
 use App\Event\TaskEvent;
 use App\Event\TaskReportCompletionFailureEvent;
 use App\Event\TaskReportCompletionSuccessEvent;
@@ -351,11 +350,7 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
         $taskOutput->setContentType($outputValues['contentType']);
 
         $task->setOutput($taskOutput);
-
-        $timePeriod = new TimePeriod();
-        $timePeriod->setEndDateTime($endDateTime);
-
-        $task->setTimePeriod($timePeriod);
+        $task->setEndDateTime($endDateTime);
 
         return $task;
     }

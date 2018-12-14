@@ -48,7 +48,7 @@ class TaskCompletionReporter
                 'parameter_hash' => $task->getParametersHash(),
             ],
             [
-                'end_date_time' => $task->getTimePeriod()->getEndDateTime()->format('c'),
+                'end_date_time' => $task->getEndDateTime()->format('c'),
                 'output' => $taskOutput->getOutput(),
                 'contentType' => $taskOutput->getContentType(),
                 'state' => 'task-' . $task->getState(),

@@ -4,7 +4,6 @@ namespace App\Tests\Functional\EventListener;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
-use App\Entity\TimePeriod;
 use App\Event\TaskEvent;
 use App\Event\TaskReportCompletionFailureEvent;
 use App\Event\TaskReportCompletionSuccessEvent;
@@ -29,7 +28,6 @@ class TaskReportedCompletionEventListenerTest extends AbstractTaskEventListenerT
 
         $task = $taskService->create('http://example.com/', $taskType, '');
         $task->setOutput(new Output());
-        $task->setTimePeriod(new TimePeriod());
 
         try {
             $entityManager->persist($task);
@@ -39,7 +37,6 @@ class TaskReportedCompletionEventListenerTest extends AbstractTaskEventListenerT
 
         $this->assertNotNull($task->getId());
         $this->assertNotNull($task->getOutput()->getId());
-        $this->assertNotNull($task->getTimePeriod()->getId());
 
         $eventDispatcher->dispatch(
             TaskEvent::TYPE_REPORTED_COMPLETION,
@@ -48,7 +45,6 @@ class TaskReportedCompletionEventListenerTest extends AbstractTaskEventListenerT
 
         $this->assertNull($task->getId());
         $this->assertNull($task->getOutput()->getId());
-        $this->assertNull($task->getTimePeriod()->getId());
     }
 
     /**

@@ -6,7 +6,6 @@ use App\Model\Task\TypeInterface;
 use App\Services\TaskTypeService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
-use App\Entity\TimePeriod;
 use App\Services\TaskService;
 
 class TestTaskFactory
@@ -67,6 +66,8 @@ class TestTaskFactory
      * @param string[] $taskValues
      *
      * @return Task
+     *
+     * @throws \Exception
      */
     public function create($taskValues)
     {
@@ -85,10 +86,7 @@ class TestTaskFactory
         }
 
         if (isset($taskValues['age'])) {
-            $timePeriod = new TimePeriod();
-            $timePeriod->setStartDateTime(new \DateTime('-' . $taskValues['age']));
-
-            $task->setTimePeriod($timePeriod);
+            $task->setStartDateTime(new \DateTime('-' . $taskValues['age']));
         }
 
         $this->entityManager->persist($task);

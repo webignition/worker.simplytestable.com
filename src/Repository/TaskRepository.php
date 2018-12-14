@@ -63,9 +63,8 @@ class TaskRepository extends EntityRepository
     public function getUnfinishedIdsByMaxStartDate(\DateTime $startDateTime)
     {
         $queryBuilder = $this->createQueryBuilder('Task');
-        $queryBuilder->join('Task.timePeriod', 'TimePeriod');
         $queryBuilder->select('Task.id as TaskId');
-        $queryBuilder->where('TimePeriod.startDateTime <= :StartDateTime AND TimePeriod.endDateTime IS NULL');
+        $queryBuilder->where('Task.startDateTime <= :StartDateTime AND Task.endDateTime IS NULL');
 
         $queryBuilder->setParameter('StartDateTime', $startDateTime);
 
