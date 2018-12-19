@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Entity\Task;
 
 use App\Entity\CachedResource;
 use App\Entity\Task\Task;
+use App\Model\RequestIdentifier;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\SourceFactory;
@@ -85,12 +86,13 @@ class TaskTest extends AbstractBaseTestCase
 
         $this->assertNotNull($task->getId());
 
-        $htmlResource = CachedResource::create($htmlUrl, 'text/html', '<doctype html><html lang="en"></html>');
+        $requestIdentifier = new RequestIdentifier($task->getUrl(), $task->getParameters()->toArray());
+        $requestHash = (string) $requestIdentifier;
+
+        $htmlResource = CachedResource::create($requestHash, $htmlUrl, 'text/html', '<doctype html>');
 
         $this->entityManager->persist($htmlResource);
         $this->entityManager->flush();
-
-        $this->assertNotNull($htmlResource->getId());
 
         $htmlSource = $sourceFactory->fromCachedResource($htmlResource);
         $httpUnavailableSource = $sourceFactory->createHttpFailedSource($httpUnavailableUrl, 404);
@@ -106,7 +108,7 @@ class TaskTest extends AbstractBaseTestCase
         $this->entityManager->flush();
 
         $expectedTaskSources = [
-            $htmlUrl => new Source($htmlUrl, Source::TYPE_CACHED_RESOURCE, $htmlResource->getId()),
+            $htmlUrl => new Source($htmlUrl, Source::TYPE_CACHED_RESOURCE, $requestHash),
             $httpUnavailableUrl => new Source($httpUnavailableUrl, Source::TYPE_UNAVAILABLE, 'http:404'),
             $curlUnavailableUrl => new Source($curlUnavailableUrl, Source::TYPE_UNAVAILABLE, 'curl:28'),
             $unknownUnavailableUrl => new Source($unknownUnavailableUrl, Source::TYPE_UNAVAILABLE, 'unknown:0'),
