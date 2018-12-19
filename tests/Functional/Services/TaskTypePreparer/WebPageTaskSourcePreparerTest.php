@@ -11,6 +11,7 @@ use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use GuzzleHttp\Psr7\Response;
 
 class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
@@ -24,6 +25,11 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
      * @var SourceFactory
      */
     private $sourceFactory;
+
+    /**
+     * @var EntityRepository
+     */
+    private $cachedResourceRepository;
 
     /**
      * @var HttpMockHandler
@@ -40,6 +46,9 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         $this->preparer = self::$container->get(WebPageTaskSourcePreparer::class);
         $this->sourceFactory = self::$container->get(SourceFactory::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
+
+        $entityManager = self::$container->get(EntityManagerInterface::class);
+        $this->cachedResourceRepository = $entityManager->getRepository(CachedResource::class);
     }
 
     /**
@@ -86,9 +95,6 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
 
     public function testPrepareSuccessNoPreExistingCachedResource()
     {
-        $entityManager = self::$container->get(EntityManagerInterface::class);
-        $cachedResourceRepository = $entityManager->getRepository(CachedResource::class);
-
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], 'html content'),
@@ -100,12 +106,12 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         $task = Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
 
         $this->assertEquals([], $task->getSources());
-        $this->assertEquals([], $cachedResourceRepository->findAll());
+        $this->assertEquals([], $this->cachedResourceRepository->findAll());
 
         $this->preparer->prepare($task);
 
         /* @var CachedResource $cachedResource */
-        $cachedResource = $cachedResourceRepository->findOneBy([
+        $cachedResource = $this->cachedResourceRepository->findOneBy([
             'url' => $url,
         ]);
 
@@ -117,5 +123,41 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
             ],
             $task->getSources()
         );
+    }
+
+    public function testPrepareSuccessHasPreExistingCachedResource()
+    {
+        $this->httpMockHandler->appendFixtures([
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], 'html content'),
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], 'html content'),
+        ]);
+
+        $taskTypeService = self::$container->get(TaskTypeService::class);
+
+        $url = 'http://example.com';
+        $task = Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+
+        $this->assertEquals([], $task->getSources());
+        $this->assertEquals([], $this->cachedResourceRepository->findAll());
+
+        $this->preparer->prepare($task);
+
+        /* @var CachedResource $cachedResource */
+        $cachedResource = $this->cachedResourceRepository->findOneBy([
+            'url' => $url,
+        ]);
+
+        $expectedSource = $this->sourceFactory->fromCachedResource($cachedResource);
+
+        $this->assertEquals(
+            [
+                $url => $expectedSource,
+            ],
+            $task->getSources()
+        );
+
+        $this->preparer->prepare($task);
     }
 }
