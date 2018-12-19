@@ -34,15 +34,24 @@ class CachedResourceManagerTest extends AbstractBaseTestCase
         $this->entityRepository = $this->entityManager->getRepository(CachedResource::class);
     }
 
-    public function testPersist()
+    public function testFind()
     {
-        $this->assertEmpty($this->entityRepository->findAll());
-
         $requestHash = 'request-hash';
-        $cachedResource = CachedResource::create($requestHash, 'http://example.com', 'text/plain', '');
+        $url = 'http://example.com';
+        $contentType = 'text/plain';
+        $body = '';
 
-        $this->cachedResourceManager->persist($cachedResource);
+        $this->assertNull($this->cachedResourceManager->find($requestHash));
 
-        $this->assertNotEmpty($this->entityRepository->findAll());
+        $this->cachedResourceManager->persist(CachedResource::create($requestHash, $url, $contentType, $body));
+        $this->entityManager->clear();
+
+        $cachedResource = $this->cachedResourceManager->find($requestHash);
+
+        $this->assertInstanceOf(CachedResource::class, $cachedResource);
+        $this->assertEquals($requestHash, $cachedResource->getRequestHash());
+        $this->assertEquals($url, $cachedResource->getUrl());
+        $this->assertEquals($contentType, $cachedResource->getContentType());
+        $this->assertEquals($body, stream_get_contents($cachedResource->getBody()));
     }
 }
