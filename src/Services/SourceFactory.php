@@ -12,7 +12,7 @@ class SourceFactory
         return new Source(
             $cachedResource->getUrl(),
             Source::TYPE_CACHED_RESOURCE,
-            $cachedResource->getId()
+            $cachedResource->getRequestHash()
         );
     }
 

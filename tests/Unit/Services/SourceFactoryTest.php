@@ -23,7 +23,7 @@ class SourceFactoryTest extends \PHPUnit\Framework\TestCase
     public function testFromCachedResource()
     {
         $url = 'http://example.com/';
-        $id = 'cached-resource-id';
+        $requestHash = 'cached-resource-id';
 
         $cachedResource = \Mockery::mock(CachedResource::class);
         $cachedResource
@@ -33,17 +33,17 @@ class SourceFactoryTest extends \PHPUnit\Framework\TestCase
             ->andReturn($url);
 
         $cachedResource
-            ->shouldReceive('getId')
+            ->shouldReceive('getRequestHash')
             ->atLeast()
             ->once()
-            ->andReturn($id);
+            ->andReturn($requestHash);
 
         $source = $this->sourceFactory->fromCachedResource($cachedResource);
 
         $this->assertInstanceOf(Source::class, $source);
         $this->assertEquals($url, $source->getUrl());
         $this->assertEquals(Source::TYPE_CACHED_RESOURCE, $source->getType());
-        $this->assertEquals($id, $source->getValue());
+        $this->assertEquals($requestHash, $source->getValue());
         $this->assertNull($source->getFailureType());
         $this->assertNull($source->getFailureCode());
         $this->assertTrue($source->isCachedResource());
