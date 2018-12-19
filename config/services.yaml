@@ -16,6 +16,7 @@ parameters:
   link_integrity_user_agents:
     - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
     - Mozilla/5.0
+  web_page_task_source_preparer_priority: 100
 
 services:
     # default configuration for services in *this* file
@@ -180,4 +181,4 @@ services:
 
     App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
       arguments:
-        $priority: 100
+        $priority: '%web_page_task_source_preparer_priority%'

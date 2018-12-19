@@ -61,6 +61,14 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         $this->assertTrue($this->preparer->handles(TypeInterface::TYPE_URL_DISCOVERY));
     }
 
+    public function testGetPriority()
+    {
+        $this->assertEquals(
+            self::$container->getParameter('web_page_task_source_preparer_priority'),
+            $this->preparer->getPriority()
+        );
+    }
+
     /**
      * @dataProvider prepareInvalidContentTypeDataProvider
      *
