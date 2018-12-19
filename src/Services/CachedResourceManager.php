@@ -29,11 +29,4 @@ class CachedResourceManager
         $this->entityManager->persist($cachedResource);
         $this->entityManager->flush();
     }
-
-    public function find(string $url): ?CachedResource
-    {
-        return $this->entityRepository->findOneBy([
-            'urlHash' => CachedResource::createUrlHash($url),
-        ]);
-    }
 }

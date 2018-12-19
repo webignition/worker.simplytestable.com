@@ -6,12 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- *
- * @ORM\Table(
- *    uniqueConstraints={
- *        @ORM\UniqueConstraint(name="hash_url_unique", columns={"urlHash"})
- *    }
- * )
  */
 class CachedResource
 {
@@ -19,10 +13,9 @@ class CachedResource
      * @var string
      *
      * @ORM\Id
-     * @ORM\Column(name="id", type="guid")
-     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Column(type="string", length=32, unique=true)
      */
-    private $id;
+    private $requestHash = '';
 
     /**
      * @var string
@@ -30,13 +23,6 @@ class CachedResource
      * @ORM\Column(type="text")
      */
     private $url = '';
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=32)
-     */
-    private $urlHash;
 
     /**
      * @var string
@@ -52,29 +38,24 @@ class CachedResource
      */
     private $body = '';
 
-    public static function create(string $url, string $contentType, $body = ''): CachedResource
+    public static function create(string $requestHash, string $url, string $contentType, $body = ''): CachedResource
     {
         if (null === $body) {
             $body = '';
         }
 
         $cachedResouce = new static();
+        $cachedResouce->requestHash = $requestHash;
         $cachedResouce->url = $url;
-        $cachedResouce->urlHash = static::createUrlHash($url);
         $cachedResouce->contentType = $contentType;
         $cachedResouce->body = $body;
 
         return $cachedResouce;
     }
 
-    public static function createUrlHash(string $url): string
+    public function getRequestHash(): string
     {
-        return md5($url);
-    }
-
-    public function getId(): ?string
-    {
-        return $this->id;
+        return $this->requestHash;
     }
 
     public function getUrl(): string

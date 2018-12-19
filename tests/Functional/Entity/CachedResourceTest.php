@@ -24,14 +24,16 @@ class CachedResourceTest extends AbstractBaseTestCase
     /**
      * @dataProvider createDataProvider
      *
+     * @param string $requestHash
      * @param string $url
      * @param string $contentType
      * @param string $body
      */
-    public function testCreate(string $url, string $contentType, string $body)
+    public function testCreate(string $requestHash, string $url, string $contentType, string $body)
     {
-        $resource = CachedResource::create($url, $contentType, $body);
+        $resource = CachedResource::create($requestHash, $url, $contentType, $body);
 
+        $this->assertEquals($requestHash, $resource->getRequestHash());
         $this->assertEquals($url, $resource->getUrl());
         $this->assertEquals($contentType, $resource->getContentType());
         $this->assertEquals($body, stream_get_contents($resource->getBody()));
@@ -39,13 +41,12 @@ class CachedResourceTest extends AbstractBaseTestCase
         $this->entityManager->persist($resource);
         $this->entityManager->flush();
 
-        $id = $resource->getId();
-
         $this->entityManager->clear();
 
         /* @var CachedResource $retrievedResource */
-        $retrievedResource = $this->entityManager->find(CachedResource::class, $id);
+        $retrievedResource = $this->entityManager->find(CachedResource::class, $requestHash);
 
+        $this->assertEquals($requestHash, $retrievedResource->getRequestHash());
         $this->assertEquals($url, $retrievedResource->getUrl());
         $this->assertEquals($contentType, $retrievedResource->getContentType());
         $this->assertEquals($body, stream_get_contents($retrievedResource->getBody()));
@@ -55,16 +56,19 @@ class CachedResourceTest extends AbstractBaseTestCase
     {
         return [
             'empty body' => [
+                'requestHash' => 'request-hash-1',
                 'url' => 'http://example.com/',
                 'contentType' => '',
                 'body' => '',
             ],
             'has body' => [
+                'requestHash' => 'request-hash-2',
                 'url' => 'http://example.com/',
                 'contentType' => 'text/plain',
                 'body' => 'body content',
             ],
             'has mb body' => [
+                'requestHash' => 'request-hash-3',
                 'url' => 'http://example.com/',
                 'contentType' => 'text/plain',
                 'body' => '내 호버크라프트는 뱀장어로 가득하다',

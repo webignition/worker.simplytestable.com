@@ -79,6 +79,11 @@ class Parameters
         return $this->parameters[$key] ?? null;
     }
 
+    public function toArray(): array
+    {
+        return $this->parameters;
+    }
+
     /**
      * @param string $key
      *
