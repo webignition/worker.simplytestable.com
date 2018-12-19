@@ -29,4 +29,9 @@ class CachedResourceManager
         $this->entityManager->persist($cachedResource);
         $this->entityManager->flush();
     }
+
+    public function find(string $requestHash): ?CachedResource
+    {
+        return $this->entityRepository->find($requestHash);
+    }
 }
