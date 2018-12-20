@@ -20,6 +20,7 @@ parameters:
   css_validation_task_type_performer_priority: 100
   link_integrity_task_type_performer_priority: 100
   url_discovery_task_type_performer_priority: 100
+  web_page_task_source_preparer_priority: 100
 
 services:
     # default configuration for services in *this* file
@@ -194,3 +195,7 @@ services:
       arguments:
         $hostname: '%hostname%'
         $token: '%token%'
+
+    App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
+      arguments:
+        $priority: '%web_page_task_source_preparer_priority%'
