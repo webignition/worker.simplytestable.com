@@ -11,6 +11,7 @@ use App\Model\Task\TypeInterface;
 use App\Services\SourceFactory;
 use App\Services\TaskTypePreparer\WebPageTaskSourcePreparer;
 use App\Services\TaskTypeService;
+use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
 use Doctrine\ORM\EntityManagerInterface;
@@ -180,9 +181,9 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider prepareTooManyRedirectsDataProvider
+     * @dataProvider prepareFailureDataProvider
      */
-    public function testPrepareTooManyRedirects(array $httpFixtures, array $expectedSourceData)
+    public function testPrepareFailure(array $httpFixtures, array $expectedSourceData)
     {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
@@ -201,10 +202,35 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         $this->assertEquals($expectedSourceData, $source->toArray());
     }
 
-    public function prepareTooManyRedirectsDataProvider(): array
+    public function prepareFailureDataProvider(): array
     {
+        $http404Response = new Response(404);
+        $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
+
+
         return [
-            'not redirect loop (first 6 responses are to HEAD requests, second 6 are to GET requests)' => [
+            'http 404' => [
+                'httpFixtures' => [
+                    $http404Response,
+                    $http404Response,
+                ],
+                'expectedSourceData' => [
+                    'url' => 'http://example.com',
+                    'type' => Source::TYPE_UNAVAILABLE,
+                    'value' => 'http:404',
+                    'context' => [],
+                ],
+            ],
+            'curl 28' => [
+                'httpFixtures' => array_fill(0, 12, $curl28ConnectException),
+                'expectedSourceData' => [
+                    'url' => 'http://example.com',
+                    'type' => Source::TYPE_UNAVAILABLE,
+                    'value' => 'curl:28',
+                    'context' => [],
+                ],
+            ],
+            'http 301, not redirect loop (first 6 responses are to HEAD requests, second 6 are to GET requests)' => [
                 'httpFixtures' => [
                     new Response(301, ['location' => 'http://example.com/1']),
                     new Response(301, ['location' => 'http://example.com/2']),
@@ -243,7 +269,7 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
                     ],
                 ],
             ],
-            'is redirect loop' => [
+            'http 301,  redirect loop' => [
                 'httpFixtures' => [
                     new Response(301, ['location' => 'http://example.com/1']),
                     new Response(301, ['location' => 'http://example.com/2']),
