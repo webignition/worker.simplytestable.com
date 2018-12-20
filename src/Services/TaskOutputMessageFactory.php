@@ -20,7 +20,7 @@ class TaskOutputMessageFactory
         $this->httpHistoryContainer = $httpHistoryContainer;
     }
 
-    public function createOutputMessageCollectionData(
+    public function createOutputMessageCollection(
         ?HttpException $httpException,
         ?TransportException $transportException
     ): \stdClass {
