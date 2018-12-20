@@ -5,6 +5,7 @@ namespace App\Services\TaskTypePerformer;
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
+use App\Services\TaskOutputMessageFactory;
 use webignition\CssValidatorOutput\CssValidatorOutput;
 use webignition\CssValidatorOutput\Message\AbstractMessage as CssValidatorOutputMessage;
 use webignition\CssValidatorOutput\Message\AbstractMessage;
@@ -36,6 +37,7 @@ class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
         HttpHistoryContainer $httpHistoryContainer,
+        TaskOutputMessageFactory $taskOutputMessageFactory,
         CssValidatorWrapper $cssValidatorWrapper,
         CssValidatorWrapperConfigurationFactory $configurationFactory
     ) {
@@ -43,7 +45,8 @@ class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
             $httpClientService,
             $httpClientConfigurationService,
             $webResourceRetriever,
-            $httpHistoryContainer
+            $httpHistoryContainer,
+            $taskOutputMessageFactory
         );
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
