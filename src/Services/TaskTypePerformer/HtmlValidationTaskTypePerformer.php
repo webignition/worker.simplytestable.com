@@ -122,7 +122,7 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
 
         $this->response->setTaskOutput(TaskOutput::create(
             $rawOutput,
-            $this->getOutputContentType(),
+            new InternetMediaType('application/json'),
             $this->response->getErrorCount(),
             $this->response->getWarningCount()
         ));
@@ -365,18 +365,5 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
                 ]
             ]
         ];
-    }
-
-    /**
-     *
-     * @return InternetMediaType
-     */
-    private function getOutputContentType()
-    {
-        $contentType = new InternetMediaType();
-        $contentType->setType('application');
-        $contentType->setSubtype('json');
-
-        return $contentType;
     }
 }
