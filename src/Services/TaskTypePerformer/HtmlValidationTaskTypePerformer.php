@@ -22,7 +22,6 @@ use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
 use webignition\HtmlDocumentType\Validator as DoctypeValidator;
 use webignition\HtmlDocumentType\Factory as DoctypeFactory;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
-use webignition\WebResourceInterfaces\WebResourceInterface;
 
 class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
 {
@@ -42,11 +41,6 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
      * @var TransportException
      */
     private $transportException;
-
-    /**
-     * @var Task
-     */
-    protected $task;
 
     /**
      * @var WebResourceRetriever
@@ -138,10 +132,30 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
      */
     private function execute(Task $task)
     {
-        $this->task = $task;
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
-        $webPage = $this->retrieveWebPage();
+        $request = new Request('GET', $task->getUrl());
+        $webPage = null;
+
+        try {
+            $webPage = $this->webResourceRetriever->retrieve($request);
+        } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
+            $this->response->setHasBeenSkipped();
+            $this->response->setIsRetryable(false);
+            $this->response->setErrorCount(0);
+        } catch (HttpException $httpException) {
+            $this->httpException = $httpException;
+            $this->response->setHasFailed();
+            $this->response->setIsRetryable(false);
+        } catch (TransportException $transportException) {
+            if (!$transportException->isCurlException() && !$transportException->isTooManyRedirectsException()) {
+                throw $transportException;
+            }
+
+            $this->transportException = $transportException;
+            $this->response->setHasFailed();
+            $this->response->setIsRetryable(false);
+        }
 
         if (!$this->response->hasSucceeded()) {
             return $this->hasNotSucceededHandler();
@@ -163,39 +177,6 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         }
 
         return $this->performValidation($webPage);
-    }
-
-    /**
-     * @return WebResourceInterface
-     *
-     * @throws InternetMediaTypeParseException
-     * @throws TransportException
-     */
-    private function retrieveWebPage()
-    {
-        $request = new Request('GET', $this->task->getUrl());
-
-        try {
-            return $this->webResourceRetriever->retrieve($request);
-        } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
-            $this->response->setHasBeenSkipped();
-            $this->response->setIsRetryable(false);
-            $this->response->setErrorCount(0);
-        } catch (HttpException $httpException) {
-            $this->httpException = $httpException;
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
-        } catch (TransportException $transportException) {
-            if (!$transportException->isCurlException() && !$transportException->isTooManyRedirectsException()) {
-                throw $transportException;
-            }
-
-            $this->transportException = $transportException;
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
-        }
-
-        return null;
     }
 
     /**
