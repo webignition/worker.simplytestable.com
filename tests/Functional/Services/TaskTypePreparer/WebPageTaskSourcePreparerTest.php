@@ -14,6 +14,7 @@ use App\Services\TaskTypeService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
+use App\Tests\UnhandledGuzzleException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use GuzzleHttp\Psr7\Response;
@@ -206,7 +207,7 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
     {
         $http404Response = new Response(404);
         $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
-
+        $unhandledGuzzleException = new UnhandledGuzzleException();
 
         return [
             'http 404' => [
@@ -306,6 +307,18 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
                             'http://example.com/2',
                         ],
                     ],
+                ],
+            ],
+            'unknown' => [
+                'httpFixtures' => [
+                    $unhandledGuzzleException,
+                    $unhandledGuzzleException,
+                ],
+                'expectedSourceData' => [
+                    'url' => 'http://example.com',
+                    'type' => Source::TYPE_UNAVAILABLE,
+                    'value' => 'unknown:0',
+                    'context' => [],
                 ],
             ],
         ];
