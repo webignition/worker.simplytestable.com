@@ -34,7 +34,7 @@ class Source
         $value = $data['value'] ?? '';
         $context = $data['context'] ?? [];
 
-        return new static($url, $type, $value);
+        return new static($url, $type, $value, $context);
     }
 
     public function getUrl(): string
