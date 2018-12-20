@@ -13,7 +13,7 @@ use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer;
 use App\Tests\Factory\HtmlDocumentFactory;
 
-class UrlDiscoveryTaskTypePerformerTest extends AbstractUpdatedWebPageTaskTypePerformerTest
+class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
     /**
      * @var UrlDiscoveryTaskTypePerformer

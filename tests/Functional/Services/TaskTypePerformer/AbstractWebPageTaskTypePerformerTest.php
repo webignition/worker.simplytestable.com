@@ -1,12 +1,15 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
+use App\Entity\Task\Output;
+use App\Entity\Task\Task;
+use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use App\Services\TaskTypePerformer\TaskTypePerformer;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Services\HttpMockHandler;
@@ -42,33 +45,20 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
 
-    /**
-     * @return TaskTypePerformer
-     */
-    abstract protected function getTaskTypePerformer();
-
-    /**
-     * @return string
-     */
-    abstract protected function getTaskTypeString();
+    abstract protected function getTaskTypePerformer(): TaskTypePerformerInterface;
+    abstract protected function getTaskTypeString():string;
 
     /**
      * @dataProvider cookiesDataProvider
-     *
-     * @param array $taskParameters
-     * @param string $expectedRequestCookieHeader
      */
-    abstract public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader);
+    abstract public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader);
 
     /**
      * @dataProvider httpAuthDataProvider
-     *
-     * @param array $taskParameters
-     * @param string $expectedRequestAuthorizationHeaderValue
      */
     abstract public function testSetHttpAuthenticationOnRequests(
-        $taskParameters,
-        $expectedRequestAuthorizationHeaderValue
+        array $taskParameters,
+        string $expectedRequestAuthorizationHeaderValue
     );
 
     public function testPerformNonCurlConnectException()
@@ -103,17 +93,10 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider performBadWebResourceDataProvider
-     *
-     * @param string[] $httpResponseFixtures
-     * @param bool $expectedWebResourceRetrievalHasSucceeded
-     * @param bool $expectedIsRetryable
-     * @param int $expectedErrorCount
-     * @param string $expectedTaskOutput
      */
     public function testPerformBadWebResource(
         $httpResponseFixtures,
-        $expectedWebResourceRetrievalHasSucceeded,
-        $expectedIsRetryable,
+        $expectedTaskState,
         $expectedErrorCount,
         $expectedTaskOutput
     ) {
@@ -124,20 +107,21 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         );
 
         $taskTypePerformer = $this->getTaskTypePerformer();
+        $taskTypePerformer->perform($task);
 
-        $response = $taskTypePerformer->perform($task);
+        $this->assertEquals($expectedTaskState, $task->getState());
 
-        $this->assertEquals($expectedWebResourceRetrievalHasSucceeded, $response->hasSucceeded());
-        $this->assertEquals($expectedIsRetryable, $response->isRetryable());
-        $this->assertEquals($expectedErrorCount, $response->getErrorCount());
+        $output = $task->getOutput();
+        $this->assertInstanceOf(Output::class, $output);
+        $this->assertEquals($expectedErrorCount, $output->getErrorCount());
 
         $this->assertEquals(
             $expectedTaskOutput,
-            json_decode($response->getTaskOutput()->getOutput(), true)
+            json_decode($output->getOutput(), true)
         );
     }
 
-    public function performBadWebResourceDataProvider()
+    public function performBadWebResourceDataProvider(): array
     {
         $notFoundResponse = new Response(404);
         $internalServerErrorResponse = new Response(500);
@@ -162,8 +146,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                     new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '5']),
                     new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '6']),
                 ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedTaskOutput' => [
                     'messages' => [
@@ -191,8 +174,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                     new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
 
                 ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedTaskOutput' => [
                     'messages' => [
@@ -209,8 +191,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                     $notFoundResponse,
                     $notFoundResponse,
                 ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedTaskOutput' => [
                     'messages' => [
@@ -223,23 +204,8 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                 ]
             ],
             'http 500' => [
-                'httpResponseFixtures' => [
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
+                'httpResponseFixtures' => array_fill(0, 12, $internalServerErrorResponse),
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedTaskOutput' => [
                     'messages' => [
@@ -252,22 +218,8 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                 ]
             ],
             'curl 3' => [
-                'httpResponseFixtures' => [
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
+                'httpResponseFixtures' => array_fill(0, 12, $curl3ConnectException),
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedTaskOutput' => [
                     'messages' => [
@@ -280,22 +232,8 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                 ]
             ],
             'curl 6' => [
-                'httpResponseFixtures' => [
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
+                'httpResponseFixtures' => array_fill(0, 12, $curl6ConnectException),
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedTaskOutput' => [
                     'messages' => [
@@ -308,22 +246,8 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                 ]
             ],
             'curl 28' => [
-                'httpResponseFixtures' => [
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
+                'httpResponseFixtures' => array_fill(0, 12, $curl28ConnectException),
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedTaskOutput' => [
                     'messages' => [
@@ -336,22 +260,8 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                 ]
             ],
             'curl unknown' => [
-                'httpResponseFixtures' => [
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
+                'httpResponseFixtures' => array_fill(0, 12, $curl55ConnectException),
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedTaskOutput' => [
                     'messages' => [
@@ -367,8 +277,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                 'httpResponseFixtures' => [
                     new Response(200, ['content-type' => 'application/pdf']),
                 ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => false,
+                'expectedTaskState' => Task::STATE_SKIPPED,
                 'expectedErrorCount' => 0,
                 'expectedTaskOutput' =>
                     null
@@ -377,8 +286,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                 'httpResponseFixtures' => [
                     new Response(200, ['content-type' => 'text/javascript']),
                 ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => false,
+                'expectedTaskState' => Task::STATE_SKIPPED,
                 'expectedErrorCount' => 0,
                 'expectedTaskOutput' =>
                     null
@@ -387,8 +295,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                 'httpResponseFixtures' => [
                     new Response(200, ['content-type' => 'application/javascript']),
                 ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => false,
+                'expectedTaskState' => Task::STATE_SKIPPED,
                 'expectedErrorCount' => 0,
                 'expectedTaskOutput' =>
                     null
@@ -397,8 +304,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                 'httpResponseFixtures' => [
                     new Response(200, ['content-type' => 'application/xml']),
                 ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => false,
+                'expectedTaskState' => Task::STATE_SKIPPED,
                 'expectedErrorCount' => 0,
                 'expectedTaskOutput' =>
                     null
@@ -407,8 +313,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                 'httpResponseFixtures' => [
                     new Response(200, ['content-type' => 'text/xml']),
                 ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => false,
+                'expectedTaskState' => Task::STATE_SKIPPED,
                 'expectedErrorCount' => 0,
                 'expectedTaskOutput' =>
                     null
@@ -418,8 +323,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                     new Response(200, ['content-type' => 'text/html']),
                     new Response(200, ['content-type' => 'text/html']),
                 ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_SKIPPED,
                 'expectedErrorCount' => 0,
                 'expectedTaskOutput' =>
                     null

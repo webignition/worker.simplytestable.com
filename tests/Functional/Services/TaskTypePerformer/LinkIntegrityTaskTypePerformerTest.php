@@ -16,7 +16,7 @@ use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
 use Psr\Http\Message\RequestInterface;
 
-class LinkIntegrityTaskTypePerformerTest extends AbstractUpdatedWebPageTaskTypePerformerTest
+class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
     /**
      * @var LinkIntegrityTaskTypePerformer
