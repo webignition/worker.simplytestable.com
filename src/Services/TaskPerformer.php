@@ -3,10 +3,10 @@
 namespace App\Services;
 
 use App\Event\TaskEvent;
+use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
-use App\Services\TaskTypePerformer\TaskTypePerformer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TaskPerformer
@@ -22,7 +22,7 @@ class TaskPerformer
     private $eventDispatcher;
 
     /**
-     * @var TaskTypePerformer[]
+     * @var TaskTypePerformerInterface[]
      */
     private $taskTypePerformers;
 
@@ -32,7 +32,7 @@ class TaskPerformer
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function addTaskTypePerformer(string $taskTypeName, TaskTypePerformer $taskTypePerformer)
+    public function addTaskTypePerformer(string $taskTypeName, TaskTypePerformerInterface $taskTypePerformer)
     {
         $this->taskTypePerformers[strtolower($taskTypeName)] = $taskTypePerformer;
     }
@@ -41,6 +41,7 @@ class TaskPerformer
     {
         $taskTypePerformer = $this->taskTypePerformers[strtolower($task->getType())];
 
+        /** @noinspection PhpUnhandledExceptionInspection */
         $task->setStartDateTime(new \DateTime());
         $task->setState(Task::STATE_IN_PROGRESS);
 
@@ -51,10 +52,17 @@ class TaskPerformer
 
         $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORMED, new TaskEvent($task));
 
+        /** @noinspection PhpUnhandledExceptionInspection */
         $task->setEndDateTime(new \DateTime());
 
-        $task->setOutput($response->getTaskOutput());
-        $task->setState($this->getCompletionStateFromResponse($response));
+        $taskOutput = $task->getOutput();
+        if (null === $taskOutput) {
+            $task->setOutput($response->getTaskOutput());
+        }
+
+        if ($task->isIncomplete()) {
+            $task->setState($this->getCompletionStateFromResponse($response));
+        }
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();

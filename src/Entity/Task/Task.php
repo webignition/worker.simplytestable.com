@@ -188,6 +188,16 @@ class Task implements \JsonSerializable
         return $this->endDateTime;
     }
 
+    public function isIncomplete(): bool
+    {
+        return in_array($this->state, [
+            Task::STATE_QUEUED,
+            Task::STATE_PREPARING,
+            Task::STATE_PREPARED,
+            Task::STATE_IN_PROGRESS,
+        ]);
+    }
+
     public function jsonSerialize(): array
     {
         return [

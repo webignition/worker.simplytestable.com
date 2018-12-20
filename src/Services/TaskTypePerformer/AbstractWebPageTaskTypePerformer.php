@@ -2,6 +2,7 @@
 
 namespace App\Services\TaskTypePerformer;
 
+use App\Services\TaskOutputMessageFactory;
 use GuzzleHttp\Psr7\Request;
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
@@ -58,16 +59,23 @@ abstract class AbstractWebPageTaskTypePerformer extends TaskTypePerformer
      */
     private $httpHistoryContainer;
 
+    /**
+     * @var TaskOutputMessageFactory
+     */
+    protected $taskOutputMessageFactory;
+
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
-        HttpHistoryContainer $httpHistoryContainer
+        HttpHistoryContainer $httpHistoryContainer,
+        TaskOutputMessageFactory $taskOutputMessageFactory
     ) {
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->webResourceRetriever = $webResourceRetriever;
         $this->httpHistoryContainer = $httpHistoryContainer;
+        $this->taskOutputMessageFactory = $taskOutputMessageFactory;
     }
 
     /**
@@ -154,118 +162,9 @@ abstract class AbstractWebPageTaskTypePerformer extends TaskTypePerformer
      */
     protected function getHttpExceptionOutput()
     {
-        return (object)[
-            'messages' => [
-                [
-                    'message' => $this->getOutputMessage(),
-                    'messageId' => 'http-retrieval-' . $this->getOutputMessageId(),
-                    'type' => 'error',
-                ]
-            ],
-        ];
-    }
-
-    /**
-     * @return string
-     */
-    private function getOutputMessage()
-    {
-        if ($this->hasTooManyRedirectsException()) {
-            if ($this->isRedirectLoopException()) {
-                return 'Redirect loop detected';
-            }
-
-            return 'Redirect limit reached';
-        }
-
-        if (!empty($this->transportException)) {
-            if ($this->transportException->isCurlException()) {
-                if (self::CURL_CODE_TIMEOUT == $this->transportException->getCode()) {
-                    return 'Timeout reached retrieving resource';
-                }
-
-                if (self::CURL_CODE_DNS_LOOKUP_FAILURE == $this->transportException->getCode()) {
-                    return 'DNS lookup failure resolving resource domain name';
-                }
-
-                if (self::CURL_CODE_INVALID_URL == $this->transportException->getCode()) {
-                    return 'Invalid resource URL';
-                }
-
-                return '';
-            }
-
-            return '';
-        }
-
-        return $this->httpException->getMessage();
-    }
-
-    /**
-     * @return string
-     */
-    private function getOutputMessageId()
-    {
-        if ($this->hasTooManyRedirectsException()) {
-            if ($this->isRedirectLoopException()) {
-                return 'redirect-loop';
-            }
-
-            return 'redirect-limit-reached';
-        }
-
-        if (!empty($this->transportException)) {
-            return 'curl-code-' . $this->transportException->getCode();
-        }
-
-        if (!empty($this->curlException)) {
-            return 'curl-code-' . $this->curlException->getCurlCode();
-        }
-
-        return $this->httpException->getCode();
-    }
-
-    /**
-     * @return boolean
-     */
-    private function isRedirectLoopException()
-    {
-        $responses = $this->httpHistoryContainer->getResponses();
-        $responseHistoryContainsOnlyRedirects = true;
-
-        foreach ($responses as $response) {
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 300 || $statusCode >=400) {
-                $responseHistoryContainsOnlyRedirects = false;
-            }
-        }
-
-        if (!$responseHistoryContainsOnlyRedirects) {
-            return false;
-        }
-
-        $requestUrls = $this->httpHistoryContainer->getRequestUrlsAsStrings();
-        $requestUrls = array_slice($requestUrls, count($requestUrls) / 2);
-
-        foreach ($requestUrls as $urlIndex => $url) {
-            if (in_array($url, array_slice($requestUrls, $urlIndex + 1))) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    private function hasTooManyRedirectsException()
-    {
-        if (empty($this->transportException)) {
-            return false;
-        }
-
-        return $this->transportException->isTooManyRedirectsException();
+        return $this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
+            $this->httpException,
+            $this->transportException
+        );
     }
 }

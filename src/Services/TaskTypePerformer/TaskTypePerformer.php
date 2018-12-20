@@ -7,7 +7,7 @@ use App\Entity\Task\Task;
 use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use webignition\InternetMediaType\InternetMediaType;
 
-abstract class TaskTypePerformer
+abstract class TaskTypePerformer implements TaskTypePerformerInterface
 {
     const OUTPUT_STARTING_STATE = 'taskoutput-queued';
 
@@ -21,7 +21,7 @@ abstract class TaskTypePerformer
      *
      * @return TaskTypePerformerResponse
      */
-    public function perform(Task $task)
+    public function perform(Task $task): TaskTypePerformerResponse
     {
         $this->response = new TaskTypePerformerResponse();
 

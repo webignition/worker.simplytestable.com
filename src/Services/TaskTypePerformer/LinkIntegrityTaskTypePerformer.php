@@ -7,6 +7,7 @@ use App\Model\LinkIntegrityResultCollection;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
+use App\Services\TaskOutputMessageFactory;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
@@ -34,6 +35,7 @@ class LinkIntegrityTaskTypePerformer extends AbstractWebPageTaskTypePerformer
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
         HttpHistoryContainer $httpHistoryContainer,
+        TaskOutputMessageFactory $taskOutputMessageFactory,
         LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory,
         HttpRetryMiddleware $httpRetryMiddleware
     ) {
@@ -41,7 +43,8 @@ class LinkIntegrityTaskTypePerformer extends AbstractWebPageTaskTypePerformer
             $httpClientService,
             $httpClientConfigurationService,
             $webResourceRetriever,
-            $httpHistoryContainer
+            $httpHistoryContainer,
+            $taskOutputMessageFactory
         );
 
         $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
