@@ -6,7 +6,6 @@ use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
 use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use App\Services\HttpClientConfigurationService;
-use App\Services\TaskOutputMessageFactory;
 use App\Services\TaskPerformerWebPageRetriever;
 use webignition\HtmlValidator\Output\Parser\Configuration as HtmlValidatorOutputParserConfiguration;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
@@ -73,21 +72,6 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
      * @throws TransportException
      */
     public function perform(Task $task): ?TaskTypePerformerResponse
-    {
-        $this->execute($task);
-
-        return null;
-    }
-
-    /**
-     * @param Task $task
-     *
-     * @return null
-     *
-     * @throws InternetMediaTypeParseException
-     * @throws TransportException
-     */
-    private function execute(Task $task)
     {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
@@ -179,12 +163,7 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         return null;
     }
 
-    /**
-     * @param string $content
-     *
-     * @return string
-     */
-    private function storeTmpFile($content)
+    private function storeTmpFile(string $content): string
     {
         $filename = sys_get_temp_dir() . '/' . md5($content) . '.html';
 
@@ -195,50 +174,32 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         return $filename;
     }
 
-    /**
-     * @return \stdClass
-     */
-    private function getMissingDocumentTypeOutput()
+    private function getMissingDocumentTypeOutput(): array
     {
-        return (object)[
-            'messages' => [
-                [
-                    'message' => 'No doctype',
-                    'messageId' => 'document-type-missing',
-                    'type' => 'error',
-                ]
-            ]
-        ];
+        return $this->createErrorOutput('No doctype', 'document-type-missing');
     }
 
-    /**
-     * @param $fragment
-     *
-     * @return \stdClass
-     */
-    private function getIsNotMarkupOutput($fragment)
+    private function getIsNotMarkupOutput(string $fragment): array
     {
-        return (object)[
-            'messages' => [
-                [
-                    'message' => 'Not markup',
-                    'messageId' => 'document-is-not-markup',
-                    'type' => 'error',
-                    'fragment' => $fragment,
-                ]
-            ],
-        ];
+        return $this->createErrorOutput('Not markup', 'document-is-not-markup', [
+            'fragment' => $fragment,
+        ]);
     }
 
     private function createInvalidDocumentTypeOutput(string $documentType): array
     {
+        return $this->createErrorOutput($documentType, 'document-type-invalid');
+    }
+
+    private function createErrorOutput(string $message, string $messageId, ?array $additionalData = []): array
+    {
         return [
             'messages' => [
-                [
-                    'message' => $documentType,
-                    'messageId' => 'document-type-invalid',
+                array_merge([
+                    'message' => $message,
+                    'messageId' => $messageId,
                     'type' => 'error',
-                ]
+                ], $additionalData)
             ]
         ];
     }
