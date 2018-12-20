@@ -162,7 +162,7 @@ abstract class AbstractWebPageTaskTypePerformer extends TaskTypePerformer
      */
     protected function getHttpExceptionOutput()
     {
-        return $this->taskOutputMessageFactory->createOutputMessageCollection(
+        return $this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
             $this->httpException,
             $this->transportException
         );
