@@ -14,26 +14,17 @@ class Source
 
     const MESSAGE_INVALID_CONTENT_TYPE = 'invalid-content-type';
 
-    /**
-     * @var string
-     */
     private $url;
-
-    /**
-     * @var string
-     */
     private $type;
-
-    /**
-     * @var string
-     */
     private $value;
+    private $context = [];
 
-    public function __construct(string $url, string $type, string $value)
+    public function __construct(string $url, string $type, string $value, array $context = [])
     {
         $this->url = $url;
         $this->type = $type;
         $this->value = $value;
+        $this->context = $context;
     }
 
     public static function fromArray(array $data): Source
@@ -41,6 +32,7 @@ class Source
         $url = $data['url'] ?? '';
         $type = $data['type'] ?? '';
         $value = $data['value'] ?? '';
+        $context = $data['context'] ?? [];
 
         return new static($url, $type, $value);
     }
@@ -58,6 +50,11 @@ class Source
     public function getValue(): string
     {
         return $this->value;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
     }
 
     public function isCachedResource(): bool
@@ -103,6 +100,7 @@ class Source
             'url' => $this->url,
             'type' => $this->type,
             'value' => $this->value,
+            'context' => $this->context,
         ];
     }
 

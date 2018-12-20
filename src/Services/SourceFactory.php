@@ -16,9 +16,9 @@ class SourceFactory
         );
     }
 
-    public function createHttpFailedSource(string $url, int $statusCode): Source
+    public function createHttpFailedSource(string $url, int $statusCode, array $context = []): Source
     {
-        return $this->createUnavailableSource($url, Source::FAILURE_TYPE_HTTP, $statusCode);
+        return $this->createUnavailableSource($url, Source::FAILURE_TYPE_HTTP, $statusCode, $context);
     }
 
     public function createCurlFailedSource(string $url, int $curlCode): Source
@@ -40,12 +40,17 @@ class SourceFactory
         );
     }
 
-    private function createUnavailableSource(string $url, string $failureType, int $failureCode): Source
-    {
+    private function createUnavailableSource(
+        string $url,
+        string $failureType,
+        int $failureCode,
+        array $context = []
+    ): Source {
         return new Source(
             $url,
             Source::TYPE_UNAVAILABLE,
-            $failureType . ':' . $failureCode
+            $failureType . ':' . $failureCode,
+            $context
         );
     }
 }
