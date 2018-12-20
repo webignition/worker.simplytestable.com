@@ -1,9 +1,11 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services\TaskTypePreparer;
 
 use App\Entity\CachedResource;
 use App\Entity\Task\Task;
+use App\Model\Source;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\SourceFactory;
@@ -71,8 +73,6 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider prepareInvalidContentTypeDataProvider
-     *
-     * @param string $contentType
      */
     public function testPrepareInvalidContentType(string $contentType)
     {
@@ -177,5 +177,122 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         );
 
         $this->preparer->prepare($task);
+    }
+
+    /**
+     * @dataProvider prepareTooManyRedirectsDataProvider
+     */
+    public function testPrepareTooManyRedirects(array $httpFixtures, array $expectedSourceData)
+    {
+        $this->httpMockHandler->appendFixtures($httpFixtures);
+
+        $taskTypeService = self::$container->get(TaskTypeService::class);
+
+        $url = 'http://example.com';
+        $task = Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+
+        $this->assertEquals([], $task->getSources());
+
+        $this->preparer->prepare($task);
+
+//        $expectedSource = $this->sourceFactory->createHttpFailedSource($url, 301);
+
+//        var_dump($task->getSources());
+
+        /* @var Source $source */
+        $source = $task->getSources()[$url];
+
+        $this->assertEquals($expectedSourceData, $source->toArray());
+//
+////        $this->assertEquals(
+////            [
+////                $url => $expectedSource,
+////            ],
+////            $task->getSources()
+////        );
+    }
+
+    public function prepareTooManyRedirectsDataProvider(): array
+    {
+        return [
+            'not redirect loop (first 6 responses are to HEAD requests, second 6 are to GET requests)' => [
+                'httpFixtures' => [
+                    new Response(301, ['location' => 'http://example.com/1']),
+                    new Response(301, ['location' => 'http://example.com/2']),
+                    new Response(301, ['location' => 'http://example.com/3']),
+                    new Response(301, ['location' => 'http://example.com/4']),
+                    new Response(301, ['location' => 'http://example.com/5']),
+                    new Response(301, ['location' => 'http://example.com/6']),
+                    new Response(301, ['location' => 'http://example.com/1']),
+                    new Response(301, ['location' => 'http://example.com/2']),
+                    new Response(301, ['location' => 'http://example.com/3']),
+                    new Response(301, ['location' => 'http://example.com/4']),
+                    new Response(301, ['location' => 'http://example.com/5']),
+                    new Response(301, ['location' => 'http://example.com/6']),
+                ],
+                'expectedSourceData' => [
+                    'url' => 'http://example.com',
+                    'type' => Source::TYPE_UNAVAILABLE,
+                    'value' => 'http:301',
+                    'context' => [
+                        'too_many_redirects' => true,
+                        'is_redirect_loop' => false,
+                        'history' => [
+                            'http://example.com',
+                            'http://example.com/1',
+                            'http://example.com/2',
+                            'http://example.com/3',
+                            'http://example.com/4',
+                            'http://example.com/5',
+                            'http://example.com',
+                            'http://example.com/1',
+                            'http://example.com/2',
+                            'http://example.com/3',
+                            'http://example.com/4',
+                            'http://example.com/5',
+                        ],
+                    ],
+                ],
+            ],
+            'is redirect loop' => [
+                'httpFixtures' => [
+                    new Response(301, ['location' => 'http://example.com/1']),
+                    new Response(301, ['location' => 'http://example.com/2']),
+                    new Response(301, ['location' => 'http://example.com/3']),
+                    new Response(301, ['location' => 'http://example.com/1']),
+                    new Response(301, ['location' => 'http://example.com/2']),
+                    new Response(301, ['location' => 'http://example.com/3']),
+                    new Response(301, ['location' => 'http://example.com/1']),
+                    new Response(301, ['location' => 'http://example.com/2']),
+                    new Response(301, ['location' => 'http://example.com/3']),
+                    new Response(301, ['location' => 'http://example.com/1']),
+                    new Response(301, ['location' => 'http://example.com/2']),
+                    new Response(301, ['location' => 'http://example.com/3']),
+                ],
+                'expectedSourceData' => [
+                    'url' => 'http://example.com',
+                    'type' => Source::TYPE_UNAVAILABLE,
+                    'value' => 'http:301',
+                    'context' => [
+                        'too_many_redirects' => true,
+                        'is_redirect_loop' => true,
+                        'history' => [
+                            'http://example.com',
+                            'http://example.com/1',
+                            'http://example.com/2',
+                            'http://example.com/3',
+                            'http://example.com/1',
+                            'http://example.com/2',
+                            'http://example.com',
+                            'http://example.com/1',
+                            'http://example.com/2',
+                            'http://example.com/3',
+                            'http://example.com/1',
+                            'http://example.com/2',
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

@@ -13,6 +13,8 @@ use App\Services\RequestIdentifierFactory;
 use App\Services\SourceFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\RequestInterface;
+use ReflectionClass;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 use webignition\WebResource\Exception\HttpException;
@@ -94,9 +96,6 @@ class WebPageTaskSourcePreparer implements TaskPreparerInterface
         } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
             $source = $this->sourceFactory->createInvalidSource($taskUrl, Source::MESSAGE_INVALID_CONTENT_TYPE);
         } catch (HttpException $httpException) {
-            // 301 could occur here
-            // handle differentiating between redirect limit hit and redirect loop
-
             $source = $this->sourceFactory->createHttpFailedSource(
                 $taskUrl,
                 $httpException->getCode()
@@ -105,10 +104,24 @@ class WebPageTaskSourcePreparer implements TaskPreparerInterface
             if (!$transportException->isCurlException() && !$transportException->isTooManyRedirectsException()) {
                 $source = $this->sourceFactory->createUnknownFailedSource($taskUrl);
             } else {
-                $source = $this->sourceFactory->createCurlFailedSource(
-                    $taskUrl,
-                    $transportException->getCode()
-                );
+                if ($transportException->isTooManyRedirectsException()) {
+                    $this->fixHeadRequestMethods();
+
+                    $source = $this->sourceFactory->createHttpFailedSource(
+                        $taskUrl,
+                        301,
+                        [
+                            'too_many_redirects' => true,
+                            'is_redirect_loop' => $this->httpHistoryContainer->hasRedirectLoop(),
+                            'history' => $this->httpHistoryContainer->getRequestUrlsAsStrings(),
+                        ]
+                    );
+                } else {
+                    $source = $this->sourceFactory->createCurlFailedSource(
+                        $taskUrl,
+                        $transportException->getCode()
+                    );
+                }
             }
         } catch (InternetMediaTypeParseException $e) {
             $source = $this->sourceFactory->createInvalidSource(
@@ -134,5 +147,27 @@ class WebPageTaskSourcePreparer implements TaskPreparerInterface
     public function getPriority(): int
     {
         return $this->priority;
+    }
+
+    /**
+     * Guzzle currently (incorrectly) follows a redirected HEAD request with a GET request
+     * This modifies the method on such requests
+     */
+    private function fixHeadRequestMethods()
+    {
+        $httpTransactionCount = $this->httpHistoryContainer->count();
+        $httpTransactions = $this->httpHistoryContainer->getTransactions();
+        $headTransactions = array_slice($httpTransactions, 0, $httpTransactionCount / 2);
+
+        foreach ($headTransactions as $httpTransaction) {
+            /* @var RequestInterface $request */
+            $request = $httpTransaction['request'];
+
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $reflector = new ReflectionClass(Request::class);
+            $property = $reflector->getProperty('method');
+            $property->setAccessible(true);
+            $property->setValue($request, 'HEAD');
+        }
     }
 }
