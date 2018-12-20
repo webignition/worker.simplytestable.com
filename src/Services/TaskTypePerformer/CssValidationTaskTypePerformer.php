@@ -2,10 +2,14 @@
 
 namespace App\Services\TaskTypePerformer;
 
+use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\TaskOutputMessageFactory;
+use App\Services\TaskPerformerWebPageRetriever;
+use HttpException;
 use webignition\CssValidatorOutput\CssValidatorOutput;
 use webignition\CssValidatorOutput\Message\AbstractMessage as CssValidatorOutputMessage;
 use webignition\CssValidatorOutput\Message\AbstractMessage;
@@ -16,12 +20,55 @@ use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebPageInspector\UnparseableContentTypeException;
+use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
+class CssValidationTaskTypePerformer implements TaskTypePerformerInterface
 {
+    const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
+
+    /**
+     * @var HttpException
+     */
+    private $httpException;
+
+    /**
+     * @var TransportException
+     */
+    private $transportException;
+
+    /**
+     * @var WebResourceRetriever
+     */
+    private $webResourceRetriever;
+
+    /**
+     * @var HttpClientService
+     */
+    private $httpClientService;
+
+    /**
+     * @var HttpClientConfigurationService
+     */
+    private $httpClientConfigurationService;
+
+    /**
+     * @var HttpHistoryContainer
+     */
+    private $httpHistoryContainer;
+
+    /**
+     * @var TaskOutputMessageFactory
+     */
+    private $taskOutputMessageFactory;
+
+    /**
+     * @var TaskPerformerWebPageRetriever
+     */
+    private $taskPerformerWebPageRetriever;
+
     /**
      * @var CssValidatorWrapper
      */
@@ -38,19 +85,39 @@ class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
         WebResourceRetriever $webResourceRetriever,
         HttpHistoryContainer $httpHistoryContainer,
         TaskOutputMessageFactory $taskOutputMessageFactory,
+        TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
         CssValidatorWrapper $cssValidatorWrapper,
         CssValidatorWrapperConfigurationFactory $configurationFactory
     ) {
-        parent::__construct(
-            $httpClientService,
-            $httpClientConfigurationService,
-            $webResourceRetriever,
-            $httpHistoryContainer,
-            $taskOutputMessageFactory
-        );
+        $this->httpClientService = $httpClientService;
+        $this->httpClientConfigurationService = $httpClientConfigurationService;
+        $this->webResourceRetriever = $webResourceRetriever;
+        $this->httpHistoryContainer = $httpHistoryContainer;
+        $this->taskOutputMessageFactory = $taskOutputMessageFactory;
+        $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
         $this->configurationFactory = $configurationFactory;
+    }
+
+    /**
+     * @param Task $task
+     *
+     * @return TaskTypePerformerResponse
+     * @throws InternetMediaTypeParseException
+     * @throws TransportException
+     */
+    public function perform(Task $task): ?TaskTypePerformerResponse
+    {
+        $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
+
+        $webPage = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+
+        if (!$task->isIncomplete()) {
+            return null;
+        }
+
+        return $this->performValidation($task, $webPage);
     }
 
     /**
@@ -91,10 +158,10 @@ class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
      * @throws InternetMediaTypeParseException
      * @throws UnparseableContentTypeException
      */
-    protected function performValidation(WebPage $webPage)
+    protected function performValidation(Task $task, WebPage $webPage)
     {
         $cssValidatorWrapperConfiguration = $this->configurationFactory->create(
-            $this->task,
+            $task,
             (string)$webPage->getUri(),
             $webPage->getContent()
         );
@@ -104,27 +171,32 @@ class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
 
         if ($cssValidatorOutput->hasException()) {
             // Will only get unknown CSS validator exceptions here
-            $this->response->setHasFailed();
-            $this->response->setErrorCount(1);
-            $this->response->setIsRetryable(false);
-
-            return json_encode([
-                $this->getUnknownExceptionErrorOutput($this->task)
-            ]);
+            return $this->setTaskOutputAndState(
+                $task,
+                json_encode([
+                    $this->getUnknownExceptionErrorOutput($task)
+                ]),
+                Task::STATE_FAILED_NO_RETRY_AVAILABLE,
+                1,
+                0
+            );
         }
 
-        $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
-        $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
+        return $this->setTaskOutputAndState(
+            $task,
+            json_encode($this->prepareCssValidatorOutput($cssValidatorOutput)),
+            Task::STATE_COMPLETED,
+            $cssValidatorOutput->getErrorCount(),
+            $cssValidatorOutput->getWarningCount()
+        );
 
-        return json_encode($this->prepareCssValidatorOutput($cssValidatorOutput));
+//        $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
+//        $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
+//
+//        return json_encode($this->prepareCssValidatorOutput($cssValidatorOutput));
     }
 
-    /**
-     * @param CssValidatorOutput $cssValidatorOutput
-     *
-     * @return array
-     */
-    private function prepareCssValidatorOutput(CssValidatorOutput $cssValidatorOutput)
+    private function prepareCssValidatorOutput(CssValidatorOutput $cssValidatorOutput): array
     {
         $serializableMessages = [];
         $messages = $cssValidatorOutput->getMessages();
@@ -218,5 +290,24 @@ class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
             'ref' => $task->getUrl(),
             'line_number' => 0,
         ];
+    }
+
+    private function setTaskOutputAndState(
+        Task $task,
+        string $output,
+        string $state,
+        int $errorCount,
+        int $warningCount
+    ) {
+        $task->setOutput(Output::create(
+            $output,
+            new InternetMediaType('application/json'),
+            $errorCount,
+            $warningCount
+        ));
+
+        $task->setState($state);
+
+        return null;
     }
 }
