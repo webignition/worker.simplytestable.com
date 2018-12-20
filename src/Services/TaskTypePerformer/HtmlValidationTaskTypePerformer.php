@@ -106,7 +106,9 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param Task $task
+     *
+     * @return null
      *
      * @throws InternetMediaTypeParseException
      * @throws TransportException
@@ -115,7 +117,27 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
+        $webPage = $this->retrieveWebPage($task);
+
+        if (!$task->isIncomplete()) {
+            return null;
+        }
+
+        return $this->performValidation($task, $webPage);
+    }
+
+    /**
+     * @param Task $task
+     *
+     * @return WebPage|null
+     *
+     * @throws InternetMediaTypeParseException
+     * @throws TransportException
+     */
+    private function retrieveWebPage(Task $task)
+    {
         $request = new Request('GET', $task->getUrl());
+
         /* @var WebPage $webPage */
         $webPage = null;
 
@@ -167,7 +189,7 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
             );
         }
 
-        return $this->performValidation($task, $webPage);
+        return $webPage;
     }
 
     /**

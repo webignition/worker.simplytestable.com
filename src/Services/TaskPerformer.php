@@ -60,14 +60,7 @@ class TaskPerformer
             $task->setOutput($response->getTaskOutput());
         }
 
-        $incompleteStates = [
-            Task::STATE_QUEUED,
-            Task::STATE_PREPARING,
-            Task::STATE_PREPARED,
-            Task::STATE_IN_PROGRESS,
-        ];
-
-        if (in_array($task->getState(), $incompleteStates)) {
+        if ($task->isIncomplete()) {
             $task->setState($this->getCompletionStateFromResponse($response));
         }
 
