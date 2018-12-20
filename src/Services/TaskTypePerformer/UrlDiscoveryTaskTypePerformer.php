@@ -2,14 +2,32 @@
 
 namespace App\Services\TaskTypePerformer;
 
+use App\Entity\Task\Output;
+use App\Entity\Task\Task;
+use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
+use App\Services\HttpClientConfigurationService;
+use App\Services\TaskPerformerWebPageRetriever;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
+use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
+use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
 
-class UrlDiscoveryTaskTypePerformer extends AbstractWebPageTaskTypePerformer
+class UrlDiscoveryTaskTypePerformer implements TaskTypePerformerInterface
 {
+    const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
+
+    /**
+     * @var HttpClientConfigurationService
+     */
+    private $httpClientConfigurationService;
+
+    /**
+     * @var TaskPerformerWebPageRetriever
+     */
+    private $taskPerformerWebPageRetriever;
 
     /**
      * @var string[]
@@ -19,29 +37,36 @@ class UrlDiscoveryTaskTypePerformer extends AbstractWebPageTaskTypePerformer
         'https'
     ];
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function hasNotSucceededHandler()
-    {
-        $this->response->setErrorCount(1);
-
-        return json_encode($this->getHttpExceptionOutput());
+    public function __construct(
+        TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
+        HttpClientConfigurationService $httpClientConfigurationService
+    ) {
+        $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
+        $this->httpClientConfigurationService = $httpClientConfigurationService;
     }
 
     /**
-     * {@inheritdoc}
+     * @param Task $task
+     *
+     * @return TaskTypePerformerResponse|null
+     *
+     * @throws InternetMediaTypeParseException
+     * @throws TransportException
      */
-    protected function isBlankWebResourceHandler()
+    public function perform(Task $task): ?TaskTypePerformerResponse
     {
-        $this->response->setHasBeenSkipped();
-        $this->response->setErrorCount(0);
+        $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
+
+        $webPage = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+
+        if (!$task->isIncomplete()) {
+            return null;
+        }
+
+        return $this->performValidation($task, $webPage);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function performValidation(WebPage $webPage)
+    private function performValidation(Task $task, WebPage $webPage)
     {
         $configuration = new LinkUrlFinderConfiguration([
             LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE => $webPage,
@@ -50,7 +75,7 @@ class UrlDiscoveryTaskTypePerformer extends AbstractWebPageTaskTypePerformer
             LinkUrlFinderConfiguration::CONFIG_KEY_IGNORE_FRAGMENT_IN_URL_COMPARISON => true,
         ]);
 
-        $urlScope = $this->task->getParameters()->get('scope');
+        $urlScope = $task->getParameters()->get('scope');
         if ($urlScope) {
             $configuration->setUrlScope($urlScope);
         }
@@ -59,18 +84,12 @@ class UrlDiscoveryTaskTypePerformer extends AbstractWebPageTaskTypePerformer
         $finder->setConfiguration($configuration);
         $finder->getUrlScopeComparer()->addEquivalentSchemes($this->equivalentSchemes);
 
-        return json_encode($finder->getUniqueUrls());
-    }
+        $task->setOutput(Output::create(
+            json_encode($finder->getUniqueUrls()),
+            new InternetMediaType('application/json'),
+            0
+        ));
 
-    /**
-     * @return InternetMediaType
-     */
-    protected function getOutputContentType()
-    {
-        $contentType = new InternetMediaType();
-        $contentType->setType('application');
-        $contentType->setSubtype('json');
-
-        return $contentType;
+        $task->setState(Task::STATE_COMPLETED);
     }
 }
