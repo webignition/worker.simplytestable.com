@@ -7,8 +7,8 @@ use App\Entity\Task\Task;
 use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
+use App\Services\TaskOutputMessageFactory;
 use GuzzleHttp\Psr7\Request;
-use Psr\Http\Message\ResponseInterface;
 use webignition\HtmlValidator\Output\Parser\Configuration as HtmlValidatorOutputParserConfiguration;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
@@ -69,6 +69,11 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     private $httpHistoryContainer;
 
     /**
+     * @var TaskOutputMessageFactory
+     */
+    private $taskOutputMessageFactory;
+
+    /**
      * @var HtmlValidatorWrapper
      */
     private $htmlValidatorWrapper;
@@ -88,6 +93,7 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         HttpClientConfigurationService $httpClientConfigurationService,
         WebResourceRetriever $webResourceRetriever,
         HttpHistoryContainer $httpHistoryContainer,
+        TaskOutputMessageFactory $taskOutputMessageFactory,
         HtmlValidatorWrapper $htmlValidatorWrapper,
         string $validatorPath
     ) {
@@ -95,6 +101,7 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->webResourceRetriever = $webResourceRetriever;
         $this->httpHistoryContainer = $httpHistoryContainer;
+        $this->taskOutputMessageFactory = $taskOutputMessageFactory;
 
         $this->htmlValidatorWrapper = $htmlValidatorWrapper;
         $this->validatorPath = $validatorPath;
@@ -198,23 +205,10 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     {
         $this->response->setErrorCount(1);
 
-        return json_encode($this->getHttpExceptionOutput());
-    }
-
-    /**
-     * @return \stdClass
-     */
-    private function getHttpExceptionOutput()
-    {
-        return (object)[
-            'messages' => [
-                [
-                    'message' => $this->getOutputMessage(),
-                    'messageId' => 'http-retrieval-' . $this->getOutputMessageId(),
-                    'type' => 'error',
-                ]
-            ],
-        ];
+        return json_encode($this->taskOutputMessageFactory->createOutputMessageData(
+            $this->httpException,
+            $this->transportException
+        ));
     }
 
     /**
@@ -384,110 +378,5 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         $contentType->setSubtype('json');
 
         return $contentType;
-    }
-
-    /**
-     * @return string
-     */
-    private function getOutputMessage()
-    {
-        if ($this->hasTooManyRedirectsException()) {
-            if ($this->isRedirectLoopException()) {
-                return 'Redirect loop detected';
-            }
-
-            return 'Redirect limit reached';
-        }
-
-        if (!empty($this->transportException)) {
-            if ($this->transportException->isCurlException()) {
-                if (self::CURL_CODE_TIMEOUT == $this->transportException->getCode()) {
-                    return 'Timeout reached retrieving resource';
-                }
-
-                if (self::CURL_CODE_DNS_LOOKUP_FAILURE == $this->transportException->getCode()) {
-                    return 'DNS lookup failure resolving resource domain name';
-                }
-
-                if (self::CURL_CODE_INVALID_URL == $this->transportException->getCode()) {
-                    return 'Invalid resource URL';
-                }
-
-                return '';
-            }
-
-            return '';
-        }
-
-        return $this->httpException->getMessage();
-    }
-
-    /**
-     * @return string
-     */
-    private function getOutputMessageId()
-    {
-        if ($this->hasTooManyRedirectsException()) {
-            if ($this->isRedirectLoopException()) {
-                return 'redirect-loop';
-            }
-
-            return 'redirect-limit-reached';
-        }
-
-        if (!empty($this->transportException)) {
-            return 'curl-code-' . $this->transportException->getCode();
-        }
-
-        if (!empty($this->curlException)) {
-            return 'curl-code-' . $this->curlException->getCurlCode();
-        }
-
-        return $this->httpException->getCode();
-    }
-
-    /**
-     * @return boolean
-     */
-    private function isRedirectLoopException()
-    {
-        /* @var ResponseInterface[] $responses */
-        $responses = $this->httpHistoryContainer->getResponses();
-        $responseHistoryContainsOnlyRedirects = true;
-
-        foreach ($responses as $response) {
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 300 || $statusCode >=400) {
-                $responseHistoryContainsOnlyRedirects = false;
-            }
-        }
-
-        if (!$responseHistoryContainsOnlyRedirects) {
-            return false;
-        }
-
-        $requestUrls = $this->httpHistoryContainer->getRequestUrlsAsStrings();
-        $requestUrls = array_slice($requestUrls, count($requestUrls) / 2);
-
-        foreach ($requestUrls as $urlIndex => $url) {
-            if (in_array($url, array_slice($requestUrls, $urlIndex + 1))) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    private function hasTooManyRedirectsException()
-    {
-        if (empty($this->transportException)) {
-            return false;
-        }
-
-        return $this->transportException->isTooManyRedirectsException();
     }
 }
