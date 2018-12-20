@@ -205,7 +205,7 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     {
         $this->response->setErrorCount(1);
 
-        return json_encode($this->taskOutputMessageFactory->createOutputMessageData(
+        return json_encode($this->taskOutputMessageFactory->createOutputMessageCollectionData(
             $this->httpException,
             $this->transportException
         ));
