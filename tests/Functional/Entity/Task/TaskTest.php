@@ -66,10 +66,11 @@ class TaskTest extends AbstractBaseTestCase
         $this->assertEquals($parentTask, $childTask2->getParentTask());
     }
 
-    public function testResourceIndexPopulateAndRetrieve()
+    public function testSourcesPopulateAndRetrieve()
     {
         $htmlUrl = 'http://example.com';
         $httpUnavailableUrl = 'http://example.com/404';
+        $httpTooManyRedirectsUrl = 'http://example.com/301';
         $curlUnavailableUrl = 'http://example.com/timeout';
         $unknownUnavailableUrl = 'http://example.com/unknown';
 
@@ -96,11 +97,28 @@ class TaskTest extends AbstractBaseTestCase
 
         $htmlSource = $sourceFactory->fromCachedResource($htmlResource);
         $httpUnavailableSource = $sourceFactory->createHttpFailedSource($httpUnavailableUrl, 404);
+        $httpTooManyRedirectsSource = $sourceFactory->createHttpFailedSource(
+            $httpTooManyRedirectsUrl,
+            301,
+            [
+                'too_many_redirects' => true,
+                'is_redirect_loop' => true,
+                'history' => [
+                    'http://example.com/301',
+                    'http://example.com/301',
+                    'http://example.com/301',
+                    'http://example.com/301',
+                    'http://example.com/301',
+                    'http://example.com/301',
+                ],
+            ]
+        );
         $curlUnavailableResource = $sourceFactory->createCurlFailedSource($curlUnavailableUrl, 28);
         $unknownUnavailableResource = $sourceFactory->createUnknownFailedSource($unknownUnavailableUrl);
 
         $task->addSource($htmlSource);
         $task->addSource($httpUnavailableSource);
+        $task->addSource($httpTooManyRedirectsSource);
         $task->addSource($curlUnavailableResource);
         $task->addSource($unknownUnavailableResource);
 
@@ -110,6 +128,18 @@ class TaskTest extends AbstractBaseTestCase
         $expectedTaskSources = [
             $htmlUrl => new Source($htmlUrl, Source::TYPE_CACHED_RESOURCE, $requestHash),
             $httpUnavailableUrl => new Source($httpUnavailableUrl, Source::TYPE_UNAVAILABLE, 'http:404'),
+            $httpTooManyRedirectsUrl => new Source($httpTooManyRedirectsUrl, Source::TYPE_UNAVAILABLE, 'http:301', [
+                'too_many_redirects' => true,
+                'is_redirect_loop' => true,
+                'history' => [
+                    'http://example.com/301',
+                    'http://example.com/301',
+                    'http://example.com/301',
+                    'http://example.com/301',
+                    'http://example.com/301',
+                    'http://example.com/301',
+                ],
+            ]),
             $curlUnavailableUrl => new Source($curlUnavailableUrl, Source::TYPE_UNAVAILABLE, 'curl:28'),
             $unknownUnavailableUrl => new Source($unknownUnavailableUrl, Source::TYPE_UNAVAILABLE, 'unknown:0'),
         ];
