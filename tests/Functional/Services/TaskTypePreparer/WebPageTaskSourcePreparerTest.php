@@ -195,21 +195,10 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
 
         $this->preparer->prepare($task);
 
-//        $expectedSource = $this->sourceFactory->createHttpFailedSource($url, 301);
-
-//        var_dump($task->getSources());
-
         /* @var Source $source */
         $source = $task->getSources()[$url];
 
         $this->assertEquals($expectedSourceData, $source->toArray());
-//
-////        $this->assertEquals(
-////            [
-////                $url => $expectedSource,
-////            ],
-////            $task->getSources()
-////        );
     }
 
     public function prepareTooManyRedirectsDataProvider(): array
