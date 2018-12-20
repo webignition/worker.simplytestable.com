@@ -68,6 +68,7 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
      * @param Task $task
      *
      * @return TaskTypePerformerResponse
+     *
      * @throws InternetMediaTypeParseException
      * @throws TransportException
      */

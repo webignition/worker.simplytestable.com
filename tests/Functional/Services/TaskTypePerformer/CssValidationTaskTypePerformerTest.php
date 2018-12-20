@@ -1,8 +1,13 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
+use App\Entity\Task\Output;
+use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
+use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\CssValidationTaskTypePerformer;
@@ -11,7 +16,7 @@ use App\Tests\Factory\CssValidatorFixtureFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
 
-class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
+class CssValidationTaskTypePerformerTest extends AbstractUpdatedWebPageTaskTypePerformerTest
 {
     /**
      * @var CssValidationTaskTypePerformer
@@ -27,43 +32,27 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->taskTypePerformer = self::$container->get(CssValidationTaskTypePerformer::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTaskTypePerformer()
+    protected function getTaskTypePerformer(): TaskTypePerformerInterface
     {
         return $this->taskTypePerformer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTaskTypeString()
+    protected function getTaskTypeString(): string
     {
         return TypeInterface::TYPE_CSS_VALIDATION;
     }
 
     /**
      * @dataProvider performSuccessDataProvider
-     *
-     * @param array $httpFixtures
-     * @param array $taskParameters
-     * @param string $cssValidatorOutput
-     * @param bool $expectedHasSucceeded
-     * @param bool $expectedIsRetryable
-     * @param int $expectedErrorCount
-     * @param int $expectedWarningCount
-     * @param array $expectedDecodedOutput
      */
     public function testPerformSuccess(
-        $httpFixtures,
-        $taskParameters,
-        $cssValidatorOutput,
-        $expectedHasSucceeded,
-        $expectedIsRetryable,
-        $expectedErrorCount,
-        $expectedWarningCount,
-        $expectedDecodedOutput
+        array $httpFixtures,
+        array $taskParameters,
+        string $cssValidatorOutput,
+        string $expectedTaskState,
+        int $expectedErrorCount,
+        int $expectedWarningCount,
+        array $expectedDecodedOutput
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
@@ -76,19 +65,22 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         CssValidatorFixtureFactory::set($cssValidatorOutput);
 
-        $response = $this->taskTypePerformer->perform($task);
+        $this->taskTypePerformer->perform($task);
 
-        $this->assertEquals($expectedHasSucceeded, $response->hasSucceeded());
-        $this->assertEquals($expectedIsRetryable, $response->isRetryable());
-        $this->assertEquals($expectedErrorCount, $response->getErrorCount());
-        $this->assertEquals($expectedWarningCount, $response->getWarningCount());
-        $this->assertEquals($expectedDecodedOutput, json_decode($response->getTaskOutput()->getOutput()));
+        $this->assertEquals($expectedTaskState, $task->getState());
+
+        $output = $task->getOutput();
+        $this->assertInstanceOf(Output::class, $output);
+        $this->assertEquals($expectedErrorCount, $output->getErrorCount());
+        $this->assertEquals($expectedWarningCount, $output->getWarningCount());
+
+        $this->assertEquals(
+            $expectedDecodedOutput,
+            json_decode($output->getOutput(), true)
+        );
     }
 
-    /**
-     * @return array
-     */
-    public function performSuccessDataProvider()
+    public function performSuccessDataProvider(): array
     {
         $notFoundResponse = new Response(404);
         $internalServerErrorResponse = new Response(500);
@@ -102,12 +94,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('unknown-exception'),
-                'expectedHasSucceeded' => false,
-                'expectedIsRetryable' => false,
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [
-                    (object)[
+                    [
                         'message' => 'Unknown error',
                         'class' => 'css-validation-exception-unknown',
                         'type' => 'error',
@@ -126,8 +117,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                     'ignore-warnings' => true,
                 ],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('1-vendor-extension-warning'),
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
@@ -141,8 +131,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                     'vendor-extensions' => VendorExtensionSeverityLevel::LEVEL_IGNORE,
                 ],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('1-vendor-extension-warning'),
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
@@ -156,26 +145,25 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                     'ignore-warnings' => true,
                 ],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('3-errors'),
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 3,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [
-                    (object)[
+                    [
                         'message' => 'one',
                         'context' => 'audio, canvas, video',
                         'line_number' => 1,
                         'type' => 'error',
                         'ref' => 'http://example.com/',
                     ],
-                    (object)[
+                    [
                         'message' => 'two',
                         'context' => 'html',
                         'line_number' => 2,
                         'type' => 'error',
                         'ref' => 'http://example.com/',
                     ],
-                    (object)[
+                    [
                         'message' => 'three',
                         'context' => '.hide-text',
                         'line_number' => 3,
@@ -197,12 +185,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [
-                    (object)[
+                    [
                         'message' => 'http-retrieval-404',
                         'type' => 'error',
                         'context' => '',
@@ -234,12 +221,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [
-                    (object)[
+                    [
                         'message' => 'http-retrieval-500',
                         'type' => 'error',
                         'context' => '',
@@ -271,12 +257,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [
-                    (object)[
+                    [
                         'message' => 'http-retrieval-curl-code-6',
                         'type' => 'error',
                         'context' => '',
@@ -297,12 +282,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [
-                    (object)[
+                    [
                         'message' => 'invalid-content-type:application/pdf',
                         'type' => 'error',
                         'context' => '',
@@ -316,10 +300,8 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
     /**
      * @dataProvider cookiesDataProvider
-     *
-     * {@inheritdoc}
      */
-    public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
+    public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader)
     {
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
@@ -353,11 +335,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
     /**
      * @dataProvider httpAuthDataProvider
-     *
-     * {@inheritdoc}
      */
-    public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
-    {
+    public function testSetHttpAuthenticationOnRequests(
+        array $taskParameters,
+        string $expectedRequestAuthorizationHeaderValue
+    ) {
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(
@@ -393,9 +375,6 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown()
     {
         parent::tearDown();
