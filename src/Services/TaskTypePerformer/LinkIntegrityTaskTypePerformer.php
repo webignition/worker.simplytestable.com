@@ -6,7 +6,6 @@ use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\LinkIntegrityResult;
 use App\Model\LinkIntegrityResultCollection;
-use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
@@ -66,11 +65,12 @@ class LinkIntegrityTaskTypePerformer implements TaskTypePerformerInterface
     /**
      * @param Task $task
      *
-     * @return TaskTypePerformerResponse
+     * @return null
+     *
      * @throws InternetMediaTypeParseException
      * @throws TransportException
      */
-    public function perform(Task $task): ?TaskTypePerformerResponse
+    public function perform(Task $task)
     {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 

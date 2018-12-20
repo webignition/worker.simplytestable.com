@@ -4,7 +4,6 @@ namespace App\Services\TaskTypePerformer;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
-use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\TaskPerformerWebPageRetriever;
@@ -68,14 +67,14 @@ class CssValidationTaskTypePerformer implements TaskTypePerformerInterface
     /**
      * @param Task $task
      *
-     * @return TaskTypePerformerResponse
+     * @return null
      *
      * @throws InternetMediaTypeParseException
      * @throws InvalidValidatorOutputException
      * @throws TransportException
      * @throws UnparseableContentTypeException
      */
-    public function perform(Task $task): ?TaskTypePerformerResponse
+    public function perform(Task $task)
     {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
