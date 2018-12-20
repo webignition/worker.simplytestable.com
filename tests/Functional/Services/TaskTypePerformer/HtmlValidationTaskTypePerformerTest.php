@@ -14,7 +14,7 @@ use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 
-class HtmlValidationTaskTypePerformerTest extends AbstractUpdatedWebPageTaskTypePerformerTest
+class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
     /**
      * @var HtmlValidationTaskTypePerformer

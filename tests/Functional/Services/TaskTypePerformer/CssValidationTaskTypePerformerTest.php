@@ -16,7 +16,7 @@ use App\Tests\Factory\CssValidatorFixtureFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
 
-class CssValidationTaskTypePerformerTest extends AbstractUpdatedWebPageTaskTypePerformerTest
+class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
     /**
      * @var CssValidationTaskTypePerformer
