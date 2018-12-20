@@ -6,22 +6,17 @@ use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
 use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use App\Services\HttpClientConfigurationService;
-use App\Services\HttpClientService;
 use App\Services\TaskOutputMessageFactory;
-use GuzzleHttp\Psr7\Request;
+use App\Services\TaskPerformerWebPageRetriever;
 use webignition\HtmlValidator\Output\Parser\Configuration as HtmlValidatorOutputParserConfiguration;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
-use webignition\WebResource\Exception\HttpException;
-use webignition\WebResource\Exception\InvalidResponseContentTypeException;
 use webignition\WebResource\Exception\TransportException;
-use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
 use webignition\HtmlDocumentType\Validator as DoctypeValidator;
 use webignition\HtmlDocumentType\Factory as DoctypeFactory;
-use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
 {
@@ -33,29 +28,14 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     const CURL_CODE_DNS_LOOKUP_FAILURE = 6;
 
     /**
-     * @var WebResourceRetriever
-     */
-    private $webResourceRetriever;
-
-    /**
-     * @var HttpClientService
-     */
-    protected $httpClientService;
-
-    /**
      * @var HttpClientConfigurationService
      */
     private $httpClientConfigurationService;
 
     /**
-     * @var HttpHistoryContainer
+     * @var TaskPerformerWebPageRetriever
      */
-    private $httpHistoryContainer;
-
-    /**
-     * @var TaskOutputMessageFactory
-     */
-    private $taskOutputMessageFactory;
+    private $taskPerformerWebPageRetriever;
 
     /**
      * @var HtmlValidatorWrapper
@@ -73,19 +53,13 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     protected $response = null;
 
     public function __construct(
-        HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
-        WebResourceRetriever $webResourceRetriever,
-        HttpHistoryContainer $httpHistoryContainer,
-        TaskOutputMessageFactory $taskOutputMessageFactory,
+        TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
         HtmlValidatorWrapper $htmlValidatorWrapper,
         string $validatorPath
     ) {
-        $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
-        $this->webResourceRetriever = $webResourceRetriever;
-        $this->httpHistoryContainer = $httpHistoryContainer;
-        $this->taskOutputMessageFactory = $taskOutputMessageFactory;
+        $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
 
         $this->htmlValidatorWrapper = $htmlValidatorWrapper;
         $this->validatorPath = $validatorPath;
@@ -117,79 +91,13 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
-        $webPage = $this->retrieveWebPage($task);
+        $webPage = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
 
         if (!$task->isIncomplete()) {
             return null;
         }
 
         return $this->performValidation($task, $webPage);
-    }
-
-    /**
-     * @param Task $task
-     *
-     * @return WebPage|null
-     *
-     * @throws InternetMediaTypeParseException
-     * @throws TransportException
-     */
-    private function retrieveWebPage(Task $task)
-    {
-        $request = new Request('GET', $task->getUrl());
-
-        /* @var WebPage $webPage */
-        $webPage = null;
-
-        try {
-            $webPage = $this->webResourceRetriever->retrieve($request);
-        } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
-            return $this->setTaskOutputAndState(
-                $task,
-                '',
-                Task::STATE_SKIPPED,
-                0
-            );
-        } catch (HttpException $httpException) {
-            $output = $this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
-                $httpException,
-                null
-            );
-
-            return $this->setTaskOutputAndState(
-                $task,
-                json_encode($output),
-                Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                1
-            );
-        } catch (TransportException $transportException) {
-            if (!$transportException->isCurlException() && !$transportException->isTooManyRedirectsException()) {
-                throw $transportException;
-            }
-
-            $output = $this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
-                null,
-                $transportException
-            );
-
-            return $this->setTaskOutputAndState(
-                $task,
-                json_encode($output),
-                Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                1
-            );
-        }
-
-        if (empty($webPage->getContent())) {
-            return $this->setTaskOutputAndState(
-                $task,
-                '',
-                Task::STATE_SKIPPED,
-                0
-            );
-        }
-
-        return $webPage;
     }
 
     /**
