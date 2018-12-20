@@ -1,14 +1,20 @@
 <?php
 
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpDocSignatureInspection */
+
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
+use App\Entity\Task\Output;
+use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
+use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 
-class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
+class HtmlValidationTaskTypePerformerTest extends AbstractUpdatedWebPageTaskTypePerformerTest
 {
     /**
      * @var HtmlValidationTaskTypePerformer
@@ -24,29 +30,20 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         $this->taskTypePerformer = self::$container->get(HtmlValidationTaskTypePerformer::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTaskTypePerformer()
+    protected function getTaskTypePerformer(): TaskTypePerformerInterface
     {
         return $this->taskTypePerformer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTaskTypeString()
+    protected function getTaskTypeString(): string
     {
         return TypeInterface::TYPE_HTML_VALIDATION;
     }
 
     /**
      * @dataProvider badDocumentTypeDataProvider
-     *
-     * @param string $content
-     * @param array $expectedOutputMessage
      */
-    public function testPerformBadDocumentType($content, $expectedOutputMessage)
+    public function testPerformBadDocumentType(string $content, array $expectedOutputMessage)
     {
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
@@ -57,20 +54,21 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
-        $response = $this->taskTypePerformer->perform($task);
+        $this->taskTypePerformer->perform($task);
 
-        $this->assertEquals(1, $response->getErrorCount());
-        $this->assertEquals([
-            'messages' => [
-                $expectedOutputMessage,
-            ],
-        ], json_decode($response->getTaskOutput()->getOutput(), true));
+        $this->assertEquals(Task::STATE_FAILED_NO_RETRY_AVAILABLE, $task->getState());
+
+        $output = $task->getOutput();
+        $this->assertInstanceOf(Output::class, $output);
+        $this->assertEquals(1, $output->getErrorCount());
+
+        $outputContent = json_decode($output->getOutput(), true);
+        $outputMessage = $outputContent['messages'][0];
+
+        $this->assertEquals($expectedOutputMessage, $outputMessage);
     }
 
-    /**
-     * @return array
-     */
-    public function badDocumentTypeDataProvider()
+    public function badDocumentTypeDataProvider(): array
     {
         return [
             'not markup' => [
@@ -119,21 +117,13 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
 
     /**
      * @dataProvider performSuccessDataProvider
-     *
-     * @param string $content
-     * @param string $htmlValidatorOutput
-     * @param bool $expectedHasSucceeded
-     * @param bool $expectedIsRetryable
-     * @param int $expectedErrorCount
-     * @param array $expectedDecodedOutput
      */
     public function testPerformSuccess(
-        $content,
-        $htmlValidatorOutput,
-        $expectedHasSucceeded,
-        $expectedIsRetryable,
-        $expectedErrorCount,
-        $expectedDecodedOutput
+        string $content,
+        string $htmlValidatorOutput,
+        string $expectedTaskState,
+        int $expectedErrorCount,
+        array $expectedDecodedOutput
     ) {
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
@@ -146,29 +136,27 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
 
         HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
 
-        $response = $this->taskTypePerformer->perform($task);
+        $this->taskTypePerformer->perform($task);
 
-        $this->assertEquals($expectedHasSucceeded, $response->hasSucceeded());
-        $this->assertEquals($expectedIsRetryable, $response->isRetryable());
-        $this->assertEquals($expectedErrorCount, $response->getErrorCount());
+        $this->assertEquals($expectedTaskState, $task->getState());
+
+        $output = $task->getOutput();
+        $this->assertInstanceOf(Output::class, $output);
+        $this->assertEquals($expectedErrorCount, $output->getErrorCount());
 
         $this->assertEquals(
             $expectedDecodedOutput,
-            json_decode($response->getTaskOutput()->getOutput(), true)
+            json_decode($output->getOutput(), true)
         );
     }
 
-    /**
-     * @return array
-     */
-    public function performSuccessDataProvider()
+    public function performSuccessDataProvider(): array
     {
         return [
             'no errors' => [
                 'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('0-errors'),
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
                     'messages' => [],
@@ -177,8 +165,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             'one error' => [
                 'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('1-error'),
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedDecodedOutput' => [
                     'messages' => [
@@ -196,8 +183,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             'three errors' => [
                 'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('3-errors'),
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 3,
                 'expectedDecodedOutput' => [
                     'messages' => [
@@ -231,8 +217,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             'internal software error' => [
                 'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('internal-software-error'),
-                'expectedHasSucceeded' => false,
-                'expectedIsRetryable' => false,
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
                     'messages' => [
@@ -247,8 +232,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             'invalid character encoding' => [
                 'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('invalid-character-encoding-error'),
-                'expectedHasSucceeded' => false,
-                'expectedIsRetryable' => false,
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedDecodedOutput' => [
                     'messages' => [
@@ -274,8 +258,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             'css validation errors only, ignored' => [
                 'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('css-errors-only'),
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
                     'messages' => [],
@@ -286,10 +269,8 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
 
     /**
      * @dataProvider cookiesDataProvider
-     *
-     * {@inheritdoc}
      */
-    public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
+    public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader)
     {
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
@@ -317,11 +298,11 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
 
     /**
      * @dataProvider httpAuthDataProvider
-     *
-     * {@inheritdoc}
      */
-    public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
-    {
+    public function testSetHttpAuthenticationOnRequests(
+        array $taskParameters,
+        string $expectedRequestAuthorizationHeaderValue
+    ) {
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
@@ -353,10 +334,8 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
 
     /**
      * @dataProvider storeTmpFileDataProvider
-     *
-     * @param $fileExists
      */
-    public function testStoreTmpFile($fileExists)
+    public function testStoreTmpFile(bool $fileExists)
     {
         $tmpFilePath = sys_get_temp_dir() . '/f45451f4d07ca1f5bab9ed278e880c5f.html';
         $content = '<!doctype html>';
@@ -381,10 +360,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         $this->taskTypePerformer->perform($task);
     }
 
-    /**
-     * @return array
-     */
-    public function storeTmpFileDataProvider()
+    public function storeTmpFileDataProvider(): array
     {
         return [
             'tmp file does not already exist' => [
@@ -396,9 +372,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown()
     {
         parent::tearDown();

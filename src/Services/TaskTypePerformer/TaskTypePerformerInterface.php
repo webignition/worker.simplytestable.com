@@ -7,5 +7,5 @@ use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 
 interface TaskTypePerformerInterface
 {
-    public function perform(Task $task): TaskTypePerformerResponse;
+    public function perform(Task $task): ?TaskTypePerformerResponse;
 }

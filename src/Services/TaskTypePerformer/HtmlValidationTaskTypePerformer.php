@@ -33,16 +33,6 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     const CURL_CODE_DNS_LOOKUP_FAILURE = 6;
 
     /**
-     * @var HttpException
-     */
-    private $httpException;
-
-    /**
-     * @var TransportException
-     */
-    private $transportException;
-
-    /**
      * @var WebResourceRetriever
      */
     private $webResourceRetriever;
@@ -108,20 +98,11 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
      * @throws InternetMediaTypeParseException
      * @throws TransportException
      */
-    public function perform(Task $task): TaskTypePerformerResponse
+    public function perform(Task $task): ?TaskTypePerformerResponse
     {
-        $this->response = new TaskTypePerformerResponse();
+        $this->execute($task);
 
-        $rawOutput = $this->execute($task);
-
-        $this->response->setTaskOutput(TaskOutput::create(
-            $rawOutput,
-            new InternetMediaType('application/json'),
-            $this->response->getErrorCount(),
-            $this->response->getWarningCount()
-        ));
-
-        return $this->response;
+        return null;
     }
 
     /**
@@ -135,88 +116,96 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
         $request = new Request('GET', $task->getUrl());
+        /* @var WebPage $webPage */
         $webPage = null;
 
         try {
             $webPage = $this->webResourceRetriever->retrieve($request);
         } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
-            $this->response->setHasBeenSkipped();
-            $this->response->setIsRetryable(false);
-            $this->response->setErrorCount(0);
+            return $this->setTaskOutputAndState(
+                $task,
+                '',
+                Task::STATE_SKIPPED,
+                0
+            );
         } catch (HttpException $httpException) {
-            $this->httpException = $httpException;
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
+            $output = $this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
+                $httpException,
+                null
+            );
+
+            return $this->setTaskOutputAndState(
+                $task,
+                json_encode($output),
+                Task::STATE_FAILED_NO_RETRY_AVAILABLE,
+                1
+            );
         } catch (TransportException $transportException) {
             if (!$transportException->isCurlException() && !$transportException->isTooManyRedirectsException()) {
                 throw $transportException;
             }
 
-            $this->transportException = $transportException;
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
-        }
+            $output = $this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
+                null,
+                $transportException
+            );
 
-        if (!$this->response->hasSucceeded()) {
-            $this->response->setErrorCount(1);
-
-            return json_encode($this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
-                $this->httpException,
-                $this->transportException
-            ));
-        }
-
-        if (!$webPage instanceof WebPage) {
-            $this->response->setHasBeenSkipped();
-            $this->response->setIsRetryable(false);
-            $this->response->setErrorCount(0);
-
-            return null;
+            return $this->setTaskOutputAndState(
+                $task,
+                json_encode($output),
+                Task::STATE_FAILED_NO_RETRY_AVAILABLE,
+                1
+            );
         }
 
         if (empty($webPage->getContent())) {
-            $this->response->setHasBeenSkipped();
-            $this->response->setErrorCount(0);
-
-            return null;
+            return $this->setTaskOutputAndState(
+                $task,
+                '',
+                Task::STATE_SKIPPED,
+                0
+            );
         }
 
-        return $this->performValidation($webPage);
+        return $this->performValidation($task, $webPage);
     }
 
     /**
      * {@inheritdoc}
      */
-    private function performValidation(WebPage $webPage)
+    private function performValidation(Task $task, WebPage $webPage)
     {
         $webPageContent = $webPage->getContent();
         $docTypeString = DoctypeExtractor::extract($webPageContent);
 
         if (empty($docTypeString)) {
-            $this->response->setErrorCount(1);
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
-
             $isMarkup = strip_tags($webPageContent) !== $webPageContent;
+            $output = $isMarkup
+                ? json_encode($this->getMissingDocumentTypeOutput())
+                : json_encode($this->getIsNotMarkupOutput($webPageContent));
 
-            if ($isMarkup) {
-                return json_encode($this->getMissingDocumentTypeOutput());
-            } else {
-                return json_encode($this->getIsNotMarkupOutput($webPageContent));
-            }
+            return $this->setTaskOutputAndState($task, $output, Task::STATE_FAILED_NO_RETRY_AVAILABLE, 1);
         }
 
         $doctypeValidator = new DoctypeValidator();
         $doctypeValidator->setMode(DoctypeValidator::MODE_IGNORE_FPI_URI_VALIDITY);
 
         try {
-            $documentType = DoctypeFactory::createFromDocTypeString($docTypeString);
-
-            if (!$doctypeValidator->isValid($documentType)) {
-                return $this->createInvalidDocumentTypeResponse($docTypeString);
+            if (!$doctypeValidator->isValid(DoctypeFactory::createFromDocTypeString($docTypeString))) {
+                return $this->setTaskOutputAndState(
+                    $task,
+                    json_encode($this->createInvalidDocumentTypeOutput($docTypeString)),
+                    Task::STATE_FAILED_NO_RETRY_AVAILABLE,
+                    1
+                );
             }
         } catch (\InvalidArgumentException $invalidArgumentException) {
-            return $this->createInvalidDocumentTypeResponse($docTypeString);
+            return $this->setTaskOutputAndState(
+                $task,
+                json_encode($this->createInvalidDocumentTypeOutput($docTypeString)),
+                Task::STATE_FAILED_NO_RETRY_AVAILABLE,
+                1
+            );
         }
 
         $webPageCharacterSet = $webPage->getCharacterSet();
@@ -235,32 +224,29 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         ]);
 
         $output = $this->htmlValidatorWrapper->validate();
+        $state = $output->wasAborted() ? Task::STATE_FAILED_NO_RETRY_AVAILABLE : Task::STATE_COMPLETED;
 
-        if ($output->wasAborted()) {
-            $this->response->setHasFailed();
-            $this->response->setIsRetryable(false);
-        }
-
-        $outputObject = new \stdClass();
-        $outputObject->messages = $output->getMessages();
-
-        $this->response->setErrorCount((int)$output->getErrorCount());
-
-        return json_encode($outputObject);
+        return $this->setTaskOutputAndState(
+            $task,
+            json_encode([
+                'messages' => $output->getMessages(),
+            ]),
+            $state,
+            (int) $output->getErrorCount()
+        );
     }
 
-    /**
-     * @param string $docTypeString
-     *
-     * @return string
-     */
-    private function createInvalidDocumentTypeResponse($docTypeString)
+    private function setTaskOutputAndState(Task $task, string $output, string $state, int $errorCount)
     {
-        $this->response->setErrorCount(1);
-        $this->response->setHasFailed();
-        $this->response->setIsRetryable(false);
+        $task->setOutput(TaskOutput::create(
+            $output,
+            new InternetMediaType('application/json'),
+            $errorCount
+        ));
 
-        return json_encode($this->getInvalidDocumentTypeOutput($docTypeString));
+        $task->setState($state);
+
+        return null;
     }
 
     /**
@@ -314,14 +300,9 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         ];
     }
 
-    /**
-     * @param $documentType
-     *
-     * @return \stdClass
-     */
-    private function getInvalidDocumentTypeOutput($documentType)
+    private function createInvalidDocumentTypeOutput(string $documentType): array
     {
-        return (object)[
+        return [
             'messages' => [
                 [
                     'message' => $documentType,
