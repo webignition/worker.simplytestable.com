@@ -55,8 +55,21 @@ class TaskPerformer
         /** @noinspection PhpUnhandledExceptionInspection */
         $task->setEndDateTime(new \DateTime());
 
-        $task->setOutput($response->getTaskOutput());
-        $task->setState($this->getCompletionStateFromResponse($response));
+        $taskOutput = $task->getOutput();
+        if (null === $taskOutput) {
+            $task->setOutput($response->getTaskOutput());
+        }
+
+        $incompleteStates = [
+            Task::STATE_QUEUED,
+            Task::STATE_PREPARING,
+            Task::STATE_PREPARED,
+            Task::STATE_IN_PROGRESS,
+        ];
+
+        if (in_array($task->getState(), $incompleteStates)) {
+            $task->setState($this->getCompletionStateFromResponse($response));
+        }
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
