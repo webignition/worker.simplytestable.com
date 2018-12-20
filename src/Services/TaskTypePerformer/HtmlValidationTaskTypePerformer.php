@@ -4,7 +4,6 @@ namespace App\Services\TaskTypePerformer;
 
 use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
-use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use App\Services\HttpClientConfigurationService;
 use App\Services\TaskPerformerWebPageRetriever;
 use webignition\HtmlValidator\Output\Parser\Configuration as HtmlValidatorOutputParserConfiguration;
@@ -46,11 +45,6 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
      */
     private $validatorPath;
 
-    /**
-     * @var TaskTypePerformerResponse
-     */
-    protected $response = null;
-
     public function __construct(
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
@@ -67,12 +61,12 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     /**
      * @param Task $task
      *
-     * @return TaskTypePerformerResponse
+     * @return null
      *
      * @throws InternetMediaTypeParseException
      * @throws TransportException
      */
-    public function perform(Task $task): ?TaskTypePerformerResponse
+    public function perform(Task $task)
     {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
