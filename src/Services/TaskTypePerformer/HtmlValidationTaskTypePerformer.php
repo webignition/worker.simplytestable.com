@@ -158,7 +158,12 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         }
 
         if (!$this->response->hasSucceeded()) {
-            return $this->hasNotSucceededHandler();
+            $this->response->setErrorCount(1);
+
+            return json_encode($this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
+                $this->httpException,
+                $this->transportException
+            ));
         }
 
         if (!$webPage instanceof WebPage) {
@@ -177,19 +182,6 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         }
 
         return $this->performValidation($webPage);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    private function hasNotSucceededHandler()
-    {
-        $this->response->setErrorCount(1);
-
-        return json_encode($this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
-            $this->httpException,
-            $this->transportException
-        ));
     }
 
     /**
