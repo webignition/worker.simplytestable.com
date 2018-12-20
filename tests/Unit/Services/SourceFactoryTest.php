@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Unit\Services;
 
@@ -51,22 +52,69 @@ class SourceFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($source->isInvalid());
     }
 
-    public function testCreateHttpFailedSource()
+    /**
+     * @dataProvider createHttpFailedSourceDataProvider
+     */
+    public function testCreateHttpFailedSource(string $url, int $statusCode, array $context, string $expectedValue)
     {
-        $url = 'http://example.com/';
-        $statusCode = 404;
-
-        $source = $this->sourceFactory->createHttpFailedSource($url, $statusCode);
+        $source = $this->sourceFactory->createHttpFailedSource($url, $statusCode, $context);
 
         $this->assertInstanceOf(Source::class, $source);
         $this->assertEquals($url, $source->getUrl());
         $this->assertEquals(Source::TYPE_UNAVAILABLE, $source->getType());
-        $this->assertEquals('http:404', $source->getValue());
+        $this->assertEquals($expectedValue, $source->getValue());
         $this->assertEquals(Source::FAILURE_TYPE_HTTP, $source->getFailureType());
         $this->assertEquals($statusCode, $source->getFailureCode());
+        $this->assertEquals($context, $source->getContext());
         $this->assertFalse($source->isCachedResource());
         $this->assertTrue($source->isUnavailable());
         $this->assertFalse($source->isInvalid());
+    }
+
+    public function createHttpFailedSourceDataProvider(): array
+    {
+        return [
+            '404 without context' => [
+                'url' => 'http://example.com/404',
+                'statusCode' => 404,
+                'context' => [],
+                'expectedValue' => 'http:404',
+            ],
+            '301 with context, redirect loop' => [
+                'url' => 'http://example.com/301',
+                'statusCode' => 301,
+                'context' => [
+                    'too_many_redirects' => true,
+                    'is_redirect_loop' => true,
+                    'history' => [
+                        'http://example.com/301',
+                        'http://example.com/301',
+                        'http://example.com/301',
+                        'http://example.com/301',
+                        'http://example.com/301',
+                        'http://example.com/301',
+                    ],
+                ],
+                'expectedValue' => 'http:301',
+            ],
+            '301 with context, too many redirects' => [
+                'url' => 'http://example.com/301',
+                'statusCode' => 301,
+                'context' => [
+                    'too_many_redirects' => true,
+                    'is_redirect_loop' => false,
+                    'history' => [
+                        'http://example.com/301',
+                        'http://example.com/301/1',
+                        'http://example.com/301/2',
+                        'http://example.com/301/3',
+                        'http://example.com/301/4',
+                        'http://example.com/301/5',
+                    ],
+                ],
+                'expectedValue' => 'http:301',
+            ],
+        ];
     }
 
     public function testCreateCurlFailedSource()
