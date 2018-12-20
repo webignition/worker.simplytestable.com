@@ -224,7 +224,9 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
             $this->response->setHasFailed();
             $this->response->setIsRetryable(false);
 
-            if ($this->isMarkup($webPageContent)) {
+            $isMarkup = strip_tags($webPageContent) !== $webPageContent;
+
+            if ($isMarkup) {
                 return json_encode($this->getMissingDocumentTypeOutput());
             } else {
                 return json_encode($this->getIsNotMarkupOutput($webPageContent));
@@ -302,16 +304,6 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         }
 
         return $filename;
-    }
-
-    /**
-     * @param string $fragment
-     *
-     * @return boolean
-     */
-    private function isMarkup($fragment)
-    {
-        return strip_tags($fragment) !== $fragment;
     }
 
     /**
