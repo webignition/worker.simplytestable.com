@@ -8,11 +8,14 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
+use App\Services\TaskPerformerWebPageRetriever;
 use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
+use webignition\WebResource\WebPage\WebPage;
 
 class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -125,14 +128,11 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         int $expectedErrorCount,
         array $expectedDecodedOutput
     ) {
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], $content),
-        ]);
-
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
+
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer($task, $content);
 
         HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
 
@@ -370,6 +370,24 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                 'fileExists' => true,
             ],
         ];
+    }
+
+    private function setTaskPerformerWebPageRetrieverOnTaskPerformer(Task $task, string $content)
+    {
+        $webPage = WebPage::createFromContent($content);
+
+        $taskPerformerWebPageRetriever = \Mockery::mock(TaskPerformerWebPageRetriever::class);
+        $taskPerformerWebPageRetriever
+            ->shouldReceive('retrieveWebPage')
+            ->with($task)
+            ->andReturn($webPage);
+
+        ObjectPropertySetter::setProperty(
+            $this->taskTypePerformer,
+            HtmlValidationTaskTypePerformer::class,
+            'taskPerformerWebPageRetriever',
+            $taskPerformerWebPageRetriever
+        );
     }
 
     protected function tearDown()
