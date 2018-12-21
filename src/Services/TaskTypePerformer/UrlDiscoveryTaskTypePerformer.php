@@ -5,6 +5,7 @@ namespace App\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
+use App\Services\TaskPerformerTaskOutputMutator;
 use App\Services\TaskPerformerWebPageRetriever;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
@@ -29,6 +30,11 @@ class UrlDiscoveryTaskTypePerformer implements TaskTypePerformerInterface
     private $taskPerformerWebPageRetriever;
 
     /**
+     * @var TaskPerformerTaskOutputMutator
+     */
+    private $taskPerformerTaskOutputMutator;
+
+    /**
      * @var string[]
      */
     private $equivalentSchemes = [
@@ -38,9 +44,11 @@ class UrlDiscoveryTaskTypePerformer implements TaskTypePerformerInterface
 
     public function __construct(
         TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
+        TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
         HttpClientConfigurationService $httpClientConfigurationService
     ) {
         $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
+        $this->taskPerformerTaskOutputMutator = $taskPerformerTaskOutputMutator;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
     }
 
@@ -56,13 +64,16 @@ class UrlDiscoveryTaskTypePerformer implements TaskTypePerformerInterface
     {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
-        $webPage = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+        $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+        $task->setState($result->getTaskState());
 
         if (!$task->isIncomplete()) {
+            $this->taskPerformerTaskOutputMutator->mutate($task, $result->getTaskOutputValues());
+
             return null;
         }
 
-        return $this->performValidation($task, $webPage);
+        return $this->performValidation($task, $result->getWebPage());
     }
 
     private function performValidation(Task $task, WebPage $webPage)
