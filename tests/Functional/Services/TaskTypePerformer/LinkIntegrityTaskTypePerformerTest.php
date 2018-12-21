@@ -60,7 +60,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'parameters' => json_encode($taskParameters),
         ]));
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             LinkIntegrityTaskTypePerformer::class,
             $task,
             $webPageContent
@@ -72,6 +72,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $output = $task->getOutput();
         $this->assertInstanceOf(Output::class, $output);
+        $this->assertEquals('application/json', $output->getContentType());
         $this->assertEquals($expectedErrorCount, $output->getErrorCount());
         $this->assertEquals($expectedWarningCount, $output->getWarningCount());
 
@@ -205,7 +206,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             LinkIntegrityTaskTypePerformer::class,
             $task,
             '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
@@ -234,7 +235,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             LinkIntegrityTaskTypePerformer::class,
             $task,
             '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'

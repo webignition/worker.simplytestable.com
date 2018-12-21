@@ -96,7 +96,7 @@ class UrlDiscoveryTaskTypePerformer implements TaskTypePerformerInterface
 
         $task->setOutput(Output::create(
             json_encode($finder->getUniqueUrls()),
-            new InternetMediaType('application/json'),
+            new InternetMediaType('application', 'json'),
             0
         ));
 

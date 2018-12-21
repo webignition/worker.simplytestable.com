@@ -49,7 +49,11 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(HtmlValidationTaskTypePerformer::class, $task, $content);
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
+            HtmlValidationTaskTypePerformer::class,
+            $task,
+            $content
+        );
 
         $this->taskTypePerformer->perform($task);
 
@@ -57,6 +61,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
 
         $output = $task->getOutput();
         $this->assertInstanceOf(Output::class, $output);
+        $this->assertEquals('application/json', $output->getContentType());
         $this->assertEquals(1, $output->getErrorCount());
 
         $outputContent = json_decode($output->getOutput(), true);
@@ -126,7 +131,11 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(HtmlValidationTaskTypePerformer::class, $task, $content);
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
+            HtmlValidationTaskTypePerformer::class,
+            $task,
+            $content
+        );
 
         HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
 
@@ -135,7 +144,9 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         $this->assertEquals($expectedTaskState, $task->getState());
 
         $output = $task->getOutput();
+
         $this->assertInstanceOf(Output::class, $output);
+        $this->assertEquals('application/json', $output->getContentType());
         $this->assertEquals($expectedErrorCount, $output->getErrorCount());
 
         $this->assertEquals(

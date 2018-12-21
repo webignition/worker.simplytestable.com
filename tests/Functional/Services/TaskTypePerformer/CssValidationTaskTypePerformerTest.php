@@ -64,7 +64,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             ])
         );
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             CssValidationTaskTypePerformer::class,
             $task,
             $webPageContent
@@ -78,6 +78,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $output = $task->getOutput();
         $this->assertInstanceOf(Output::class, $output);
+        $this->assertEquals('application/json', $output->getContentType());
         $this->assertEquals($expectedErrorCount, $output->getErrorCount());
         $this->assertEquals($expectedWarningCount, $output->getWarningCount());
 
@@ -268,7 +269,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             CssValidationTaskTypePerformer::class,
             $task,
             HtmlDocumentFactory::load('empty-body-single-css-link')
@@ -300,7 +301,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             CssValidationTaskTypePerformer::class,
             $task,
             HtmlDocumentFactory::load('empty-body-single-css-link')

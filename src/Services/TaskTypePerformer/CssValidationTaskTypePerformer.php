@@ -221,7 +221,7 @@ class CssValidationTaskTypePerformer implements TaskTypePerformerInterface
     ) {
         $task->setOutput(Output::create(
             $output,
-            new InternetMediaType('application/json'),
+            new InternetMediaType('application', 'json'),
             $errorCount,
             $warningCount
         ));

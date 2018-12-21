@@ -13,7 +13,7 @@ class TaskPerformerTaskOutputMutator
     {
         $task->setOutput(Output::create(
             json_encode($taskOutputValues->getContent()),
-            new InternetMediaType('application/json'),
+            new InternetMediaType('application', 'json'),
             $taskOutputValues->getErrorCount(),
             $taskOutputValues->getWarningCount()
         ));
