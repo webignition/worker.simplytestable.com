@@ -7,14 +7,18 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
+use App\Services\TaskPerformerWebPageRetriever;
 use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\CssValidationTaskTypePerformer;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\CssValidatorFixtureFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
+use GuzzleHttp\Psr7\Uri;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
+use webignition\WebResource\WebPage\WebPage;
 
 class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -46,6 +50,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
+        string $webPageContent,
         array $httpFixtures,
         array $taskParameters,
         string $cssValidatorOutput,
@@ -62,6 +67,8 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 'parameters' => json_encode($taskParameters),
             ])
         );
+
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer($task, $webPageContent);
 
         CssValidatorFixtureFactory::set($cssValidatorOutput);
 
@@ -88,10 +95,8 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         return [
             'unknown validator exception' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(200, ['content-type' => 'text/html'], 'foo'),
-                ],
+                'webPageContent' => 'foo',
+                'httpFixtures' => [],
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('unknown-exception'),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
@@ -109,10 +114,8 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'no errors, ignore warnings' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(200, ['content-type' => 'text/html'], 'foo'),
-                ],
+                'webPageContent' => 'foo',
+                'httpFixtures' => [],
                 'taskParameters' => [
                     'ignore-warnings' => true,
                 ],
@@ -123,10 +126,8 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 'expectedDecodedOutput' => [],
             ],
             'no errors, ignore vendor extension warnings' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(200, ['content-type' => 'text/html'], 'foo'),
-                ],
+                'webPageContent' => 'foo',
+                'httpFixtures' => [],
                 'taskParameters' => [
                     'vendor-extensions' => VendorExtensionSeverityLevel::LEVEL_IGNORE,
                 ],
@@ -137,10 +138,8 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 'expectedDecodedOutput' => [],
             ],
             'three errors' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(200, ['content-type' => 'text/html'], 'foo'),
-                ],
+                'webPageContent' => 'foo',
+                'httpFixtures' => [],
                 'taskParameters' => [
                     'ignore-warnings' => true,
                 ],
@@ -173,13 +172,8 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'http 404 getting linked resource' => [
+                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        HtmlDocumentFactory::load('empty-body-single-css-link')
-                    ),
                     $notFoundResponse,
                     $notFoundResponse,
                 ],
@@ -199,26 +193,8 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'http 500 getting linked resource' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        HtmlDocumentFactory::load('empty-body-single-css-link')
-                    ),
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                ],
+                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                'httpFixtures' => array_fill(0, 12, $internalServerErrorResponse),
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
@@ -235,26 +211,8 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'curl 6 getting linked resource' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        HtmlDocumentFactory::load('empty-body-single-css-link')
-                    ),
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                ],
+                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                'httpFixtures' => array_fill(0, 12, $curl6ConnectException),
                 'taskParameters' => [],
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
@@ -271,13 +229,8 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'invalid content type getting linked resource' => [
+                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        HtmlDocumentFactory::load('empty-body-single-css-link')
-                    ),
                     new Response(200, ['content-type' => 'application/pdf']),
                 ],
                 'taskParameters' => [],
@@ -358,6 +311,25 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->taskTypePerformer->perform($task);
 
         $this->assertHttpAuthorizationSetOnAllRequests(count($httpFixtures), $expectedRequestAuthorizationHeaderValue);
+    }
+
+    private function setTaskPerformerWebPageRetrieverOnTaskPerformer(Task $task, string $content)
+    {
+        $webPage = WebPage::createFromContent($content);
+        $webPage = $webPage->setUri(new Uri($task->getUrl()));
+
+        $taskPerformerWebPageRetriever = \Mockery::mock(TaskPerformerWebPageRetriever::class);
+        $taskPerformerWebPageRetriever
+            ->shouldReceive('retrieveWebPage')
+            ->with($task)
+            ->andReturn($webPage);
+
+        ObjectPropertySetter::setProperty(
+            $this->taskTypePerformer,
+            CssValidationTaskTypePerformer::class,
+            'taskPerformerWebPageRetriever',
+            $taskPerformerWebPageRetriever
+        );
     }
 
     protected function tearDown()
