@@ -43,17 +43,21 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
-        array $httpFixtures,
+        string $webPageContent,
         array $taskParameters,
         array $expectedDecodedOutput
     ) {
-        $this->httpMockHandler->appendFixtures($httpFixtures);
-
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults([
                 'type' => $this->getTaskTypeString(),
                 'parameters' => json_encode($taskParameters),
             ])
+        );
+
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+            UrlDiscoveryTaskTypePerformer::class,
+            $task,
+            $webPageContent
         );
 
         $this->taskTypePerformer->perform($task);
@@ -75,22 +79,12 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
     {
         return [
             'no urls' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(200, ['content-type' => 'text/html'], HtmlDocumentFactory::load('minimal')),
-                ],
+                'webPageContent' => HtmlDocumentFactory::load('minimal'),
                 'taskParameters' => [],
                 'expectedDecodedOutput' => [],
             ],
             'no scope' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        HtmlDocumentFactory::load('css-link-js-link-image-anchors')
-                    ),
-                ],
+                'webPageContent' => HtmlDocumentFactory::load('css-link-js-link-image-anchors'),
                 'taskParameters' => [],
                 'expectedDecodedOutput' => [
                     'http://example.com/foo/anchor1',
@@ -100,14 +94,7 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
                 ],
             ],
             'has scope' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        HtmlDocumentFactory::load('css-link-js-link-image-anchors')
-                    ),
-                ],
+                'webPageContent' => HtmlDocumentFactory::load('css-link-js-link-image-anchors'),
                 'taskParameters' => [
                     'scope' => [
                         'http://example.com',
