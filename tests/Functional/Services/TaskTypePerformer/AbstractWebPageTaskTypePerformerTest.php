@@ -4,6 +4,7 @@
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Entity\Task\Task;
+use App\Model\TaskPerformerWebPageRetrieverResult;
 use App\Services\TaskPerformerWebPageRetriever;
 use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
 use App\Tests\Services\ObjectPropertySetter;
@@ -152,14 +153,19 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         string $content
     ) {
         /** @noinspection PhpUnhandledExceptionInspection */
+        /* @var WebPage $webPage */
         $webPage = WebPage::createFromContent($content);
         $webPage = $webPage->setUri(new Uri($task->getUrl()));
+
+        $taskPerformerWebPageRetrieverResult = new TaskPerformerWebPageRetrieverResult();
+        $taskPerformerWebPageRetrieverResult->setWebPage($webPage);
+        $taskPerformerWebPageRetrieverResult->setTaskState($task->getState());
 
         $taskPerformerWebPageRetriever = \Mockery::mock(TaskPerformerWebPageRetriever::class);
         $taskPerformerWebPageRetriever
             ->shouldReceive('retrieveWebPage')
             ->with($task)
-            ->andReturn($webPage);
+            ->andReturn($taskPerformerWebPageRetrieverResult);
 
         ObjectPropertySetter::setProperty(
             $this->getTaskTypePerformer(),

@@ -23,8 +23,8 @@ class TaskOutputMessageFactory
     public function createOutputMessageCollectionFromExceptions(
         ?HttpException $httpException,
         ?TransportException $transportException
-    ): \stdClass {
-        return (object)[
+    ): array {
+        return [
             'messages' => [
                 [
                     'message' => $this->createOutputMessage($httpException, $transportException),

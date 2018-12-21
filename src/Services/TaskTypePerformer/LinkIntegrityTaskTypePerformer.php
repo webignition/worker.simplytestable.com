@@ -9,6 +9,7 @@ use App\Model\LinkIntegrityResultCollection;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
+use App\Services\TaskPerformerTaskOutputMutator;
 use App\Services\TaskPerformerWebPageRetriever;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\InternetMediaType\InternetMediaType;
@@ -38,6 +39,11 @@ class LinkIntegrityTaskTypePerformer implements TaskTypePerformerInterface
     private $taskPerformerWebPageRetriever;
 
     /**
+     * @var TaskPerformerTaskOutputMutator
+     */
+    private $taskPerformerTaskOutputMutator;
+
+    /**
      * @var LinkCheckerConfigurationFactory
      */
     private $linkCheckerConfigurationFactory;
@@ -51,12 +57,14 @@ class LinkIntegrityTaskTypePerformer implements TaskTypePerformerInterface
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
+        TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
         LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory,
         HttpRetryMiddleware $httpRetryMiddleware
     ) {
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
+        $this->taskPerformerTaskOutputMutator = $taskPerformerTaskOutputMutator;
 
         $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
         $this->httpRetryMiddleware = $httpRetryMiddleware;
@@ -74,13 +82,16 @@ class LinkIntegrityTaskTypePerformer implements TaskTypePerformerInterface
     {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
-        $webPage = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+        $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+        $task->setState($result->getTaskState());
 
         if (!$task->isIncomplete()) {
+            $this->taskPerformerTaskOutputMutator->mutate($task, $result->getTaskOutputValues());
+
             return null;
         }
 
-        return $this->performValidation($task, $webPage);
+        return $this->performValidation($task, $result->getWebPage());
     }
 
     private function performValidation(Task $task, WebPage $webPage)

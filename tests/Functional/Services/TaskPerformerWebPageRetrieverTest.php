@@ -4,8 +4,9 @@
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Model\TaskOutputValues;
+use App\Model\TaskPerformerWebPageRetrieverResult;
 use App\Services\TaskPerformerWebPageRetriever;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -52,8 +53,7 @@ class TaskPerformerWebPageRetrieverTest extends AbstractBaseTestCase
     public function testRetrieveWebPageFailure(
         array $httpFixtures,
         string $expectedTaskState,
-        int $expectedErrorCount,
-        ?array $expectedTaskOutput
+        TaskOutputValues $expectedTaskOutputValues
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
@@ -61,18 +61,15 @@ class TaskPerformerWebPageRetrieverTest extends AbstractBaseTestCase
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
-        $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+        $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
 
-        $this->assertEquals($expectedTaskState, $task->getState());
+        $this->assertInstanceOf(TaskPerformerWebPageRetrieverResult::class, $result);
+        $this->assertNull($result->getWebPage());
+        $this->assertEquals($expectedTaskState, $result->getTaskState());
 
-        $output = $task->getOutput();
-        $this->assertInstanceOf(Output::class, $output);
-        $this->assertEquals($expectedErrorCount, $output->getErrorCount());
-
-        $this->assertEquals(
-            $expectedTaskOutput,
-            json_decode($output->getOutput(), true)
-        );
+        $taskOutputValues = $result->getTaskOutputValues();
+        $this->assertInstanceOf(TaskOutputValues::class, $taskOutputValues);
+        $this->assertEquals($expectedTaskOutputValues, $taskOutputValues);
     }
 
     public function retrieveWebPageFailureDataProvider(): array
@@ -101,16 +98,19 @@ class TaskPerformerWebPageRetrieverTest extends AbstractBaseTestCase
                     new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '6']),
                 ],
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Redirect limit reached',
-                            'messageId' => 'http-retrieval-redirect-limit-reached',
-                            'type' => 'error',
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    [
+                        'messages' => [
+                            [
+                                'message' => 'Redirect limit reached',
+                                'messageId' => 'http-retrieval-redirect-limit-reached',
+                                'type' => 'error',
+                            ],
                         ],
                     ],
-                ],
+                    1,
+                    0
+                ),
             ],
             'http redirect loop' => [
                 'httpResponseFixtures' => [
@@ -129,16 +129,19 @@ class TaskPerformerWebPageRetrieverTest extends AbstractBaseTestCase
 
                 ],
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Redirect loop detected',
-                            'messageId' => 'http-retrieval-redirect-loop',
-                            'type' => 'error',
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    [
+                        'messages' => [
+                            [
+                                'message' => 'Redirect loop detected',
+                                'messageId' => 'http-retrieval-redirect-loop',
+                                'type' => 'error',
+                            ],
                         ],
                     ],
-                ],
+                    1,
+                    0
+                ),
             ],
             'http 404' => [
                 'httpResponseFixtures' => [
@@ -146,131 +149,159 @@ class TaskPerformerWebPageRetrieverTest extends AbstractBaseTestCase
                     $notFoundResponse,
                 ],
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Not Found',
-                            'messageId' => 'http-retrieval-404',
-                            'type' => 'error',
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    [
+                        'messages' => [
+                            [
+                                'message' => 'Not Found',
+                                'messageId' => 'http-retrieval-404',
+                                'type' => 'error',
+                            ],
                         ],
                     ],
-                ]
+                    1,
+                    0
+                ),
             ],
             'http 500' => [
                 'httpResponseFixtures' => array_fill(0, 12, $internalServerErrorResponse),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Internal Server Error',
-                            'messageId' => 'http-retrieval-500',
-                            'type' => 'error',
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    [
+                        'messages' => [
+                            [
+                                'message' => 'Internal Server Error',
+                                'messageId' => 'http-retrieval-500',
+                                'type' => 'error',
+                            ],
                         ],
                     ],
-                ]
+                    1,
+                    0
+                ),
             ],
             'curl 3' => [
                 'httpResponseFixtures' => array_fill(0, 12, $curl3ConnectException),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Invalid resource URL',
-                            'messageId' => 'http-retrieval-curl-code-3',
-                            'type' => 'error',
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    [
+                        'messages' => [
+                            [
+                                'message' => 'Invalid resource URL',
+                                'messageId' => 'http-retrieval-curl-code-3',
+                                'type' => 'error',
+                            ],
                         ],
                     ],
-                ]
+                    1,
+                    0
+                ),
             ],
             'curl 6' => [
                 'httpResponseFixtures' => array_fill(0, 12, $curl6ConnectException),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'DNS lookup failure resolving resource domain name',
-                            'messageId' => 'http-retrieval-curl-code-6',
-                            'type' => 'error',
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    [
+                        'messages' => [
+                            [
+                                'message' => 'DNS lookup failure resolving resource domain name',
+                                'messageId' => 'http-retrieval-curl-code-6',
+                                'type' => 'error',
+                            ],
                         ],
                     ],
-                ]
+                    1,
+                    0
+                ),
             ],
             'curl 28' => [
                 'httpResponseFixtures' => array_fill(0, 12, $curl28ConnectException),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Timeout reached retrieving resource',
-                            'messageId' => 'http-retrieval-curl-code-28',
-                            'type' => 'error',
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    [
+                        'messages' => [
+                            [
+                                'message' => 'Timeout reached retrieving resource',
+                                'messageId' => 'http-retrieval-curl-code-28',
+                                'type' => 'error',
+                            ],
                         ],
                     ],
-                ]
+                    1,
+                    0
+                ),
             ],
             'curl unknown' => [
                 'httpResponseFixtures' => array_fill(0, 12, $curl55ConnectException),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => '',
-                            'messageId' => 'http-retrieval-curl-code-55',
-                            'type' => 'error',
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    [
+                        'messages' => [
+                            [
+                                'message' => '',
+                                'messageId' => 'http-retrieval-curl-code-55',
+                                'type' => 'error',
+                            ],
                         ],
                     ],
-                ]
+                    1,
+                    0
+                ),
             ],
             'incorrect resource type: application/pdf' => [
                 'httpResponseFixtures' => [
                     new Response(200, ['content-type' => 'application/pdf']),
                 ],
                 'expectedTaskState' => Task::STATE_SKIPPED,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    null,
+                    0,
+                    0
+                ),
             ],
             'incorrect resource type: text/javascript' => [
                 'httpResponseFixtures' => [
                     new Response(200, ['content-type' => 'text/javascript']),
                 ],
                 'expectedTaskState' => Task::STATE_SKIPPED,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    null,
+                    0,
+                    0
+                ),
             ],
             'incorrect resource type: application/javascript' => [
                 'httpResponseFixtures' => [
                     new Response(200, ['content-type' => 'application/javascript']),
                 ],
                 'expectedTaskState' => Task::STATE_SKIPPED,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    null,
+                    0,
+                    0
+                ),
             ],
             'incorrect resource type: application/xml' => [
                 'httpResponseFixtures' => [
                     new Response(200, ['content-type' => 'application/xml']),
                 ],
                 'expectedTaskState' => Task::STATE_SKIPPED,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    null,
+                    0,
+                    0
+                ),
             ],
             'incorrect resource type: text/xml' => [
                 'httpResponseFixtures' => [
                     new Response(200, ['content-type' => 'text/xml']),
                 ],
                 'expectedTaskState' => Task::STATE_SKIPPED,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    null,
+                    0,
+                    0
+                ),
             ],
             'empty content' => [
                 'httpResponseFixtures' => [
@@ -278,9 +309,11 @@ class TaskPerformerWebPageRetrieverTest extends AbstractBaseTestCase
                     new Response(200, ['content-type' => 'text/html']),
                 ],
                 'expectedTaskState' => Task::STATE_SKIPPED,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
+                'expectedTaskOutputValues' => new TaskOutputValues(
+                    null,
+                    0,
+                    0
+                ),
             ],
         ];
     }
@@ -315,15 +348,19 @@ class TaskPerformerWebPageRetrieverTest extends AbstractBaseTestCase
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
+        $taskState = $task->getState();
+
         $this->assertTrue($task->isIncomplete());
         $this->assertEmpty($task->getOutput());
 
-        $webPage = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+        $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+
+        $this->assertEquals($taskState, $result->getTaskState());
+        $this->assertNull($result->getTaskOutputValues());
+
+        $webPage = $result->getWebPage();
 
         $this->assertInstanceOf(WebPage::class, $webPage);
         $this->assertEquals($content, $webPage->getContent());
-
-        $this->assertTrue($task->isIncomplete());
-        $this->assertEmpty($task->getOutput());
     }
 }

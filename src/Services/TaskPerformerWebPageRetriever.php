@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Model\TaskOutputValues;
+use App\Model\TaskPerformerWebPageRetrieverResult;
 use GuzzleHttp\Psr7\Request;
-use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebResource\Exception\HttpException;
 use webignition\WebResource\Exception\InvalidResponseContentTypeException;
@@ -29,13 +29,15 @@ class TaskPerformerWebPageRetriever
     /**
      * @param Task $task
      *
-     * @return WebPage|null
+     * @return TaskPerformerWebPageRetrieverResult
      *
      * @throws InternetMediaTypeParseException
      * @throws TransportException
      */
-    public function retrieveWebPage(Task $task)
+    public function retrieveWebPage(Task $task): TaskPerformerWebPageRetrieverResult
     {
+        $result = new TaskPerformerWebPageRetrieverResult();
+
         $request = new Request('GET', $task->getUrl());
 
         /* @var WebPage $webPage */
@@ -44,24 +46,20 @@ class TaskPerformerWebPageRetriever
         try {
             $webPage = $this->webResourceRetriever->retrieve($request);
         } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
-            return $this->setTaskOutputAndState(
-                $task,
-                '',
-                Task::STATE_SKIPPED,
-                0
-            );
+            $result->setTaskState(Task::STATE_SKIPPED);
+            $result->setTaskOutputValues(new TaskOutputValues('', 0, 0));
+
+            return $result;
         } catch (HttpException $httpException) {
             $output = $this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
                 $httpException,
                 null
             );
 
-            return $this->setTaskOutputAndState(
-                $task,
-                json_encode($output),
-                Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                1
-            );
+            $result->setTaskState(Task::STATE_FAILED_NO_RETRY_AVAILABLE);
+            $result->setTaskOutputValues(new TaskOutputValues($output, 1, 0));
+
+            return $result;
         } catch (TransportException $transportException) {
             if (!$transportException->isCurlException() && !$transportException->isTooManyRedirectsException()) {
                 throw $transportException;
@@ -72,36 +70,22 @@ class TaskPerformerWebPageRetriever
                 $transportException
             );
 
-            return $this->setTaskOutputAndState(
-                $task,
-                json_encode($output),
-                Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                1
-            );
+            $result->setTaskState(Task::STATE_FAILED_NO_RETRY_AVAILABLE);
+            $result->setTaskOutputValues(new TaskOutputValues($output, 1, 0));
+
+            return $result;
         }
 
         if (empty($webPage->getContent())) {
-            return $this->setTaskOutputAndState(
-                $task,
-                '',
-                Task::STATE_SKIPPED,
-                0
-            );
+            $result->setTaskState(Task::STATE_SKIPPED);
+            $result->setTaskOutputValues(new TaskOutputValues('', 0, 0));
+
+            return $result;
         }
 
-        return $webPage;
-    }
+        $result->setTaskState($task->getState());
+        $result->setWebPage($webPage);
 
-    private function setTaskOutputAndState(Task $task, string $output, string $state, int $errorCount)
-    {
-        $task->setOutput(Output::create(
-            $output,
-            new InternetMediaType('application/json'),
-            $errorCount
-        ));
-
-        $task->setState($state);
-
-        return null;
+        return $result;
     }
 }

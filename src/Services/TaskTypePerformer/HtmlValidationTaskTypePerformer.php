@@ -5,6 +5,7 @@ namespace App\Services\TaskTypePerformer;
 use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
+use App\Services\TaskPerformerTaskOutputMutator;
 use App\Services\TaskPerformerWebPageRetriever;
 use webignition\HtmlValidator\Output\Parser\Configuration as HtmlValidatorOutputParserConfiguration;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
@@ -36,6 +37,11 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     private $taskPerformerWebPageRetriever;
 
     /**
+     * @var TaskPerformerTaskOutputMutator
+     */
+    private $taskPerformerTaskOutputMutator;
+
+    /**
      * @var HtmlValidatorWrapper
      */
     private $htmlValidatorWrapper;
@@ -48,11 +54,13 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     public function __construct(
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
+        TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
         HtmlValidatorWrapper $htmlValidatorWrapper,
         string $validatorPath
     ) {
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
+        $this->taskPerformerTaskOutputMutator = $taskPerformerTaskOutputMutator;
 
         $this->htmlValidatorWrapper = $htmlValidatorWrapper;
         $this->validatorPath = $validatorPath;
@@ -70,13 +78,16 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
-        $webPage = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+        $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+        $task->setState($result->getTaskState());
 
         if (!$task->isIncomplete()) {
+            $this->taskPerformerTaskOutputMutator->mutate($task, $result->getTaskOutputValues());
+
             return null;
         }
 
-        return $this->performValidation($task, $webPage);
+        return $this->performValidation($task, $result->getWebPage());
     }
 
     /**
