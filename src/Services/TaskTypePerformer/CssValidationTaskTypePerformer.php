@@ -2,9 +2,12 @@
 
 namespace App\Services\TaskTypePerformer;
 
+use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
+use App\Services\TaskPerformerTaskOutputMutator;
+use App\Services\TaskPerformerWebPageRetriever;
 use webignition\CssValidatorOutput\CssValidatorOutput;
 use webignition\CssValidatorOutput\Message\AbstractMessage as CssValidatorOutputMessage;
 use webignition\CssValidatorOutput\Message\AbstractMessage;
@@ -15,12 +18,33 @@ use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebPageInspector\UnparseableContentTypeException;
-use webignition\WebResource\Retriever as WebResourceRetriever;
+use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
-use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
+class CssValidationTaskTypePerformer implements TaskTypePerformerInterface
 {
+    const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
+
+    /**
+     * @var HttpClientService
+     */
+    private $httpClientService;
+
+    /**
+     * @var HttpClientConfigurationService
+     */
+    private $httpClientConfigurationService;
+
+    /**
+     * @var TaskPerformerWebPageRetriever
+     */
+    private $taskPerformerWebPageRetriever;
+
+    /**
+     * @var TaskPerformerTaskOutputMutator
+     */
+    private $taskPerformerTaskOutputMutator;
+
     /**
      * @var CssValidatorWrapper
      */
@@ -34,65 +58,61 @@ class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
-        WebResourceRetriever $webResourceRetriever,
-        HttpHistoryContainer $httpHistoryContainer,
+        TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
+        TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
         CssValidatorWrapper $cssValidatorWrapper,
         CssValidatorWrapperConfigurationFactory $configurationFactory
     ) {
-        parent::__construct(
-            $httpClientService,
-            $httpClientConfigurationService,
-            $webResourceRetriever,
-            $httpHistoryContainer
-        );
+        $this->httpClientService = $httpClientService;
+        $this->httpClientConfigurationService = $httpClientConfigurationService;
+        $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
+        $this->taskPerformerTaskOutputMutator = $taskPerformerTaskOutputMutator;
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
         $this->configurationFactory = $configurationFactory;
     }
 
     /**
-     * @return InternetMediaType
-     */
-    protected function getOutputContentType()
-    {
-        $contentType = new InternetMediaType();
-        $contentType->setType('application');
-        $contentType->setSubtype('json');
-
-        return $contentType;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function hasNotSucceededHandler()
-    {
-        $this->response->setErrorCount(1);
-
-        return json_encode($this->getHttpExceptionOutput());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function isBlankWebResourceHandler()
-    {
-        $this->response->setHasBeenSkipped();
-        $this->response->setErrorCount(0);
-    }
-
-    /**
-     * {@inheritdoc}
+     * @param Task $task
      *
-     * @throws InvalidValidatorOutputException
+     * @return null
+     *
      * @throws InternetMediaTypeParseException
+     * @throws InvalidValidatorOutputException
+     * @throws TransportException
      * @throws UnparseableContentTypeException
      */
-    protected function performValidation(WebPage $webPage)
+    public function perform(Task $task)
+    {
+        $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
+
+        $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+        $task->setState($result->getTaskState());
+
+        if (!$task->isIncomplete()) {
+            $this->taskPerformerTaskOutputMutator->mutate($task, $result->getTaskOutputValues());
+
+            return null;
+        }
+
+        return $this->performValidation($task, $result->getWebPage());
+    }
+
+    /**
+     * @param Task $task
+     * @param WebPage $webPage
+     *
+     * @return null
+     *
+     * @throws InternetMediaTypeParseException
+     * @throws InvalidValidatorOutputException
+     * @throws UnparseableContentTypeException
+     */
+    private function performValidation(Task $task, WebPage $webPage)
     {
         $cssValidatorWrapperConfiguration = $this->configurationFactory->create(
-            $this->task,
-            (string)$webPage->getUri(),
+            $task,
+            (string) $webPage->getUri(),
             $webPage->getContent()
         );
 
@@ -101,27 +121,27 @@ class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
 
         if ($cssValidatorOutput->hasException()) {
             // Will only get unknown CSS validator exceptions here
-            $this->response->setHasFailed();
-            $this->response->setErrorCount(1);
-            $this->response->setIsRetryable(false);
-
-            return json_encode([
-                $this->getUnknownExceptionErrorOutput($this->task)
-            ]);
+            return $this->setTaskOutputAndState(
+                $task,
+                json_encode([
+                    $this->getUnknownExceptionErrorOutput($task)
+                ]),
+                Task::STATE_FAILED_NO_RETRY_AVAILABLE,
+                1,
+                0
+            );
         }
 
-        $this->response->setErrorCount($cssValidatorOutput->getErrorCount());
-        $this->response->setWarningCount($cssValidatorOutput->getWarningCount());
-
-        return json_encode($this->prepareCssValidatorOutput($cssValidatorOutput));
+        return $this->setTaskOutputAndState(
+            $task,
+            json_encode($this->prepareCssValidatorOutput($cssValidatorOutput)),
+            Task::STATE_COMPLETED,
+            $cssValidatorOutput->getErrorCount(),
+            $cssValidatorOutput->getWarningCount()
+        );
     }
 
-    /**
-     * @param CssValidatorOutput $cssValidatorOutput
-     *
-     * @return array
-     */
-    private function prepareCssValidatorOutput(CssValidatorOutput $cssValidatorOutput)
+    private function prepareCssValidatorOutput(CssValidatorOutput $cssValidatorOutput): array
     {
         $serializableMessages = [];
         $messages = $cssValidatorOutput->getMessages();
@@ -156,56 +176,31 @@ class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
         return $serializableMessages;
     }
 
-    /**
-     * @param CssValidatorOutputError $error
-     *
-     * @return boolean
-     */
-    private function isCssValidatorHttpError(CssValidatorOutputError $error)
+    private function isCssValidatorHttpError(CssValidatorOutputError $error): bool
     {
         $message = $error->getMessage();
 
         return substr($message, 0, strlen('http-error:')) === 'http-error:';
     }
 
-    /**
-     * @param CssValidatorOutputError $error
-     *
-     * @return boolean
-     */
-    private function isCssValidatorCurlError(CssValidatorOutputError $error)
+    private function isCssValidatorCurlError(CssValidatorOutputError $error): bool
     {
         $message = $error->getMessage();
 
         return substr($message, 0, strlen('curl-error:')) === 'curl-error:';
     }
 
-    /**
-     * @param CssValidatorOutputError $error
-     *
-     * @return int
-     */
-    private function getCssValidatorHttpErrorStatusCode(CssValidatorOutputError $error)
+    private function getCssValidatorHttpErrorStatusCode(CssValidatorOutputError $error): int
     {
         return (int)str_replace('http-error:', '', $error->getMessage());
     }
 
-    /**
-     * @param CssValidatorOutputError $error
-     *
-     * @return int
-     */
-    private function getCssValidatorCurlErrorCode(CssValidatorOutputError $error)
+    private function getCssValidatorCurlErrorCode(CssValidatorOutputError $error): int
     {
         return (int)str_replace('curl-error:', '', $error->getMessage());
     }
 
-    /**
-     * @param Task $task
-     *
-     * @return array
-     */
-    protected function getUnknownExceptionErrorOutput(Task $task)
+    private function getUnknownExceptionErrorOutput(Task $task): array
     {
         return [
             'message' => 'Unknown error',
@@ -215,5 +210,24 @@ class CssValidationTaskTypePerformer extends AbstractWebPageTaskTypePerformer
             'ref' => $task->getUrl(),
             'line_number' => 0,
         ];
+    }
+
+    private function setTaskOutputAndState(
+        Task $task,
+        string $output,
+        string $state,
+        int $errorCount,
+        int $warningCount
+    ) {
+        $task->setOutput(Output::create(
+            $output,
+            new InternetMediaType('application/json'),
+            $errorCount,
+            $warningCount
+        ));
+
+        $task->setState($state);
+
+        return null;
     }
 }

@@ -1,15 +1,19 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
+use App\Entity\Task\Output;
+use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
+use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory;
 use App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
-use Psr\Http\Message\RequestInterface;
 
 class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -27,41 +31,27 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->taskTypePerformer = self::$container->get(LinkIntegrityTaskTypePerformer::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTaskTypePerformer()
+    protected function getTaskTypePerformer(): TaskTypePerformerInterface
     {
         return $this->taskTypePerformer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTaskTypeString()
+    protected function getTaskTypeString(): string
     {
         return TypeInterface::TYPE_LINK_INTEGRITY;
     }
 
     /**
      * @dataProvider performSuccessDataProvider
-     *
-     * @param array $httpFixtures
-     * @param array $taskParameters
-     * @param bool $expectedHasSucceeded
-     * @param bool $expectedIsRetryable
-     * @param int $expectedErrorCount
-     * @param int $expectedWarningCount
-     * @param array $expectedDecodedOutput
      */
     public function testPerformSuccess(
-        $httpFixtures,
-        $taskParameters,
-        $expectedHasSucceeded,
-        $expectedIsRetryable,
-        $expectedErrorCount,
-        $expectedWarningCount,
-        $expectedDecodedOutput
+        string $webPageContent,
+        array $httpFixtures,
+        array $taskParameters,
+        string $expectedTaskState,
+        int $expectedErrorCount,
+        int $expectedWarningCount,
+        array $expectedDecodedOutput
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
@@ -70,57 +60,53 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'parameters' => json_encode($taskParameters),
         ]));
 
-        $response = $this->taskTypePerformer->perform($task);
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+            LinkIntegrityTaskTypePerformer::class,
+            $task,
+            $webPageContent
+        );
 
-        $this->assertEquals($expectedHasSucceeded, $response->hasSucceeded());
-        $this->assertEquals($expectedIsRetryable, $response->isRetryable());
-        $this->assertEquals($expectedErrorCount, $response->getErrorCount());
-        $this->assertEquals($expectedWarningCount, $response->getWarningCount());
-        $this->assertEquals($expectedDecodedOutput, json_decode($response->getTaskOutput()->getOutput()));
+        $this->taskTypePerformer->perform($task);
+
+        $this->assertEquals($expectedTaskState, $task->getState());
+
+        $output = $task->getOutput();
+        $this->assertInstanceOf(Output::class, $output);
+        $this->assertEquals($expectedErrorCount, $output->getErrorCount());
+        $this->assertEquals($expectedWarningCount, $output->getWarningCount());
+
+        $this->assertEquals(
+            $expectedDecodedOutput,
+            json_decode($output->getOutput(), true)
+        );
     }
 
-    /**
-     * @return array
-     */
-    public function performSuccessDataProvider()
+    public function performSuccessDataProvider(): array
     {
         $notFoundResponse = new Response(404);
         $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
 
         return [
             'no links' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body></body></html>'
-                    ),
-                ],
+                'webPageContent' => '<!doctype html><html><head></head><body></body></html>',
+                'httpFixtures' => [],
                 'taskParameters' => [],
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
             'single 200 OK link' => [
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-                    ),
                     new Response(),
                 ],
                 'taskParameters' => [],
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [
-                    (object)[
+                    [
                         'context' => '<a href="/foo"></a>',
                         'state' => 200,
                         'type' => 'http',
@@ -129,23 +115,17 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'single 404 Not Found link' => [
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-                    ),
                     $notFoundResponse,
                     $notFoundResponse,
                 ],
                 'taskParameters' => [],
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [
-                    (object)[
+                    [
                         'context' => '<a href="/foo"></a>',
                         'state' => 404,
                         'type' => 'http',
@@ -154,22 +134,16 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'single curl 28 link' => [
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-                    ),
                     $curl28ConnectException,
                 ],
                 'taskParameters' => [],
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [
-                    (object)[
+                    [
                         'context' => '<a href="/foo"></a>',
                         'state' => 28,
                         'type' => 'curl',
@@ -178,57 +152,36 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'excluded urls' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-                    ),
-                ],
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
+                'httpFixtures' => [],
                 'taskParameters' => [
                     LinkCheckerConfigurationFactory::EXCLUDED_URLS_PARAMETER_NAME => [
                         'http://example.com/foo'
                     ],
                 ],
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
             'excluded domains' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-                    ),
-                ],
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
+                'httpFixtures' => [],
                 'taskParameters' => [
                     LinkCheckerConfigurationFactory::EXCLUDED_DOMAINS_PARAMETER_NAME => [
                         'example.com'
                     ],
                 ],
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
             'ignored schemes' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        HtmlDocumentFactory::load('ignored-link-integrity-schemes')
-                    ),
-                ],
+                'webPageContent' => HtmlDocumentFactory::load('ignored-link-integrity-schemes'),
+                'httpFixtures' => [],
                 'taskParameters' => [],
-                'expectedHasSucceeded' => true,
-                'expectedIsRetryable' => true,
+                'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
@@ -238,74 +191,57 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
     /**
      * @dataProvider cookiesDataProvider
-     *
-     * {@inheritdoc}
      */
-    public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader)
+    public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader)
     {
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(
-                200,
-                ['content-type' => 'text/html'],
-                '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-            ),
+        $httpFixtures = [
             new Response(200),
-        ]);
+        ];
+
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
 
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+            LinkIntegrityTaskTypePerformer::class,
+            $task,
+            '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
+        );
+
         $this->taskTypePerformer->perform($task);
 
-        /* @var RequestInterface[]|array $historicalRequests */
-        $historicalRequests = $this->httpHistoryContainer->getRequests();
-        $this->assertCount(3, $historicalRequests);
-
-        foreach ($historicalRequests as $historicalRequest) {
-            $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
-            $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
-        }
+        $this->assertCookieHeadeSetOnAllRequests(count($httpFixtures), $expectedRequestCookieHeader);
     }
 
     /**
      * @dataProvider httpAuthDataProvider
-     *
-     * {@inheritdoc}
      */
-    public function testSetHttpAuthenticationOnRequests($taskParameters, $expectedRequestAuthorizationHeaderValue)
-    {
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(
-                200,
-                ['content-type' => 'text/html'],
-                '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-            ),
+    public function testSetHttpAuthenticationOnRequests(
+        array $taskParameters,
+        string $expectedRequestAuthorizationHeaderValue
+    ) {
+        $httpFixtures = [
             new Response(200),
-        ]);
+        ];
+
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
 
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+            LinkIntegrityTaskTypePerformer::class,
+            $task,
+            '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
+        );
+
         $this->taskTypePerformer->perform($task);
 
-        /* @var RequestInterface[]|array $historicalRequests */
-        $historicalRequests = $this->httpHistoryContainer->getRequests();
-        $this->assertCount(3, $historicalRequests);
-
-        foreach ($historicalRequests as $historicalRequest) {
-            $authorizationHeaderLine = $historicalRequest->getHeaderLine('authorization');
-
-            $decodedAuthorizationHeaderValue = base64_decode(
-                str_replace('Basic ', '', $authorizationHeaderLine)
-            );
-
-            $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
-        }
+        $this->assertHttpAuthorizationSetOnAllRequests(count($httpFixtures), $expectedRequestAuthorizationHeaderValue);
     }
 }

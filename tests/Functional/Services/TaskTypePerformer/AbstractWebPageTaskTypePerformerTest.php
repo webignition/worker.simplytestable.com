@@ -1,17 +1,19 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
+use App\Entity\Task\Task;
+use App\Model\TaskPerformerWebPageRetrieverResult;
+use App\Services\TaskPerformerWebPageRetriever;
+use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
-use App\Services\TaskTypePerformer\TaskTypePerformer;
 use App\Tests\Functional\AbstractBaseTestCase;
-use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Services\HttpMockHandler;
-use webignition\WebResource\Exception\TransportException;
+use GuzzleHttp\Psr7\Uri;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
+use webignition\WebResource\WebPage\WebPage;
 
 abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
 {
@@ -42,390 +44,8 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
 
-    /**
-     * @return TaskTypePerformer
-     */
-    abstract protected function getTaskTypePerformer();
-
-    /**
-     * @return string
-     */
-    abstract protected function getTaskTypeString();
-
-    /**
-     * @dataProvider cookiesDataProvider
-     *
-     * @param array $taskParameters
-     * @param string $expectedRequestCookieHeader
-     */
-    abstract public function testSetCookiesOnRequests($taskParameters, $expectedRequestCookieHeader);
-
-    /**
-     * @dataProvider httpAuthDataProvider
-     *
-     * @param array $taskParameters
-     * @param string $expectedRequestAuthorizationHeaderValue
-     */
-    abstract public function testSetHttpAuthenticationOnRequests(
-        $taskParameters,
-        $expectedRequestAuthorizationHeaderValue
-    );
-
-    public function testPerformNonCurlConnectException()
-    {
-        $connectException = new ConnectException('foo', new Request('GET', 'http://example.com'));
-
-        $this->httpMockHandler->appendFixtures([
-            $connectException,
-            $connectException,
-            $connectException,
-            $connectException,
-            $connectException,
-            $connectException,
-            $connectException,
-            $connectException,
-            $connectException,
-            $connectException,
-            $connectException,
-            $connectException,
-        ]);
-
-        $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults()
-        );
-
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('foo');
-        $this->expectExceptionCode(0);
-
-        $this->getTaskTypePerformer()->perform($task);
-    }
-
-    /**
-     * @dataProvider performBadWebResourceDataProvider
-     *
-     * @param string[] $httpResponseFixtures
-     * @param bool $expectedWebResourceRetrievalHasSucceeded
-     * @param bool $expectedIsRetryable
-     * @param int $expectedErrorCount
-     * @param string $expectedTaskOutput
-     */
-    public function testPerformBadWebResource(
-        $httpResponseFixtures,
-        $expectedWebResourceRetrievalHasSucceeded,
-        $expectedIsRetryable,
-        $expectedErrorCount,
-        $expectedTaskOutput
-    ) {
-        $this->httpMockHandler->appendFixtures($httpResponseFixtures);
-
-        $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults()
-        );
-
-        $taskTypePerformer = $this->getTaskTypePerformer();
-
-        $response = $taskTypePerformer->perform($task);
-
-        $this->assertEquals($expectedWebResourceRetrievalHasSucceeded, $response->hasSucceeded());
-        $this->assertEquals($expectedIsRetryable, $response->isRetryable());
-        $this->assertEquals($expectedErrorCount, $response->getErrorCount());
-
-        $this->assertEquals(
-            $expectedTaskOutput,
-            json_decode($response->getTaskOutput()->getOutput(), true)
-        );
-    }
-
-    public function performBadWebResourceDataProvider()
-    {
-        $notFoundResponse = new Response(404);
-        $internalServerErrorResponse = new Response(500);
-        $curl3ConnectException = ConnectExceptionFactory::create('CURL/3: foo');
-        $curl6ConnectException = ConnectExceptionFactory::create('CURL/6: foo');
-        $curl28ConnectException = ConnectExceptionFactory::create('CURL/28: foo');
-        $curl55ConnectException = ConnectExceptionFactory::create('CURL/55: foo');
-
-        return [
-            'http too many redirects' => [
-                'httpResponseFixtures' => [
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '4']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '5']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '6']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '4']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '5']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '6']),
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Redirect limit reached',
-                            'messageId' => 'http-retrieval-redirect-limit-reached',
-                            'type' => 'error',
-                        ],
-                    ],
-                ],
-            ],
-            'http redirect loop' => [
-                'httpResponseFixtures' => [
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL]),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '3']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL]),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '1']),
-                    new Response(301, ['location' => TestTaskFactory::DEFAULT_TASK_URL . '2']),
-
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Redirect loop detected',
-                            'messageId' => 'http-retrieval-redirect-loop',
-                            'type' => 'error',
-                        ],
-                    ],
-                ],
-            ],
-            'http 404' => [
-                'httpResponseFixtures' => [
-                    $notFoundResponse,
-                    $notFoundResponse,
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Not Found',
-                            'messageId' => 'http-retrieval-404',
-                            'type' => 'error',
-                        ],
-                    ],
-                ]
-            ],
-            'http 500' => [
-                'httpResponseFixtures' => [
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Internal Server Error',
-                            'messageId' => 'http-retrieval-500',
-                            'type' => 'error',
-                        ],
-                    ],
-                ]
-            ],
-            'curl 3' => [
-                'httpResponseFixtures' => [
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                    $curl3ConnectException,
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Invalid resource URL',
-                            'messageId' => 'http-retrieval-curl-code-3',
-                            'type' => 'error',
-                        ],
-                    ],
-                ]
-            ],
-            'curl 6' => [
-                'httpResponseFixtures' => [
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                    $curl6ConnectException,
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'DNS lookup failure resolving resource domain name',
-                            'messageId' => 'http-retrieval-curl-code-6',
-                            'type' => 'error',
-                        ],
-                    ],
-                ]
-            ],
-            'curl 28' => [
-                'httpResponseFixtures' => [
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => 'Timeout reached retrieving resource',
-                            'messageId' => 'http-retrieval-curl-code-28',
-                            'type' => 'error',
-                        ],
-                    ],
-                ]
-            ],
-            'curl unknown' => [
-                'httpResponseFixtures' => [
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                    $curl55ConnectException,
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => false,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 1,
-                'expectedTaskOutput' => [
-                    'messages' => [
-                        [
-                            'message' => '',
-                            'messageId' => 'http-retrieval-curl-code-55',
-                            'type' => 'error',
-                        ],
-                    ],
-                ]
-            ],
-            'incorrect resource type: application/pdf' => [
-                'httpResponseFixtures' => [
-                    new Response(200, ['content-type' => 'application/pdf']),
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
-            ],
-            'incorrect resource type: text/javascript' => [
-                'httpResponseFixtures' => [
-                    new Response(200, ['content-type' => 'text/javascript']),
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
-            ],
-            'incorrect resource type: application/javascript' => [
-                'httpResponseFixtures' => [
-                    new Response(200, ['content-type' => 'application/javascript']),
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
-            ],
-            'incorrect resource type: application/xml' => [
-                'httpResponseFixtures' => [
-                    new Response(200, ['content-type' => 'application/xml']),
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
-            ],
-            'incorrect resource type: text/xml' => [
-                'httpResponseFixtures' => [
-                    new Response(200, ['content-type' => 'text/xml']),
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => false,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
-            ],
-            'empty content' => [
-                'httpResponseFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(200, ['content-type' => 'text/html']),
-                ],
-                'expectedWebResourceRetrievalHasSucceeded' => true,
-                'expectedIsRetryable' => true,
-                'expectedErrorCount' => 0,
-                'expectedTaskOutput' =>
-                    null
-            ],
-        ];
-    }
+    abstract protected function getTaskTypePerformer(): TaskTypePerformerInterface;
+    abstract protected function getTaskTypeString():string;
 
     /**
      * @return array
@@ -492,6 +112,67 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
                 'expectedRequestAuthorizationHeaderValue' => 'foouser:foopassword',
             ],
         ];
+    }
+
+    protected function assertHttpAuthorizationSetOnAllRequests(
+        int $expectedRequestCount,
+        string $expectedRequestAuthorizationHeaderValue
+    ) {
+        /* @var array $historicalRequests */
+        $historicalRequests = $this->httpHistoryContainer->getRequests();
+        $this->assertCount($expectedRequestCount, $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $authorizationHeaderLine = $historicalRequest->getHeaderLine('authorization');
+
+            $decodedAuthorizationHeaderValue = base64_decode(
+                str_replace('Basic ', '', $authorizationHeaderLine)
+            );
+
+            $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
+        }
+    }
+
+    protected function assertCookieHeadeSetOnAllRequests(
+        int $expectedRequestCount,
+        string $expectedRequestCookieHeader
+    ) {
+        /* @var array $historicalRequests */
+        $historicalRequests = $this->httpHistoryContainer->getRequests();
+        $this->assertCount($expectedRequestCount, $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
+            $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
+        }
+    }
+
+    protected function setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        string $performerClass,
+        Task $task,
+        string $content
+    ) {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        /* @var WebPage $webPage */
+        $webPage = WebPage::createFromContent($content);
+        $webPage = $webPage->setUri(new Uri($task->getUrl()));
+
+        $taskPerformerWebPageRetrieverResult = new TaskPerformerWebPageRetrieverResult();
+        $taskPerformerWebPageRetrieverResult->setWebPage($webPage);
+        $taskPerformerWebPageRetrieverResult->setTaskState($task->getState());
+
+        $taskPerformerWebPageRetriever = \Mockery::mock(TaskPerformerWebPageRetriever::class);
+        $taskPerformerWebPageRetriever
+            ->shouldReceive('retrieveWebPage')
+            ->with($task)
+            ->andReturn($taskPerformerWebPageRetrieverResult);
+
+        ObjectPropertySetter::setProperty(
+            $this->getTaskTypePerformer(),
+            $performerClass,
+            'taskPerformerWebPageRetriever',
+            $taskPerformerWebPageRetriever
+        );
     }
 
     protected function assertPostConditions()

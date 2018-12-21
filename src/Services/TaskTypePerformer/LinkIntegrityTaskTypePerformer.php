@@ -2,22 +2,46 @@
 
 namespace App\Services\TaskTypePerformer;
 
+use App\Entity\Task\Output;
+use App\Entity\Task\Task;
 use App\Model\LinkIntegrityResult;
 use App\Model\LinkIntegrityResultCollection;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
+use App\Services\TaskPerformerTaskOutputMutator;
+use App\Services\TaskPerformerWebPageRetriever;
+use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\InternetMediaType\InternetMediaType;
-use webignition\WebResource\Retriever as WebResourceRetriever;
+use webignition\WebResource\Exception\TransportException;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
 use webignition\WebResource\WebPage\WebPage;
-use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkFinderConfiguration;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
-class LinkIntegrityTaskTypePerformer extends AbstractWebPageTaskTypePerformer
+class LinkIntegrityTaskTypePerformer implements TaskTypePerformerInterface
 {
-    const COOKIES_PARAMETER_NAME = 'cookies';
+    const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
+
+    /**
+     * @var HttpClientService
+     */
+    private $httpClientService;
+
+    /**
+     * @var HttpClientConfigurationService
+     */
+    private $httpClientConfigurationService;
+
+    /**
+     * @var TaskPerformerWebPageRetriever
+     */
+    private $taskPerformerWebPageRetriever;
+
+    /**
+     * @var TaskPerformerTaskOutputMutator
+     */
+    private $taskPerformerTaskOutputMutator;
 
     /**
      * @var LinkCheckerConfigurationFactory
@@ -32,48 +56,48 @@ class LinkIntegrityTaskTypePerformer extends AbstractWebPageTaskTypePerformer
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
-        WebResourceRetriever $webResourceRetriever,
-        HttpHistoryContainer $httpHistoryContainer,
+        TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
+        TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
         LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory,
         HttpRetryMiddleware $httpRetryMiddleware
     ) {
-        parent::__construct(
-            $httpClientService,
-            $httpClientConfigurationService,
-            $webResourceRetriever,
-            $httpHistoryContainer
-        );
+        $this->httpClientService = $httpClientService;
+        $this->httpClientConfigurationService = $httpClientConfigurationService;
+        $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
+        $this->taskPerformerTaskOutputMutator = $taskPerformerTaskOutputMutator;
 
         $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
         $this->httpRetryMiddleware = $httpRetryMiddleware;
     }
 
     /**
-     * {@inheritdoc}
+     * @param Task $task
+     *
+     * @return null
+     *
+     * @throws InternetMediaTypeParseException
+     * @throws TransportException
      */
-    protected function hasNotSucceededHandler()
+    public function perform(Task $task)
     {
-        $this->response->setErrorCount(1);
+        $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
-        return json_encode($this->getHttpExceptionOutput());
+        $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+        $task->setState($result->getTaskState());
+
+        if (!$task->isIncomplete()) {
+            $this->taskPerformerTaskOutputMutator->mutate($task, $result->getTaskOutputValues());
+
+            return null;
+        }
+
+        return $this->performValidation($task, $result->getWebPage());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function isBlankWebResourceHandler()
-    {
-        $this->response->setHasBeenSkipped();
-        $this->response->setErrorCount(0);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function performValidation(WebPage $webPage)
+    private function performValidation(Task $task, WebPage $webPage)
     {
         $linkChecker = new LinkChecker(
-            $this->linkCheckerConfigurationFactory->create($this->task),
+            $this->linkCheckerConfigurationFactory->create($task),
             $this->httpClientService->getHttpClient()
         );
 
@@ -98,16 +122,17 @@ class LinkIntegrityTaskTypePerformer extends AbstractWebPageTaskTypePerformer
 
         $this->httpRetryMiddleware->enable();
 
-        $this->response->setErrorCount($linkIntegrityResultCollection->getErrorCount());
+        $task->setOutput(Output::create(
+            json_encode($linkIntegrityResultCollection),
+            new InternetMediaType('application/json'),
+            $linkIntegrityResultCollection->getErrorCount()
+        ));
 
-        return json_encode($linkIntegrityResultCollection);
+        $task->setState(Task::STATE_COMPLETED);
+
+        return null;
     }
 
-    /**
-     * @param WebPage $webPage
-     *
-     * @return array
-     */
     private function findWebPageLinks(WebPage $webPage): array
     {
         $linkFinderConfiguration = new LinkFinderConfiguration([
@@ -119,17 +144,5 @@ class LinkIntegrityTaskTypePerformer extends AbstractWebPageTaskTypePerformer
         $linkFinder->setConfiguration($linkFinderConfiguration);
 
         return $linkFinder->getAll();
-    }
-
-    /**
-     * @return InternetMediaType
-     */
-    protected function getOutputContentType()
-    {
-        $contentType = new InternetMediaType();
-        $contentType->setType('application');
-        $contentType->setSubtype('json');
-
-        return $contentType;
     }
 }
