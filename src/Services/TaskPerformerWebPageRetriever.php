@@ -51,9 +51,9 @@ class TaskPerformerWebPageRetriever
 
             return $result;
         } catch (HttpException $httpException) {
-            $output = $this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
-                $httpException,
-                null
+            $output = $this->taskOutputMessageFactory->createHttpExceptionOutputMessageCollection(
+                $httpException->getMessage(),
+                $httpException->getCode()
             );
 
             $result->setTaskState(Task::STATE_FAILED_NO_RETRY_AVAILABLE);
@@ -65,8 +65,7 @@ class TaskPerformerWebPageRetriever
                 throw $transportException;
             }
 
-            $output = $this->taskOutputMessageFactory->createOutputMessageCollectionFromExceptions(
-                null,
+            $output = $this->taskOutputMessageFactory->createTransportExceptionOutputMessageCollection(
                 $transportException
             );
 
