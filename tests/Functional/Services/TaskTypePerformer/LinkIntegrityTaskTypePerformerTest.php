@@ -45,6 +45,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
+        string $webPageContent,
         array $httpFixtures,
         array $taskParameters,
         string $expectedTaskState,
@@ -58,6 +59,12 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters),
         ]));
+
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+            LinkIntegrityTaskTypePerformer::class,
+            $task,
+            $webPageContent
+        );
 
         $this->taskTypePerformer->perform($task);
 
@@ -81,14 +88,8 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         return [
             'no links' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body></body></html>'
-                    ),
-                ],
+                'webPageContent' => '<!doctype html><html><head></head><body></body></html>',
+                'httpFixtures' => [],
                 'taskParameters' => [],
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
@@ -96,13 +97,8 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 'expectedDecodedOutput' => [],
             ],
             'single 200 OK link' => [
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-                    ),
                     new Response(),
                 ],
                 'taskParameters' => [],
@@ -119,13 +115,8 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'single 404 Not Found link' => [
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-                    ),
                     $notFoundResponse,
                     $notFoundResponse,
                 ],
@@ -143,13 +134,8 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'single curl 28 link' => [
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-                    ),
                     $curl28ConnectException,
                 ],
                 'taskParameters' => [],
@@ -166,14 +152,8 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'excluded urls' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-                    ),
-                ],
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
+                'httpFixtures' => [],
                 'taskParameters' => [
                     LinkCheckerConfigurationFactory::EXCLUDED_URLS_PARAMETER_NAME => [
                         'http://example.com/foo'
@@ -185,14 +165,8 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 'expectedDecodedOutput' => [],
             ],
             'excluded domains' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-                    ),
-                ],
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
+                'httpFixtures' => [],
                 'taskParameters' => [
                     LinkCheckerConfigurationFactory::EXCLUDED_DOMAINS_PARAMETER_NAME => [
                         'example.com'
@@ -204,14 +178,8 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 'expectedDecodedOutput' => [],
             ],
             'ignored schemes' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/html']),
-                    new Response(
-                        200,
-                        ['content-type' => 'text/html'],
-                        HtmlDocumentFactory::load('ignored-link-integrity-schemes')
-                    ),
-                ],
+                'webPageContent' => HtmlDocumentFactory::load('ignored-link-integrity-schemes'),
+                'httpFixtures' => [],
                 'taskParameters' => [],
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
