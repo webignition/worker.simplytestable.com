@@ -101,7 +101,7 @@ class CssValidationTaskTypePerformer implements TaskTypePerformerInterface
     {
         $cssValidatorWrapperConfiguration = $this->configurationFactory->create(
             $task,
-            (string)$webPage->getUri(),
+            (string) $webPage->getUri(),
             $webPage->getContent()
         );
 

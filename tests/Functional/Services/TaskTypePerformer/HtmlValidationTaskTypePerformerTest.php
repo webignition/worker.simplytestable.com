@@ -45,14 +45,11 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
      */
     public function testPerformBadDocumentType(string $content, array $expectedOutputMessage)
     {
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], $content),
-        ]);
-
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
+
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(HtmlValidationTaskTypePerformer::class, $task, $content);
 
         $this->taskTypePerformer->perform($task);
 
@@ -125,14 +122,11 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         int $expectedErrorCount,
         array $expectedDecodedOutput
     ) {
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], $content),
-        ]);
-
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
+
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(HtmlValidationTaskTypePerformer::class, $task, $content);
 
         HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
 
@@ -265,71 +259,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                 ],
             ],
         ];
-    }
-
-    /**
-     * @dataProvider cookiesDataProvider
-     */
-    public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader)
-    {
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ]);
-
-        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
-
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
-            'parameters' => json_encode($taskParameters)
-        ]));
-
-        $this->taskTypePerformer->perform($task);
-
-        /* @var array $historicalRequests */
-        $historicalRequests = $this->httpHistoryContainer->getRequests();
-        $this->assertCount(2, $historicalRequests);
-
-        foreach ($historicalRequests as $historicalRequest) {
-            $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
-            $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
-        }
-    }
-
-    /**
-     * @dataProvider httpAuthDataProvider
-     */
-    public function testSetHttpAuthenticationOnRequests(
-        array $taskParameters,
-        string $expectedRequestAuthorizationHeaderValue
-    ) {
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ]);
-
-        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
-
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
-            'parameters' => json_encode($taskParameters),
-        ]));
-
-        $this->taskTypePerformer->perform($task);
-
-        /* @var array $historicalRequests */
-        $historicalRequests = $this->httpHistoryContainer->getRequests();
-        $this->assertCount(2, $historicalRequests);
-
-        foreach ($historicalRequests as $historicalRequest) {
-            $authorizationHeaderLine = $historicalRequest->getHeaderLine('authorization');
-
-            $decodedAuthorizationHeaderValue = base64_decode(
-                str_replace('Basic ', '', $authorizationHeaderLine)
-            );
-
-            $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
-        }
     }
 
     /**
