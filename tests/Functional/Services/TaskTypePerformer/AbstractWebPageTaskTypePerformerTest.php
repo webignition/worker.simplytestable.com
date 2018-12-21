@@ -47,19 +47,6 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
     abstract protected function getTaskTypeString():string;
 
     /**
-     * @dataProvider cookiesDataProvider
-     */
-    abstract public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader);
-
-    /**
-     * @dataProvider httpAuthDataProvider
-     */
-    abstract public function testSetHttpAuthenticationOnRequests(
-        array $taskParameters,
-        string $expectedRequestAuthorizationHeaderValue
-    );
-
-    /**
      * @return array
      */
     public function cookiesDataProvider()

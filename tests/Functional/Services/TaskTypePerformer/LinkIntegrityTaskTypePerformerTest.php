@@ -195,12 +195,6 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
     public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader)
     {
         $httpFixtures = [
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(
-                200,
-                ['content-type' => 'text/html'],
-                '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-            ),
             new Response(200),
         ];
 
@@ -210,6 +204,12 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
+
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+            LinkIntegrityTaskTypePerformer::class,
+            $task,
+            '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
+        );
 
         $this->taskTypePerformer->perform($task);
 
@@ -224,12 +224,6 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         string $expectedRequestAuthorizationHeaderValue
     ) {
         $httpFixtures = [
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(
-                200,
-                ['content-type' => 'text/html'],
-                '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
-            ),
             new Response(200),
         ];
 
@@ -239,6 +233,12 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
+
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+            LinkIntegrityTaskTypePerformer::class,
+            $task,
+            '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
+        );
 
         $this->taskTypePerformer->perform($task);
 

@@ -257,12 +257,6 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
     public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader)
     {
         $httpFixtures = [
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(
-                200,
-                ['content-type' => 'text/html'],
-                HtmlDocumentFactory::load('empty-body-single-css-link')
-            ),
             new Response(200, ['content-type' => 'text/css']),
             new Response(200, ['content-type' => 'text/css']),
         ];
@@ -273,6 +267,12 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
+
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+            CssValidationTaskTypePerformer::class,
+            $task,
+            HtmlDocumentFactory::load('empty-body-single-css-link')
+        );
 
         CssValidatorFixtureFactory::set(CssValidatorFixtureFactory::load('no-messages'));
 
@@ -289,12 +289,6 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         string $expectedRequestAuthorizationHeaderValue
     ) {
         $httpFixtures = [
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(
-                200,
-                ['content-type' => 'text/html'],
-                HtmlDocumentFactory::load('empty-body-single-css-link')
-            ),
             new Response(200, ['content-type' => 'text/css']),
             new Response(200, ['content-type' => 'text/css']),
         ];
@@ -305,6 +299,12 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'type' => $this->getTaskTypeString(),
             'parameters' => json_encode($taskParameters)
         ]));
+
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+            CssValidationTaskTypePerformer::class,
+            $task,
+            HtmlDocumentFactory::load('empty-body-single-css-link')
+        );
 
         CssValidatorFixtureFactory::set(CssValidatorFixtureFactory::load('no-messages'));
 

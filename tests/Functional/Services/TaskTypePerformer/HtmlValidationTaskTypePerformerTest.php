@@ -262,56 +262,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
     }
 
     /**
-     * @dataProvider cookiesDataProvider
-     */
-    public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader)
-    {
-        $httpFixtures = [
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ];
-
-        $this->httpMockHandler->appendFixtures($httpFixtures);
-
-        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
-
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
-            'parameters' => json_encode($taskParameters)
-        ]));
-
-        $this->taskTypePerformer->perform($task);
-
-        $this->assertCookieHeadeSetOnAllRequests(count($httpFixtures), $expectedRequestCookieHeader);
-    }
-
-    /**
-     * @dataProvider httpAuthDataProvider
-     */
-    public function testSetHttpAuthenticationOnRequests(
-        array $taskParameters,
-        string $expectedRequestAuthorizationHeaderValue
-    ) {
-        $httpFixtures = [
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ];
-
-        $this->httpMockHandler->appendFixtures($httpFixtures);
-
-        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
-
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
-            'parameters' => json_encode($taskParameters),
-        ]));
-
-        $this->taskTypePerformer->perform($task);
-
-        $this->assertHttpAuthorizationSetOnAllRequests(count($httpFixtures), $expectedRequestAuthorizationHeaderValue);
-    }
-
-    /**
      * @dataProvider storeTmpFileDataProvider
      */
     public function testStoreTmpFile(bool $fileExists)
