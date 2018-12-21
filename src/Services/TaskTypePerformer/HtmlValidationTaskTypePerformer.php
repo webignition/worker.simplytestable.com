@@ -17,7 +17,7 @@ use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
 use webignition\HtmlDocumentType\Validator as DoctypeValidator;
 use webignition\HtmlDocumentType\Factory as DoctypeFactory;
 
-class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
+class HtmlValidationTaskTypePerformer implements TaskPerformerInterface
 {
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';

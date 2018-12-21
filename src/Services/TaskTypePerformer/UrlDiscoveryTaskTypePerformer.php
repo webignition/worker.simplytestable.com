@@ -14,7 +14,7 @@ use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
 
-class UrlDiscoveryTaskTypePerformer implements TaskTypePerformerInterface
+class UrlDiscoveryTaskTypePerformer implements TaskPerformerInterface
 {
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';

@@ -21,7 +21,7 @@ use webignition\WebPageInspector\UnparseableContentTypeException;
 use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
 
-class CssValidationTaskTypePerformer implements TaskTypePerformerInterface
+class CssValidationTaskTypePerformer implements TaskPerformerInterface
 {
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
 

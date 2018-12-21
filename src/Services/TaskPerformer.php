@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Event\TaskEvent;
-use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
+use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -21,7 +21,7 @@ class TaskPerformer
     private $eventDispatcher;
 
     /**
-     * @var TaskTypePerformerInterface[]
+     * @var TaskPerformerInterface[]
      */
     private $taskTypePerformers;
 
@@ -31,7 +31,7 @@ class TaskPerformer
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function addTaskTypePerformer(string $taskTypeName, TaskTypePerformerInterface $taskTypePerformer)
+    public function addTaskTypePerformer(string $taskTypeName, TaskPerformerInterface $taskTypePerformer)
     {
         $this->taskTypePerformers[strtolower($taskTypeName)] = $taskTypePerformer;
     }

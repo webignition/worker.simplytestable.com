@@ -8,7 +8,7 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
+use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
@@ -30,7 +30,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         $this->taskTypePerformer = self::$container->get(HtmlValidationTaskTypePerformer::class);
     }
 
-    protected function getTaskTypePerformer(): TaskTypePerformerInterface
+    protected function getTaskTypePerformer(): TaskPerformerInterface
     {
         return $this->taskTypePerformer;
     }
