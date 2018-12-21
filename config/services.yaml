@@ -76,13 +76,13 @@ services:
         $kernelProjectDirectory: '%kernel.project_dir%'
         $cacheDirectory: '%kernel.cache_dir%'
 
-    App\Services\TaskPerformer:
-      public: true
-      calls:
-        - [addTaskTypePerformer, ['html validation', '@App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer']]
-        - [addTaskTypePerformer, ['css validation', '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer']]
-        - [addTaskTypePerformer, ['link integrity', '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer']]
-        - [addTaskTypePerformer, ['url discovery', '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer']]
+    App\Services\TaskTypePerformer\Factory:
+      arguments:
+        $taskPerformers:
+          - '@App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer'
+          - '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer'
+          - '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer'
+          - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
 
     App\Services\TasksService:
       public: true

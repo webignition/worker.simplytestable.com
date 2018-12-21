@@ -3,51 +3,38 @@
 namespace App\Services;
 
 use App\Event\TaskEvent;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
+use App\Services\TaskTypePerformer\Factory;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TaskPerformer
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    private $factory;
     private $entityManager;
-
-    /**
-     * @var EventDispatcherInterface
-     */
     private $eventDispatcher;
 
-    /**
-     * @var TaskPerformerInterface[]
-     */
-    private $taskTypePerformers;
-
-    public function __construct(EntityManagerInterface $entityManager, EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        Factory $factory,
+        EntityManagerInterface $entityManager,
+        EventDispatcherInterface $eventDispatcher
+    ) {
+        $this->factory = $factory;
         $this->entityManager = $entityManager;
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function addTaskTypePerformer(string $taskTypeName, TaskPerformerInterface $taskTypePerformer)
-    {
-        $this->taskTypePerformers[strtolower($taskTypeName)] = $taskTypePerformer;
-    }
-
     public function perform(Task $task)
     {
-        $taskTypePerformer = $this->taskTypePerformers[strtolower($task->getType())];
-
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $task->setStartDateTime(new \DateTime());
         $task->setState(Task::STATE_IN_PROGRESS);
-
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
-        $taskTypePerformer->perform($task);
+        $taskPerformerCollection = $this->factory->getPerformers($task->getType());
+
+        foreach ($taskPerformerCollection as $taskPerformer) {
+            $taskPerformer->perform($task);
+        }
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $task->setEndDateTime(new \DateTime());
