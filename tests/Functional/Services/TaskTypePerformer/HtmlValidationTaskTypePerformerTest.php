@@ -48,14 +48,11 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
      */
     public function testPerformBadDocumentType(string $content, array $expectedOutputMessage)
     {
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], $content),
-        ]);
-
         $task = $this->testTaskFactory->create(
             TestTaskFactory::createTaskValuesFromDefaults()
         );
+
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer($task, $content);
 
         $this->taskTypePerformer->perform($task);
 
