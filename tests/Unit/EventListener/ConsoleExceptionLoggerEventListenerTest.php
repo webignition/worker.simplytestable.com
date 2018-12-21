@@ -3,7 +3,6 @@
 namespace App\Tests\Unit\EventListener;
 
 use App\EventListener\ConsoleExceptionLoggerEventListener;
-use App\Tests\Functional\AbstractBaseTestCase;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -14,7 +13,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConsoleExceptionLoggerEventListenerTest extends AbstractBaseTestCase
+class ConsoleExceptionLoggerEventListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider onConsoleErrorDataProvider

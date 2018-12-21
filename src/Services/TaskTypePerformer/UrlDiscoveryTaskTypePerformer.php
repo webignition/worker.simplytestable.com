@@ -4,6 +4,7 @@ namespace App\Services\TaskTypePerformer;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Model\Task\TypeInterface;
 use App\Services\HttpClientConfigurationService;
 use App\Services\TaskPerformerTaskOutputMutator;
 use App\Services\TaskPerformerWebPageRetriever;
@@ -42,14 +43,21 @@ class UrlDiscoveryTaskTypePerformer implements TaskPerformerInterface
         'https'
     ];
 
+    /**
+     * @var int
+     */
+    private $priority;
+
     public function __construct(
         TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
         TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
-        HttpClientConfigurationService $httpClientConfigurationService
+        HttpClientConfigurationService $httpClientConfigurationService,
+        int $priority
     ) {
         $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
         $this->taskPerformerTaskOutputMutator = $taskPerformerTaskOutputMutator;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
+        $this->priority = $priority;
     }
 
     /**
@@ -75,6 +83,17 @@ class UrlDiscoveryTaskTypePerformer implements TaskPerformerInterface
 
         return $this->performValidation($task, $result->getWebPage());
     }
+
+    public function handles(string $taskType): bool
+    {
+        return TypeInterface::TYPE_URL_DISCOVERY === $taskType;
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
 
     private function performValidation(Task $task, WebPage $webPage)
     {
