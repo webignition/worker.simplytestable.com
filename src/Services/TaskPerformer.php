@@ -6,7 +6,6 @@ use App\Event\TaskEvent;
 use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
-use App\Model\TaskTypePerformer\Response as TaskTypePerformerResponse;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TaskPerformer
@@ -48,36 +47,14 @@ class TaskPerformer
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
-        $response = $taskTypePerformer->perform($task);
-
-        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORMED, new TaskEvent($task));
+        $taskTypePerformer->perform($task);
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $task->setEndDateTime(new \DateTime());
 
-        $taskOutput = $task->getOutput();
-        if (null === $taskOutput) {
-            $task->setOutput($response->getTaskOutput());
-        }
-
-        if ($task->isIncomplete()) {
-            $task->setState($this->getCompletionStateFromResponse($response));
-        }
-
         $this->entityManager->persist($task);
         $this->entityManager->flush();
-    }
 
-    private function getCompletionStateFromResponse(TaskTypePerformerResponse $response): string
-    {
-        if ($response->hasBeenSkipped()) {
-            return Task::STATE_SKIPPED;
-        }
-
-        if ($response->hasSucceeded()) {
-            return Task::STATE_COMPLETED;
-        }
-
-        return Task::STATE_FAILED_NO_RETRY_AVAILABLE;
+        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORMED, new TaskEvent($task));
     }
 }
