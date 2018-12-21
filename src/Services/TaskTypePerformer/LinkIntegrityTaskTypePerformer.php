@@ -6,6 +6,7 @@ use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\LinkIntegrityResult;
 use App\Model\LinkIntegrityResultCollection;
+use App\Model\Task\TypeInterface;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
@@ -19,7 +20,7 @@ use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkFinderConfiguration;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
-class LinkIntegrityTaskTypePerformer implements TaskTypePerformerInterface
+class LinkIntegrityTaskTypePerformer implements TaskPerformerInterface
 {
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
 
@@ -53,13 +54,19 @@ class LinkIntegrityTaskTypePerformer implements TaskTypePerformerInterface
      */
     private $httpRetryMiddleware;
 
+    /**
+     * @var int
+     */
+    private $priority;
+
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
         TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
         LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory,
-        HttpRetryMiddleware $httpRetryMiddleware
+        HttpRetryMiddleware $httpRetryMiddleware,
+        int $priority
     ) {
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
@@ -68,6 +75,7 @@ class LinkIntegrityTaskTypePerformer implements TaskTypePerformerInterface
 
         $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
         $this->httpRetryMiddleware = $httpRetryMiddleware;
+        $this->priority = $priority;
     }
 
     /**
@@ -92,6 +100,16 @@ class LinkIntegrityTaskTypePerformer implements TaskTypePerformerInterface
         }
 
         return $this->performValidation($task, $result->getWebPage());
+    }
+
+    public function handles(string $taskType): bool
+    {
+        return TypeInterface::TYPE_LINK_INTEGRITY === $taskType;
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority;
     }
 
     private function performValidation(Task $task, WebPage $webPage)

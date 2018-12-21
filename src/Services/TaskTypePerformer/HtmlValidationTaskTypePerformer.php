@@ -4,6 +4,7 @@ namespace App\Services\TaskTypePerformer;
 
 use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
+use App\Model\Task\TypeInterface;
 use App\Services\HttpClientConfigurationService;
 use App\Services\TaskPerformerTaskOutputMutator;
 use App\Services\TaskPerformerWebPageRetriever;
@@ -17,7 +18,7 @@ use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
 use webignition\HtmlDocumentType\Validator as DoctypeValidator;
 use webignition\HtmlDocumentType\Factory as DoctypeFactory;
 
-class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
+class HtmlValidationTaskTypePerformer implements TaskPerformerInterface
 {
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
@@ -51,12 +52,18 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
      */
     private $validatorPath;
 
+    /**
+     * @var int
+     */
+    private $priority;
+
     public function __construct(
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
         TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
         HtmlValidatorWrapper $htmlValidatorWrapper,
-        string $validatorPath
+        string $validatorPath,
+        int $priority
     ) {
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
@@ -64,6 +71,7 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
 
         $this->htmlValidatorWrapper = $htmlValidatorWrapper;
         $this->validatorPath = $validatorPath;
+        $this->priority = $priority;
     }
 
     /**
@@ -88,6 +96,16 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
         }
 
         return $this->performValidation($task, $result->getWebPage());
+    }
+
+    public function handles(string $taskType): bool
+    {
+        return TypeInterface::TYPE_HTML_VALIDATION === $taskType;
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority;
     }
 
     /**

@@ -8,7 +8,7 @@ use App\Entity\Task\Task;
 use App\Model\TaskOutputValues;
 use App\Model\TaskPerformerWebPageRetrieverResult;
 use App\Services\TaskPerformerWebPageRetriever;
-use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
+use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -46,7 +46,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
 
-    abstract protected function getTaskTypePerformer(): TaskTypePerformerInterface;
+    abstract protected function getTaskTypePerformer(): TaskPerformerInterface;
     abstract protected function getTaskTypeString():string;
 
     /**

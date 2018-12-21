@@ -7,7 +7,7 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
+use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer;
 use App\Tests\Factory\HtmlDocumentFactory;
@@ -28,7 +28,7 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
         $this->taskTypePerformer = self::$container->get(UrlDiscoveryTaskTypePerformer::class);
     }
 
-    protected function getTaskTypePerformer(): TaskTypePerformerInterface
+    protected function getTaskTypePerformer(): TaskPerformerInterface
     {
         return $this->taskTypePerformer;
     }
@@ -108,5 +108,22 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
                 ],
             ],
         ];
+    }
+
+    public function testHandles()
+    {
+        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_HTML_VALIDATION));
+        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_CSS_VALIDATION));
+        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_LINK_INTEGRITY));
+        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_LINK_INTEGRITY_SINGLE_URL));
+        $this->assertTrue($this->taskTypePerformer->handles(TypeInterface::TYPE_URL_DISCOVERY));
+    }
+
+    public function testGetPriority()
+    {
+        $this->assertEquals(
+            self::$container->getParameter('url_discovery_task_type_performer_priority'),
+            $this->taskTypePerformer->getPriority()
+        );
     }
 }
