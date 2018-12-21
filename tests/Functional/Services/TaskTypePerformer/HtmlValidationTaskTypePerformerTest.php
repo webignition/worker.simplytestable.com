@@ -272,10 +272,12 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
      */
     public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader)
     {
-        $this->httpMockHandler->appendFixtures([
+        $httpFixtures = [
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ]);
+        ];
+
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
@@ -286,14 +288,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
 
         $this->taskTypePerformer->perform($task);
 
-        /* @var array $historicalRequests */
-        $historicalRequests = $this->httpHistoryContainer->getRequests();
-        $this->assertCount(2, $historicalRequests);
-
-        foreach ($historicalRequests as $historicalRequest) {
-            $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
-            $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
-        }
+        $this->assertCookieHeadeSetOnAllRequests(count($httpFixtures), $expectedRequestCookieHeader);
     }
 
     /**
@@ -303,10 +298,12 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         array $taskParameters,
         string $expectedRequestAuthorizationHeaderValue
     ) {
-        $this->httpMockHandler->appendFixtures([
+        $httpFixtures = [
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ]);
+        ];
+
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
@@ -317,19 +314,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
 
         $this->taskTypePerformer->perform($task);
 
-        /* @var array $historicalRequests */
-        $historicalRequests = $this->httpHistoryContainer->getRequests();
-        $this->assertCount(2, $historicalRequests);
-
-        foreach ($historicalRequests as $historicalRequest) {
-            $authorizationHeaderLine = $historicalRequest->getHeaderLine('authorization');
-
-            $decodedAuthorizationHeaderValue = base64_decode(
-                str_replace('Basic ', '', $authorizationHeaderLine)
-            );
-
-            $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
-        }
+        $this->assertHttpAuthorizationSetOnAllRequests(count($httpFixtures), $expectedRequestAuthorizationHeaderValue);
     }
 
     /**

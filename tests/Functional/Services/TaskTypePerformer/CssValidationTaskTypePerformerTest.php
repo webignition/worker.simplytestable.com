@@ -303,7 +303,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
      */
     public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader)
     {
-        $this->httpMockHandler->appendFixtures([
+        $httpFixtures = [
             new Response(200, ['content-type' => 'text/html']),
             new Response(
                 200,
@@ -312,7 +312,9 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             ),
             new Response(200, ['content-type' => 'text/css']),
             new Response(200, ['content-type' => 'text/css']),
-        ]);
+        ];
+
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
@@ -323,14 +325,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $this->taskTypePerformer->perform($task);
 
-        /* @var array $historicalRequests */
-        $historicalRequests = $this->httpHistoryContainer->getRequests();
-        $this->assertCount(4, $historicalRequests);
-
-        foreach ($historicalRequests as $historicalRequest) {
-            $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
-            $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
-        }
+        $this->assertCookieHeadeSetOnAllRequests(count($httpFixtures), $expectedRequestCookieHeader);
     }
 
     /**
@@ -340,7 +335,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         array $taskParameters,
         string $expectedRequestAuthorizationHeaderValue
     ) {
-        $this->httpMockHandler->appendFixtures([
+        $httpFixtures = [
             new Response(200, ['content-type' => 'text/html']),
             new Response(
                 200,
@@ -349,7 +344,9 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             ),
             new Response(200, ['content-type' => 'text/css']),
             new Response(200, ['content-type' => 'text/css']),
-        ]);
+        ];
+
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'type' => $this->getTaskTypeString(),
@@ -360,19 +357,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $this->taskTypePerformer->perform($task);
 
-        /* @var array $historicalRequests */
-        $historicalRequests = $this->httpHistoryContainer->getRequests();
-        $this->assertCount(4, $historicalRequests);
-
-        foreach ($historicalRequests as $historicalRequest) {
-            $authorizationHeaderLine = $historicalRequest->getHeaderLine('authorization');
-
-            $decodedAuthorizationHeaderValue = base64_decode(
-                str_replace('Basic ', '', $authorizationHeaderLine)
-            );
-
-            $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
-        }
+        $this->assertHttpAuthorizationSetOnAllRequests(count($httpFixtures), $expectedRequestAuthorizationHeaderValue);
     }
 
     protected function tearDown()

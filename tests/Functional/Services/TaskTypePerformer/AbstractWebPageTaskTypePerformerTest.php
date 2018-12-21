@@ -121,6 +121,39 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         ];
     }
 
+    protected function assertHttpAuthorizationSetOnAllRequests(
+        int $expectedRequestCount,
+        string $expectedRequestAuthorizationHeaderValue
+    ) {
+        /* @var array $historicalRequests */
+        $historicalRequests = $this->httpHistoryContainer->getRequests();
+        $this->assertCount($expectedRequestCount, $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $authorizationHeaderLine = $historicalRequest->getHeaderLine('authorization');
+
+            $decodedAuthorizationHeaderValue = base64_decode(
+                str_replace('Basic ', '', $authorizationHeaderLine)
+            );
+
+            $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
+        }
+    }
+
+    protected function assertCookieHeadeSetOnAllRequests(
+        int $expectedRequestCount,
+        string $expectedRequestCookieHeader
+    ) {
+        /* @var array $historicalRequests */
+        $historicalRequests = $this->httpHistoryContainer->getRequests();
+        $this->assertCount($expectedRequestCount, $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
+            $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
+        }
+    }
+
     protected function assertPostConditions()
     {
         parent::assertPostConditions();
