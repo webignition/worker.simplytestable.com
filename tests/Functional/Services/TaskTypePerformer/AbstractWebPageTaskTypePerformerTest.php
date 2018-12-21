@@ -3,11 +3,16 @@
 
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
+use App\Entity\Task\Task;
+use App\Services\TaskPerformerWebPageRetriever;
 use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
+use GuzzleHttp\Psr7\Uri;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
+use webignition\WebResource\WebPage\WebPage;
 
 abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
 {
@@ -152,6 +157,29 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
             $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
             $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
         }
+    }
+
+    protected function setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        string $performerClass,
+        Task $task,
+        string $content
+    ) {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $webPage = WebPage::createFromContent($content);
+        $webPage = $webPage->setUri(new Uri($task->getUrl()));
+
+        $taskPerformerWebPageRetriever = \Mockery::mock(TaskPerformerWebPageRetriever::class);
+        $taskPerformerWebPageRetriever
+            ->shouldReceive('retrieveWebPage')
+            ->with($task)
+            ->andReturn($webPage);
+
+        ObjectPropertySetter::setProperty(
+            $this->getTaskTypePerformer(),
+            $performerClass,
+            'taskPerformerWebPageRetriever',
+            $taskPerformerWebPageRetriever
+        );
     }
 
     protected function assertPostConditions()

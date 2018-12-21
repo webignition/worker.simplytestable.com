@@ -7,18 +7,14 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskPerformerWebPageRetriever;
 use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
-use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\CssValidationTaskTypePerformer;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\CssValidatorFixtureFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
-use GuzzleHttp\Psr7\Uri;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
-use webignition\WebResource\WebPage\WebPage;
 
 class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -68,7 +64,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             ])
         );
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer($task, $webPageContent);
+        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+            CssValidationTaskTypePerformer::class,
+            $task,
+            $webPageContent
+        );
 
         CssValidatorFixtureFactory::set($cssValidatorOutput);
 
@@ -311,25 +311,6 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->taskTypePerformer->perform($task);
 
         $this->assertHttpAuthorizationSetOnAllRequests(count($httpFixtures), $expectedRequestAuthorizationHeaderValue);
-    }
-
-    private function setTaskPerformerWebPageRetrieverOnTaskPerformer(Task $task, string $content)
-    {
-        $webPage = WebPage::createFromContent($content);
-        $webPage = $webPage->setUri(new Uri($task->getUrl()));
-
-        $taskPerformerWebPageRetriever = \Mockery::mock(TaskPerformerWebPageRetriever::class);
-        $taskPerformerWebPageRetriever
-            ->shouldReceive('retrieveWebPage')
-            ->with($task)
-            ->andReturn($webPage);
-
-        ObjectPropertySetter::setProperty(
-            $this->taskTypePerformer,
-            CssValidationTaskTypePerformer::class,
-            'taskPerformerWebPageRetriever',
-            $taskPerformerWebPageRetriever
-        );
     }
 
     protected function tearDown()
