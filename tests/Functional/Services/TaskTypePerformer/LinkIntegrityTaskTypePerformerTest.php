@@ -60,7 +60,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'parameters' => json_encode($taskParameters),
         ]));
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             LinkIntegrityTaskTypePerformer::class,
             $task,
             $webPageContent
@@ -206,7 +206,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             LinkIntegrityTaskTypePerformer::class,
             $task,
             '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
@@ -235,7 +235,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             LinkIntegrityTaskTypePerformer::class,
             $task,
             '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'

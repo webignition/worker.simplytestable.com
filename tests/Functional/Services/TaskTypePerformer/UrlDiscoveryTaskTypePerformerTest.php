@@ -53,7 +53,7 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
             ])
         );
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             UrlDiscoveryTaskTypePerformer::class,
             $task,
             $webPageContent

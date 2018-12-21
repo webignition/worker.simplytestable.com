@@ -64,7 +64,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             ])
         );
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             CssValidationTaskTypePerformer::class,
             $task,
             $webPageContent
@@ -269,7 +269,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             CssValidationTaskTypePerformer::class,
             $task,
             HtmlDocumentFactory::load('empty-body-single-css-link')
@@ -301,7 +301,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'parameters' => json_encode($taskParameters)
         ]));
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             CssValidationTaskTypePerformer::class,
             $task,
             HtmlDocumentFactory::load('empty-body-single-css-link')

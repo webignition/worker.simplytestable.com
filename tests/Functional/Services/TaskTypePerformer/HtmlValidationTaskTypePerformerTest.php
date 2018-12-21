@@ -49,7 +49,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(HtmlValidationTaskTypePerformer::class, $task, $content);
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(HtmlValidationTaskTypePerformer::class, $task, $content);
 
         $this->taskTypePerformer->perform($task);
 
@@ -127,7 +127,11 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
-        $this->setTaskPerformerWebPageRetrieverOnTaskPerformer(HtmlValidationTaskTypePerformer::class, $task, $content);
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
+            HtmlValidationTaskTypePerformer::class,
+            $task,
+            $content
+        );
 
         HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
 
