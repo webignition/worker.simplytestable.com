@@ -4,6 +4,7 @@ namespace App\Services\TaskTypePerformer;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Model\Task\TypeInterface;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\TaskPerformerTaskOutputMutator;
@@ -21,7 +22,7 @@ use webignition\WebPageInspector\UnparseableContentTypeException;
 use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
 
-class CssValidationTaskTypePerformer implements TaskTypePerformerInterface
+class CssValidationTaskTypePerformer implements TaskPerformerInterface
 {
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
 
@@ -55,13 +56,19 @@ class CssValidationTaskTypePerformer implements TaskTypePerformerInterface
      */
     private $configurationFactory;
 
+    /**
+     * @var int
+     */
+    private $priority;
+
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
         TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
         CssValidatorWrapper $cssValidatorWrapper,
-        CssValidatorWrapperConfigurationFactory $configurationFactory
+        CssValidatorWrapperConfigurationFactory $configurationFactory,
+        int $priority
     ) {
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
@@ -70,6 +77,7 @@ class CssValidationTaskTypePerformer implements TaskTypePerformerInterface
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
         $this->configurationFactory = $configurationFactory;
+        $this->priority = $priority;
     }
 
     /**
@@ -96,6 +104,16 @@ class CssValidationTaskTypePerformer implements TaskTypePerformerInterface
         }
 
         return $this->performValidation($task, $result->getWebPage());
+    }
+
+    public function handles(string $taskType): bool
+    {
+        return TypeInterface::TYPE_CSS_VALIDATION === $taskType;
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority;
     }
 
     /**

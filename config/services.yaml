@@ -16,6 +16,10 @@ parameters:
   link_integrity_user_agents:
     - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
     - Mozilla/5.0
+  html_validation_task_type_performer_priority: 100
+  css_validation_task_type_performer_priority: 100
+  link_integrity_task_type_performer_priority: 100
+  url_discovery_task_type_performer_priority: 100
 
 services:
     # default configuration for services in *this* file
@@ -72,13 +76,13 @@ services:
         $kernelProjectDirectory: '%kernel.project_dir%'
         $cacheDirectory: '%kernel.cache_dir%'
 
-    App\Services\TaskPerformer:
-      public: true
-      calls:
-        - [addTaskTypePerformer, ['html validation', '@App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer']]
-        - [addTaskTypePerformer, ['css validation', '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer']]
-        - [addTaskTypePerformer, ['link integrity', '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer']]
-        - [addTaskTypePerformer, ['url discovery', '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer']]
+    App\Services\TaskTypePerformer\Factory:
+      arguments:
+        $taskPerformers:
+          - '@App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer'
+          - '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer'
+          - '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer'
+          - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
 
     App\Services\TasksService:
       public: true
@@ -107,6 +111,7 @@ services:
     App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer:
       arguments:
         $validatorPath: '%env(HTML_VALIDATOR_PATH)%'
+        $priority: '%html_validation_task_type_performer_priority%'
 
     App\Services\TaskTypePerformer\CssValidatorWrapperConfigurationFactory:
       arguments:
@@ -115,6 +120,18 @@ services:
     App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory:
       arguments:
         - '%link_integrity_user_agents%'
+
+    App\Services\TaskTypePerformer\CssValidationTaskTypePerformer:
+      arguments:
+        $priority: '%html_validation_task_type_performer_priority%'
+
+    App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer:
+      arguments:
+        $priority: '%html_validation_task_type_performer_priority%'
+
+    App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer:
+      arguments:
+        $priority: '%html_validation_task_type_performer_priority%'
 
     App\Services\WebResourceRetrieverFactory:
       arguments:

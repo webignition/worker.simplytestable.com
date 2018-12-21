@@ -8,7 +8,7 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypePerformer\TaskTypePerformerInterface;
+use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
@@ -30,7 +30,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         $this->taskTypePerformer = self::$container->get(HtmlValidationTaskTypePerformer::class);
     }
 
-    protected function getTaskTypePerformer(): TaskTypePerformerInterface
+    protected function getTaskTypePerformer(): TaskPerformerInterface
     {
         return $this->taskTypePerformer;
     }
@@ -310,6 +310,23 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                 'fileExists' => true,
             ],
         ];
+    }
+
+    public function testHandles()
+    {
+        $this->assertTrue($this->taskTypePerformer->handles(TypeInterface::TYPE_HTML_VALIDATION));
+        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_CSS_VALIDATION));
+        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_LINK_INTEGRITY));
+        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_LINK_INTEGRITY_SINGLE_URL));
+        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_URL_DISCOVERY));
+    }
+
+    public function testGetPriority()
+    {
+        $this->assertEquals(
+            self::$container->getParameter('html_validation_task_type_performer_priority'),
+            $this->taskTypePerformer->getPriority()
+        );
     }
 
     protected function tearDown()
