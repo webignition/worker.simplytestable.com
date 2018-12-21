@@ -49,7 +49,11 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             TestTaskFactory::createTaskValuesFromDefaults()
         );
 
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(HtmlValidationTaskTypePerformer::class, $task, $content);
+        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
+            HtmlValidationTaskTypePerformer::class,
+            $task,
+            $content
+        );
 
         $this->taskTypePerformer->perform($task);
 
