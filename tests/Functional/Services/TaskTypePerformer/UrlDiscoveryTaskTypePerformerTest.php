@@ -65,6 +65,7 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
 
         $output = $task->getOutput();
         $this->assertInstanceOf(Output::class, $output);
+        $this->assertEquals('application/json', $output->getContentType());
         $this->assertEquals(0, $output->getErrorCount());
         $this->assertEquals(0, $output->getWarningCount());
 

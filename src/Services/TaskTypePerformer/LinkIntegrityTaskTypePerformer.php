@@ -124,7 +124,7 @@ class LinkIntegrityTaskTypePerformer implements TaskTypePerformerInterface
 
         $task->setOutput(Output::create(
             json_encode($linkIntegrityResultCollection),
-            new InternetMediaType('application/json'),
+            new InternetMediaType('application', 'json'),
             $linkIntegrityResultCollection->getErrorCount()
         ));
 

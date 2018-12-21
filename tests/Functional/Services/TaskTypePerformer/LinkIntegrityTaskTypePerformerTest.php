@@ -72,6 +72,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $output = $task->getOutput();
         $this->assertInstanceOf(Output::class, $output);
+        $this->assertEquals('application/json', $output->getContentType());
         $this->assertEquals($expectedErrorCount, $output->getErrorCount());
         $this->assertEquals($expectedWarningCount, $output->getWarningCount());
 

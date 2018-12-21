@@ -160,7 +160,7 @@ class HtmlValidationTaskTypePerformer implements TaskTypePerformerInterface
     {
         $task->setOutput(TaskOutput::create(
             $output,
-            new InternetMediaType('application/json'),
+            new InternetMediaType('application', 'json'),
             $errorCount
         ));
 
