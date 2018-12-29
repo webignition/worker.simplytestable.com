@@ -21,6 +21,8 @@ parameters:
   link_integrity_task_type_performer_priority: 100
   url_discovery_task_type_performer_priority: 100
   web_page_task_source_preparer_priority: 100
+  web_page_task_invalid_source_examiner_priority: 200
+  web_page_task_failed_source_examiner_priority: 190
 
 services:
     # default configuration for services in *this* file
@@ -84,6 +86,8 @@ services:
           - '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
+          - '@App\Services\TaskTypePerformer\WebPageTaskInvalidSourceExaminer'
+          - '@App\Services\TaskTypePerformer\WebPageTaskFailedSourceExaminer'
 
     App\Services\TasksService:
       public: true
@@ -199,3 +203,11 @@ services:
     App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
       arguments:
         $priority: '%web_page_task_source_preparer_priority%'
+
+    App\Services\TaskTypePerformer\WebPageTaskInvalidSourceExaminer:
+      arguments:
+        $priority:  '%web_page_task_invalid_source_examiner_priority%'
+
+    App\Services\TaskTypePerformer\WebPageTaskFailedSourceExaminer:
+      arguments:
+        $priority:  '%web_page_task_failed_source_examiner_priority%'

@@ -104,6 +104,11 @@ class Source
         ];
     }
 
+    public function isInvalidContentType(): bool
+    {
+        return 'invalid:' . self::MESSAGE_INVALID_CONTENT_TYPE === $this->value;
+    }
+
     private function getFailureComponents(): array
     {
         $failureType = null;

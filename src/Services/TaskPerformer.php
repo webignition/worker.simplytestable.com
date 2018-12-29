@@ -33,7 +33,9 @@ class TaskPerformer
         $taskPerformerCollection = $this->factory->getPerformers($task->getType());
 
         foreach ($taskPerformerCollection as $taskPerformer) {
-            $taskPerformer->perform($task);
+            if (empty($task->getOutput())) {
+                $taskPerformer->perform($task);
+            }
         }
 
         /** @noinspection PhpUnhandledExceptionInspection */
