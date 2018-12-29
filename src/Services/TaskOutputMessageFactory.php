@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Model\Source;
 use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 use webignition\WebResource\Exception\TransportException;
@@ -52,6 +53,49 @@ class TaskOutputMessageFactory
         ]);
     }
 
+    public function createOutputMessageCollectionFromSource(Source $source)
+    {
+        $message = '';
+        $messageId = '';
+
+        $context = $source->getContext();
+
+        $isRedirectLoop = isset($context['is_redirect_loop']) && $context['is_redirect_loop'];
+        $isTooManyRedirects = isset($context['too_many_redirects']) && $context['too_many_redirects']
+            && !$isRedirectLoop;
+
+        if ($isTooManyRedirects) {
+            $message = 'Redirect limit reached';
+            $messageId = 'http-retrieval-redirect-limit-reached';
+        }
+
+        if ($isRedirectLoop) {
+            $message = 'Redirect loop detected';
+            $messageId = 'http-retrieval-redirect-loop';
+        }
+
+        if (!$messageId) {
+            $messageId = 'http-retrieval-';
+
+            $failureType = $source->getFailureType();
+
+            if (Source::FAILURE_TYPE_CURL === $failureType) {
+                $message = $this->createMessageFromCurlCode($source->getFailureCode());
+                $messageId .= 'curl-code-';
+            }
+
+            if (Source::FAILURE_TYPE_UNKNOWN === $failureType) {
+                $messageId .= 'unknown-';
+            }
+
+            $messageId .= $source->getFailureCode();
+        }
+
+        return $this->createOutputMessageCollection([
+            $this->createOutputMessage($message, $messageId)
+        ]);
+    }
+
     private function createTransportExceptionOutputMessage(TransportException $transportException): string
     {
         if ($transportException->isTooManyRedirectsException()) {
@@ -61,17 +105,24 @@ class TaskOutputMessageFactory
         }
 
         if ($transportException->isCurlException()) {
-            if (self::CURL_CODE_TIMEOUT == $transportException->getCode()) {
-                return 'Timeout reached retrieving resource';
-            }
+            return $this->createMessageFromCurlCode($transportException->getCode());
+        }
 
-            if (self::CURL_CODE_DNS_LOOKUP_FAILURE == $transportException->getCode()) {
-                return 'DNS lookup failure resolving resource domain name';
-            }
+        return '';
+    }
 
-            if (self::CURL_CODE_INVALID_URL == $transportException->getCode()) {
-                return 'Invalid resource URL';
-            }
+    private function createMessageFromCurlCode(int $code)
+    {
+        if (self::CURL_CODE_TIMEOUT == $code) {
+            return 'Timeout reached retrieving resource';
+        }
+
+        if (self::CURL_CODE_DNS_LOOKUP_FAILURE == $code) {
+            return 'DNS lookup failure resolving resource domain name';
+        }
+
+        if (self::CURL_CODE_INVALID_URL == $code) {
+            return 'Invalid resource URL';
         }
 
         return '';
