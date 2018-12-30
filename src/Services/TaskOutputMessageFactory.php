@@ -3,9 +3,7 @@
 namespace App\Services;
 
 use App\Model\Source;
-use Psr\Http\Message\ResponseInterface;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
-use webignition\WebResource\Exception\TransportException;
 
 class TaskOutputMessageFactory
 {
@@ -18,39 +16,6 @@ class TaskOutputMessageFactory
     public function __construct(HttpHistoryContainer $httpHistoryContainer)
     {
         $this->httpHistoryContainer = $httpHistoryContainer;
-    }
-
-    public function createOutputMessageCollection(array $messages): array
-    {
-        return [
-            'messages' => $messages,
-        ];
-    }
-
-    public function createOutputMessage(string $message, string $messageId): array
-    {
-        return [
-            'message' => $message,
-            'messageId' => $messageId,
-            'type' => 'error',
-        ];
-    }
-
-    public function createHttpExceptionOutputMessageCollection(string $message, int $statusCode): array
-    {
-        return $this->createOutputMessageCollection([
-            $this->createOutputMessage($message, 'http-retrieval-' . $statusCode),
-        ]);
-    }
-
-    public function createTransportExceptionOutputMessageCollection(TransportException $transportException): array
-    {
-        return $this->createOutputMessageCollection([
-            $this->createOutputMessage(
-                $this->createTransportExceptionOutputMessage($transportException),
-                $this->createTransportExceptionOutputMessageId($transportException)
-            )
-        ]);
     }
 
     public function createOutputMessageCollectionFromSource(Source $source)
@@ -96,19 +61,20 @@ class TaskOutputMessageFactory
         ]);
     }
 
-    private function createTransportExceptionOutputMessage(TransportException $transportException): string
+    private function createOutputMessageCollection(array $messages): array
     {
-        if ($transportException->isTooManyRedirectsException()) {
-            return $this->isRedirectLoopException()
-                ? 'Redirect loop detected'
-                : 'Redirect limit reached';
-        }
+        return [
+            'messages' => $messages,
+        ];
+    }
 
-        if ($transportException->isCurlException()) {
-            return $this->createMessageFromCurlCode($transportException->getCode());
-        }
-
-        return '';
+    private function createOutputMessage(string $message, string $messageId): array
+    {
+        return [
+            'message' => $message,
+            'messageId' => $messageId,
+            'type' => 'error',
+        ];
     }
 
     private function createMessageFromCurlCode(int $code)
@@ -126,48 +92,5 @@ class TaskOutputMessageFactory
         }
 
         return '';
-    }
-
-    private function createTransportExceptionOutputMessageId(TransportException $transportException): string
-    {
-        $prefix = 'http-retrieval-';
-
-        if ($transportException->isTooManyRedirectsException()) {
-            return $this->isRedirectLoopException()
-                ? $prefix . 'redirect-loop'
-                : $prefix . 'redirect-limit-reached';
-        }
-
-        return $prefix . 'curl-code-' . $transportException->getCode();
-    }
-
-    private function isRedirectLoopException(): bool
-    {
-        /* @var ResponseInterface[] $responses */
-        $responses = $this->httpHistoryContainer->getResponses();
-        $responseHistoryContainsOnlyRedirects = true;
-
-        foreach ($responses as $response) {
-            $statusCode = $response->getStatusCode();
-
-            if ($statusCode < 300 || $statusCode >=400) {
-                $responseHistoryContainsOnlyRedirects = false;
-            }
-        }
-
-        if (!$responseHistoryContainsOnlyRedirects) {
-            return false;
-        }
-
-        $requestUrls = $this->httpHistoryContainer->getRequestUrlsAsStrings();
-        $requestUrls = array_slice($requestUrls, count($requestUrls) / 2);
-
-        foreach ($requestUrls as $urlIndex => $url) {
-            if (in_array($url, array_slice($requestUrls, $urlIndex + 1))) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
