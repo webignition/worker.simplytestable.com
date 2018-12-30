@@ -7,6 +7,7 @@ use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
+use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Services\TaskPerformerTaskOutputMutator;
 use App\Services\TaskPerformerWebPageRetriever;
 use webignition\CssValidatorOutput\CssValidatorOutput;
@@ -47,6 +48,11 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
     private $taskPerformerTaskOutputMutator;
 
     /**
+     * @var TaskCachedSourceWebPageRetriever
+     */
+    private $taskCachedSourceWebPageRetriever;
+
+    /**
      * @var CssValidatorWrapper
      */
     private $cssValidatorWrapper;
@@ -66,6 +72,7 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
         TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
+        TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         CssValidatorWrapper $cssValidatorWrapper,
         CssValidatorWrapperConfigurationFactory $configurationFactory,
         int $priority
@@ -74,6 +81,7 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
         $this->taskPerformerTaskOutputMutator = $taskPerformerTaskOutputMutator;
+        $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
         $this->configurationFactory = $configurationFactory;
@@ -92,18 +100,24 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
      */
     public function perform(Task $task)
     {
-        $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
+        $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 
-        $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
-        $task->setState($result->getTaskState());
+        if (empty($webPage)) {
+            $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
-        if (!$task->isIncomplete()) {
-            $this->taskPerformerTaskOutputMutator->mutate($task, $result->getTaskOutputValues());
+            $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
+            $task->setState($result->getTaskState());
 
-            return null;
+            if (!$task->isIncomplete()) {
+                $this->taskPerformerTaskOutputMutator->mutate($task, $result->getTaskOutputValues());
+
+                return null;
+            }
+
+            $webPage = $result->getWebPage();
         }
 
-        return $this->performValidation($task, $result->getWebPage());
+        return $this->performValidation($task, $webPage);
     }
 
     public function handles(string $taskType): bool
