@@ -2,7 +2,6 @@
 
 namespace App\Services\TaskTypePreparer;
 
-use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
@@ -84,13 +83,6 @@ class WebPageTaskSourcePreparer implements TaskPreparerInterface
                 $this->entityManager->persist($cachedResource);
                 $this->entityManager->flush();
             }
-
-            $cachedResource = CachedResource::create(
-                $requestIdentifier,
-                $taskUrl,
-                (string)$webPage->getContentType(),
-                $webPage->getContent()
-            );
 
             $source = $this->sourceFactory->fromCachedResource($cachedResource);
         } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
