@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory;
@@ -31,23 +30,13 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->taskTypePerformer = self::$container->get(LinkIntegrityTaskTypePerformer::class);
     }
 
-    protected function getTaskTypePerformer(): TaskPerformerInterface
-    {
-        return $this->taskTypePerformer;
-    }
-
-    protected function getTaskTypeString(): string
-    {
-        return TypeInterface::TYPE_LINK_INTEGRITY;
-    }
-
     /**
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
-        string $webPageContent,
         array $httpFixtures,
         array $taskParameters,
+        string $webPageContent,
         string $expectedTaskState,
         int $expectedErrorCount,
         int $expectedWarningCount,
@@ -56,15 +45,10 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
+            'type' => TypeInterface::TYPE_LINK_INTEGRITY,
             'parameters' => json_encode($taskParameters),
         ]));
-
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            LinkIntegrityTaskTypePerformer::class,
-            $task,
-            $webPageContent
-        );
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $webPageContent);
 
         $this->taskTypePerformer->perform($task);
 
@@ -84,25 +68,22 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
     public function performSuccessDataProvider(): array
     {
-        $notFoundResponse = new Response(404);
-        $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
-
         return [
             'no links' => [
-                'webPageContent' => '<!doctype html><html><head></head><body></body></html>',
                 'httpFixtures' => [],
                 'taskParameters' => [],
+                'webPageContent' => '<!doctype html><html><head></head><body></body></html>',
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
             'single 200 OK link' => [
-                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'httpFixtures' => [
                     new Response(),
                 ],
                 'taskParameters' => [],
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
@@ -116,12 +97,12 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'single 404 Not Found link' => [
-                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'httpFixtures' => [
-                    $notFoundResponse,
-                    $notFoundResponse,
+                    new Response(404),
+                    new Response(404),
                 ],
                 'taskParameters' => [],
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
@@ -135,11 +116,11 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'single curl 28 link' => [
-                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'httpFixtures' => [
-                    $curl28ConnectException,
+                    ConnectExceptionFactory::create('CURL/28 Operation timed out.'),
                 ],
                 'taskParameters' => [],
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
@@ -153,35 +134,35 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'excluded urls' => [
-                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'httpFixtures' => [],
                 'taskParameters' => [
                     LinkCheckerConfigurationFactory::EXCLUDED_URLS_PARAMETER_NAME => [
                         'http://example.com/foo'
                     ],
                 ],
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
             'excluded domains' => [
-                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'httpFixtures' => [],
                 'taskParameters' => [
                     LinkCheckerConfigurationFactory::EXCLUDED_DOMAINS_PARAMETER_NAME => [
                         'example.com'
                     ],
                 ],
+                'webPageContent' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
-            'ignored schemes' => [
-                'webPageContent' => HtmlDocumentFactory::load('ignored-link-integrity-schemes'),
+            'ignored schemes, no sources' => [
                 'httpFixtures' => [],
                 'taskParameters' => [],
+                'webPageContent' => HtmlDocumentFactory::load('ignored-link-integrity-schemes'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
@@ -202,12 +183,11 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
-            'parameters' => json_encode($taskParameters)
+            'type' => TypeInterface::TYPE_LINK_INTEGRITY,
+            'parameters' => json_encode($taskParameters),
         ]));
 
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            LinkIntegrityTaskTypePerformer::class,
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask(
             $task,
             '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
         );
@@ -231,12 +211,11 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
-            'parameters' => json_encode($taskParameters)
+            'type' => TypeInterface::TYPE_LINK_INTEGRITY,
+            'parameters' => json_encode($taskParameters),
         ]));
 
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            LinkIntegrityTaskTypePerformer::class,
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask(
             $task,
             '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
         );

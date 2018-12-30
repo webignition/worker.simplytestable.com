@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "26e3084135a4a4f557022b1e82ed710f",
+    "content-hash": "f2d06d2e9f12f61eeb8b7275cd2efa1c",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -60,6 +60,7 @@
                 "redis",
                 "resque"
             ],
+            "abandoned": "resque/php-resque",
             "time": "2017-04-12T21:58:19+00:00"
         },
         {
@@ -4259,25 +4260,25 @@
         },
         {
             "name": "webignition/http-history-container",
-            "version": "0.5",
+            "version": "0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/http-history-container.git",
-                "reference": "7542942842c3f161650838ac4ff14b52c3f0349b"
+                "reference": "d5da155790e090467e8df074422c5ee27fc358a8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/http-history-container/zipball/7542942842c3f161650838ac4ff14b52c3f0349b",
-                "reference": "7542942842c3f161650838ac4ff14b52c3f0349b",
+                "url": "https://api.github.com/repos/webignition/http-history-container/zipball/d5da155790e090467e8df074422c5ee27fc358a8",
+                "reference": "d5da155790e090467e8df074422c5ee27fc358a8",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.6.0",
+                "php": ">=7.2.0",
                 "psr/http-message": "^1"
             },
             "require-dev": {
                 "mockery/mockery": "^1.0",
-                "phpunit/phpunit": "^5.0",
+                "phpunit/phpunit": "^7.0",
                 "squizlabs/php_codesniffer": "^3"
             },
             "type": "library",
@@ -4306,7 +4307,7 @@
                 "middleware",
                 "psr-7"
             ],
-            "time": "2018-05-15T12:07:58+00:00"
+            "time": "2018-12-19T19:23:34+00:00"
         },
         {
             "name": "webignition/internet-media-type",

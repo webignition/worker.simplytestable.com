@@ -2,82 +2,80 @@
 
 namespace App\Tests\Functional\Command\Tasks;
 
-use App\Services\TaskPerformer;
+use App\Entity\Task\Output;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
-use GuzzleHttp\Psr7\Response;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Command\Task\ReportCompletionCommand as TaskReportCompletionCommand;
 use App\Command\Tasks\ReportCompletionCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Functional\AbstractBaseTestCase;
-use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use Symfony\Component\Console\Input\ArrayInput;
-use App\Tests\Services\HttpMockHandler;
+use Symfony\Component\Console\Output\OutputInterface;
+use webignition\InternetMediaType\InternetMediaType;
 
 class ReportCompletionCommandTest extends AbstractBaseTestCase
 {
-    /**
-     * @var ReportCompletionCommand
-     */
-    private $command;
-
-    /**
-     * @var HttpMockHandler
-     */
-    private $httpMockHandler;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->command = self::$container->get(ReportCompletionCommand::class);
-        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
-    }
-
     /**
      * @throws \Exception
      */
     public function testRun()
     {
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-            new Response(200),
-        ]);
-
-        HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
-
+        $command = self::$container->get(ReportCompletionCommand::class);
+        $entityManager = self::$container->get(EntityManagerInterface::class);
         $testTaskFactory = self::$container->get(TestTaskFactory::class);
 
         $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'url' => 'http://example.com/',
             'type' => 'html validation',
         ]));
-        $this->assertNotNull($task->getId());
 
-        self::$container->get(TaskPerformer::class)->perform($task);
-        $this->assertNotNull($task->getOutput()->getId());
+        $task->setOutput(Output::create(
+            '',
+            new InternetMediaType('application', 'json')
+        ));
 
-        $returnCode = $this->command->run(
+        $entityManager->persist($task);
+        $entityManager->flush();
+
+        $taskId = $task->getId();
+
+        $taskReportCompletionCommand = \Mockery::mock(TaskReportCompletionCommand::class);
+        $taskReportCompletionCommand
+            ->shouldReceive('run')
+            ->withArgs(function (InputInterface $input, OutputInterface $output) use ($taskId) {
+                $reflector = new \ReflectionClass(ArrayInput::class);
+                $property = $reflector->getProperty('parameters');
+                $property->setAccessible(true);
+                $inputParameters = $property->getValue($input);
+
+                $this->assertEquals(
+                    [
+                        'id' => $taskId,
+                    ],
+                    $inputParameters
+                );
+
+                $this->assertInstanceOf(BufferedOutput::class, $output);
+
+                return true;
+            });
+
+        ObjectPropertySetter::setProperty(
+            $command,
+            ReportCompletionCommand::class,
+            'taskReportCompletionCommand',
+            $taskReportCompletionCommand
+        );
+
+        $returnCode = $command->run(
             new ArrayInput([]),
             new NullOutput()
         );
 
-        $this->assertEquals(
-            0,
-            $returnCode
-        );
-
-        $this->assertNull($task->getOutput()->getId());
-        $this->assertNull($task->getId());
-    }
-
-    protected function assertPostConditions()
-    {
-        parent::assertPostConditions();
-
-        $this->assertEquals(0, $this->httpMockHandler->count());
+        $this->assertEquals(0, $returnCode);
     }
 
     /**

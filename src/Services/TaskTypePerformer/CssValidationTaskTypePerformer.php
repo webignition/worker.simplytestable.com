@@ -7,8 +7,7 @@ use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
-use App\Services\TaskPerformerTaskOutputMutator;
-use App\Services\TaskPerformerWebPageRetriever;
+use App\Services\TaskCachedSourceWebPageRetriever;
 use webignition\CssValidatorOutput\CssValidatorOutput;
 use webignition\CssValidatorOutput\Message\AbstractMessage as CssValidatorOutputMessage;
 use webignition\CssValidatorOutput\Message\AbstractMessage;
@@ -19,7 +18,6 @@ use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebPageInspector\UnparseableContentTypeException;
-use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
 
 class CssValidationTaskTypePerformer implements TaskPerformerInterface
@@ -37,14 +35,9 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
     private $httpClientConfigurationService;
 
     /**
-     * @var TaskPerformerWebPageRetriever
+     * @var TaskCachedSourceWebPageRetriever
      */
-    private $taskPerformerWebPageRetriever;
-
-    /**
-     * @var TaskPerformerTaskOutputMutator
-     */
-    private $taskPerformerTaskOutputMutator;
+    private $taskCachedSourceWebPageRetriever;
 
     /**
      * @var CssValidatorWrapper
@@ -64,16 +57,14 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
-        TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
-        TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
+        TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         CssValidatorWrapper $cssValidatorWrapper,
         CssValidatorWrapperConfigurationFactory $configurationFactory,
         int $priority
     ) {
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
-        $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
-        $this->taskPerformerTaskOutputMutator = $taskPerformerTaskOutputMutator;
+        $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
         $this->configurationFactory = $configurationFactory;
@@ -87,23 +78,13 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
      *
      * @throws InternetMediaTypeParseException
      * @throws InvalidValidatorOutputException
-     * @throws TransportException
      * @throws UnparseableContentTypeException
      */
     public function perform(Task $task)
     {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
-        $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
-        $task->setState($result->getTaskState());
-
-        if (!$task->isIncomplete()) {
-            $this->taskPerformerTaskOutputMutator->mutate($task, $result->getTaskOutputValues());
-
-            return null;
-        }
-
-        return $this->performValidation($task, $result->getWebPage());
+        return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
     }
 
     public function handles(string $taskType): bool

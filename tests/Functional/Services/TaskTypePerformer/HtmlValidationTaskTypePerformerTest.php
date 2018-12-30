@@ -8,9 +8,7 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
-use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 
@@ -30,30 +28,13 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         $this->taskTypePerformer = self::$container->get(HtmlValidationTaskTypePerformer::class);
     }
 
-    protected function getTaskTypePerformer(): TaskPerformerInterface
-    {
-        return $this->taskTypePerformer;
-    }
-
-    protected function getTaskTypeString(): string
-    {
-        return TypeInterface::TYPE_HTML_VALIDATION;
-    }
-
     /**
      * @dataProvider badDocumentTypeDataProvider
      */
     public function testPerformBadDocumentType(string $content, array $expectedOutputMessage)
     {
-        $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults()
-        );
-
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            HtmlValidationTaskTypePerformer::class,
-            $task,
-            $content
-        );
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $content);
 
         $this->taskTypePerformer->perform($task);
 
@@ -121,21 +102,13 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
-        string $content,
         string $htmlValidatorOutput,
         string $expectedTaskState,
         int $expectedErrorCount,
         array $expectedDecodedOutput
     ) {
-        $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults()
-        );
-
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            HtmlValidationTaskTypePerformer::class,
-            $task,
-            $content
-        );
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, '<!DOCTYPE html>');
 
         HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
 
@@ -159,7 +132,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
     {
         return [
             'no errors' => [
-                'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('0-errors'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
@@ -168,7 +140,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                 ],
             ],
             'one error' => [
-                'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('1-error'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
@@ -186,7 +157,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                 ],
             ],
             'three errors' => [
-                'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('3-errors'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 3,
@@ -220,7 +190,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                 ],
             ],
             'internal software error' => [
-                'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('internal-software-error'),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 0,
@@ -235,7 +204,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                 ],
             ],
             'invalid character encoding' => [
-                'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('invalid-character-encoding-error'),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
@@ -261,7 +229,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                 ],
             ],
             'css validation errors only, ignored' => [
-                'content' => '<!DOCTYPE html>',
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('css-errors-only'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
@@ -281,21 +248,15 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         $content = '<!doctype html>';
 
         if (!$fileExists) {
-            unlink($tmpFilePath);
+            @unlink($tmpFilePath);
         } else {
             file_put_contents($tmpFilePath, $content);
         }
 
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], $content),
-        ]);
-
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults()
-        );
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $content);
 
         $this->taskTypePerformer->perform($task);
     }

@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\CssValidationTaskTypePerformer;
@@ -32,23 +31,13 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->taskTypePerformer = self::$container->get(CssValidationTaskTypePerformer::class);
     }
 
-    protected function getTaskTypePerformer(): TaskPerformerInterface
-    {
-        return $this->taskTypePerformer;
-    }
-
-    protected function getTaskTypeString(): string
-    {
-        return TypeInterface::TYPE_CSS_VALIDATION;
-    }
-
     /**
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
-        string $webPageContent,
         array $httpFixtures,
         array $taskParameters,
+        string $webPageContent,
         string $cssValidatorOutput,
         string $expectedTaskState,
         int $expectedErrorCount,
@@ -57,18 +46,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
-                'parameters' => json_encode($taskParameters),
-            ])
-        );
-
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            CssValidationTaskTypePerformer::class,
-            $task,
-            $webPageContent
-        );
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_CSS_VALIDATION,
+            'parameters' => json_encode($taskParameters),
+        ]));
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $webPageContent);
 
         CssValidatorFixtureFactory::set($cssValidatorOutput);
 
@@ -90,15 +72,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
     public function performSuccessDataProvider(): array
     {
-        $notFoundResponse = new Response(404);
-        $internalServerErrorResponse = new Response(500);
-        $curl6ConnectException = ConnectExceptionFactory::create('CURL/6 foo');
-
         return [
             'unknown validator exception' => [
-                'webPageContent' => 'foo',
                 'httpFixtures' => [],
                 'taskParameters' => [],
+                'webPageContent' => 'foo',
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('unknown-exception'),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
@@ -115,11 +93,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'no errors, ignore warnings' => [
-                'webPageContent' => 'foo',
                 'httpFixtures' => [],
                 'taskParameters' => [
                     'ignore-warnings' => true,
                 ],
+                'webPageContent' => 'foo',
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('1-vendor-extension-warning'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
@@ -127,11 +105,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 'expectedDecodedOutput' => [],
             ],
             'no errors, ignore vendor extension warnings' => [
-                'webPageContent' => 'foo',
                 'httpFixtures' => [],
                 'taskParameters' => [
                     'vendor-extensions' => VendorExtensionSeverityLevel::LEVEL_IGNORE,
                 ],
+                'webPageContent' => 'foo',
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('1-vendor-extension-warning'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
@@ -139,11 +117,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 'expectedDecodedOutput' => [],
             ],
             'three errors' => [
-                'webPageContent' => 'foo',
                 'httpFixtures' => [],
                 'taskParameters' => [
                     'ignore-warnings' => true,
                 ],
+                'webPageContent' => 'foo',
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('3-errors'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 3,
@@ -173,12 +151,12 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'http 404 getting linked resource' => [
-                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'httpFixtures' => [
-                    $notFoundResponse,
-                    $notFoundResponse,
+                    new Response(404),
+                    new Response(404),
                 ],
                 'taskParameters' => [],
+                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
@@ -194,9 +172,9 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'http 500 getting linked resource' => [
-                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
-                'httpFixtures' => array_fill(0, 12, $internalServerErrorResponse),
+                'httpFixtures' => array_fill(0, 12, new Response(500)),
                 'taskParameters' => [],
+                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
@@ -212,9 +190,9 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'curl 6 getting linked resource' => [
-                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
-                'httpFixtures' => array_fill(0, 12, $curl6ConnectException),
+                'httpFixtures' => array_fill(0, 12, ConnectExceptionFactory::create('CURL/6 foo')),
                 'taskParameters' => [],
+                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
@@ -230,11 +208,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'invalid content type getting linked resource' => [
-                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'httpFixtures' => [
                     new Response(200, ['content-type' => 'application/pdf']),
                 ],
                 'taskParameters' => [],
+                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
@@ -265,12 +243,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
-            'parameters' => json_encode($taskParameters)
+            'type' => TypeInterface::TYPE_CSS_VALIDATION,
+            'parameters' => json_encode($taskParameters),
         ]));
 
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            CssValidationTaskTypePerformer::class,
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask(
             $task,
             HtmlDocumentFactory::load('empty-body-single-css-link')
         );
@@ -297,12 +274,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
-            'parameters' => json_encode($taskParameters)
+            'type' => TypeInterface::TYPE_CSS_VALIDATION,
+            'parameters' => json_encode($taskParameters),
         ]));
 
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            CssValidationTaskTypePerformer::class,
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask(
             $task,
             HtmlDocumentFactory::load('empty-body-single-css-link')
         );

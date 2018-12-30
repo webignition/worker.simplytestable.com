@@ -7,13 +7,11 @@ use App\Resque\Job\TasksRequestJob;
 use App\Services\TaskPerformer;
 use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
-use GuzzleHttp\Psr7\Response;
 use App\Command\Task\PerformCommand;
 use App\Services\Resque\QueueService;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
-use App\Tests\Services\HttpMockHandler;
 
 /**
  * @group Command/Task/PerformCommand
@@ -41,13 +39,6 @@ class PerformCommandTest extends AbstractBaseTestCase
             'url' => 'http://example.com/',
             'type' => 'html validation',
         ]));
-
-        $httpMockHandler = self::$container->get(HttpMockHandler::class);
-
-        $httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ]);
     }
 
     /**

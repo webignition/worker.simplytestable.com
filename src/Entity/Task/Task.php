@@ -2,6 +2,7 @@
 
 namespace App\Entity\Task;
 
+use App\Model\Source;
 use App\Model\Task\Type;
 use Doctrine\ORM\Mapping as ORM;
 use App\Model\Task\Parameters;
@@ -91,6 +92,13 @@ class Task implements \JsonSerializable
     private $parentTask;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(type="array")
+     */
+    private $sources = [];
+
+    /**
      * @var Parameters
      */
     private $parametersObject;
@@ -166,6 +174,30 @@ class Task implements \JsonSerializable
     public function getParentTask(): ?Task
     {
         return $this->parentTask;
+    }
+
+    public function addSource(Source $source)
+    {
+        $key = $source->getUrl();
+
+        if (!array_key_exists($key, $this->sources)) {
+            $this->sources[$key] = $source->toArray();
+        }
+    }
+
+    /**
+     * @return Source[]
+     */
+    public function getSources(): array
+    {
+        $sources = [];
+
+        foreach ($this->sources as $sourceData) {
+            $source = Source::fromArray($sourceData);
+            $sources[$source->getUrl()] = $source;
+        }
+
+        return $sources;
     }
 
     public function setStartDateTime(\DateTime $startDateTime)

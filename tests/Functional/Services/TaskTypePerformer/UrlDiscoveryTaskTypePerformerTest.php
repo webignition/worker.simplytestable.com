@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer;
 use App\Tests\Factory\HtmlDocumentFactory;
@@ -28,36 +27,20 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
         $this->taskTypePerformer = self::$container->get(UrlDiscoveryTaskTypePerformer::class);
     }
 
-    protected function getTaskTypePerformer(): TaskPerformerInterface
-    {
-        return $this->taskTypePerformer;
-    }
-
-    protected function getTaskTypeString(): string
-    {
-        return TypeInterface::TYPE_URL_DISCOVERY;
-    }
-
     /**
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
-        string $webPageContent,
         array $taskParameters,
+        string $webPageContent,
         array $expectedDecodedOutput
     ) {
-        $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
-                'parameters' => json_encode($taskParameters),
-            ])
-        );
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_URL_DISCOVERY,
+            'parameters' => json_encode($taskParameters),
+        ]));
 
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            UrlDiscoveryTaskTypePerformer::class,
-            $task,
-            $webPageContent
-        );
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $webPageContent);
 
         $this->taskTypePerformer->perform($task);
 
@@ -79,13 +62,13 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
     {
         return [
             'no urls' => [
-                'webPageContent' => HtmlDocumentFactory::load('minimal'),
                 'taskParameters' => [],
+                'webPageContent' => HtmlDocumentFactory::load('minimal'),
                 'expectedDecodedOutput' => [],
             ],
             'no scope' => [
-                'webPageContent' => HtmlDocumentFactory::load('css-link-js-link-image-anchors'),
                 'taskParameters' => [],
+                'webPageContent' => HtmlDocumentFactory::load('css-link-js-link-image-anchors'),
                 'expectedDecodedOutput' => [
                     'http://example.com/foo/anchor1',
                     'http://www.example.com/foo/anchor2',
@@ -93,14 +76,14 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
                     'https://www.example.com/foo/anchor1',
                 ],
             ],
-            'has scope' => [
-                'webPageContent' => HtmlDocumentFactory::load('css-link-js-link-image-anchors'),
+            'has scope, no sources' => [
                 'taskParameters' => [
                     'scope' => [
                         'http://example.com',
                         'http://www.example.com',
-                    ]
+                    ],
                 ],
+                'webPageContent' => HtmlDocumentFactory::load('css-link-js-link-image-anchors'),
                 'expectedDecodedOutput' => [
                     'http://example.com/foo/anchor1',
                     'http://www.example.com/foo/anchor2',

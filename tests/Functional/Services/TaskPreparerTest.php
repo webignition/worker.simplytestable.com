@@ -1,11 +1,15 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services;
 
 use App\Event\TaskEvent;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
+use App\Model\TaskPreparerCollection;
 use App\Services\TaskPreparer;
+use App\Services\TaskTypePreparer\Factory;
+use App\Services\TaskTypePreparer\TaskPreparerInterface;
 use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use App\Entity\Task\Task;
@@ -20,34 +24,14 @@ class TaskPreparerTest extends AbstractBaseTestCase
     const DEFAULT_TASK_STATE = Task::STATE_QUEUED;
 
     /**
-     * @var TaskPreparer
+     * @dataProvider prepareDataProvider
      */
-    private $taskPreparer;
-
-    /**
-     * @var TestTaskFactory
-     */
-    private $testTaskFactory;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    public function testPrepare(array $taskValues)
     {
-        parent::setUp();
+        $taskPreparer = self::$container->get(TaskPreparer::class);
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
 
-        $this->taskPreparer = self::$container->get(TaskPreparer::class);
-        $this->testTaskFactory = self::$container->get(TestTaskFactory::class);
-    }
-
-    /**
-     * @dataProvider prepareNoTaskTypePreparerDataProvider
-     *
-     * @param array $taskValues
-     */
-    public function testPrepareNoTaskTypePreparer($taskValues)
-    {
-        $task = $this->testTaskFactory->create($taskValues);
+        $task = $testTaskFactory->create($taskValues);
 
         $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
         $eventDispatcher
@@ -60,22 +44,47 @@ class TaskPreparerTest extends AbstractBaseTestCase
                 return true;
             });
 
+        $taskTypePreparer = \Mockery::mock(TaskPreparerInterface::class);
+        $taskTypePreparer
+            ->shouldReceive('getPriority')
+            ->once()
+            ->andReturn(0);
+
+        $taskTypePreparer
+            ->shouldReceive('prepare')
+            ->once()
+            ->with($task);
+
+        $taskPreparerCollection = new TaskPreparerCollection([
+            $taskTypePreparer,
+        ]);
+
+        $taskTypePreparerFactory = \Mockery::mock(Factory::class);
+        $taskTypePreparerFactory
+            ->shouldReceive('getPreparers')
+            ->with((string) $task->getType())
+            ->andReturn($taskPreparerCollection);
+
         ObjectPropertySetter::setProperty(
-            $this->taskPreparer,
+            $taskPreparer,
             TaskPreparer::class,
             'eventDispatcher',
             $eventDispatcher
         );
 
-        $this->taskPreparer->prepare($task);
+        ObjectPropertySetter::setProperty(
+            $taskPreparer,
+            TaskPreparer::class,
+            'taskTypePreparerFactory',
+            $taskTypePreparerFactory
+        );
+
+        $taskPreparer->prepare($task);
 
         $this->assertEquals(Task::STATE_PREPARED, $task->getState());
     }
 
-    /**
-     * @return array
-     */
-    public function prepareNoTaskTypePreparerDataProvider()
+    public function prepareDataProvider(): array
     {
         return [
             'html validation' => [
@@ -101,9 +110,6 @@ class TaskPreparerTest extends AbstractBaseTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown()
     {
         parent::tearDown();

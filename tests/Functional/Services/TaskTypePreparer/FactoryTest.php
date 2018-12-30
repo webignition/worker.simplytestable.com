@@ -32,10 +32,10 @@ class FactoryTest extends AbstractBaseTestCase
     {
         $preparers = $this->factory->getPreparers($taskType);
 
-        $this->assertCount(0, $preparers);
+        $this->assertCount(1, $preparers);
     }
 
-    public function getPreparersDataProvider()
+    public function getPreparersDataProvider(): array
     {
         return [
             'html validation' => [
