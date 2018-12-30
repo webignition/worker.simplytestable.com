@@ -5,6 +5,10 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Entity\Task\Task;
 use App\Model\TaskPerformerWebPageRetrieverResult;
+use App\Services\CachedResourceFactory;
+use App\Services\CachedResourceManager;
+use App\Services\RequestIdentifierFactory;
+use App\Services\SourceFactory;
 use App\Services\TaskPerformerWebPageRetriever;
 use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\ObjectPropertySetter;
@@ -168,6 +172,37 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
             $taskPerformerWebPageRetriever
         );
     }
+
+    protected function createTaskWithPrimarySource(array $taskValues, string $webPageContent): Task
+    {
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+        $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
+        $cachedResourceManager = self::$container->get(CachedResourceManager::class);
+        $sourceFactory = self::$container->get(SourceFactory::class);
+        $requestIdentiferFactory = self::$container->get(RequestIdentifierFactory::class);
+
+        $task =  $testTaskFactory->create($taskValues);
+
+        $requestIdentifer = $requestIdentiferFactory->createFromTask($task);
+
+        /* @var WebPage $webPage */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $webPage = WebPage::createFromContent($webPageContent);
+
+        $cachedResource = $cachedResourceFactory->createForTask(
+            (string) $requestIdentifer,
+            $task,
+            $webPage
+        );
+
+        $cachedResourceManager->persist($cachedResource);
+
+        $source = $sourceFactory->fromCachedResource($cachedResource);
+        $task->addSource($source);
+
+        return $task;
+    }
+
 
     protected function assertPostConditions()
     {

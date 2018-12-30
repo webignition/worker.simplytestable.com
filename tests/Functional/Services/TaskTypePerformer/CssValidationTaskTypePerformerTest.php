@@ -7,12 +7,7 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\CachedResourceFactory;
-use App\Services\CachedResourceManager;
-use App\Services\RequestIdentifierFactory;
-use App\Services\SourceFactory;
 use App\Services\TaskTypePerformer\TaskPerformerInterface;
-use App\Tests\Services\HttpMockHandler;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\CssValidationTaskTypePerformer;
@@ -20,7 +15,6 @@ use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\CssValidatorFixtureFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
 use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
-use webignition\WebResource\WebPage\WebPage;
 
 class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -52,8 +46,8 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
-        callable $taskCreator,
-        callable $setUp,
+        array $httpFixtures,
+        array $taskParameters,
         string $webPageContent,
         string $cssValidatorOutput,
         string $expectedTaskState,
@@ -61,9 +55,15 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         int $expectedWarningCount,
         array $expectedDecodedOutput
     ) {
-        /* @var Task $task */
-        $task = $taskCreator($webPageContent);
-        $setUp($task, $webPageContent);
+        $this->httpMockHandler->appendFixtures($httpFixtures);
+
+        $task = $this->createTaskWithPrimarySource(
+            TestTaskFactory::createTaskValuesFromDefaults([
+                'type' => $this->getTaskTypeString(),
+                'parameters' => json_encode($taskParameters),
+            ]),
+            $webPageContent
+        );
 
         $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             CssValidationTaskTypePerformer::class,
@@ -92,23 +92,9 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
     public function performSuccessDataProvider(): array
     {
         return [
-            'unknown validator exception, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([
-                            'type' => $this->getTaskTypeString(),
-                        ])
-                    );
-                },
-                'setUp' => function (Task $task, string $webPageContent) {
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        CssValidationTaskTypePerformer::class,
-                        $task,
-                        $webPageContent
-                    );
-                },
+            'unknown validator exception' => [
+                'httpFixtures' => [],
+                'taskParameters' => [],
                 'webPageContent' => 'foo',
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('unknown-exception'),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
@@ -125,77 +111,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                     ],
                 ],
             ],
-            'unknown validator exception, has primary source' => [
-                'taskCreator' => function (string $webPageContent): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-                    $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
-                    $cachedResourceManager = self::$container->get(CachedResourceManager::class);
-
-                    $requestIdentiferFactory = new RequestIdentifierFactory();
-                    $sourceFactory = new SourceFactory();
-
-                    $task =  $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([
-                            'type' => $this->getTaskTypeString(),
-                        ])
-                    );
-
-                    $requestIdentifer = $requestIdentiferFactory->createFromTask($task);
-
-                    /* @var WebPage $webPage */
-                    $webPage = WebPage::createFromContent($webPageContent);
-
-                    $cachedResource = $cachedResourceFactory->createForTask(
-                        (string) $requestIdentifer,
-                        $task,
-                        $webPage
-                    );
-
-                    $cachedResourceManager->persist($cachedResource);
-
-                    $source = $sourceFactory->fromCachedResource($cachedResource);
-                    $task->addSource($source);
-
-                    return $task;
-                },
-                'setUp' => function () {
-                },
-                'webPageContent' => 'foo',
-                'cssValidatorOutput' => CssValidatorFixtureFactory::load('unknown-exception'),
-                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                'expectedErrorCount' => 1,
-                'expectedWarningCount' => 0,
-                'expectedDecodedOutput' => [
-                    [
-                        'message' => 'Unknown error',
-                        'class' => 'css-validation-exception-unknown',
-                        'type' => 'error',
-                        'context' => '',
-                        'ref' => 'http://example.com/',
-                        'line_number' => 0,
-                    ],
+            'no errors, ignore warnings' => [
+                'httpFixtures' => [],
+                'taskParameters' => [
+                    'ignore-warnings' => true,
                 ],
-            ],
-            'no errors, ignore warnings, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([
-                            'type' => $this->getTaskTypeString(),
-                            'parameters' => json_encode([
-                                'ignore-warnings' => true,
-                            ]),
-                        ])
-                    );
-                },
-                'setUp' => function (Task $task, string $webPageContent) {
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        CssValidationTaskTypePerformer::class,
-                        $task,
-                        $webPageContent
-                    );
-                },
                 'webPageContent' => 'foo',
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('1-vendor-extension-warning'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
@@ -203,26 +123,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
-            'no errors, ignore vendor extension warnings, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([
-                            'type' => $this->getTaskTypeString(),
-                            'parameters' => json_encode([
-                                'vendor-extensions' => VendorExtensionSeverityLevel::LEVEL_IGNORE,
-                            ]),
-                        ])
-                    );
-                },
-                'setUp' => function (Task $task, string $webPageContent) {
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        CssValidationTaskTypePerformer::class,
-                        $task,
-                        $webPageContent
-                    );
-                },
+            'no errors, ignore vendor extension warnings' => [
+                'httpFixtures' => [],
+                'taskParameters' => [
+                    'vendor-extensions' => VendorExtensionSeverityLevel::LEVEL_IGNORE,
+                ],
                 'webPageContent' => 'foo',
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('1-vendor-extension-warning'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
@@ -230,26 +135,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
-            'three errors, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([
-                            'type' => $this->getTaskTypeString(),
-                            'parameters' => json_encode([
-                                'ignore-warnings' => true,
-                            ]),
-                        ])
-                    );
-                },
-                'setUp' => function (Task $task, string $webPageContent) {
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        CssValidationTaskTypePerformer::class,
-                        $task,
-                        $webPageContent
-                    );
-                },
+            'three errors' => [
+                'httpFixtures' => [],
+                'taskParameters' => [
+                    'ignore-warnings' => true,
+                ],
                 'webPageContent' => 'foo',
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('3-errors'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
@@ -279,31 +169,12 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                     ],
                 ],
             ],
-            'http 404 getting linked resource, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([
-                            'type' => $this->getTaskTypeString(),
-                        ])
-                    );
-                },
-                'setUp' => function (Task $task, string $webPageContent) {
-                    $notFoundResponse = new Response(404);
-
-                    $httpMockHandler = self::$container->get(HttpMockHandler::class);
-                    $httpMockHandler->appendFixtures([
-                        $notFoundResponse,
-                        $notFoundResponse,
-                    ]);
-
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        CssValidationTaskTypePerformer::class,
-                        $task,
-                        $webPageContent
-                    );
-                },
+            'http 404 getting linked resource' => [
+                'httpFixtures' => [
+                    new Response(404),
+                    new Response(404),
+                ],
+                'taskParameters' => [],
                 'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
@@ -319,28 +190,9 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                     ],
                 ],
             ],
-            'http 500 getting linked resource, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([
-                            'type' => $this->getTaskTypeString(),
-                        ])
-                    );
-                },
-                'setUp' => function (Task $task, string $webPageContent) {
-                    $internalServerErrorResponse = new Response(500);
-
-                    $httpMockHandler = self::$container->get(HttpMockHandler::class);
-                    $httpMockHandler->appendFixtures(array_fill(0, 12, $internalServerErrorResponse));
-
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        CssValidationTaskTypePerformer::class,
-                        $task,
-                        $webPageContent
-                    );
-                },
+            'http 500 getting linked resource' => [
+                'httpFixtures' => array_fill(0, 12, new Response(500)),
+                'taskParameters' => [],
                 'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
@@ -356,28 +208,9 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                     ],
                 ],
             ],
-            'curl 6 getting linked resource, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([
-                            'type' => $this->getTaskTypeString(),
-                        ])
-                    );
-                },
-                'setUp' => function (Task $task, string $webPageContent) {
-                    $curl6ConnectException = ConnectExceptionFactory::create('CURL/6 foo');
-
-                    $httpMockHandler = self::$container->get(HttpMockHandler::class);
-                    $httpMockHandler->appendFixtures(array_fill(0, 12, $curl6ConnectException));
-
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        CssValidationTaskTypePerformer::class,
-                        $task,
-                        $webPageContent
-                    );
-                },
+            'curl 6 getting linked resource' => [
+                'httpFixtures' => array_fill(0, 12, ConnectExceptionFactory::create('CURL/6 foo')),
+                'taskParameters' => [],
                 'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
@@ -393,28 +226,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                     ],
                 ],
             ],
-            'invalid content type getting linked resource, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([
-                            'type' => $this->getTaskTypeString(),
-                        ])
-                    );
-                },
-                'setUp' => function (Task $task, string $webPageContent) {
-                    $httpMockHandler = self::$container->get(HttpMockHandler::class);
-                    $httpMockHandler->appendFixtures([
-                        new Response(200, ['content-type' => 'application/pdf']),
-                    ]);
-
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        CssValidationTaskTypePerformer::class,
-                        $task,
-                        $webPageContent
-                    );
-                },
+            'invalid content type getting linked resource' => [
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'application/pdf']),
+                ],
+                'taskParameters' => [],
                 'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
@@ -443,16 +259,16 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             new Response(200, ['content-type' => 'text/css']),
         ];
 
-        $this->httpMockHandler->appendFixtures($httpFixtures);
+        $this->httpMockHandler->appendFixtures([
+            new Response(200, ['content-type' => 'text/css']),
+            new Response(200, ['content-type' => 'text/css']),
+        ]);
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
-            'parameters' => json_encode($taskParameters)
-        ]));
-
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            CssValidationTaskTypePerformer::class,
-            $task,
+        $task = $this->createTaskWithPrimarySource(
+            TestTaskFactory::createTaskValuesFromDefaults([
+                'type' => $this->getTaskTypeString(),
+                'parameters' => json_encode($taskParameters)
+            ]),
             HtmlDocumentFactory::load('empty-body-single-css-link')
         );
 
@@ -477,14 +293,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
-            'parameters' => json_encode($taskParameters)
-        ]));
-
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            CssValidationTaskTypePerformer::class,
-            $task,
+        $task = $this->createTaskWithPrimarySource(
+            TestTaskFactory::createTaskValuesFromDefaults([
+                'type' => $this->getTaskTypeString(),
+                'parameters' => json_encode($taskParameters)
+            ]),
             HtmlDocumentFactory::load('empty-body-single-css-link')
         );
 

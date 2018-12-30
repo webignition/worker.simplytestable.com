@@ -8,15 +8,10 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\CachedResourceFactory;
-use App\Services\CachedResourceManager;
-use App\Services\RequestIdentifierFactory;
-use App\Services\SourceFactory;
 use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
-use webignition\WebResource\WebPage\WebPage;
 
 class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -301,36 +296,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
             self::$container->getParameter('html_validation_task_type_performer_priority'),
             $this->taskTypePerformer->getPriority()
         );
-    }
-
-    private function createTaskWithPrimarySource(array $taskValues, string $webPageContent): Task
-    {
-        $testTaskFactory = self::$container->get(TestTaskFactory::class);
-        $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
-        $cachedResourceManager = self::$container->get(CachedResourceManager::class);
-
-        $requestIdentiferFactory = new RequestIdentifierFactory();
-        $sourceFactory = new SourceFactory();
-
-        $task =  $testTaskFactory->create($taskValues);
-
-        $requestIdentifer = $requestIdentiferFactory->createFromTask($task);
-
-        /* @var WebPage $webPage */
-        $webPage = WebPage::createFromContent($webPageContent);
-
-        $cachedResource = $cachedResourceFactory->createForTask(
-            (string) $requestIdentifer,
-            $task,
-            $webPage
-        );
-
-        $cachedResourceManager->persist($cachedResource);
-
-        $source = $sourceFactory->fromCachedResource($cachedResource);
-        $task->addSource($source);
-
-        return $task;
     }
 
     protected function tearDown()

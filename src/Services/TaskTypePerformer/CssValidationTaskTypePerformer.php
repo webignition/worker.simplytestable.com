@@ -8,8 +8,6 @@ use App\Model\Task\TypeInterface;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\TaskCachedSourceWebPageRetriever;
-use App\Services\TaskPerformerTaskOutputMutator;
-use App\Services\TaskPerformerWebPageRetriever;
 use webignition\CssValidatorOutput\CssValidatorOutput;
 use webignition\CssValidatorOutput\Message\AbstractMessage as CssValidatorOutputMessage;
 use webignition\CssValidatorOutput\Message\AbstractMessage;
@@ -20,7 +18,6 @@ use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\WebPageInspector\UnparseableContentTypeException;
-use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
 
 class CssValidationTaskTypePerformer implements TaskPerformerInterface
@@ -36,16 +33,6 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
      * @var HttpClientConfigurationService
      */
     private $httpClientConfigurationService;
-
-    /**
-     * @var TaskPerformerWebPageRetriever
-     */
-    private $taskPerformerWebPageRetriever;
-
-    /**
-     * @var TaskPerformerTaskOutputMutator
-     */
-    private $taskPerformerTaskOutputMutator;
 
     /**
      * @var TaskCachedSourceWebPageRetriever
@@ -70,8 +57,6 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
-        TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
-        TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         CssValidatorWrapper $cssValidatorWrapper,
         CssValidatorWrapperConfigurationFactory $configurationFactory,
@@ -79,8 +64,6 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
     ) {
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
-        $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
-        $this->taskPerformerTaskOutputMutator = $taskPerformerTaskOutputMutator;
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
@@ -95,29 +78,11 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
      *
      * @throws InternetMediaTypeParseException
      * @throws InvalidValidatorOutputException
-     * @throws TransportException
      * @throws UnparseableContentTypeException
      */
     public function perform(Task $task)
     {
-        $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
-
-        if (empty($webPage)) {
-            $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
-
-            $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
-            $task->setState($result->getTaskState());
-
-            if (!$task->isIncomplete()) {
-                $this->taskPerformerTaskOutputMutator->mutate($task, $result->getTaskOutputValues());
-
-                return null;
-            }
-
-            $webPage = $result->getWebPage();
-        }
-
-        return $this->performValidation($task, $webPage);
+        return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
     }
 
     public function handles(string $taskType): bool
@@ -142,6 +107,8 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
      */
     private function performValidation(Task $task, WebPage $webPage)
     {
+        $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
+
         $cssValidatorWrapperConfiguration = $this->configurationFactory->create(
             $task,
             (string) $webPage->getUri(),
