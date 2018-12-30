@@ -37,6 +37,7 @@ class TaskService
     {
         $task = Task::create($type, $url, $parameters);
 
+        /* @var Task $existingTask */
         $existingTask = $this->taskRepository->findOneBy([
             'state' => $task->getState(),
             'type' => (string) $task->getType(),
@@ -102,5 +103,10 @@ class TaskService
             Task::STATE_QUEUED,
             Task::STATE_IN_PROGRESS
         ]);
+    }
+
+    public function isCachedResourceRequestHashInUse(int $taskId, string $requestHash): bool
+    {
+        return $this->taskRepository->isSourceValueInUse($taskId, $requestHash);
     }
 }

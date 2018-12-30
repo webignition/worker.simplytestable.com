@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Task\Task;
 use Doctrine\ORM\EntityRepository;
 
 class TaskRepository extends EntityRepository
@@ -115,5 +116,37 @@ class TaskRepository extends EntityRepository
         }
 
         return $result[0]['type'];
+    }
+
+    public function isSourceValueInUse(int $taskId, string $value): bool
+    {
+        $queryBuilder = $this->createQueryBuilder('Task');
+        $queryBuilder->select('Task.id, Task.sources');
+        $queryBuilder->where('Task.sources IS NOT NULL AND Task.state IN (:States)');
+
+        $queryBuilder->setParameter('States', [
+            Task::STATE_PREPARED,
+            Task::STATE_IN_PROGRESS,
+        ]);
+
+        $results = $queryBuilder->getQuery()->getResult();
+
+        foreach ($results as $result) {
+            $resultId = $result['id'];
+
+            if ($taskId === $resultId) {
+                continue;
+            }
+
+            $sources = $result['sources'];
+
+            foreach ($sources as $source) {
+                if ($value === $source['value']) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
