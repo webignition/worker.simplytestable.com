@@ -2,16 +2,19 @@
 
 namespace App\Tests\Functional\Command\Tasks;
 
+use App\Model\Task\TypeInterface;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
-use GuzzleHttp\Psr7\Response;
+use App\Command\Task\PerformCommand as TaskPerformCommand;
 use App\Command\Tasks\PerformCommand;
 use App\Entity\Task\Task;
-use App\Services\Resque\QueueService;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
-use App\Tests\Services\HttpMockHandler;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class PerformCommandTest extends AbstractBaseTestCase
 {
@@ -20,27 +23,47 @@ class PerformCommandTest extends AbstractBaseTestCase
      */
     public function testRun()
     {
-        $httpMockHandler = self::$container->get(HttpMockHandler::class);
-        $resqueQueueService = self::$container->get(QueueService::class);
-        $this->clearRedis();
-
-        $httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], '<!doctype html>'),
-        ]);
-
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
         $testTaskFactory = self::$container->get(TestTaskFactory::class);
 
         $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'url' => 'http://example.com/',
-            'type' => 'html validation',
+            'type' => TypeInterface::TYPE_HTML_VALIDATION,
         ]));
+
+        $taskId = $task->getId();
 
         $this->assertEquals(Task::STATE_QUEUED, $task->getState());
 
+        $taskPerformCommand = \Mockery::mock(TaskPerformCommand::class);
+        $taskPerformCommand
+            ->shouldReceive('run')
+            ->withArgs(function (InputInterface $input, OutputInterface $output) use ($taskId) {
+                $reflector = new \ReflectionClass(ArrayInput::class);
+                $property = $reflector->getProperty('parameters');
+                $property->setAccessible(true);
+                $inputParameters = $property->getValue($input);
+
+                $this->assertEquals(
+                    [
+                        'id' => $taskId,
+                    ],
+                    $inputParameters
+                );
+
+                $this->assertInstanceOf(BufferedOutput::class, $output);
+
+                return true;
+            });
+
         $command = self::$container->get(PerformCommand::class);
+
+        ObjectPropertySetter::setProperty(
+            $command,
+            PerformCommand::class,
+            'taskPerformCommand',
+            $taskPerformCommand
+        );
 
         $returnCode = $command->run(
             new ArrayInput([]),
@@ -48,14 +71,6 @@ class PerformCommandTest extends AbstractBaseTestCase
         );
 
         $this->assertEquals(0, $returnCode);
-        $this->assertEquals(Task::STATE_COMPLETED, $task->getState());
-
-        $this->assertTrue($resqueQueueService->contains(
-            'task-report-completion',
-            [
-                'id' => $task->getId(),
-            ]
-        ));
     }
 
     /**
