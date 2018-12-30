@@ -46,13 +46,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $task = $this->createTaskWithPrimarySource(
-            TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => TypeInterface::TYPE_CSS_VALIDATION,
-                'parameters' => json_encode($taskParameters),
-            ]),
-            $webPageContent
-        );
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_CSS_VALIDATION,
+            'parameters' => json_encode($taskParameters),
+        ]));
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $webPageContent);
 
         CssValidatorFixtureFactory::set($cssValidatorOutput);
 
@@ -244,11 +242,13 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $task = $this->createTaskWithPrimarySource(
-            TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => TypeInterface::TYPE_CSS_VALIDATION,
-                'parameters' => json_encode($taskParameters)
-            ]),
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_CSS_VALIDATION,
+            'parameters' => json_encode($taskParameters),
+        ]));
+
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask(
+            $task,
             HtmlDocumentFactory::load('empty-body-single-css-link')
         );
 
@@ -273,11 +273,13 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $task = $this->createTaskWithPrimarySource(
-            TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => TypeInterface::TYPE_CSS_VALIDATION,
-                'parameters' => json_encode($taskParameters)
-            ]),
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_CSS_VALIDATION,
+            'parameters' => json_encode($taskParameters),
+        ]));
+
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask(
+            $task,
             HtmlDocumentFactory::load('empty-body-single-css-link')
         );
 

@@ -1,12 +1,19 @@
 <?php
+/** @noinspection PhpDocMissingThrowsInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace App\Tests\Services;
 
 use App\Model\Task\TypeInterface;
+use App\Services\CachedResourceFactory;
+use App\Services\CachedResourceManager;
+use App\Services\RequestIdentifierFactory;
+use App\Services\SourceFactory;
 use App\Services\TaskTypeService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Services\TaskService;
+use webignition\WebResource\WebPage\WebPage;
 
 class TestTaskFactory
 {
@@ -15,9 +22,6 @@ class TestTaskFactory
     const DEFAULT_TASK_TYPE = TypeInterface::TYPE_HTML_VALIDATION;
     const DEFAULT_TASK_STATE = Task::STATE_QUEUED;
 
-    /**
-     * @var array
-     */
     private static $defaultTaskValues = [
         'url' => self::DEFAULT_TASK_URL,
         'type' => self::DEFAULT_TASK_TYPE,
@@ -25,49 +29,38 @@ class TestTaskFactory
         'state' => self::DEFAULT_TASK_STATE,
     ];
 
-    /**
-     * @var EntityManagerInterface
-     */
     private $entityManager;
-
-    /**
-     * @var TaskService
-     */
     private $taskService;
-
-    /**
-     * @var TaskTypeService
-     */
     private $taskTypeService;
+    private $requestIdentifierFactory;
+    private $cachedResourceFactory;
+    private $cachedResourceManager;
+    private $sourceFactory;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         TaskService $taskService,
-        TaskTypeService $taskTypeService
+        TaskTypeService $taskTypeService,
+        RequestIdentifierFactory $requestIdentifierFactory,
+        CachedResourceFactory $cachedResourceFactory,
+        CachedResourceManager $cachedResourceManager,
+        SourceFactory $sourceFactory
     ) {
         $this->entityManager = $entityManager;
         $this->taskService = $taskService;
         $this->taskTypeService = $taskTypeService;
+        $this->requestIdentifierFactory = $requestIdentifierFactory;
+        $this->cachedResourceFactory = $cachedResourceFactory;
+        $this->cachedResourceManager = $cachedResourceManager;
+        $this->sourceFactory = $sourceFactory;
     }
 
-
-    /**
-     * @param array $taskValues
-     *
-     * @return array
-     */
-    public static function createTaskValuesFromDefaults(array $taskValues = [])
+    public static function createTaskValuesFromDefaults(array $taskValues = []): array
     {
         return array_merge(self::$defaultTaskValues, $taskValues);
     }
 
-
-    /**
-     * @param string[] $taskValues
-     *
-     * @return Task
-     */
-    public function create($taskValues)
+    public function create(array $taskValues): Task
     {
         if (!isset($taskValues['parameters'])) {
             $taskValues['parameters'] = '';
@@ -91,5 +84,27 @@ class TestTaskFactory
         $this->entityManager->flush();
 
         return $task;
+    }
+
+    public function addPrimaryCachedResourceSourceToTask(Task $task, string $webPageContent)
+    {
+        $requestIdentifer = $this->requestIdentifierFactory->createFromTask($task);
+
+        /* @var WebPage $webPage */
+        $webPage = WebPage::createFromContent($webPageContent);
+
+        $cachedResource = $this->cachedResourceFactory->createForTask(
+            (string) $requestIdentifer,
+            $task,
+            $webPage
+        );
+
+        $this->cachedResourceManager->persist($cachedResource);
+
+        $source = $this->sourceFactory->fromCachedResource($cachedResource);
+        $task->addSource($source);
+
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
     }
 }
