@@ -3,9 +3,7 @@
 
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
-use App\Entity\Task\Output;
 use App\Entity\Task\Task;
-use App\Model\TaskOutputValues;
 use App\Model\TaskPerformerWebPageRetrieverResult;
 use App\Services\TaskPerformerWebPageRetriever;
 use App\Services\TaskTypePerformer\TaskPerformerInterface;
@@ -49,71 +47,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
     abstract protected function getTaskTypePerformer(): TaskPerformerInterface;
     abstract protected function getTaskTypeString():string;
 
-    /**
-     * @dataProvider performBadWebPageRetrievalDataProvider
-     */
-    public function testPerformBadWebPageRetrieval(
-        string $taskState,
-        TaskOutputValues $taskOutputValues
-    ) {
-        $taskTypePerformer = $this->getTaskTypePerformer();
-
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => $this->getTaskTypeString(),
-        ]));
-
-        $this->setFailedTaskPerformerWebPageRetrieverOnTaskPerformer(
-            get_class($taskTypePerformer),
-            $task,
-            $taskState,
-            $taskOutputValues
-        );
-
-        $taskTypePerformer->perform($task);
-
-        $this->assertEquals($taskState, $task->getState());
-
-        $output = $task->getOutput();
-
-        $this->assertInstanceOf(Output::class, $output);
-        $this->assertEquals('application/json', $output->getContentType());
-        $this->assertEquals($taskOutputValues->getErrorCount(), $output->getErrorCount());
-        $this->assertEquals($taskOutputValues->getWarningCount(), $output->getWarningCount());
-
-        $this->assertEquals(
-            $taskOutputValues->getContent(),
-            json_decode($output->getOutput(), true)
-        );
-    }
-
-    public function performBadWebPageRetrievalDataProvider(): array
-    {
-        return [
-            'invalid response content type' => [
-                'taskState' => Task::STATE_SKIPPED,
-                'taskOutputValues' => new TaskOutputValues('', 0, 0),
-            ],
-            'http 404 exception' => [
-                'taskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                'taskOutputValues' => new TaskOutputValues(
-                    [
-                        'messages' => [
-                            'message' => 'Not Found',
-                            'messageId' => 'http-retrieval-404',
-                            'type' => 'error',
-                        ],
-                    ],
-                    1,
-                    0
-                ),
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function cookiesDataProvider()
+    public function cookiesDataProvider(): array
     {
         return [
             'no cookies' => [
@@ -157,10 +91,7 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function httpAuthDataProvider()
+    public function httpAuthDataProvider(): array
     {
         return [
             'no auth' => [
@@ -223,35 +154,6 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         $taskPerformerWebPageRetrieverResult = new TaskPerformerWebPageRetrieverResult();
         $taskPerformerWebPageRetrieverResult->setWebPage($webPage);
         $taskPerformerWebPageRetrieverResult->setTaskState($task->getState());
-
-        $taskPerformerWebPageRetriever = \Mockery::mock(TaskPerformerWebPageRetriever::class);
-        $taskPerformerWebPageRetriever
-            ->shouldReceive('retrieveWebPage')
-            ->with($task)
-            ->andReturn($taskPerformerWebPageRetrieverResult);
-
-        ObjectPropertySetter::setProperty(
-            $this->getTaskTypePerformer(),
-            $performerClass,
-            'taskPerformerWebPageRetriever',
-            $taskPerformerWebPageRetriever
-        );
-    }
-
-    protected function setFailedTaskPerformerWebPageRetrieverOnTaskPerformer(
-        string $performerClass,
-        Task $task,
-        string $taskState,
-        TaskOutputValues $taskOutputValues
-    ) {
-//        /** @noinspection PhpUnhandledExceptionInspection */
-//        /* @var WebPage $webPage */
-//        $webPage = WebPage::createFromContent($content);
-//        $webPage = $webPage->setUri(new Uri($task->getUrl()));
-
-        $taskPerformerWebPageRetrieverResult = new TaskPerformerWebPageRetrieverResult();
-        $taskPerformerWebPageRetrieverResult->setTaskState($taskState);
-        $taskPerformerWebPageRetrieverResult->setTaskOutputValues($taskOutputValues);
 
         $taskPerformerWebPageRetriever = \Mockery::mock(TaskPerformerWebPageRetriever::class);
         $taskPerformerWebPageRetriever
