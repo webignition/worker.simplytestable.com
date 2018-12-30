@@ -38,8 +38,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
     protected function getTaskTypePerformer(): TaskPerformerInterface
     {
         return self::$container->get(HtmlValidationTaskTypePerformer::class);
-
-//        return $this->taskTypePerformer;
     }
 
     protected function getTaskTypeString(): string
