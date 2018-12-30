@@ -7,10 +7,15 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
+use App\Services\CachedResourceFactory;
+use App\Services\CachedResourceManager;
+use App\Services\RequestIdentifierFactory;
+use App\Services\SourceFactory;
 use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer;
 use App\Tests\Factory\HtmlDocumentFactory;
+use webignition\WebResource\WebPage\WebPage;
 
 class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -30,7 +35,7 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
 
     protected function getTaskTypePerformer(): TaskPerformerInterface
     {
-        return $this->taskTypePerformer;
+        return self::$container->get(UrlDiscoveryTaskTypePerformer::class);
     }
 
     protected function getTaskTypeString(): string
@@ -42,16 +47,14 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
+        callable $taskCreator,
+        callable $setUp,
         string $webPageContent,
-        array $taskParameters,
         array $expectedDecodedOutput
     ) {
-        $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
-                'parameters' => json_encode($taskParameters),
-            ])
-        );
+        /* @var Task $task */
+        $task = $taskCreator($webPageContent);
+        $setUp($task, $webPageContent);
 
         $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
             UrlDiscoveryTaskTypePerformer::class,
@@ -78,14 +81,87 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
     public function performSuccessDataProvider(): array
     {
         return [
-            'no urls' => [
+            'no urls, no sources' => [
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+
+                    return $testTaskFactory->create(
+                        TestTaskFactory::createTaskValuesFromDefaults([
+                            'type' => $this->getTaskTypeString(),
+                        ])
+                    );
+                },
+                'setUp' => function (Task $task, string $content) {
+                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
+                        UrlDiscoveryTaskTypePerformer::class,
+                        $task,
+                        $content
+                    );
+                },
                 'webPageContent' => HtmlDocumentFactory::load('minimal'),
-                'taskParameters' => [],
                 'expectedDecodedOutput' => [],
             ],
-            'no scope' => [
+            'no urls, has source' => [
+                'taskCreator' => function (string $webPageContent): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
+                    $cachedResourceManager = self::$container->get(CachedResourceManager::class);
+
+                    $requestIdentiferFactory = new RequestIdentifierFactory();
+                    $sourceFactory = new SourceFactory();
+
+                    $task =  $testTaskFactory->create(
+                        TestTaskFactory::createTaskValuesFromDefaults([
+                            'type' => $this->getTaskTypeString(),
+                        ])
+                    );
+
+                    $requestIdentifer = $requestIdentiferFactory->createFromTask($task);
+
+                    /* @var WebPage $webPage */
+                    $webPage = WebPage::createFromContent($webPageContent);
+
+                    $cachedResource = $cachedResourceFactory->createForTask(
+                        (string) $requestIdentifer,
+                        $task,
+                        $webPage
+                    );
+
+                    $cachedResourceManager->persist($cachedResource);
+
+                    $source = $sourceFactory->fromCachedResource($cachedResource);
+                    $task->addSource($source);
+
+                    return $task;
+                },
+                'setUp' => function (Task $task, string $content) {
+                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
+                        UrlDiscoveryTaskTypePerformer::class,
+                        $task,
+                        $content
+                    );
+                },
+                'webPageContent' => HtmlDocumentFactory::load('minimal'),
+                'expectedDecodedOutput' => [],
+            ],
+            'no scope, no sources' => [
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+
+                    return $testTaskFactory->create(
+                        TestTaskFactory::createTaskValuesFromDefaults([
+                            'type' => $this->getTaskTypeString(),
+                        ])
+                    );
+                },
+                'setUp' => function (Task $task, string $content) {
+                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
+                        UrlDiscoveryTaskTypePerformer::class,
+                        $task,
+                        $content
+                    );
+                },
                 'webPageContent' => HtmlDocumentFactory::load('css-link-js-link-image-anchors'),
-                'taskParameters' => [],
                 'expectedDecodedOutput' => [
                     'http://example.com/foo/anchor1',
                     'http://www.example.com/foo/anchor2',
@@ -93,14 +169,30 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
                     'https://www.example.com/foo/anchor1',
                 ],
             ],
-            'has scope' => [
+            'has scope, no sources' => [
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+
+                    return $testTaskFactory->create(
+                        TestTaskFactory::createTaskValuesFromDefaults([
+                            'type' => $this->getTaskTypeString(),
+                            'parameters' => json_encode([
+                                'scope' => [
+                                    'http://example.com',
+                                    'http://www.example.com',
+                                ]
+                            ]),
+                        ])
+                    );
+                },
+                'setUp' => function (Task $task, string $content) {
+                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
+                        UrlDiscoveryTaskTypePerformer::class,
+                        $task,
+                        $content
+                    );
+                },
                 'webPageContent' => HtmlDocumentFactory::load('css-link-js-link-image-anchors'),
-                'taskParameters' => [
-                    'scope' => [
-                        'http://example.com',
-                        'http://www.example.com',
-                    ]
-                ],
                 'expectedDecodedOutput' => [
                     'http://example.com/foo/anchor1',
                     'http://www.example.com/foo/anchor2',
