@@ -33,7 +33,8 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
      */
     public function testPerformBadDocumentType(string $content, array $expectedOutputMessage)
     {
-        $task = $this->createTaskWithPrimarySource(TestTaskFactory::createTaskValuesFromDefaults(), $content);
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $content);
 
         $this->taskTypePerformer->perform($task);
 
@@ -106,7 +107,8 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         int $expectedErrorCount,
         array $expectedDecodedOutput
     ) {
-        $task = $this->createTaskWithPrimarySource(TestTaskFactory::createTaskValuesFromDefaults(), '<!DOCTYPE html>');
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, '<!DOCTYPE html>');
 
         HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
 
@@ -253,7 +255,8 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
 
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->createTaskWithPrimarySource(TestTaskFactory::createTaskValuesFromDefaults(), $content);
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $content);
 
         $this->taskTypePerformer->perform($task);
     }

@@ -5,25 +5,22 @@
 namespace App\Tests\Integration\Command\Task;
 
 use App\Command\Task\PerformCommand;
+use App\Entity\CachedResource;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
 use App\Resque\Job\TaskReportCompletionJob;
-use App\Services\CachedResourceFactory;
-use App\Services\CachedResourceManager;
-use App\Services\RequestIdentifierFactory;
-use App\Services\SourceFactory;
 use App\Tests\Factory\CssValidatorFixtureFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use App\Tests\Services\HttpMockHandler;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\Resque\QueueService;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
-use webignition\WebResource\WebPage\WebPage;
 
 /**
  * @group Command/Task/PerformCommand
@@ -54,10 +51,20 @@ class PerformCommandTest extends AbstractBaseTestCase
     ) {
         $setUp();
 
+        $entityManager = self::$container->get(EntityManagerInterface::class);
+
         $httpMockHandler = self::$container->get(HttpMockHandler::class);
         $httpMockHandler->appendFixtures($httpFixtures);
 
-        $task = $this->createTaskWithPrimarySource($taskValues, $primarySourceContent);
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+        $task = $testTaskFactory->create($taskValues);
+        $testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $primarySourceContent);
+
+        $sources = $task->getSources();
+        $primarySource = $sources[$task->getUrl()];
+        $primarySourceRequestHash = $primarySource->getValue();
+
+        $this->assertNotNull($entityManager->find(CachedResource::class, $primarySourceRequestHash));
 
         $returnCode = $this->command->run(
             new ArrayInput([
@@ -82,6 +89,8 @@ class PerformCommandTest extends AbstractBaseTestCase
                 'id' => $task->getId()
             ]
         ));
+
+        $this->assertNull($entityManager->find(CachedResource::class, $primarySourceRequestHash));
     }
 
     public function runDataProvider(): array
@@ -159,35 +168,6 @@ class PerformCommandTest extends AbstractBaseTestCase
                 ],
             ],
         ];
-    }
-
-    private function createTaskWithPrimarySource(array $taskValues, string $webPageContent): Task
-    {
-        $testTaskFactory = self::$container->get(TestTaskFactory::class);
-        $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
-        $cachedResourceManager = self::$container->get(CachedResourceManager::class);
-        $sourceFactory = self::$container->get(SourceFactory::class);
-        $requestIdentiferFactory = self::$container->get(RequestIdentifierFactory::class);
-
-        $task =  $testTaskFactory->create($taskValues);
-
-        $requestIdentifer = $requestIdentiferFactory->createFromTask($task);
-
-        /* @var WebPage $webPage */
-        $webPage = WebPage::createFromContent($webPageContent);
-
-        $cachedResource = $cachedResourceFactory->createForTask(
-            (string) $requestIdentifer,
-            $task,
-            $webPage
-        );
-
-        $cachedResourceManager->persist($cachedResource);
-
-        $source = $sourceFactory->fromCachedResource($cachedResource);
-        $task->addSource($source);
-
-        return $task;
     }
 
     /**

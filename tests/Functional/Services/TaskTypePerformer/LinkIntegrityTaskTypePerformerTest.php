@@ -44,13 +44,11 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $task = $this->createTaskWithPrimarySource(
-            TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => TypeInterface::TYPE_LINK_INTEGRITY,
-                'parameters' => json_encode($taskParameters),
-            ]),
-            $webPageContent
-        );
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_LINK_INTEGRITY,
+            'parameters' => json_encode($taskParameters),
+        ]));
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $webPageContent);
 
         $this->taskTypePerformer->perform($task);
 
@@ -184,11 +182,13 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $task = $this->createTaskWithPrimarySource(
-            TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => TypeInterface::TYPE_LINK_INTEGRITY,
-                'parameters' => json_encode($taskParameters)
-            ]),
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_LINK_INTEGRITY,
+            'parameters' => json_encode($taskParameters),
+        ]));
+
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask(
+            $task,
             '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
         );
 
@@ -210,11 +210,13 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $task = $this->createTaskWithPrimarySource(
-            TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => TypeInterface::TYPE_LINK_INTEGRITY,
-                'parameters' => json_encode($taskParameters)
-            ]),
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_LINK_INTEGRITY,
+            'parameters' => json_encode($taskParameters),
+        ]));
+
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask(
+            $task,
             '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
         );
 

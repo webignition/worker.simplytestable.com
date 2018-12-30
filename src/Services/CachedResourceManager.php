@@ -34,4 +34,10 @@ class CachedResourceManager
     {
         return $this->entityRepository->find($requestHash);
     }
+
+    public function remove(CachedResource $cachedResource)
+    {
+        $this->entityManager->remove($cachedResource);
+        $this->entityManager->flush();
+    }
 }

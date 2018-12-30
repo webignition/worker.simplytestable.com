@@ -6,13 +6,10 @@ use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
-use App\Services\CachedResourceFactory;
-use App\Services\CachedResourceManager;
 use App\Services\SourceFactory;
 use App\Services\TaskTypePerformer\WebPageTaskFailedSourceExaminer;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\TestTaskFactory;
-use webignition\WebResource\WebPage\WebPage;
 
 class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
 {
@@ -37,13 +34,8 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
      */
     public function testPerformNoChanges(callable $taskCreator)
     {
-        $testTaskFactory = self::$container->get(TestTaskFactory::class);
-        $sourceFactory = self::$container->get(SourceFactory::class);
-        $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
-        $cachedResourceManager = self::$container->get(CachedResourceManager::class);
-
         /* @var Task $task */
-        $task = $taskCreator($testTaskFactory, $sourceFactory, $cachedResourceFactory, $cachedResourceManager);
+        $task = $taskCreator();
 
         $taskState = $task->getState();
 
@@ -57,14 +49,19 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
     {
         return [
             'no sources' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+
                     return $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
                 },
             ],
             'no primary source' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
@@ -77,32 +74,22 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
                 },
             ],
             'invalid primary source, is cached resource' => [
-                'taskCreator' => function (
-                    TestTaskFactory $testTaskFactory,
-                    SourceFactory $sourceFactory,
-                    CachedResourceFactory $cachedResourceFactory,
-                    CachedResourceManager $cachedResourceManager
-                ): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
-
-                    /* @var WebPage $webPage */
-                    /** @noinspection PhpUnhandledExceptionInspection */
-                    $webPage = WebPage::createFromContent('non-empty content');
-
-                    $cachedResource = $cachedResourceFactory->createForTask('request_hash', $task, $webPage);
-                    $cachedResourceManager->persist($cachedResource);
-
-                    $task->addSource(
-                        $sourceFactory->fromCachedResource($cachedResource)
-                    );
+                    $testTaskFactory->addPrimaryCachedResourceSourceToTask($task, 'non-empty content');
 
                     return $task;
                 },
             ],
             'invalid primary source, is invalid content type' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
@@ -128,13 +115,8 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
      */
     public function testPerformSetsTaskAsFailed(callable $taskCreator, array $expectedOutput)
     {
-        $testTaskFactory = self::$container->get(TestTaskFactory::class);
-        $sourceFactory = self::$container->get(SourceFactory::class);
-        $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
-        $cachedResourceManager = self::$container->get(CachedResourceManager::class);
-
         /* @var Task $task */
-        $task = $taskCreator($testTaskFactory, $sourceFactory, $cachedResourceFactory, $cachedResourceManager);
+        $task = $taskCreator();
 
         $this->assertEquals(Task::STATE_QUEUED, $task->getState());
         $this->assertNull($task->getOutput());
@@ -154,7 +136,10 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
     {
         return [
             'redirect loop' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
@@ -189,7 +174,10 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
                 ],
             ],
             'redirect limit reached' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
@@ -224,7 +212,10 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
                 ],
             ],
             'curl 3' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
@@ -244,7 +235,10 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
                 ],
             ],
             'curl 6' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
@@ -264,7 +258,10 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
                 ],
             ],
             'curl 7' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
@@ -284,7 +281,10 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
                 ],
             ],
             'curl 28' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
@@ -304,7 +304,10 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
                 ],
             ],
             'http 404' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
@@ -324,7 +327,10 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
                 ],
             ],
             'http 500' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
@@ -344,7 +350,10 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
                 ],
             ],
             'unknown' => [
-                'taskCreator' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+                'taskCreator' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );

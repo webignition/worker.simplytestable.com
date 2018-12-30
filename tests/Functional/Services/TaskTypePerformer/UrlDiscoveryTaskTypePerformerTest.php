@@ -35,13 +35,12 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
         string $webPageContent,
         array $expectedDecodedOutput
     ) {
-        $task = $this->createTaskWithPrimarySource(
-            TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => TypeInterface::TYPE_URL_DISCOVERY,
-                'parameters' => json_encode($taskParameters),
-            ]),
-            $webPageContent
-        );
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_URL_DISCOVERY,
+            'parameters' => json_encode($taskParameters),
+        ]));
+
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $webPageContent);
 
         $this->taskTypePerformer->perform($task);
 

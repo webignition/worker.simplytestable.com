@@ -5,9 +5,6 @@ namespace App\Tests\Functional\Services;
 use App\Event\TaskEvent;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
-use App\Services\CachedResourceFactory;
-use App\Services\CachedResourceManager;
-use App\Services\RequestIdentifierFactory;
 use App\Services\SourceFactory;
 use App\Services\TaskPerformer;
 use App\Tests\Services\ObjectPropertySetter;
@@ -16,7 +13,6 @@ use App\Entity\Task\Task;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use webignition\WebResource\WebPage\WebPage;
 
 class TaskPerformerTest extends AbstractBaseTestCase
 {
@@ -88,29 +84,12 @@ class TaskPerformerTest extends AbstractBaseTestCase
             'html validation success' => [
                 'task' => function (): Task {
                     $testTaskFactory = self::$container->get(TestTaskFactory::class);
-                    $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
-                    $cachedResourceManager = self::$container->get(CachedResourceManager::class);
-                    $sourceFactory = self::$container->get(SourceFactory::class);
-                    $requestIdentiferFactory = self::$container->get(RequestIdentifierFactory::class);
 
-                    $task =  $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
-
-                    $requestIdentifer = $requestIdentiferFactory->createFromTask($task);
-
-                    /* @var WebPage $webPage */
-                    /** @noinspection PhpUnhandledExceptionInspection */
-                    $webPage = WebPage::createFromContent('<!doctype html><html><head></head><body></body>');
-
-                    $cachedResource = $cachedResourceFactory->createForTask(
-                        (string) $requestIdentifer,
+                    $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+                    $testTaskFactory->addPrimaryCachedResourceSourceToTask(
                         $task,
-                        $webPage
+                        '<!doctype html><html><head></head><body></body>'
                     );
-
-                    $cachedResourceManager->persist($cachedResource);
-
-                    $source = $sourceFactory->fromCachedResource($cachedResource);
-                    $task->addSource($source);
 
                     return $task;
                 },
