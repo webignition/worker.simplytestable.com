@@ -6,12 +6,12 @@ use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\Type;
-use App\Services\CachedResourceManager;
-use App\Services\RequestIdentifierFactory;
-use App\Services\SourceFactory;
+use App\Model\Task\TypeInterface;
 use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
+use App\Tests\Services\TestTaskFactory;
+use Doctrine\ORM\EntityManagerInterface;
 use webignition\WebResource\WebPage\WebPage;
 
 class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
@@ -91,32 +91,26 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
 
     public function testRetrieveValidCachedResource()
     {
-        $taskTypeService = self::$container->get(TaskTypeService::class);
-        $sourceFactory = self::$container->get(SourceFactory::class);
-        $requestIdentifierFactory = self::$container->get(RequestIdentifierFactory::class);
-        $cachedResourceManager = self::$container->get(CachedResourceManager::class);
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+        $entityManager = self::$container->get(EntityManagerInterface::class);
 
         $taskUrl = 'http://example.com';
         $webPageContent = 'web page content';
 
-        $task = Task::create(
-            $taskTypeService->get(Type::TYPE_HTML_VALIDATION),
-            $taskUrl
-        );
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'url' => $taskUrl,
+            'type' => TypeInterface::TYPE_HTML_VALIDATION,
+        ]));
+        $testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $webPageContent);
 
-        $requestIdentifier = $requestIdentifierFactory->createFromTask($task);
-        $cachedResource = CachedResource::create(
-            (string) $requestIdentifier,
-            $taskUrl,
-            'text/html',
-            $webPageContent
-        );
+        $primarySource = $task->getSources()[$taskUrl];
+        $requestHash = $primarySource->getValue();
 
-        $cachedResourceManager->persist($cachedResource);
+        /* @var CachedResource $cachedResource */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $cachedResource = $entityManager->find(CachedResource::class, $requestHash);
 
-        $source = $sourceFactory->fromCachedResource($cachedResource);
-
-        $task->addSource($source);
+        $this->assertEquals($webPageContent, stream_get_contents($cachedResource->getBody()));
 
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 

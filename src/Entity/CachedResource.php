@@ -79,6 +79,8 @@ class CachedResource
             $body = $this->createStreamFromString($body);
         }
 
+        rewind($body);
+
         return $body;
     }
 
@@ -91,7 +93,6 @@ class CachedResource
     {
         $stream = fopen('php://memory', 'r+');
         fwrite($stream, $content);
-        rewind($stream);
 
         return $stream;
     }
