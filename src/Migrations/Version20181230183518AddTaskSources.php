@@ -8,14 +8,14 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20181214112415AddCachedResourceContentType extends AbstractMigration
+final class Version20181230183518AddTaskSources extends AbstractMigration
 {
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE CachedResource ADD contentType LONGTEXT NOT NULL');
+        $this->addSql('ALTER TABLE Task ADD sources LONGTEXT NOT NULL COMMENT \'(DC2Type:array)\'');
     }
 
     public function down(Schema $schema) : void
@@ -23,6 +23,6 @@ final class Version20181214112415AddCachedResourceContentType extends AbstractMi
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE CachedResource DROP contentType');
+        $this->addSql('ALTER TABLE Task DROP sources');
     }
 }
