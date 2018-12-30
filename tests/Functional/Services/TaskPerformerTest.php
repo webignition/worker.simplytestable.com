@@ -5,16 +5,18 @@ namespace App\Tests\Functional\Services;
 use App\Event\TaskEvent;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
+use App\Services\CachedResourceFactory;
+use App\Services\CachedResourceManager;
+use App\Services\RequestIdentifierFactory;
 use App\Services\SourceFactory;
 use App\Services\TaskPerformer;
 use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
-use GuzzleHttp\Psr7\Response;
 use App\Entity\Task\Task;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
-use App\Tests\Services\HttpMockHandler;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use webignition\WebResource\WebPage\WebPage;
 
 class TaskPerformerTest extends AbstractBaseTestCase
 {
@@ -29,21 +31,6 @@ class TaskPerformerTest extends AbstractBaseTestCase
     private $taskPerformer;
 
     /**
-     * @var TestTaskFactory
-     */
-    private $testTaskFactory;
-
-    /**
-     * @var HttpMockHandler
-     */
-    private $httpMockHandler;
-
-    /**
-     * @var SourceFactory
-     */
-    private $sourceFactory;
-
-    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -51,9 +38,6 @@ class TaskPerformerTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->taskPerformer = self::$container->get(TaskPerformer::class);
-        $this->testTaskFactory = self::$container->get(TestTaskFactory::class);
-        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
-        $this->sourceFactory = self::$container->get(SourceFactory::class);
     }
 
     /**
@@ -69,8 +53,8 @@ class TaskPerformerTest extends AbstractBaseTestCase
         string $expectedFinishedStateName
     ) {
         /* @var Task $task */
-        $task = $taskCreator($this->testTaskFactory, $this->sourceFactory);
-        $setUp($this->httpMockHandler);
+        $task = $taskCreator();
+        $setUp();
 
         $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
         $eventDispatcher
@@ -101,40 +85,45 @@ class TaskPerformerTest extends AbstractBaseTestCase
     public function performDataProvider()
     {
         return [
-            'html validation success, no sources' => [
-                'task' => function (TestTaskFactory $testTaskFactory): Task {
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([])
+            'html validation success' => [
+                'task' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
+                    $cachedResourceManager = self::$container->get(CachedResourceManager::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+                    $requestIdentiferFactory = self::$container->get(RequestIdentifierFactory::class);
+
+                    $task =  $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+
+                    $requestIdentifer = $requestIdentiferFactory->createFromTask($task);
+
+                    /* @var WebPage $webPage */
+                    /** @noinspection PhpUnhandledExceptionInspection */
+                    $webPage = WebPage::createFromContent('<!doctype html><html><head></head><body></body>');
+
+                    $cachedResource = $cachedResourceFactory->createForTask(
+                        (string) $requestIdentifer,
+                        $task,
+                        $webPage
                     );
+
+                    $cachedResourceManager->persist($cachedResource);
+
+                    $source = $sourceFactory->fromCachedResource($cachedResource);
+                    $task->addSource($source);
+
+                    return $task;
                 },
-                'setUp' => function (HttpMockHandler $httpMockHandler) {
-                    $httpMockHandler->appendFixtures([
-                        new Response(200, ['content-type' => 'text/html']),
-                        new Response(
-                            200,
-                            ['content-type' => 'text/html'],
-                            '<!doctype html><html><head></head><body></body>'
-                        ),
-                    ]);
+                'setUp' => function () {
                     HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
                 },
                 'expectedFinishedStateName' => Task::STATE_COMPLETED,
             ],
-            'skipped, no sources' => [
-                'task' => function (TestTaskFactory $testTaskFactory): Task {
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([])
-                    );
-                },
-                'setUp' => function (HttpMockHandler $httpMockHandler) {
-                    $httpMockHandler->appendFixtures([
-                        new Response(200, ['content-type' => 'application/pdf']),
-                    ]);
-                },
-                'expectedFinishedStateName' => Task::STATE_SKIPPED,
-            ],
-            'skipped, has source' => [
-                'task' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
+            'html validation skipped' => [
+                'task' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
+
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults([])
                     );
@@ -152,24 +141,11 @@ class TaskPerformerTest extends AbstractBaseTestCase
                 },
                 'expectedFinishedStateName' => Task::STATE_SKIPPED,
             ],
-            'failed no retry available, no sources' => [
-                'task' => function (TestTaskFactory $testTaskFactory): Task {
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults([])
-                    );
-                },
-                'setUp' => function (HttpMockHandler $httpMockHandler) {
-                    $notFoundResponse = new Response(404);
+            'failed no retry available' => [
+                'task' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+                    $sourceFactory = self::$container->get(SourceFactory::class);
 
-                    $httpMockHandler->appendFixtures([
-                        $notFoundResponse,
-                        $notFoundResponse,
-                    ]);
-                },
-                'expectedFinishedStateName' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-            ],
-            'failed no retry available, has source' => [
-                'task' => function (TestTaskFactory $testTaskFactory, SourceFactory $sourceFactory): Task {
                     $task = $testTaskFactory->create(
                         TestTaskFactory::createTaskValuesFromDefaults([])
                     );

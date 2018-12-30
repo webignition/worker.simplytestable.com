@@ -8,16 +8,9 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\CachedResourceFactory;
-use App\Services\CachedResourceManager;
-use App\Services\RequestIdentifierFactory;
-use App\Services\SourceFactory;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
-use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
-use webignition\WebResource\WebPage\WebPage;
 
 class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -35,30 +28,12 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         $this->taskTypePerformer = self::$container->get(HtmlValidationTaskTypePerformer::class);
     }
 
-    protected function getTaskTypePerformer(): TaskPerformerInterface
-    {
-        return self::$container->get(HtmlValidationTaskTypePerformer::class);
-    }
-
-    protected function getTaskTypeString(): string
-    {
-        return TypeInterface::TYPE_HTML_VALIDATION;
-    }
-
     /**
      * @dataProvider badDocumentTypeDataProvider
      */
     public function testPerformBadDocumentType(string $content, array $expectedOutputMessage)
     {
-        $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults()
-        );
-
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            HtmlValidationTaskTypePerformer::class,
-            $task,
-            $content
-        );
+        $task = $this->createTaskWithPrimarySource(TestTaskFactory::createTaskValuesFromDefaults(), $content);
 
         $this->taskTypePerformer->perform($task);
 
@@ -126,17 +101,12 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
-        callable $taskCreator,
-        callable $setUp,
-        string $content,
         string $htmlValidatorOutput,
         string $expectedTaskState,
         int $expectedErrorCount,
         array $expectedDecodedOutput
     ) {
-        /* @var Task $task */
-        $task = $taskCreator($content);
-        $setUp($task, $content);
+        $task = $this->createTaskWithPrimarySource(TestTaskFactory::createTaskValuesFromDefaults(), '<!DOCTYPE html>');
 
         HtmlValidatorFixtureFactory::set($htmlValidatorOutput);
 
@@ -159,22 +129,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
     public function performSuccessDataProvider(): array
     {
         return [
-            'no errors, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults()
-                    );
-                },
-                'setUp' => function (Task $task, string $content) {
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        HtmlValidationTaskTypePerformer::class,
-                        $task,
-                        $content
-                    );
-                },
-                'content' => '<!DOCTYPE html>',
+            'no errors' => [
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('0-errors'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
@@ -182,63 +137,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                     'messages' => [],
                 ],
             ],
-            'no errors, has source' => [
-                'taskCreator' => function (string $content): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-                    $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
-                    $cachedResourceManager = self::$container->get(CachedResourceManager::class);
-
-                    $requestIdentiferFactory = new RequestIdentifierFactory();
-                    $sourceFactory = new SourceFactory();
-
-                    $task =  $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults()
-                    );
-
-                    $requestIdentifer = $requestIdentiferFactory->createFromTask($task);
-
-                    /* @var WebPage $webPage */
-                    $webPage = WebPage::createFromContent($content);
-
-                    $cachedResource = $cachedResourceFactory->createForTask(
-                        (string) $requestIdentifer,
-                        $task,
-                        $webPage
-                    );
-
-                    $cachedResourceManager->persist($cachedResource);
-
-                    $source = $sourceFactory->fromCachedResource($cachedResource);
-                    $task->addSource($source);
-
-                    return $task;
-                },
-                'setUp' => function () {
-                },
-                'content' => '<!DOCTYPE html>',
-                'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('0-errors'),
-                'expectedTaskState' => Task::STATE_COMPLETED,
-                'expectedErrorCount' => 0,
-                'expectedDecodedOutput' => [
-                    'messages' => [],
-                ],
-            ],
-            'one error, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults()
-                    );
-                },
-                'setUp' => function (Task $task, string $content) {
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        HtmlValidationTaskTypePerformer::class,
-                        $task,
-                        $content
-                    );
-                },
-                'content' => '<!DOCTYPE html>',
+            'one error' => [
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('1-error'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
@@ -255,22 +154,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                     ],
                 ],
             ],
-            'three errors, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults()
-                    );
-                },
-                'setUp' => function (Task $task, string $content) {
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        HtmlValidationTaskTypePerformer::class,
-                        $task,
-                        $content
-                    );
-                },
-                'content' => '<!DOCTYPE html>',
+            'three errors' => [
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('3-errors'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 3,
@@ -303,22 +187,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                     ],
                 ],
             ],
-            'internal software error, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults()
-                    );
-                },
-                'setUp' => function (Task $task, string $content) {
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        HtmlValidationTaskTypePerformer::class,
-                        $task,
-                        $content
-                    );
-                },
-                'content' => '<!DOCTYPE html>',
+            'internal software error' => [
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('internal-software-error'),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 0,
@@ -332,22 +201,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                     ],
                 ],
             ],
-            'invalid character encoding, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults()
-                    );
-                },
-                'setUp' => function (Task $task, string $content) {
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        HtmlValidationTaskTypePerformer::class,
-                        $task,
-                        $content
-                    );
-                },
-                'content' => '<!DOCTYPE html>',
+            'invalid character encoding' => [
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('invalid-character-encoding-error'),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
@@ -372,22 +226,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
                     ],
                 ],
             ],
-            'css validation errors only, ignored, no sources' => [
-                'taskCreator' => function (): Task {
-                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
-
-                    return $testTaskFactory->create(
-                        TestTaskFactory::createTaskValuesFromDefaults()
-                    );
-                },
-                'setUp' => function (Task $task, string $content) {
-                    $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-                        HtmlValidationTaskTypePerformer::class,
-                        $task,
-                        $content
-                    );
-                },
-                'content' => '<!DOCTYPE html>',
+            'css validation errors only, ignored' => [
                 'htmlValidatorOutput' => HtmlValidatorFixtureFactory::load('css-errors-only'),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
@@ -407,21 +246,14 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         $content = '<!doctype html>';
 
         if (!$fileExists) {
-            unlink($tmpFilePath);
+            @unlink($tmpFilePath);
         } else {
             file_put_contents($tmpFilePath, $content);
         }
 
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], $content),
-        ]);
-
         HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
 
-        $task = $this->testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults()
-        );
+        $task = $this->createTaskWithPrimarySource(TestTaskFactory::createTaskValuesFromDefaults(), $content);
 
         $this->taskTypePerformer->perform($task);
     }

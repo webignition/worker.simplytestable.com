@@ -5,15 +5,10 @@ namespace App\Services\TaskTypePerformer;
 use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\HttpClientConfigurationService;
 use App\Services\TaskCachedSourceWebPageRetriever;
-use App\Services\TaskPerformerTaskOutputMutator;
-use App\Services\TaskPerformerWebPageRetriever;
 use webignition\HtmlValidator\Output\Parser\Configuration as HtmlValidatorOutputParserConfiguration;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
-use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
-use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
 use webignition\HtmlDocumentType\Validator as DoctypeValidator;
@@ -23,25 +18,6 @@ class HtmlValidationTaskTypePerformer implements TaskPerformerInterface
 {
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
-
-    const CURL_CODE_INVALID_URL = 3;
-    const CURL_CODE_TIMEOUT = 28;
-    const CURL_CODE_DNS_LOOKUP_FAILURE = 6;
-
-    /**
-     * @var HttpClientConfigurationService
-     */
-    private $httpClientConfigurationService;
-
-    /**
-     * @var TaskPerformerWebPageRetriever
-     */
-    private $taskPerformerWebPageRetriever;
-
-    /**
-     * @var TaskPerformerTaskOutputMutator
-     */
-    private $taskPerformerTaskOutputMutator;
 
     /**
      * @var TaskCachedSourceWebPageRetriever
@@ -64,17 +40,11 @@ class HtmlValidationTaskTypePerformer implements TaskPerformerInterface
     private $priority;
 
     public function __construct(
-        HttpClientConfigurationService $httpClientConfigurationService,
-        TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
-        TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         HtmlValidatorWrapper $htmlValidatorWrapper,
         string $validatorPath,
         int $priority
     ) {
-        $this->httpClientConfigurationService = $httpClientConfigurationService;
-        $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
-        $this->taskPerformerTaskOutputMutator = $taskPerformerTaskOutputMutator;
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
 
         $this->htmlValidatorWrapper = $htmlValidatorWrapper;
@@ -82,34 +52,9 @@ class HtmlValidationTaskTypePerformer implements TaskPerformerInterface
         $this->priority = $priority;
     }
 
-    /**
-     * @param Task $task
-     *
-     * @return null
-     *
-     * @throws InternetMediaTypeParseException
-     * @throws TransportException
-     */
     public function perform(Task $task)
     {
-        $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
-
-        if (empty($webPage)) {
-            $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
-
-            $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
-            $task->setState($result->getTaskState());
-
-            if (!$task->isIncomplete()) {
-                $this->taskPerformerTaskOutputMutator->mutate($task, $result->getTaskOutputValues());
-
-                return null;
-            }
-
-            $webPage = $result->getWebPage();
-        }
-
-        return $this->performValidation($task, $webPage);
+        return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
     }
 
     public function handles(string $taskType): bool
