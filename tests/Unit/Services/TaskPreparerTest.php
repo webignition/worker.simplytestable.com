@@ -3,7 +3,6 @@
 namespace App\Tests\Unit\Services;
 
 use App\Entity\Task\Task;
-use App\Event\TaskEvent;
 use App\Model\Task\Type;
 use App\Model\TaskPreparerCollection;
 use App\Services\TaskPreparer;
@@ -21,10 +20,16 @@ class TaskPreparerTest extends \PHPUnit\Framework\TestCase
 
         $entityManager = $this->createEntityManager([
             Task::STATE_PREPARING,
+            Task::STATE_PREPARED,
         ]);
 
         /* @var EventDispatcherInterface|MockInterface $eventDispatcher */
         $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
+        $eventDispatcher
+            ->shouldReceive('dispatch')
+            ->withArgs(function () {
+                return true;
+            });
 
         /* @var TaskPreparerInterface|MockInterface $taskTypePreparer */
         $taskTypePreparer = \Mockery::mock(TaskPreparerInterface::class);
@@ -50,36 +55,6 @@ class TaskPreparerTest extends \PHPUnit\Framework\TestCase
         $taskPreparer->prepare($task);
 
         $this->assertTrue(true);
-    }
-
-    public function testStateProgression()
-    {
-        $task = Task::create(new Type(Type::TYPE_HTML_VALIDATION, true, null), 'http://example.com');
-
-        $entityManager = $this->createEntityManager([
-            Task::STATE_PREPARING,
-            Task::STATE_PREPARED,
-        ]);
-
-        /* @var EventDispatcherInterface|MockInterface $eventDispatcher */
-        $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
-
-        $taskTypePreparerFactory = $this->createTaskTypePreparerFactory($task, new TaskPreparerCollection([]));
-
-        $eventDispatcher
-            ->shouldReceive('dispatch')
-            ->once()
-            ->withArgs(function (string $eventName, TaskEvent $taskEvent) use ($task) {
-                $this->assertSame(TaskEvent::TYPE_PREPARED, $eventName);
-                $this->assertSame($task, $taskEvent->getTask());
-
-                return true;
-            });
-
-        $taskPreparer = new TaskPreparer($entityManager, $taskTypePreparerFactory, $eventDispatcher);
-        $taskPreparer->prepare($task);
-
-        $this->addToAssertionCount(\Mockery::getContainer()->mockery_getExpectationCount());
     }
 
     private function createEntityManager(array $persistCallExpectedStates): EntityManagerInterface
