@@ -65,12 +65,6 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             $webPageContent
         );
 
-        $this->setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-            CssValidationTaskTypePerformer::class,
-            $task,
-            $webPageContent
-        );
-
         CssValidatorFixtureFactory::set($cssValidatorOutput);
 
         $this->taskTypePerformer->perform($task);
@@ -259,10 +253,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             new Response(200, ['content-type' => 'text/css']),
         ];
 
-        $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/css']),
-            new Response(200, ['content-type' => 'text/css']),
-        ]);
+        $this->httpMockHandler->appendFixtures($httpFixtures);
 
         $task = $this->createTaskWithPrimarySource(
             TestTaskFactory::createTaskValuesFromDefaults([

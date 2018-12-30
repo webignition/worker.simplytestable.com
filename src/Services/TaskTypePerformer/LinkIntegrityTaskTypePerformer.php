@@ -11,11 +11,7 @@ use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
 use App\Services\TaskCachedSourceWebPageRetriever;
-use App\Services\TaskPerformerTaskOutputMutator;
-use App\Services\TaskPerformerWebPageRetriever;
-use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\InternetMediaType\InternetMediaType;
-use webignition\WebResource\Exception\TransportException;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkFinderConfiguration;
@@ -34,16 +30,6 @@ class LinkIntegrityTaskTypePerformer implements TaskPerformerInterface
      * @var HttpClientConfigurationService
      */
     private $httpClientConfigurationService;
-
-    /**
-     * @var TaskPerformerWebPageRetriever
-     */
-    private $taskPerformerWebPageRetriever;
-
-    /**
-     * @var TaskPerformerTaskOutputMutator
-     */
-    private $taskPerformerTaskOutputMutator;
 
     /**
      * @var TaskCachedSourceWebPageRetriever
@@ -68,8 +54,6 @@ class LinkIntegrityTaskTypePerformer implements TaskPerformerInterface
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
-        TaskPerformerWebPageRetriever $taskPerformerWebPageRetriever,
-        TaskPerformerTaskOutputMutator $taskPerformerTaskOutputMutator,
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory,
         HttpRetryMiddleware $httpRetryMiddleware,
@@ -77,8 +61,6 @@ class LinkIntegrityTaskTypePerformer implements TaskPerformerInterface
     ) {
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
-        $this->taskPerformerWebPageRetriever = $taskPerformerWebPageRetriever;
-        $this->taskPerformerTaskOutputMutator = $taskPerformerTaskOutputMutator;
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
 
         $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
@@ -86,34 +68,11 @@ class LinkIntegrityTaskTypePerformer implements TaskPerformerInterface
         $this->priority = $priority;
     }
 
-    /**
-     * @param Task $task
-     *
-     * @return null
-     *
-     * @throws InternetMediaTypeParseException
-     * @throws TransportException
-     */
     public function perform(Task $task)
     {
-        $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
+        $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
-        if (empty($webPage)) {
-            $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
-
-            $result = $this->taskPerformerWebPageRetriever->retrieveWebPage($task);
-            $task->setState($result->getTaskState());
-
-            if (!$task->isIncomplete()) {
-                $this->taskPerformerTaskOutputMutator->mutate($task, $result->getTaskOutputValues());
-
-                return null;
-            }
-
-            $webPage = $result->getWebPage();
-        }
-
-        return $this->performValidation($task, $webPage);
+        return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
     }
 
     public function handles(string $taskType): bool
