@@ -8,7 +8,6 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
@@ -27,16 +26,6 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
     {
         parent::setUp();
         $this->taskTypePerformer = self::$container->get(HtmlValidationTaskTypePerformer::class);
-    }
-
-    protected function getTaskTypePerformer(): TaskPerformerInterface
-    {
-        return self::$container->get(HtmlValidationTaskTypePerformer::class);
-    }
-
-    protected function getTaskTypeString(): string
-    {
-        return TypeInterface::TYPE_HTML_VALIDATION;
     }
 
     /**

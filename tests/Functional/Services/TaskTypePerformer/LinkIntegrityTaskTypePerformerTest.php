@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory;
@@ -31,16 +30,6 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->taskTypePerformer = self::$container->get(LinkIntegrityTaskTypePerformer::class);
     }
 
-    protected function getTaskTypePerformer(): TaskPerformerInterface
-    {
-        return self::$container->get(LinkIntegrityTaskTypePerformer::class);
-    }
-
-    protected function getTaskTypeString(): string
-    {
-        return TypeInterface::TYPE_LINK_INTEGRITY;
-    }
-
     /**
      * @dataProvider performSuccessDataProvider
      */
@@ -57,7 +46,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $task = $this->createTaskWithPrimarySource(
             TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
+                'type' => TypeInterface::TYPE_LINK_INTEGRITY,
                 'parameters' => json_encode($taskParameters),
             ]),
             $webPageContent
@@ -197,7 +186,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $task = $this->createTaskWithPrimarySource(
             TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
+                'type' => TypeInterface::TYPE_LINK_INTEGRITY,
                 'parameters' => json_encode($taskParameters)
             ]),
             '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'
@@ -223,7 +212,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $task = $this->createTaskWithPrimarySource(
             TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
+                'type' => TypeInterface::TYPE_LINK_INTEGRITY,
                 'parameters' => json_encode($taskParameters)
             ]),
             '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>'

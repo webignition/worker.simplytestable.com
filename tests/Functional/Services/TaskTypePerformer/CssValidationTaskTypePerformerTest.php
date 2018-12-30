@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\CssValidationTaskTypePerformer;
@@ -32,16 +31,6 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->taskTypePerformer = self::$container->get(CssValidationTaskTypePerformer::class);
     }
 
-    protected function getTaskTypePerformer(): TaskPerformerInterface
-    {
-        return self::$container->get(CssValidationTaskTypePerformer::class);
-    }
-
-    protected function getTaskTypeString(): string
-    {
-        return TypeInterface::TYPE_CSS_VALIDATION;
-    }
-
     /**
      * @dataProvider performSuccessDataProvider
      */
@@ -59,7 +48,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $task = $this->createTaskWithPrimarySource(
             TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
+                'type' => TypeInterface::TYPE_CSS_VALIDATION,
                 'parameters' => json_encode($taskParameters),
             ]),
             $webPageContent
@@ -257,7 +246,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $task = $this->createTaskWithPrimarySource(
             TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
+                'type' => TypeInterface::TYPE_CSS_VALIDATION,
                 'parameters' => json_encode($taskParameters)
             ]),
             HtmlDocumentFactory::load('empty-body-single-css-link')
@@ -286,7 +275,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $task = $this->createTaskWithPrimarySource(
             TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
+                'type' => TypeInterface::TYPE_CSS_VALIDATION,
                 'parameters' => json_encode($taskParameters)
             ]),
             HtmlDocumentFactory::load('empty-body-single-css-link')

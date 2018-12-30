@@ -4,18 +4,13 @@
 namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Entity\Task\Task;
-use App\Model\TaskPerformerWebPageRetrieverResult;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\RequestIdentifierFactory;
 use App\Services\SourceFactory;
-use App\Services\TaskPerformerWebPageRetriever;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
-use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
-use GuzzleHttp\Psr7\Uri;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 use webignition\WebResource\WebPage\WebPage;
 
@@ -47,9 +42,6 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
-
-    abstract protected function getTaskTypePerformer(): TaskPerformerInterface;
-    abstract protected function getTaskTypeString():string;
 
     public function cookiesDataProvider(): array
     {
@@ -143,34 +135,6 @@ abstract class AbstractWebPageTaskTypePerformerTest extends AbstractBaseTestCase
             $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
             $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
         }
-    }
-
-    protected function setSuccessfulTaskPerformerWebPageRetrieverOnTaskPerformer(
-        string $performerClass,
-        Task $task,
-        string $content
-    ) {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        /* @var WebPage $webPage */
-        $webPage = WebPage::createFromContent($content);
-        $webPage = $webPage->setUri(new Uri($task->getUrl()));
-
-        $taskPerformerWebPageRetrieverResult = new TaskPerformerWebPageRetrieverResult();
-        $taskPerformerWebPageRetrieverResult->setWebPage($webPage);
-        $taskPerformerWebPageRetrieverResult->setTaskState($task->getState());
-
-        $taskPerformerWebPageRetriever = \Mockery::mock(TaskPerformerWebPageRetriever::class);
-        $taskPerformerWebPageRetriever
-            ->shouldReceive('retrieveWebPage')
-            ->with($task)
-            ->andReturn($taskPerformerWebPageRetrieverResult);
-
-        ObjectPropertySetter::setProperty(
-            $this->getTaskTypePerformer(),
-            $performerClass,
-            'taskPerformerWebPageRetriever',
-            $taskPerformerWebPageRetriever
-        );
     }
 
     protected function createTaskWithPrimarySource(array $taskValues, string $webPageContent): Task

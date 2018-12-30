@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer;
 use App\Tests\Factory\HtmlDocumentFactory;
@@ -28,16 +27,6 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
         $this->taskTypePerformer = self::$container->get(UrlDiscoveryTaskTypePerformer::class);
     }
 
-    protected function getTaskTypePerformer(): TaskPerformerInterface
-    {
-        return self::$container->get(UrlDiscoveryTaskTypePerformer::class);
-    }
-
-    protected function getTaskTypeString(): string
-    {
-        return TypeInterface::TYPE_URL_DISCOVERY;
-    }
-
     /**
      * @dataProvider performSuccessDataProvider
      */
@@ -48,7 +37,7 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
     ) {
         $task = $this->createTaskWithPrimarySource(
             TestTaskFactory::createTaskValuesFromDefaults([
-                'type' => $this->getTaskTypeString(),
+                'type' => TypeInterface::TYPE_URL_DISCOVERY,
                 'parameters' => json_encode($taskParameters),
             ]),
             $webPageContent
