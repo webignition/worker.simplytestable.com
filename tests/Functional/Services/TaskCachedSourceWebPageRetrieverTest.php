@@ -121,6 +121,7 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 
         $this->assertInstanceOf(WebPage::class, $webPage);
+        $this->assertEquals($taskUrl, (string) $webPage->getUri());
         $this->assertEquals($webPageContent, $webPage->getContent());
     }
 }

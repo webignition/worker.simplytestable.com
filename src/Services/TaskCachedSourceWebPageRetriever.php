@@ -3,7 +3,10 @@
 namespace App\Services;
 
 use App\Entity\Task\Task;
+use GuzzleHttp\Psr7\Uri;
+use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\WebPage\WebPage;
+use webignition\WebResource\WebResourceProperties;
 
 class TaskCachedSourceWebPageRetriever
 {
@@ -26,9 +29,16 @@ class TaskCachedSourceWebPageRetriever
                 $cachedResource = $this->cachedResourceManager->find($requestHash);
 
                 if ($cachedResource) {
+//                    $webPage = new WebPage(WebResourceProperties::create([
+//                        WebResourceProperties::ARG_CONTENT_TYPE => new InternetMediaType('text', 'html'),
+//                        WebResourceProperties::ARG_CONTENT => stream_get_contents($cachedResource->getBody()),
+//                        WebResourceProperties::ARG_URI => $task->getUrl(),
+//                    ]));
+
                     /* @var WebPage $webPage */
                     /** @noinspection PhpUnhandledExceptionInspection */
                     $webPage = WebPage::createFromContent(stream_get_contents($cachedResource->getBody()));
+                    $webPage = $webPage->setUri(new Uri($task->getUrl()));
 
                     return $webPage;
                 }
