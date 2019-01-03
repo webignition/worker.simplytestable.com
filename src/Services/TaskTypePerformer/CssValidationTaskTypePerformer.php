@@ -8,11 +8,10 @@ use App\Model\Task\TypeInterface;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\TaskCachedSourceWebPageRetriever;
-use webignition\CssValidatorOutput\CssValidatorOutput;
-use webignition\CssValidatorOutput\Message\AbstractMessage as CssValidatorOutputMessage;
-use webignition\CssValidatorOutput\Message\AbstractMessage;
-use webignition\CssValidatorOutput\Message\Error as CssValidatorOutputError;
-use webignition\CssValidatorOutput\Message\Factory as CssValidatorOutputMessageFactory;
+use webignition\CssValidatorOutput\Model\AbstractIssueMessage;
+use webignition\CssValidatorOutput\Model\ExceptionOutput;
+use webignition\CssValidatorOutput\Model\ValidationOutput as CssValidatorOutput;
+use webignition\CssValidatorOutput\Model\ValidationOutput;
 use webignition\CssValidatorOutput\Parser\InvalidValidatorOutputException;
 use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
@@ -23,6 +22,8 @@ use webignition\WebResource\WebPage\WebPage;
 class CssValidationTaskTypePerformer implements TaskPerformerInterface
 {
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
+    const HTTP_ERROR_TITLE_PREFIX = 'http-error:';
+    const CURL_ERROR_TITLE_PREFIX = 'curl-error:';
 
     /**
      * @var HttpClientService
@@ -118,7 +119,7 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
         $this->cssValidatorWrapper->setHttpClient($this->httpClientService->getHttpClient());
         $cssValidatorOutput = $this->cssValidatorWrapper->validate($cssValidatorWrapperConfiguration);
 
-        if ($cssValidatorOutput->hasException()) {
+        if ($cssValidatorOutput->isExceptionOutput()) {
             // Will only get unknown CSS validator exceptions here
             return $this->setTaskOutputAndState(
                 $task,
@@ -131,72 +132,41 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
             );
         }
 
+        /* @var ValidationOutput $cssValidatorOutput */
+
         return $this->setTaskOutputAndState(
             $task,
             json_encode($this->prepareCssValidatorOutput($cssValidatorOutput)),
             Task::STATE_COMPLETED,
-            $cssValidatorOutput->getErrorCount(),
-            $cssValidatorOutput->getWarningCount()
+            $cssValidatorOutput->getMessages()->getErrorCount(),
+            $cssValidatorOutput->getMessages()->getWarningCount()
         );
     }
 
     private function prepareCssValidatorOutput(CssValidatorOutput $cssValidatorOutput): array
     {
         $serializableMessages = [];
-        $messages = $cssValidatorOutput->getMessages();
+        $messageList = $cssValidatorOutput->getMessages();
 
-        foreach ($messages as $index => $message) {
-            /* @var CssValidatorOutputMessage $message */
-
+        foreach ($messageList->getMessages() as $index => $message) {
+            /* @var AbstractIssueMessage $message */
             if ($message->isError()) {
-                /* @var $message CssValidatorOutputError */
-                if ($this->isCssValidatorHttpError($message)) {
-                    $modifiedMessageData = array_merge($message->jsonSerialize(), [
-                        AbstractMessage::KEY_MESSAGE =>
-                            'http-retrieval-' . $this->getCssValidatorHttpErrorStatusCode($message),
-                    ]);
-
-                    $message = CssValidatorOutputMessageFactory::createFromArray($modifiedMessageData);
-                }
-
-                if ($this->isCssValidatorCurlError($message)) {
-                    $modifiedMessageData = array_merge($message->jsonSerialize(), [
-                        AbstractMessage::KEY_MESSAGE =>
-                            'http-retrieval-curl-code-' . $this->getCssValidatorCurlErrorCode($message)
-                    ]);
-
-                    $message = CssValidatorOutputMessageFactory::createFromArray($modifiedMessageData);
+                if (ExceptionOutput::TYPE_HTTP === $message->getTitle()) {
+                    $message = $message->withTitle('http-retrieval-' . $message->getContext());
+                    $message = $message->withContext('');
+                } elseif (ExceptionOutput::TYPE_CURL === $message->getTitle()) {
+                    $message = $message->withTitle('http-retrieval-curl-code-' . $message->getContext());
+                    $message = $message->withContext('');
+                } elseif ('invalid-content-type' === $message->getTitle()) {
+                    $message = $message->withTitle('invalid-content-type:' . $message->getContext());
+                    $message = $message->withContext('');
                 }
             }
 
-            $serializableMessages[] = $message->jsonSerialize();
+            $serializableMessages[] = $message;
         }
 
         return $serializableMessages;
-    }
-
-    private function isCssValidatorHttpError(CssValidatorOutputError $error): bool
-    {
-        $message = $error->getMessage();
-
-        return substr($message, 0, strlen('http-error:')) === 'http-error:';
-    }
-
-    private function isCssValidatorCurlError(CssValidatorOutputError $error): bool
-    {
-        $message = $error->getMessage();
-
-        return substr($message, 0, strlen('curl-error:')) === 'curl-error:';
-    }
-
-    private function getCssValidatorHttpErrorStatusCode(CssValidatorOutputError $error): int
-    {
-        return (int)str_replace('http-error:', '', $error->getMessage());
-    }
-
-    private function getCssValidatorCurlErrorCode(CssValidatorOutputError $error): int
-    {
-        return (int)str_replace('curl-error:', '', $error->getMessage());
     }
 
     private function getUnknownExceptionErrorOutput(Task $task): array

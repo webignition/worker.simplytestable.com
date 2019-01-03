@@ -338,6 +338,9 @@
     "webignition/character-set-list": {
         "version": "0.2.1"
     },
+    "webignition/css-validator-output-models": {
+        "version": "0.9"
+    },
     "webignition/css-validator-output-parser": {
         "version": "3.2"
     },
