@@ -47,6 +47,8 @@ class PerformCommandTest extends AbstractBaseTestCase
         array $httpFixtures,
         array $taskValues,
         string $primarySourceContent,
+        string $expectedTaskState,
+        int $expectedErrorCount,
         array $expectedDecodedOutput
     ) {
         $setUp();
@@ -74,11 +76,11 @@ class PerformCommandTest extends AbstractBaseTestCase
         );
 
         $this->assertEquals(0, $returnCode);
-        $this->assertEquals(Task::STATE_COMPLETED, $task->getState());
+        $this->assertEquals($expectedTaskState, $task->getState());
 
         $output = $task->getOutput();
         $this->assertInstanceOf(Output::class, $output);
-        $this->assertEquals(0, $output->getErrorCount());
+        $this->assertEquals($expectedErrorCount, $output->getErrorCount());
         $this->assertEquals(0, $output->getWarningCount());
         $this->assertEquals('application/json', $output->getContentType());
         $this->assertEquals($expectedDecodedOutput, json_decode($output->getOutput(), true));
@@ -108,8 +110,34 @@ class PerformCommandTest extends AbstractBaseTestCase
                     'type' => TypeInterface::TYPE_HTML_VALIDATION,
                 ]),
                 'primarySourceContent' => '<!doctype html>',
+                'expectedTaskState' => Task::STATE_COMPLETED,
+                'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
                     'messages' => [],
+                ],
+            ],
+            'html validation, invalid character encoding' => [
+                'setUp' => function () {
+                    HtmlValidatorFixtureFactory::set(
+                        HtmlValidatorFixtureFactory::load('0-errors')
+                    );
+                },
+                'httpFixtures' => [],
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'url' => 'http://example.com/',
+                    'type' => TypeInterface::TYPE_HTML_VALIDATION,
+                ]),
+                'primarySourceContent' => "\xc3\x28",
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
+                'expectedErrorCount' => 1,
+                'expectedDecodedOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'utf-8',
+                            'messageId' => 'invalid-character-encoding',
+                            'type' => 'error',
+                        ],
+                    ],
                 ],
             ],
             'css validation' => [
@@ -127,6 +155,8 @@ class PerformCommandTest extends AbstractBaseTestCase
                     'type' => TypeInterface::TYPE_CSS_VALIDATION,
                 ]),
                 'primarySourceContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                'expectedTaskState' => Task::STATE_COMPLETED,
+                'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
             'link integrity' => [
@@ -144,6 +174,8 @@ class PerformCommandTest extends AbstractBaseTestCase
                 ]),
                 'primarySourceContent' =>
                     '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
+                'expectedTaskState' => Task::STATE_COMPLETED,
+                'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
                     [
                         'context' => '<a href="/foo"></a>',
@@ -163,6 +195,8 @@ class PerformCommandTest extends AbstractBaseTestCase
                 ]),
                 'primarySourceContent' =>
                     '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
+                'expectedTaskState' => Task::STATE_COMPLETED,
+                'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
                     'http://example.com/foo',
                 ],
