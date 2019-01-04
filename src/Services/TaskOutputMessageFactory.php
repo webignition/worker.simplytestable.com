@@ -61,6 +61,13 @@ class TaskOutputMessageFactory
         ]);
     }
 
+    public function createInvalidCharacterEncodingOutput(string $encoding)
+    {
+        return $this->createOutputMessageCollection([
+            $this->createOutputMessage($encoding, 'invalid-character-encoding'),
+        ]);
+    }
+
     private function createOutputMessageCollection(array $messages): array
     {
         return [
