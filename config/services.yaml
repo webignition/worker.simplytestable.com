@@ -212,3 +212,13 @@ services:
     App\Services\TaskTypePerformer\WebPageTaskFailedSourceExaminer:
       arguments:
         $priority:  '%web_page_task_failed_source_examiner_priority%'
+
+    webignition\InternetMediaType\Parser\Parser:
+      class: webignition\InternetMediaType\Parser\Parser
+      calls:
+        - method: setIgnoreInvalidAttributes
+          arguments:
+              - true
+        - method: setAttemptToRecoverFromInvalidInternalCharacter
+          arguments:
+              - true

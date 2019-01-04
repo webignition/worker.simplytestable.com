@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace App\Tests\Functional\Services;
 
@@ -10,6 +12,7 @@ use App\Model\Task\TypeInterface;
 use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
+use App\Tests\Services\ContentTypeFactory;
 use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use webignition\WebResource\WebPage\WebPage;
@@ -89,19 +92,24 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
         $this->assertNull($this->taskCachedSourceWebPageRetriever->retrieve($task));
     }
 
-    public function testRetrieveValidCachedResource()
+    /**
+     * @dataProvider retrieveValidCachedResourceDataProvider
+     */
+    public function testRetrieveValidCachedResource(string $webPageContent, string $contentTypeString)
     {
         $testTaskFactory = self::$container->get(TestTaskFactory::class);
         $entityManager = self::$container->get(EntityManagerInterface::class);
+        $contentTypeFactory = self::$container->get(ContentTypeFactory::class);
 
         $taskUrl = 'http://example.com';
-        $webPageContent = 'web page content';
 
         $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
             'url' => $taskUrl,
             'type' => TypeInterface::TYPE_HTML_VALIDATION,
         ]));
-        $testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $webPageContent);
+
+        $contentType = $contentTypeFactory->createContentType($contentTypeString);
+        $testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $webPageContent, $contentType);
 
         $primarySource = $task->getSources()[$taskUrl];
         $requestHash = $primarySource->getValue();
@@ -117,5 +125,20 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
         $this->assertInstanceOf(WebPage::class, $webPage);
         $this->assertEquals($taskUrl, (string) $webPage->getUri());
         $this->assertEquals($webPageContent, $webPage->getContent());
+        $this->assertEquals($contentType, $webPage->getContentType());
+    }
+
+    public function retrieveValidCachedResourceDataProvider(): array
+    {
+        return [
+            'default text/html content type' => [
+                'webPageContent' => 'web page content',
+                'contentTypeString' => 'text/html',
+            ],
+            'text/html content type with character set attribute' => [
+                'webPageContent' => 'web page content',
+                'contentTypeString' => 'text/html; charset=utf-8',
+            ],
+        ];
     }
 }
