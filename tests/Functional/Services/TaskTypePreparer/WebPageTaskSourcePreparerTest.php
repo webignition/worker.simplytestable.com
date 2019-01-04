@@ -13,6 +13,7 @@ use App\Services\TaskTypePreparer\WebPageTaskSourcePreparer;
 use App\Services\TaskTypeService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
+use App\Tests\Services\ContentTypeFactory;
 use App\Tests\Services\HttpMockHandler;
 use App\Tests\UnhandledGuzzleException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -113,11 +114,14 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         ];
     }
 
-    public function testPrepareSuccessNoPreExistingCachedResource()
+    /**
+     * @dataProvider prepareSuccessNoPreExistingCachedResourceDataProvider
+     */
+    public function testPrepareSuccessNoPreExistingCachedResource(string $contentType)
     {
         $this->httpMockHandler->appendFixtures([
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], 'html content'),
+            new Response(200, ['content-type' => $contentType]),
+            new Response(200, ['content-type' => $contentType], 'html content'),
         ]);
 
         $taskTypeService = self::$container->get(TaskTypeService::class);
@@ -135,6 +139,8 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
             'url' => $url,
         ]);
 
+        $this->assertEquals($contentType, (string) $cachedResource->getContentType());
+
         $expectedSource = $this->sourceFactory->fromCachedResource($cachedResource);
 
         $this->assertEquals(
@@ -143,6 +149,21 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
             ],
             $task->getSources()
         );
+    }
+
+    public function prepareSuccessNoPreExistingCachedResourceDataProvider(): array
+    {
+        return [
+            'text/html' => [
+                'contentType' => 'text/html',
+            ],
+            'text/html; charset=utf-8' => [
+                'contentType' => 'text/html; charset=utf-8',
+            ],
+            'text/html; charset=windows-1251' => [
+                'contentType' => 'text/html; charset=windows-1251',
+            ],
+        ];
     }
 
     public function testPrepareSuccessHasPreExistingCachedResource()
