@@ -23,6 +23,7 @@ parameters:
   web_page_task_source_preparer_priority: 100
   web_page_task_invalid_source_examiner_priority: 200
   web_page_task_failed_source_examiner_priority: 190
+  web_page_task_content_encoding_examiner_priority: 180
 
 services:
     # default configuration for services in *this* file
@@ -93,6 +94,7 @@ services:
           - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\WebPageTaskInvalidSourceExaminer'
           - '@App\Services\TaskTypePerformer\WebPageTaskFailedSourceExaminer'
+          - '@App\Services\TaskTypePerformer\WebPageTaskContentEncodingExaminer'
 
     App\Services\TasksService:
       public: true
@@ -212,6 +214,11 @@ services:
     App\Services\TaskTypePerformer\WebPageTaskFailedSourceExaminer:
       arguments:
         $priority:  '%web_page_task_failed_source_examiner_priority%'
+
+    App\Services\TaskTypePerformer\WebPageTaskContentEncodingExaminer:
+      arguments:
+        $priority:  '%web_page_task_content_encoding_examiner_priority%'
+
 
     webignition\InternetMediaType\Parser\Parser:
       class: webignition\InternetMediaType\Parser\Parser
