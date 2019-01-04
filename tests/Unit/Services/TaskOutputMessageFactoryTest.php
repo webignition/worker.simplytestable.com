@@ -115,6 +115,18 @@ class TaskOutputMessageFactoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    public function testCreateInvalidCharacterEncodingOutput()
+    {
+        $encoding = 'utf-8';
+
+        $httpHistoryContainer = \Mockery::mock(HttpHistoryContainer::class);
+        $factory = new TaskOutputMessageFactory($httpHistoryContainer);
+
+        $output = $factory->createInvalidCharacterEncodingOutput($encoding);
+
+        $this->assertSingleMessagOutputMessageCollection($output, $encoding, 'invalid-character-encoding');
+    }
+
     private function assertSingleMessagOutputMessageCollection(
         array $output,
         string $expectedMessage,

@@ -23,6 +23,9 @@ services:
   App\Tests\Services\TestTaskFactory:
     public: true
 
+  App\Tests\Services\ContentTypeFactory:
+    public: true
+
   App\Services\ApplicationState:
     public: true
     arguments:

@@ -13,6 +13,7 @@ use App\Services\TaskTypeService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Services\TaskService;
+use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
 use webignition\WebResource\WebPage\WebPage;
 
 class TestTaskFactory
@@ -86,12 +87,19 @@ class TestTaskFactory
         return $task;
     }
 
-    public function addPrimaryCachedResourceSourceToTask(Task $task, string $webPageContent)
-    {
+    public function addPrimaryCachedResourceSourceToTask(
+        Task $task,
+        string $webPageContent,
+        ?InternetMediaTypeInterface $contentType = null
+    ) {
         $requestIdentifer = $this->requestIdentifierFactory->createFromTask($task);
 
         /* @var WebPage $webPage */
         $webPage = WebPage::createFromContent($webPageContent);
+
+        if (!empty($contentType)) {
+            $webPage = $webPage->setContentType($contentType);
+        }
 
         $cachedResource = $this->cachedResourceFactory->createForTask(
             (string) $requestIdentifer,
