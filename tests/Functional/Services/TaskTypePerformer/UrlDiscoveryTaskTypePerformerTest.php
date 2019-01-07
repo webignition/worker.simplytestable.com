@@ -27,6 +27,24 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
         $this->taskTypePerformer = self::$container->get(UrlDiscoveryTaskTypePerformer::class);
     }
 
+    public function testPerformAlreadyHasOutput()
+    {
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_URL_DISCOVERY,
+        ]));
+
+        $output = Output::create();
+        $task->setOutput($output);
+        $this->assertSame($output, $task->getOutput());
+
+        $taskState = $task->getState();
+
+        $this->taskTypePerformer->perform($task);
+
+        $this->assertEquals($taskState, $task->getState());
+        $this->assertSame($output, $task->getOutput());
+    }
+
     /**
      * @dataProvider performSuccessDataProvider
      */

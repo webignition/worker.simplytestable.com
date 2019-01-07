@@ -98,6 +98,22 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
         ];
     }
 
+    public function testPerformAlreadyHasOutput()
+    {
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+
+        $output = Output::create();
+        $task->setOutput($output);
+        $this->assertSame($output, $task->getOutput());
+
+        $taskState = $task->getState();
+
+        $this->taskTypePerformer->perform($task);
+
+        $this->assertEquals($taskState, $task->getState());
+        $this->assertSame($output, $task->getOutput());
+    }
+
     /**
      * @dataProvider performSuccessDataProvider
      */

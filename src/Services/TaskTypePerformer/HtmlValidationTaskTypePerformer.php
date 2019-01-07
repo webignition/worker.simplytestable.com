@@ -54,6 +54,10 @@ class HtmlValidationTaskTypePerformer implements TaskPerformerInterface
 
     public function perform(Task $task)
     {
+        if (!empty($task->getOutput())) {
+            return null;
+        }
+
         return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
     }
 
