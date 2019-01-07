@@ -41,6 +41,10 @@ class UrlDiscoveryTaskTypePerformer implements TaskPerformerInterface
 
     public function perform(Task $task)
     {
+        if (!empty($task->getOutput())) {
+            return null;
+        }
+
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 
         $configuration = new LinkUrlFinderConfiguration([

@@ -83,6 +83,10 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
      */
     public function perform(Task $task)
     {
+        if (!empty($task->getOutput())) {
+            return null;
+        }
+
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
         return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
