@@ -140,6 +140,30 @@ class PerformCommandTest extends AbstractBaseTestCase
                     ],
                 ],
             ],
+            'html validation, converted invalid character encoding' => [
+                'setUp' => function () {
+                    HtmlValidatorFixtureFactory::set(
+                        HtmlValidatorFixtureFactory::load('invalid-character-encoding-error')
+                    );
+                },
+                'httpFixtures' => [],
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'url' => 'http://example.com/',
+                    'type' => TypeInterface::TYPE_HTML_VALIDATION,
+                ]),
+                'primarySourceContent' => '<!doctype html>',
+                'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
+                'expectedErrorCount' => 1,
+                'expectedDecodedOutput' => [
+                    'messages' => [
+                        [
+                            'message' => 'utf-8',
+                            'messageId' => 'invalid-character-encoding',
+                            'type' => 'error',
+                        ],
+                    ],
+                ],
+            ],
             'css validation' => [
                 'setUp' => function () {
                     CssValidatorFixtureFactory::set(
