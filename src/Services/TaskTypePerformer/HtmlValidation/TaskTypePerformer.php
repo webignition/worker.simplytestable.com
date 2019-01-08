@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Services\TaskTypePerformer;
+namespace App\Services\TaskTypePerformer\HtmlValidation;
 
 use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskCachedSourceWebPageRetriever;
+use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use webignition\HtmlValidator\Output\Parser\Configuration as HtmlValidatorOutputParserConfiguration;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
@@ -14,7 +15,7 @@ use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
 use webignition\HtmlDocumentType\Validator as DoctypeValidator;
 use webignition\HtmlDocumentType\Factory as DoctypeFactory;
 
-class HtmlValidationTaskTypePerformer implements TaskPerformerInterface
+class TaskTypePerformer implements TaskPerformerInterface
 {
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';

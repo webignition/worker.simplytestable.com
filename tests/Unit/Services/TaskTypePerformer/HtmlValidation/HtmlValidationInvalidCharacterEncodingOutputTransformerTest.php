@@ -1,19 +1,19 @@
 <?php
 /** @noinspection PhpDocSignatureInspection */
 
-namespace App\Tests\Unit\Services\TaskTypePerformer;
+namespace App\Tests\Unit\Services\TaskTypePerformer\HtmlValidation;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskOutputMessageFactory;
-use App\Services\TaskTypePerformer\HtmlValidationInvalidCharacterEncodingOutputTransformer;
+use App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var HtmlValidationInvalidCharacterEncodingOutputTransformer
+     * @var InvalidCharacterEncodingOutputTransformer
      */
     private $transformer;
 
@@ -26,7 +26,7 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
 
         $taskOutputMessageFactory = new TaskOutputMessageFactory($httpHistoryContainer);
 
-        $this->transformer = new HtmlValidationInvalidCharacterEncodingOutputTransformer(
+        $this->transformer = new InvalidCharacterEncodingOutputTransformer(
             $taskOutputMessageFactory,
             0
         );

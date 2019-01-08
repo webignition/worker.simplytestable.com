@@ -3,19 +3,20 @@
 /** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection PhpDocSignatureInspection */
 
-namespace App\Tests\Functional\Services\TaskTypePerformer;
+namespace App\Tests\Functional\Services\TaskTypePerformer\HtmlValidation;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
+use App\Tests\Functional\Services\TaskTypePerformer\AbstractWebPageTaskTypePerformerTest;
 use App\Tests\Services\TestTaskFactory;
-use App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer;
+use App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
 
-class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
+class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
     /**
-     * @var HtmlValidationTaskTypePerformer
+     * @var TaskTypePerformer
      */
     private $taskTypePerformer;
 
@@ -25,7 +26,7 @@ class HtmlValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerform
     protected function setUp()
     {
         parent::setUp();
-        $this->taskTypePerformer = self::$container->get(HtmlValidationTaskTypePerformer::class);
+        $this->taskTypePerformer = self::$container->get(TaskTypePerformer::class);
     }
 
     /**

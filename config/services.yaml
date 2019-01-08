@@ -89,14 +89,14 @@ services:
     App\Services\TaskTypePerformer\Factory:
       arguments:
         $taskPerformers:
-          - '@App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer'
+          - '@App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer'
+          - '@App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer'
           - '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\WebPageTaskInvalidSourceExaminer'
           - '@App\Services\TaskTypePerformer\WebPageTaskFailedSourceExaminer'
           - '@App\Services\TaskTypePerformer\WebPageTaskContentEncodingExaminer'
-          - '@App\Services\TaskTypePerformer\HtmlValidationInvalidCharacterEncodingOutputTransformer'
 
     App\Services\TasksService:
       public: true
@@ -122,7 +122,7 @@ services:
     GuzzleHttp\Client:
       factory: 'App\Services\HttpClientService:getHttpClient'
 
-    App\Services\TaskTypePerformer\HtmlValidationTaskTypePerformer:
+    App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer:
       arguments:
         $validatorPath: '%env(HTML_VALIDATOR_PATH)%'
         $priority: '%html_validation_task_type_performer_priority%'
@@ -221,7 +221,7 @@ services:
       arguments:
         $priority:  '%web_page_task_content_encoding_examiner_priority%'
 
-    App\Services\TaskTypePerformer\HtmlValidationInvalidCharacterEncodingOutputTransformer:
+    App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer:
       arguments:
         $priority:  '%html_validation_invalid_character_encoding_output_transformer_priority%'
 
