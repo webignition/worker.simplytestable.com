@@ -28,7 +28,7 @@
         "webignition/css-validator-output-parser": ">=5,<6",
         "webignition/css-validator-wrapper": ">=4.2,<5",
         "webignition/guzzle-curl-exception": ">=1,<2",
-        "webignition/guzzle-http-authentication-middleware": ">=0.1,<1",
+        "webignition/guzzle-http-authentication-middleware": "0.2",
         "webignition/guzzle-request-headers-middleware": ">=0.1,<1",
         "webignition/html-document-link-checker": ">=3.2,<4",
         "webignition/html-document-link-finder": ">=4,<5",
@@ -41,7 +41,7 @@
         "webignition/resque-bundle": "dev-master",
         "webignition/url": ">=2,<3",
         "webignition/web-json-model": ">=5,<6",
-        "webignition/web-page-model": ">=5.4,<6",
+        "webignition/web-page-model": ">=5.6,<6",
         "webignition/web-resource-retriever": ">=1,<2"
     },
     "require-dev": {
