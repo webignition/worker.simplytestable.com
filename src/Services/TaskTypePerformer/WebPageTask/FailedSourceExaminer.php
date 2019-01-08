@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Services\TaskTypePerformer;
+namespace App\Services\TaskTypePerformer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskOutputMessageFactory;
+use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use webignition\InternetMediaType\InternetMediaType;
 
-class WebPageTaskFailedSourceExaminer implements TaskPerformerInterface
+class FailedSourceExaminer implements TaskPerformerInterface
 {
     private $taskOutputMessageFactory;
     private $priority;

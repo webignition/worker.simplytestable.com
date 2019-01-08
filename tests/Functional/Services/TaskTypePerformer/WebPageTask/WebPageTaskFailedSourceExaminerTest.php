@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Tests\Functional\Services\TaskTypePerformer;
+namespace App\Tests\Functional\Services\TaskTypePerformer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\SourceFactory;
-use App\Services\TaskTypePerformer\WebPageTaskFailedSourceExaminer;
+use App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\TestTaskFactory;
 
 class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
 {
     /**
-     * @var WebPageTaskFailedSourceExaminer
+     * @var FailedSourceExaminer
      */
     private $examiner;
 
@@ -24,7 +24,7 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->examiner = self::$container->get(WebPageTaskFailedSourceExaminer::class);
+        $this->examiner = self::$container->get(FailedSourceExaminer::class);
     }
 
     /**

@@ -94,9 +94,9 @@ services:
           - '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
-          - '@App\Services\TaskTypePerformer\WebPageTaskInvalidSourceExaminer'
-          - '@App\Services\TaskTypePerformer\WebPageTaskFailedSourceExaminer'
-          - '@App\Services\TaskTypePerformer\WebPageTaskContentEncodingExaminer'
+          - '@App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer'
+          - '@App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer'
+          - '@App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer'
 
     App\Services\TasksService:
       public: true
@@ -209,15 +209,15 @@ services:
       arguments:
         $priority: '%web_page_task_source_preparer_priority%'
 
-    App\Services\TaskTypePerformer\WebPageTaskInvalidSourceExaminer:
+    App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer:
       arguments:
         $priority:  '%web_page_task_invalid_source_examiner_priority%'
 
-    App\Services\TaskTypePerformer\WebPageTaskFailedSourceExaminer:
+    App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer:
       arguments:
         $priority:  '%web_page_task_failed_source_examiner_priority%'
 
-    App\Services\TaskTypePerformer\WebPageTaskContentEncodingExaminer:
+    App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer:
       arguments:
         $priority:  '%web_page_task_content_encoding_examiner_priority%'
 

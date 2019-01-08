@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Functional\Services\TaskTypePerformer;
+namespace App\Tests\Functional\Services\TaskTypePerformer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
@@ -9,14 +9,14 @@ use App\Model\Task\TypeInterface;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\SourceFactory;
-use App\Services\TaskTypePerformer\WebPageTaskInvalidSourceExaminer;
+use App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\TestTaskFactory;
 
 class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
 {
     /**
-     * @var WebPageTaskInvalidSourceExaminer
+     * @var InvalidSourceExaminer
      */
     private $examiner;
 
@@ -26,7 +26,7 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->examiner = self::$container->get(WebPageTaskInvalidSourceExaminer::class);
+        $this->examiner = self::$container->get(InvalidSourceExaminer::class);
     }
 
     /**
