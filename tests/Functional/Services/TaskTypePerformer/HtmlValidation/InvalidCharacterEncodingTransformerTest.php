@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Tests\Functional\Services\TaskTypePerformer;
+namespace App\Tests\Functional\Services\TaskTypePerformer\HtmlValidation;
 
-use App\Services\TaskTypePerformer\HtmlValidationInvalidCharacterEncodingOutputTransformer;
+use App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer;
+use App\Tests\Functional\Services\TaskTypePerformer\AbstractWebPageTaskTypePerformerTest;
 
-class HtmlValidationInvalidCharacterEncodingTransformerTest extends AbstractWebPageTaskTypePerformerTest
+class InvalidCharacterEncodingTransformerTest extends AbstractWebPageTaskTypePerformerTest
 {
     /**
-     * @var HtmlValidationInvalidCharacterEncodingOutputTransformer
+     * @var InvalidCharacterEncodingOutputTransformer
      */
     private $taskTypePerformer;
 
@@ -18,7 +19,7 @@ class HtmlValidationInvalidCharacterEncodingTransformerTest extends AbstractWebP
     {
         parent::setUp();
         $this->taskTypePerformer = self::$container->get(
-            HtmlValidationInvalidCharacterEncodingOutputTransformer::class
+            InvalidCharacterEncodingOutputTransformer::class
         );
     }
 

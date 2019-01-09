@@ -1,13 +1,13 @@
 <?php
 /** @noinspection PhpDocSignatureInspection */
 
-namespace App\Tests\Functional\Services\TaskTypePerformer;
+namespace App\Tests\Functional\Services\TaskTypePerformer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskCachedSourceWebPageRetriever;
-use App\Services\TaskTypePerformer\WebPageTaskContentEncodingExaminer;
+use App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\ContentTypeFactory;
@@ -18,7 +18,7 @@ use webignition\WebResource\WebPage\WebPage;
 class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
 {
     /**
-     * @var WebPageTaskContentEncodingExaminer
+     * @var ContentEncodingExaminer
      */
     private $examiner;
 
@@ -28,7 +28,7 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->examiner = self::$container->get(WebPageTaskContentEncodingExaminer::class);
+        $this->examiner = self::$container->get(ContentEncodingExaminer::class);
     }
 
     /**
@@ -52,7 +52,7 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
 
         ObjectPropertySetter::setProperty(
             $this->examiner,
-            WebPageTaskContentEncodingExaminer::class,
+            ContentEncodingExaminer::class,
             'taskCachedSourceWebPageRetriever',
             $taskCachedResourceWebPageRetriever
         );
@@ -108,7 +108,7 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
 
         ObjectPropertySetter::setProperty(
             $this->examiner,
-            WebPageTaskContentEncodingExaminer::class,
+            ContentEncodingExaminer::class,
             'taskCachedSourceWebPageRetriever',
             $taskCachedResourceWebPageRetriever
         );

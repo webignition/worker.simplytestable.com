@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\TaskTypePerformer;
+namespace App\Services\TaskTypePerformer\WebPageTask;
 
 use App\Entity\CachedResource;
 use App\Entity\Task\Output;
@@ -8,9 +8,10 @@ use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\CachedResourceManager;
+use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use webignition\InternetMediaType\InternetMediaType;
 
-class WebPageTaskInvalidSourceExaminer implements TaskPerformerInterface
+class InvalidSourceExaminer implements TaskPerformerInterface
 {
     private $cachedResourceManager;
     private $priority;

@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Services\TaskTypePerformer;
+namespace App\Services\TaskTypePerformer\HtmlValidation;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskOutputMessageFactory;
+use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use webignition\InternetMediaType\InternetMediaType;
 
-class HtmlValidationInvalidCharacterEncodingOutputTransformer implements TaskPerformerInterface
+class InvalidCharacterEncodingOutputTransformer implements TaskPerformerInterface
 {
     /**
      * @var TaskOutputMessageFactory
