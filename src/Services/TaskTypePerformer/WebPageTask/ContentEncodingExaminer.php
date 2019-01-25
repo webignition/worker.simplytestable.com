@@ -9,6 +9,7 @@ use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Services\TaskOutputMessageFactory;
 use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use webignition\InternetMediaType\InternetMediaType;
+use webignition\WebResource\WebPage\ContentEncodingValidator;
 
 class ContentEncodingExaminer implements TaskPerformerInterface
 {
@@ -34,7 +35,8 @@ class ContentEncodingExaminer implements TaskPerformerInterface
             return;
         }
 
-        if (!$webPage->isEncodingValid()) {
+        $contentEncodingValidator = new ContentEncodingValidator();
+        if (!$contentEncodingValidator->isValid($webPage)) {
             $task->setState(Task::STATE_FAILED_NO_RETRY_AVAILABLE);
             $webPageCharacterSet = $webPage->getCharacterSet();
 
