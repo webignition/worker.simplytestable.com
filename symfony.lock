@@ -101,6 +101,9 @@
     "monolog/monolog": {
         "version": "1.23.0"
     },
+    "mso/idna-convert": {
+        "version": "v1.1.0"
+    },
     "myclabs/deep-copy": {
         "version": "1.8.1"
     },
@@ -397,6 +400,9 @@
     },
     "webignition/string-parser": {
         "version": "0.2.3"
+    },
+    "webignition/uri": {
+        "version": "0.3"
     },
     "webignition/url": {
         "version": "2.1"
