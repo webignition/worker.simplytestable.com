@@ -4,27 +4,30 @@ namespace App\Services\TaskTypePerformer\HtmlValidation;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Event\TaskEvent;
+use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskOutputMessageFactory;
 use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use webignition\InternetMediaType\InternetMediaType;
 
-class InvalidCharacterEncodingOutputTransformer implements TaskPerformerInterface
+class InvalidCharacterEncodingOutputTransformer
 {
     /**
      * @var TaskOutputMessageFactory
      */
     private $taskOutputMessageFactory;
 
-    /**
-     * @var int
-     */
-    private $priority;
-
-    public function __construct(TaskOutputMessageFactory $taskOutputMessageFactory, int $priority)
+    public function __construct(TaskOutputMessageFactory $taskOutputMessageFactory)
     {
         $this->taskOutputMessageFactory = $taskOutputMessageFactory;
-        $this->priority = $priority;
+    }
+
+    public function __invoke(TaskEvent $taskEvent)
+    {
+        if (Type::TYPE_HTML_VALIDATION === (string) $taskEvent->getTask()->getType()) {
+            $this->perform($taskEvent->getTask());
+        }
     }
 
     public function perform(Task $task)
@@ -63,16 +66,6 @@ class InvalidCharacterEncodingOutputTransformer implements TaskPerformerInterfac
         $task->setOutput($updatedOutput);
 
         return null;
-    }
-
-    public function handles(string $taskType): bool
-    {
-        return TypeInterface::TYPE_HTML_VALIDATION === $taskType;
-    }
-
-    public function getPriority(): int
-    {
-        return $this->priority;
     }
 
     private function getCharacterEncodingFromInvalidCharacterEncodingOutput(string $messageContent): string

@@ -16,14 +16,6 @@ parameters:
   link_integrity_user_agents:
     - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
     - Mozilla/5.0
-  html_validation_invalid_character_encoding_output_transformer_priority: 90
-  html_validation_task_type_performer_priority: 100
-  css_validation_task_type_performer_priority: 100
-  link_integrity_task_type_performer_priority: 100
-  url_discovery_task_type_performer_priority: 100
-  web_page_task_invalid_source_examiner_priority: 200
-  web_page_task_failed_source_examiner_priority: 190
-  web_page_task_content_encoding_examiner_priority: 180
 
 services:
     # default configuration for services in *this* file
@@ -82,15 +74,7 @@ services:
 
     App\Services\TaskTypePerformer\Factory:
       arguments:
-        $taskPerformers:
-          - '@App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer'
-          - '@App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer'
-          - '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer'
-          - '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer'
-          - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
-          - '@App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer'
-          - '@App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer'
-          - '@App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer'
+        $taskPerformers: []
 
     App\Services\TasksService:
       public: true
@@ -116,9 +100,33 @@ services:
     GuzzleHttp\Client:
       factory: 'App\Services\HttpClientService:getHttpClient'
 
+    App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
+      tags:
+        - { name: kernel.event_listener, event: task.prepare, priority: 100 }
+
+    App\Services\TaskTypePreparer\FinalTaskPreparer:
+      tags:
+        - { name: kernel.event_listener, event: task.prepare, priority: 200 }
+
+    App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer:
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 200 }
+
+    App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer:
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 190 }
+
+    App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer:
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 180 }
+
     App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer:
-      arguments:
-        $priority: '%html_validation_task_type_performer_priority%'
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 100 }
+
+    App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer:
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 90 }
 
     App\Services\TaskTypePerformer\CssValidatorWrapperConfigurationFactory:
       arguments:
@@ -129,16 +137,16 @@ services:
         - '%link_integrity_user_agents%'
 
     App\Services\TaskTypePerformer\CssValidationTaskTypePerformer:
-      arguments:
-        $priority: '%html_validation_task_type_performer_priority%'
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 100 }
 
     App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer:
-      arguments:
-        $priority: '%html_validation_task_type_performer_priority%'
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 100 }
 
     App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer:
-      arguments:
-        $priority: '%html_validation_task_type_performer_priority%'
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 100 }
 
     webignition\WebResource\Retriever:
       class: webignition\WebResource\Retriever
@@ -205,30 +213,6 @@ services:
       arguments:
         $hostname: '%hostname%'
         $token: '%token%'
-
-    App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
-      tags:
-        - { name: kernel.event_listener, event: task.prepare, priority: 100 }
-
-    App\Services\TaskTypePreparer\FinalTaskPreparer:
-      tags:
-        - { name: kernel.event_listener, event: task.prepare, priority: 200 }
-
-    App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer:
-      arguments:
-        $priority:  '%web_page_task_invalid_source_examiner_priority%'
-
-    App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer:
-      arguments:
-        $priority:  '%web_page_task_failed_source_examiner_priority%'
-
-    App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer:
-      arguments:
-        $priority:  '%web_page_task_content_encoding_examiner_priority%'
-
-    App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer:
-      arguments:
-        $priority:  '%html_validation_invalid_character_encoding_output_transformer_priority%'
 
     webignition\InternetMediaType\Parser\Parser:
       class: webignition\InternetMediaType\Parser\Parser

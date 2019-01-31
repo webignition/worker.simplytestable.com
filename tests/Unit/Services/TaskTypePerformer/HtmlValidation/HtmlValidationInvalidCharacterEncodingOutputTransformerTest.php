@@ -26,10 +26,7 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
 
         $taskOutputMessageFactory = new TaskOutputMessageFactory($httpHistoryContainer);
 
-        $this->transformer = new InvalidCharacterEncodingOutputTransformer(
-            $taskOutputMessageFactory,
-            0
-        );
+        $this->transformer = new InvalidCharacterEncodingOutputTransformer($taskOutputMessageFactory);
     }
 
     public function testPerformNoOutput()
@@ -131,14 +128,5 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
                 ],
             ],
         ];
-    }
-
-    public function testHandles()
-    {
-        $this->assertTrue($this->transformer->handles(TypeInterface::TYPE_HTML_VALIDATION));
-        $this->assertFalse($this->transformer->handles(TypeInterface::TYPE_CSS_VALIDATION));
-        $this->assertFalse($this->transformer->handles(TypeInterface::TYPE_LINK_INTEGRITY));
-        $this->assertFalse($this->transformer->handles(TypeInterface::TYPE_LINK_INTEGRITY_SINGLE_URL));
-        $this->assertFalse($this->transformer->handles(TypeInterface::TYPE_URL_DISCOVERY));
     }
 }
