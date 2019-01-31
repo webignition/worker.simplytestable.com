@@ -16,7 +16,6 @@ parameters:
   link_integrity_user_agents:
     - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
     - Mozilla/5.0
-  css_validation_task_type_performer_priority: 100
   link_integrity_task_type_performer_priority: 100
   url_discovery_task_type_performer_priority: 100
 
@@ -78,7 +77,6 @@ services:
     App\Services\TaskTypePerformer\Factory:
       arguments:
         $taskPerformers:
-          - '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
 
@@ -123,8 +121,8 @@ services:
         - '%link_integrity_user_agents%'
 
     App\Services\TaskTypePerformer\CssValidationTaskTypePerformer:
-      arguments:
-        $priority: '%css_validation_task_type_performer_priority%'
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 100 }
 
     App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer:
       arguments:
