@@ -110,21 +110,4 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
             ],
         ];
     }
-
-    public function testHandles()
-    {
-        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_HTML_VALIDATION));
-        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_CSS_VALIDATION));
-        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_LINK_INTEGRITY));
-        $this->assertFalse($this->taskTypePerformer->handles(TypeInterface::TYPE_LINK_INTEGRITY_SINGLE_URL));
-        $this->assertTrue($this->taskTypePerformer->handles(TypeInterface::TYPE_URL_DISCOVERY));
-    }
-
-    public function testGetPriority()
-    {
-        $this->assertEquals(
-            self::$container->getParameter('url_discovery_task_type_performer_priority'),
-            $this->taskTypePerformer->getPriority()
-        );
-    }
 }

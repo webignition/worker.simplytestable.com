@@ -68,10 +68,15 @@ class TaskPerformerTest extends AbstractBaseTestCase
             ) use (
                 &$task,
                 &$dispatchCallCount,
-                $expectedEventNames
+                $expectedEventNames,
+                $expectedFinishedStateName
             ) {
                 $this->assertEquals($expectedEventNames[$dispatchCallCount], $eventName);
                 $this->assertSame($task, $taskEvent->getTask());
+
+                if (TaskEvent::TYPE_PERFORM === $eventName) {
+                    $task->setState($expectedFinishedStateName);
+                }
 
                 $dispatchCallCount++;
 
