@@ -46,8 +46,3 @@ services:
 
   App\Services\CachedResourceManager:
     public: true
-
-  App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
-    tags:
-      - { name: kernel.event_listener, event: task.prepare, priority: 100 }
-    public: true
