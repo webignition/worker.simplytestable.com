@@ -4,21 +4,23 @@ namespace App\Services\TaskTypePerformer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Event\TaskEvent;
 use App\Model\Source;
-use App\Model\Task\TypeInterface;
 use App\Services\TaskOutputMessageFactory;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use webignition\InternetMediaType\InternetMediaType;
 
-class FailedSourceExaminer implements TaskPerformerInterface
+class FailedSourceExaminer
 {
     private $taskOutputMessageFactory;
-    private $priority;
 
-    public function __construct(TaskOutputMessageFactory $taskOutputMessageFactory, int $priority)
+    public function __construct(TaskOutputMessageFactory $taskOutputMessageFactory)
     {
         $this->taskOutputMessageFactory = $taskOutputMessageFactory;
-        $this->priority = $priority;
+    }
+
+    public function __invoke(TaskEvent $taskEvent)
+    {
+        $this->perform($taskEvent->getTask());
     }
 
     public function perform(Task $task)
@@ -42,21 +44,5 @@ class FailedSourceExaminer implements TaskPerformerInterface
                 1
             ));
         }
-    }
-
-    public function handles(string $taskType): bool
-    {
-        return in_array($taskType, [
-            TypeInterface::TYPE_HTML_VALIDATION,
-            TypeInterface::TYPE_CSS_VALIDATION,
-            TypeInterface::TYPE_LINK_INTEGRITY,
-            TypeInterface::TYPE_LINK_INTEGRITY_SINGLE_URL,
-            TypeInterface::TYPE_URL_DISCOVERY,
-        ]);
-    }
-
-    public function getPriority(): int
-    {
-        return $this->priority;
     }
 }

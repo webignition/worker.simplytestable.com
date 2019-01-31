@@ -21,7 +21,6 @@ parameters:
   css_validation_task_type_performer_priority: 100
   link_integrity_task_type_performer_priority: 100
   url_discovery_task_type_performer_priority: 100
-  web_page_task_failed_source_examiner_priority: 190
   web_page_task_content_encoding_examiner_priority: 180
 
 services:
@@ -87,7 +86,6 @@ services:
           - '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
-          - '@App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer'
           - '@App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer'
 
     App\Services\TasksService:
@@ -217,8 +215,8 @@ services:
         - { name: kernel.event_listener, event: task.perform, priority: 200 }
 
     App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer:
-      arguments:
-        $priority:  '%web_page_task_failed_source_examiner_priority%'
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 190 }
 
     App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer:
       arguments:
