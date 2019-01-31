@@ -6,9 +6,7 @@ use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use App\Model\Task\Type;
-use App\Model\Task\TypeInterface;
 use App\Services\TaskOutputMessageFactory;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use webignition\InternetMediaType\InternetMediaType;
 
 class InvalidCharacterEncodingOutputTransformer
