@@ -124,7 +124,6 @@ services:
 
     App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer:
       arguments:
-        $validatorPath: '%env(HTML_VALIDATOR_PATH)%'
         $priority: '%html_validation_task_type_performer_priority%'
 
     App\Services\TaskTypePerformer\CssValidatorWrapperConfigurationFactory:
@@ -168,6 +167,14 @@ services:
     webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
 
     webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware:
+
+    webignition\HtmlValidator\Wrapper\CommandFactory:
+      arguments:
+        $validatorPath: '%env(HTML_VALIDATOR_PATH)%'
+
+    webignition\HtmlValidatorOutput\Parser\Parser:
+
+    webignition\HtmlValidator\Wrapper\CommandExecutor:
 
     webignition\HtmlValidator\Wrapper\Wrapper:
 

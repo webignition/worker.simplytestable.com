@@ -9,24 +9,24 @@ X-W3C-Validator-Warnings: 0
     "messages": [
 
           {
-              "lastLine": 188,
-              "lastColumn": 79,
+              "lastLine": 1,
+              "lastColumn": 2,
               "message": "An img element must have an alt attribute, except under certain conditions.",
               "messageid": "html5",
               "explanation": "explanatory text",
               "type": "error"
           },
           {
-              "lastLine": 188,
-              "lastColumn": 79,
+              "lastLine": 3,
+              "lastColumn": 4,
               "message": "An img element must have an alt attribute, except under certain conditions.",
               "messageid": "html5",
               "explanation": "explanatory text",
               "type": "error"
           },
           {
-              "lastLine": 188,
-              "lastColumn": 79,
+              "lastLine": 5,
+              "lastColumn": 6,
               "message": "An img element must have an alt attribute, except under certain conditions.",
               "messageid": "html5",
               "explanation": "explanatory text",

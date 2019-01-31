@@ -4,11 +4,12 @@ namespace App\Services\TaskTypePerformer\HtmlValidation;
 
 use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
+use App\Model\HtmlValidationMessageList;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Services\TaskTypePerformer\TaskPerformerInterface;
-use webignition\HtmlValidator\Output\Parser\Configuration as HtmlValidatorOutputParserConfiguration;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
+use webignition\HtmlValidatorOutput\Parser\Flags;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
@@ -20,20 +21,8 @@ class TaskTypePerformer implements TaskPerformerInterface
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
 
-    /**
-     * @var TaskCachedSourceWebPageRetriever
-     */
     private $taskCachedSourceWebPageRetriever;
-
-    /**
-     * @var HtmlValidatorWrapper
-     */
     private $htmlValidatorWrapper;
-
-    /**
-     * @var string
-     */
-    private $validatorPath;
 
     /**
      * @var int
@@ -43,13 +32,11 @@ class TaskTypePerformer implements TaskPerformerInterface
     public function __construct(
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         HtmlValidatorWrapper $htmlValidatorWrapper,
-        string $validatorPath,
         int $priority
     ) {
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
 
         $this->htmlValidatorWrapper = $htmlValidatorWrapper;
-        $this->validatorPath = $validatorPath;
         $this->priority = $priority;
     }
 
@@ -110,31 +97,29 @@ class TaskTypePerformer implements TaskPerformerInterface
             );
         }
 
-        $webPageCharacterSet = $webPage->getCharacterSet();
-
-        if (empty($webPageCharacterSet)) {
-            $webPageCharacterSet = self::DEFAULT_CHARACTER_ENCODING;
+        $documentUri = 'file:' . $this->storeTmpFile($webPageContent);
+        $characterEncoding = $webPage->getCharacterEncoding();
+        if (null === $characterEncoding || 'ascii' === $characterEncoding) {
+            $characterEncoding = self::DEFAULT_CHARACTER_ENCODING;
         }
 
-        $this->htmlValidatorWrapper->configure([
-            HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_URI => 'file:' . $this->storeTmpFile($webPageContent),
-            HtmlValidatorWrapper::CONFIG_KEY_VALIDATOR_PATH => $this->validatorPath,
-            HtmlValidatorWrapper::CONFIG_KEY_DOCUMENT_CHARACTER_SET => $webPageCharacterSet,
-            HtmlValidatorWrapper::CONFIG_KEY_PARSER_CONFIGURATION_VALUES => [
-                HtmlValidatorOutputParserConfiguration::KEY_CSS_VALIDATION_ISSUES => true,
-            ],
-        ]);
+        $output = $this->htmlValidatorWrapper->validate(
+            $documentUri,
+            $characterEncoding,
+            Flags::IGNORE_AMPERSAND_ENCODING_ISSUES | Flags::IGNORE_CSS_VALIDATION_ISSUES
+        );
 
-        $output = $this->htmlValidatorWrapper->validate();
         $state = $output->wasAborted() ? Task::STATE_FAILED_NO_RETRY_AVAILABLE : Task::STATE_COMPLETED;
+
+        $messages = new HtmlValidationMessageList($output->getMessages());
 
         return $this->setTaskOutputAndState(
             $task,
             json_encode([
-                'messages' => $output->getMessages(),
+                'messages' => array_values($messages->getMessages()),
             ]),
             $state,
-            (int) $output->getErrorCount()
+            $messages->getErrorCount()
         );
     }
 
