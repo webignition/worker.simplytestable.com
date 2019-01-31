@@ -65,6 +65,9 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
 
         $this->transformer->perform($task);
         $this->assertEquals($expectedDecodedOutput, json_decode($task->getOutput()->getOutput(), true));
+
+        $this->transformer->perform($task);
+        $this->assertEquals($expectedDecodedOutput, json_decode($task->getOutput()->getOutput(), true));
     }
 
     public function performHasMessagesDataProvider()
