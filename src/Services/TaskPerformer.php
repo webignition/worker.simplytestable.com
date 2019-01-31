@@ -35,12 +35,6 @@ class TaskPerformer
         $taskEvent = new TaskEvent($task);
         $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORM, $taskEvent);
 
-        $taskPerformerCollection = $this->factory->getPerformers($task->getType());
-
-        foreach ($taskPerformerCollection as $taskPerformer) {
-            $taskPerformer->perform($task);
-        }
-
         /** @noinspection PhpUnhandledExceptionInspection */
         $task->setEndDateTime(new \DateTime());
 
