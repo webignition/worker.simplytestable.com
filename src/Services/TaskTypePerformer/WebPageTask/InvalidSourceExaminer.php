@@ -7,20 +7,16 @@ use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use App\Model\Source;
-use App\Model\Task\TypeInterface;
 use App\Services\CachedResourceManager;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use webignition\InternetMediaType\InternetMediaType;
 
-class InvalidSourceExaminer implements TaskPerformerInterface
+class InvalidSourceExaminer
 {
     private $cachedResourceManager;
-    private $priority;
 
-    public function __construct(CachedResourceManager $cachedResourceManager, int $priority)
+    public function __construct(CachedResourceManager $cachedResourceManager)
     {
         $this->cachedResourceManager = $cachedResourceManager;
-        $this->priority = $priority;
     }
 
     public function __invoke(TaskEvent $taskEvent)
@@ -56,21 +52,5 @@ class InvalidSourceExaminer implements TaskPerformerInterface
     {
         $task->setState(Task::STATE_SKIPPED);
         $task->setOutput(Output::create('', new InternetMediaType('application', 'json')));
-    }
-
-    public function handles(string $taskType): bool
-    {
-        return in_array($taskType, [
-            TypeInterface::TYPE_HTML_VALIDATION,
-            TypeInterface::TYPE_CSS_VALIDATION,
-            TypeInterface::TYPE_LINK_INTEGRITY,
-            TypeInterface::TYPE_LINK_INTEGRITY_SINGLE_URL,
-            TypeInterface::TYPE_URL_DISCOVERY,
-        ]);
-    }
-
-    public function getPriority(): int
-    {
-        return $this->priority;
     }
 }
