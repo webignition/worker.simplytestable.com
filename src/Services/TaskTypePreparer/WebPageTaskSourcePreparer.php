@@ -3,6 +3,7 @@
 namespace App\Services\TaskTypePreparer;
 
 use App\Entity\Task\Task;
+use App\Event\TaskEvent;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\CachedResourceFactory;
@@ -60,6 +61,11 @@ class WebPageTaskSourcePreparer implements TaskPreparerInterface
         $this->requestIdentifierFactory = $requestIdentifierFactory;
         $this->cachedResourceFactory = $cachedResourceFactory;
         $this->priority = $priority;
+    }
+
+    public function __invoke(TaskEvent $taskEvent)
+    {
+        $this->prepare($taskEvent->getTask());
     }
 
     public function prepare(Task $task)

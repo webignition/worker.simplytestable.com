@@ -213,6 +213,8 @@ services:
         $token: '%token%'
 
     App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
+      tags:
+        - { name: kernel.event_listener, event: task.prepare }
       arguments:
         $priority: '%web_page_task_source_preparer_priority%'
 
