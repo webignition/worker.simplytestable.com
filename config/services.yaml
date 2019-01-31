@@ -16,7 +16,6 @@ parameters:
   link_integrity_user_agents:
     - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
     - Mozilla/5.0
-  url_discovery_task_type_performer_priority: 100
 
 services:
     # default configuration for services in *this* file
@@ -75,8 +74,7 @@ services:
 
     App\Services\TaskTypePerformer\Factory:
       arguments:
-        $taskPerformers:
-          - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
+        $taskPerformers: []
 
     App\Services\TasksService:
       public: true
@@ -127,8 +125,8 @@ services:
         - { name: kernel.event_listener, event: task.perform, priority: 100 }
 
     App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer:
-      arguments:
-        $priority: '%url_discovery_task_type_performer_priority%'
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 100 }
 
     webignition\WebResource\Retriever:
       class: webignition\WebResource\Retriever
