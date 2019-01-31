@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "61ab2c6e97743ea325d6bc637b104323",
+    "content-hash": "49bf711208e5042dd7a9df1ee86ed914",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4272,16 +4272,16 @@
         },
         {
             "name": "webignition/html-validator-output-models",
-            "version": "0.6",
+            "version": "0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-validator-output-models.git",
-                "reference": "f83a477995fa5ec5de9c3cb0d284c6f248405bbf"
+                "reference": "22473981b95a25290b2687d34ae81a72348abeb7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-validator-output-models/zipball/f83a477995fa5ec5de9c3cb0d284c6f248405bbf",
-                "reference": "f83a477995fa5ec5de9c3cb0d284c6f248405bbf",
+                "url": "https://api.github.com/repos/webignition/html-validator-output-models/zipball/22473981b95a25290b2687d34ae81a72348abeb7",
+                "reference": "22473981b95a25290b2687d34ae81a72348abeb7",
                 "shasum": ""
             },
             "require": {
@@ -4311,7 +4311,7 @@
                 "output",
                 "validator"
             ],
-            "time": "2019-01-30T15:06:04+00:00"
+            "time": "2019-01-31T12:44:07+00:00"
         },
         {
             "name": "webignition/html-validator-output-parser",
@@ -4359,16 +4359,16 @@
         },
         {
             "name": "webignition/html-validator-wrapper",
-            "version": "2.0",
+            "version": "2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-validator-wrapper.git",
-                "reference": "af77a194b696655c89ca0d6c988292413be3ff7b"
+                "reference": "7cefa1f3e82557660c23945a61d9af99c4fb9c85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-validator-wrapper/zipball/af77a194b696655c89ca0d6c988292413be3ff7b",
-                "reference": "af77a194b696655c89ca0d6c988292413be3ff7b",
+                "url": "https://api.github.com/repos/webignition/html-validator-wrapper/zipball/7cefa1f3e82557660c23945a61d9af99c4fb9c85",
+                "reference": "7cefa1f3e82557660c23945a61d9af99c4fb9c85",
                 "shasum": ""
             },
             "require": {
@@ -4399,7 +4399,7 @@
                 "html",
                 "validator"
             ],
-            "time": "2019-01-31T11:20:22+00:00"
+            "time": "2019-01-31T11:45:56+00:00"
         },
         {
             "name": "webignition/http-history-container",
@@ -4973,16 +4973,16 @@
         },
         {
             "name": "webignition/validator-message",
-            "version": "0.3",
+            "version": "0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/validator-message.git",
-                "reference": "16896f1f1b055256d23423b8f4f8c1ff3dda4822"
+                "reference": "1936419c7da02c690713af2d617532a52a2fe7e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/validator-message/zipball/16896f1f1b055256d23423b8f4f8c1ff3dda4822",
-                "reference": "16896f1f1b055256d23423b8f4f8c1ff3dda4822",
+                "url": "https://api.github.com/repos/webignition/validator-message/zipball/1936419c7da02c690713af2d617532a52a2fe7e1",
+                "reference": "1936419c7da02c690713af2d617532a52a2fe7e1",
                 "shasum": ""
             },
             "require": {
@@ -5011,7 +5011,7 @@
             ],
             "description": "Generic validation output message",
             "homepage": "https://github.com/webignition/validator-message",
-            "time": "2019-01-29T13:19:14+00:00"
+            "time": "2019-01-31T12:26:06+00:00"
         },
         {
             "name": "webignition/web-json-model",
