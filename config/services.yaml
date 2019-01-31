@@ -16,7 +16,6 @@ parameters:
   link_integrity_user_agents:
     - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
     - Mozilla/5.0
-  html_validation_invalid_character_encoding_output_transformer_priority: 90
   css_validation_task_type_performer_priority: 100
   link_integrity_task_type_performer_priority: 100
   url_discovery_task_type_performer_priority: 100
@@ -79,7 +78,6 @@ services:
     App\Services\TaskTypePerformer\Factory:
       arguments:
         $taskPerformers:
-          - '@App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer'
           - '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
@@ -111,6 +109,10 @@ services:
     App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 100 }
+
+    App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer:
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 90 }
 
     App\Services\TaskTypePerformer\CssValidatorWrapperConfigurationFactory:
       arguments:
@@ -217,10 +219,6 @@ services:
     App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 180 }
-
-    App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer:
-      arguments:
-        $priority:  '%html_validation_invalid_character_encoding_output_transformer_priority%'
 
     webignition\InternetMediaType\Parser\Parser:
       class: webignition\InternetMediaType\Parser\Parser
