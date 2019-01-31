@@ -7,7 +7,6 @@ use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\Type;
-use App\Model\Task\TypeInterface;
 use App\Services\SourceFactory;
 use App\Services\TaskTypePreparer\WebPageTaskSourcePreparer;
 use App\Services\TaskTypeService;
@@ -54,23 +53,6 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
 
         $entityManager = self::$container->get(EntityManagerInterface::class);
         $this->cachedResourceRepository = $entityManager->getRepository(CachedResource::class);
-    }
-
-    public function testHandles()
-    {
-        $this->assertTrue($this->preparer->handles(TypeInterface::TYPE_HTML_VALIDATION));
-        $this->assertTrue($this->preparer->handles(TypeInterface::TYPE_CSS_VALIDATION));
-        $this->assertTrue($this->preparer->handles(TypeInterface::TYPE_LINK_INTEGRITY));
-        $this->assertTrue($this->preparer->handles(TypeInterface::TYPE_LINK_INTEGRITY_SINGLE_URL));
-        $this->assertTrue($this->preparer->handles(TypeInterface::TYPE_URL_DISCOVERY));
-    }
-
-    public function testGetPriority()
-    {
-        $this->assertEquals(
-            self::$container->getParameter('web_page_task_source_preparer_priority'),
-            $this->preparer->getPriority()
-        );
     }
 
     /**

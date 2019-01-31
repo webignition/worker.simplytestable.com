@@ -5,7 +5,6 @@ namespace App\Services\TaskTypePreparer;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use App\Model\Source;
-use App\Model\Task\TypeInterface;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\HttpClientConfigurationService;
@@ -23,14 +22,9 @@ use webignition\WebResource\Exception\TransportException;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 use webignition\WebResource\WebPage\WebPage;
 
-class WebPageTaskSourcePreparer implements TaskPreparerInterface
+class WebPageTaskSourcePreparer
 {
     const USER_AGENT = 'ST Web Page Task Source Preparer (http://bit.ly/RlhKCL)';
-
-    /**
-     * @var int
-     */
-    private $priority;
 
     private $webResourceRetriever;
     private $httpClientConfigurationService;
@@ -49,8 +43,7 @@ class WebPageTaskSourcePreparer implements TaskPreparerInterface
         SourceFactory $sourceFactory,
         EntityManagerInterface $entityManager,
         RequestIdentifierFactory $requestIdentifierFactory,
-        CachedResourceFactory $cachedResourceFactory,
-        int $priority
+        CachedResourceFactory $cachedResourceFactory
     ) {
         $this->webResourceRetriever = $webResourceRetriever;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
@@ -60,7 +53,6 @@ class WebPageTaskSourcePreparer implements TaskPreparerInterface
         $this->entityManager = $entityManager;
         $this->requestIdentifierFactory = $requestIdentifierFactory;
         $this->cachedResourceFactory = $cachedResourceFactory;
-        $this->priority = $priority;
     }
 
     public function __invoke(TaskEvent $taskEvent)
@@ -134,22 +126,6 @@ class WebPageTaskSourcePreparer implements TaskPreparerInterface
         }
 
         $task->addSource($source);
-    }
-
-    public function handles(string $taskType): bool
-    {
-        return in_array($taskType, [
-            TypeInterface::TYPE_HTML_VALIDATION,
-            TypeInterface::TYPE_CSS_VALIDATION,
-            TypeInterface::TYPE_LINK_INTEGRITY,
-            TypeInterface::TYPE_LINK_INTEGRITY_SINGLE_URL,
-            TypeInterface::TYPE_URL_DISCOVERY,
-        ]);
-    }
-
-    public function getPriority(): int
-    {
-        return $this->priority;
     }
 
     /**
