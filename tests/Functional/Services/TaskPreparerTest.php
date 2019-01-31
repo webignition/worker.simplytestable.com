@@ -6,10 +6,7 @@ namespace App\Tests\Functional\Services;
 use App\Event\TaskEvent;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
-use App\Model\TaskPreparerCollection;
 use App\Services\TaskPreparer;
-use App\Services\TaskTypePreparer\Factory;
-use App\Services\TaskTypePreparer\TaskPreparerInterface;
 use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use App\Entity\Task\Task;
@@ -26,7 +23,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
     /**
      * @dataProvider prepareDataProvider
      */
-    public function testPrepare(array $taskValues)
+    public function testPrepareIsPrepared(array $taskValues)
     {
         $taskPreparer = self::$container->get(TaskPreparer::class);
         $testTaskFactory = self::$container->get(TestTaskFactory::class);
@@ -34,36 +31,34 @@ class TaskPreparerTest extends AbstractBaseTestCase
         $task = $testTaskFactory->create($taskValues);
 
         $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
+
+        $dispatchCallCount = 0;
+        $expectedEventNames = [
+            TaskEvent::TYPE_PREPARE,
+            TaskEvent::TYPE_PREPARED,
+        ];
+
         $eventDispatcher
             ->shouldReceive('dispatch')
-            ->once()
-            ->withArgs(function (string $eventName, TaskEvent $taskEvent) use ($task) {
-                $this->assertEquals(TaskEvent::TYPE_PREPARED, $eventName);
+            ->withArgs(function (
+                string $eventName,
+                TaskEvent $taskEvent
+            ) use (
+                &$task,
+                &$dispatchCallCount,
+                $expectedEventNames
+            ) {
+                $this->assertEquals($expectedEventNames[$dispatchCallCount], $eventName);
                 $this->assertSame($task, $taskEvent->getTask());
+
+                if (TaskEvent::TYPE_PREPARE === $eventName) {
+                    $task->setState(Task::STATE_PREPARED);
+                }
+
+                $dispatchCallCount++;
 
                 return true;
             });
-
-        $taskTypePreparer = \Mockery::mock(TaskPreparerInterface::class);
-        $taskTypePreparer
-            ->shouldReceive('getPriority')
-            ->once()
-            ->andReturn(0);
-
-        $taskTypePreparer
-            ->shouldReceive('prepare')
-            ->once()
-            ->with($task);
-
-        $taskPreparerCollection = new TaskPreparerCollection([
-            $taskTypePreparer,
-        ]);
-
-        $taskTypePreparerFactory = \Mockery::mock(Factory::class);
-        $taskTypePreparerFactory
-            ->shouldReceive('getPreparers')
-            ->with((string) $task->getType())
-            ->andReturn($taskPreparerCollection);
 
         ObjectPropertySetter::setProperty(
             $taskPreparer,
@@ -72,16 +67,57 @@ class TaskPreparerTest extends AbstractBaseTestCase
             $eventDispatcher
         );
 
+        $taskPreparer->prepare($task);
+
+        $this->assertEquals(Task::STATE_PREPARED, $task->getState());
+    }
+
+    /**
+     * @dataProvider prepareDataProvider
+     */
+    public function testPrepareIsNotPrepared(array $taskValues)
+    {
+        $taskPreparer = self::$container->get(TaskPreparer::class);
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+
+        $task = $testTaskFactory->create($taskValues);
+
+        $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
+
+        $dispatchCallCount = 0;
+        $expectedEventNames = [
+            TaskEvent::TYPE_PREPARE,
+            TaskEvent::TYPE_CREATED,
+        ];
+
+        $eventDispatcher
+            ->shouldReceive('dispatch')
+            ->withArgs(function (
+                string $eventName,
+                TaskEvent $taskEvent
+            ) use (
+                &$task,
+                &$dispatchCallCount,
+                $expectedEventNames
+            ) {
+                $this->assertEquals($expectedEventNames[$dispatchCallCount], $eventName);
+                $this->assertSame($task, $taskEvent->getTask());
+
+                $dispatchCallCount++;
+
+                return true;
+            });
+
         ObjectPropertySetter::setProperty(
             $taskPreparer,
             TaskPreparer::class,
-            'taskTypePreparerFactory',
-            $taskTypePreparerFactory
+            'eventDispatcher',
+            $eventDispatcher
         );
 
         $taskPreparer->prepare($task);
 
-        $this->assertEquals(Task::STATE_PREPARED, $task->getState());
+        $this->assertEquals(Task::STATE_PREPARING, $task->getState());
     }
 
     public function prepareDataProvider(): array

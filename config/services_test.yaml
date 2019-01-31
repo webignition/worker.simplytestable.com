@@ -46,8 +46,3 @@ services:
 
   App\Services\CachedResourceManager:
     public: true
-
-  App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
-    public: true
-    arguments:
-      $priority: 100

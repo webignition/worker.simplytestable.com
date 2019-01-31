@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Event\TaskEvent;
-use App\Services\TaskTypePreparer\Factory;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -11,16 +10,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class TaskPreparer
 {
     private $entityManager;
-    private $taskTypePreparerFactory;
     private $eventDispatcher;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        Factory $taskTypePreparerFactory,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->entityManager = $entityManager;
-        $this->taskTypePreparerFactory = $taskTypePreparerFactory;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -30,16 +26,13 @@ class TaskPreparer
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
-        $taskPreparerCollection = $this->taskTypePreparerFactory->getPreparers((string) $task->getType());
+        $taskEvent = new TaskEvent($task);
+        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PREPARE, $taskEvent);
 
-        foreach ($taskPreparerCollection as $taskPreparer) {
-            $taskPreparer->prepare($task);
-        }
+        $nextEvent = Task::STATE_PREPARED === $task->getState()
+            ? TaskEvent::TYPE_PREPARED
+            : TaskEvent::TYPE_CREATED;
 
-        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PREPARED, new TaskEvent($task));
-
-        $task->setState(Task::STATE_PREPARED);
-        $this->entityManager->persist($task);
-        $this->entityManager->flush();
+        $this->eventDispatcher->dispatch($nextEvent, $taskEvent);
     }
 }
