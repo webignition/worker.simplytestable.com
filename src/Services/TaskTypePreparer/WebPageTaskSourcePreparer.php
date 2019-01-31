@@ -126,6 +126,8 @@ class WebPageTaskSourcePreparer
         }
 
         $task->addSource($source);
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
     }
 
     /**
