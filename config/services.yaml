@@ -215,6 +215,8 @@ services:
         - { name: kernel.event_listener, event: task.prepare, priority: 200 }
 
     App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer:
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 200 }
       arguments:
         $priority:  '%web_page_task_invalid_source_examiner_priority%'
 

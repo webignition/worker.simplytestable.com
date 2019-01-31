@@ -5,6 +5,7 @@ namespace App\Services\TaskTypePerformer\WebPageTask;
 use App\Entity\CachedResource;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Event\TaskEvent;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\CachedResourceManager;
@@ -20,6 +21,11 @@ class InvalidSourceExaminer implements TaskPerformerInterface
     {
         $this->cachedResourceManager = $cachedResourceManager;
         $this->priority = $priority;
+    }
+
+    public function __invoke(TaskEvent $taskEvent)
+    {
+        $this->perform($taskEvent->getTask());
     }
 
     public function perform(Task $task)
