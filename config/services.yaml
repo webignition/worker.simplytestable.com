@@ -124,7 +124,6 @@ services:
 
     App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer:
       arguments:
-        $validatorPath: '%env(HTML_VALIDATOR_PATH)%'
         $priority: '%html_validation_task_type_performer_priority%'
 
     App\Services\TaskTypePerformer\CssValidatorWrapperConfigurationFactory:
