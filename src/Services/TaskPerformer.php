@@ -3,23 +3,17 @@
 namespace App\Services;
 
 use App\Event\TaskEvent;
-use App\Services\TaskTypePerformer\Factory;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TaskPerformer
 {
-    private $factory;
     private $entityManager;
     private $eventDispatcher;
 
-    public function __construct(
-        Factory $factory,
-        EntityManagerInterface $entityManager,
-        EventDispatcherInterface $eventDispatcher
-    ) {
-        $this->factory = $factory;
+    public function __construct(EntityManagerInterface $entityManager, EventDispatcherInterface $eventDispatcher)
+    {
         $this->entityManager = $entityManager;
         $this->eventDispatcher = $eventDispatcher;
     }

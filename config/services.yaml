@@ -72,10 +72,6 @@ services:
         $kernelProjectDirectory: '%kernel.project_dir%'
         $cacheDirectory: '%kernel.cache_dir%'
 
-    App\Services\TaskTypePerformer\Factory:
-      arguments:
-        $taskPerformers: []
-
     App\Services\TasksService:
       public: true
       calls:
