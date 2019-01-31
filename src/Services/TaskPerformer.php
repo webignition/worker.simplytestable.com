@@ -26,21 +26,29 @@ class TaskPerformer
 
     public function perform(Task $task)
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $task->setStartDateTime(new \DateTime());
-        $task->setState(Task::STATE_IN_PROGRESS);
-        $this->entityManager->persist($task);
-        $this->entityManager->flush();
+        if (empty($task->getStartDateTime())) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $task->setStartDateTime(new \DateTime());
+            $task->setState(Task::STATE_IN_PROGRESS);
+            $this->entityManager->persist($task);
+            $this->entityManager->flush();
+        }
 
         $taskEvent = new TaskEvent($task);
         $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORM, $taskEvent);
 
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $task->setEndDateTime(new \DateTime());
+        $nextEvent = TaskEvent::TYPE_PERFORMED;
+
+        if ($task->isIncomplete()) {
+            $nextEvent = TaskEvent::TYPE_PREPARED;
+        } else {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $task->setEndDateTime(new \DateTime());
+        }
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
-        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORMED, $taskEvent);
+        $this->eventDispatcher->dispatch($nextEvent, $taskEvent);
     }
 }

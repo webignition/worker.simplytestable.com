@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services;
 
@@ -38,14 +39,11 @@ class TaskPerformerTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider performDataProvider
-     *
-     * @param callable $taskCreator
-     * @param callable $setUp
-     * @param string $expectedFinishedStateName
      */
     public function testPerform(
         callable $taskCreator,
         callable $setUp,
+        array $expectedEventNames,
         string $expectedFinishedStateName
     ) {
         /* @var Task $task */
@@ -55,10 +53,6 @@ class TaskPerformerTest extends AbstractBaseTestCase
         $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
 
         $dispatchCallCount = 0;
-        $expectedEventNames = [
-            TaskEvent::TYPE_PERFORM,
-            TaskEvent::TYPE_PERFORMED,
-        ];
 
         $eventDispatcher
             ->shouldReceive('dispatch')
@@ -95,13 +89,10 @@ class TaskPerformerTest extends AbstractBaseTestCase
         $this->assertEquals($expectedFinishedStateName, $task->getState());
     }
 
-    /**
-     * @return array
-     */
-    public function performDataProvider()
+    public function performDataProvider(): array
     {
         return [
-            'html validation success' => [
+            'not fully performed' => [
                 'task' => function (): Task {
                     $testTaskFactory = self::$container->get(TestTaskFactory::class);
 
@@ -116,9 +107,34 @@ class TaskPerformerTest extends AbstractBaseTestCase
                 'setUp' => function () {
                     HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
                 },
+                'expectedEventNames' => [
+                    TaskEvent::TYPE_PERFORM,
+                    TaskEvent::TYPE_PREPARED,
+                ],
+                'expectedFinishedStateName' => Task::STATE_IN_PROGRESS,
+            ],
+            'finished performing; complete' => [
+                'task' => function (): Task {
+                    $testTaskFactory = self::$container->get(TestTaskFactory::class);
+
+                    $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+                    $testTaskFactory->addPrimaryCachedResourceSourceToTask(
+                        $task,
+                        '<!doctype html><html><head></head><body></body>'
+                    );
+
+                    return $task;
+                },
+                'setUp' => function () {
+                    HtmlValidatorFixtureFactory::set(HtmlValidatorFixtureFactory::load('0-errors'));
+                },
+                'expectedEventNames' => [
+                    TaskEvent::TYPE_PERFORM,
+                    TaskEvent::TYPE_PERFORMED,
+                ],
                 'expectedFinishedStateName' => Task::STATE_COMPLETED,
             ],
-            'html validation skipped' => [
+            'finished performing; skipped' => [
                 'task' => function (): Task {
                     $testTaskFactory = self::$container->get(TestTaskFactory::class);
                     $sourceFactory = self::$container->get(SourceFactory::class);
@@ -138,9 +154,13 @@ class TaskPerformerTest extends AbstractBaseTestCase
                 },
                 'setUp' => function () {
                 },
+                'expectedEventNames' => [
+                    TaskEvent::TYPE_PERFORM,
+                    TaskEvent::TYPE_PERFORMED,
+                ],
                 'expectedFinishedStateName' => Task::STATE_SKIPPED,
             ],
-            'failed no retry available' => [
+            'finished performing; failed no retry available' => [
                 'task' => function (): Task {
                     $testTaskFactory = self::$container->get(TestTaskFactory::class);
                     $sourceFactory = self::$container->get(SourceFactory::class);
@@ -160,6 +180,10 @@ class TaskPerformerTest extends AbstractBaseTestCase
                 },
                 'setUp' => function () {
                 },
+                'expectedEventNames' => [
+                    TaskEvent::TYPE_PERFORM,
+                    TaskEvent::TYPE_PERFORMED,
+                ],
                 'expectedFinishedStateName' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
             ],
         ];
