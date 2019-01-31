@@ -21,7 +21,6 @@ parameters:
   css_validation_task_type_performer_priority: 100
   link_integrity_task_type_performer_priority: 100
   url_discovery_task_type_performer_priority: 100
-  web_page_task_source_preparer_priority: 100
   web_page_task_invalid_source_examiner_priority: 200
   web_page_task_failed_source_examiner_priority: 190
   web_page_task_content_encoding_examiner_priority: 180
@@ -80,11 +79,6 @@ services:
         $baseUrl: '%env(CORE_URL)%'
         $kernelProjectDirectory: '%kernel.project_dir%'
         $cacheDirectory: '%kernel.cache_dir%'
-
-    App\Services\TaskTypePreparer\Factory:
-      arguments:
-        $taskPreparers:
-          - '@App\Services\TaskTypePreparer\WebPageTaskSourcePreparer'
 
     App\Services\TaskTypePerformer\Factory:
       arguments:
@@ -215,8 +209,6 @@ services:
     App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
       tags:
         - { name: kernel.event_listener, event: task.prepare, priority: 100 }
-      arguments:
-        $priority: '%web_page_task_source_preparer_priority%'
 
     App\Services\TaskTypePreparer\FinalTaskPreparer:
       tags:
