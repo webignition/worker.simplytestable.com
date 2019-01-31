@@ -53,12 +53,27 @@ class TaskPerformerTest extends AbstractBaseTestCase
         $setUp();
 
         $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
+
+        $dispatchCallCount = 0;
+        $expectedEventNames = [
+            TaskEvent::TYPE_PERFORM,
+            TaskEvent::TYPE_PERFORMED,
+        ];
+
         $eventDispatcher
             ->shouldReceive('dispatch')
-            ->once()
-            ->withArgs(function (string $eventName, TaskEvent $taskEvent) use ($task) {
-                $this->assertEquals(TaskEvent::TYPE_PERFORMED, $eventName);
+            ->withArgs(function (
+                string $eventName,
+                TaskEvent $taskEvent
+            ) use (
+                &$task,
+                &$dispatchCallCount,
+                $expectedEventNames
+            ) {
+                $this->assertEquals($expectedEventNames[$dispatchCallCount], $eventName);
                 $this->assertSame($task, $taskEvent->getTask());
+
+                $dispatchCallCount++;
 
                 return true;
             });
