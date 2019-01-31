@@ -21,7 +21,6 @@ parameters:
   css_validation_task_type_performer_priority: 100
   link_integrity_task_type_performer_priority: 100
   url_discovery_task_type_performer_priority: 100
-  web_page_task_content_encoding_examiner_priority: 180
 
 services:
     # default configuration for services in *this* file
@@ -86,7 +85,6 @@ services:
           - '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer'
-          - '@App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer'
 
     App\Services\TasksService:
       public: true
@@ -219,8 +217,8 @@ services:
         - { name: kernel.event_listener, event: task.perform, priority: 190 }
 
     App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer:
-      arguments:
-        $priority:  '%web_page_task_content_encoding_examiner_priority%'
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 180 }
 
     App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer:
       arguments:
