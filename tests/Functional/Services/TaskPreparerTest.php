@@ -34,12 +34,27 @@ class TaskPreparerTest extends AbstractBaseTestCase
         $task = $testTaskFactory->create($taskValues);
 
         $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
+
+        $dispatchCallCount = 0;
+        $expectedEventNames = [
+            TaskEvent::TYPE_PREPARE,
+            TaskEvent::TYPE_PREPARED,
+        ];
+
         $eventDispatcher
             ->shouldReceive('dispatch')
-            ->once()
-            ->withArgs(function (string $eventName, TaskEvent $taskEvent) use ($task) {
-                $this->assertEquals(TaskEvent::TYPE_PREPARED, $eventName);
+            ->withArgs(function (
+                string $eventName,
+                TaskEvent $taskEvent
+            ) use (
+                $task,
+                &$dispatchCallCount,
+                $expectedEventNames
+            ) {
+                $this->assertEquals($expectedEventNames[$dispatchCallCount], $eventName);
                 $this->assertSame($task, $taskEvent->getTask());
+
+                $dispatchCallCount++;
 
                 return true;
             });
