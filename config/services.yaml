@@ -169,6 +169,14 @@ services:
 
     webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware:
 
+    webignition\HtmlValidator\Wrapper\CommandFactory:
+      arguments:
+        $validatorPath: '%env(HTML_VALIDATOR_PATH)%'
+
+    webignition\HtmlValidatorOutput\Parser\Parser:
+
+    webignition\HtmlValidator\Wrapper\CommandExecutor:
+
     webignition\HtmlValidator\Wrapper\Wrapper:
 
     webignition\CssValidatorWrapper\Wrapper:
