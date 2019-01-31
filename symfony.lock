@@ -371,6 +371,9 @@
     "webignition/html-document-type": {
         "version": "0.1.1"
     },
+    "webignition/html-validator-output-models": {
+        "version": "0.6"
+    },
     "webignition/html-validator-output-parser": {
         "version": "0.7.1"
     },
@@ -409,6 +412,9 @@
     },
     "webignition/url-health-checker": {
         "version": "1.0"
+    },
+    "webignition/validator-message": {
+        "version": "0.3"
     },
     "webignition/web-json-model": {
         "version": "3.1.1"
