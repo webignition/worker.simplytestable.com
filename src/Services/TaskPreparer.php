@@ -30,13 +30,17 @@ class TaskPreparer
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
+        $taskEvent = new TaskEvent($task);
+
+        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PREPARE, $taskEvent);
+
         $taskPreparerCollection = $this->taskTypePreparerFactory->getPreparers((string) $task->getType());
 
         foreach ($taskPreparerCollection as $taskPreparer) {
             $taskPreparer->prepare($task);
         }
 
-        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PREPARED, new TaskEvent($task));
+        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PREPARED, $taskEvent);
 
         $task->setState(Task::STATE_PREPARED);
         $this->entityManager->persist($task);
