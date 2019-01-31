@@ -100,6 +100,26 @@ services:
     GuzzleHttp\Client:
       factory: 'App\Services\HttpClientService:getHttpClient'
 
+    App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
+      tags:
+        - { name: kernel.event_listener, event: task.prepare, priority: 100 }
+
+    App\Services\TaskTypePreparer\FinalTaskPreparer:
+      tags:
+        - { name: kernel.event_listener, event: task.prepare, priority: 200 }
+
+    App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer:
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 200 }
+
+    App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer:
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 190 }
+
+    App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer:
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 180 }
+
     App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 100 }
@@ -193,26 +213,6 @@ services:
       arguments:
         $hostname: '%hostname%'
         $token: '%token%'
-
-    App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
-      tags:
-        - { name: kernel.event_listener, event: task.prepare, priority: 100 }
-
-    App\Services\TaskTypePreparer\FinalTaskPreparer:
-      tags:
-        - { name: kernel.event_listener, event: task.prepare, priority: 200 }
-
-    App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer:
-      tags:
-        - { name: kernel.event_listener, event: task.perform, priority: 200 }
-
-    App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer:
-      tags:
-        - { name: kernel.event_listener, event: task.perform, priority: 190 }
-
-    App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer:
-      tags:
-        - { name: kernel.event_listener, event: task.perform, priority: 180 }
 
     webignition\InternetMediaType\Parser\Parser:
       class: webignition\InternetMediaType\Parser\Parser
