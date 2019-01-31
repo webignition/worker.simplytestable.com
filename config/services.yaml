@@ -214,9 +214,13 @@ services:
 
     App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
       tags:
-        - { name: kernel.event_listener, event: task.prepare }
+        - { name: kernel.event_listener, event: task.prepare, priority: 100 }
       arguments:
         $priority: '%web_page_task_source_preparer_priority%'
+
+    App\Services\TaskTypePreparer\FinalTaskPreparer:
+      tags:
+        - { name: kernel.event_listener, event: task.prepare, priority: 200 }
 
     App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer:
       arguments:

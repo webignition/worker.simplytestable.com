@@ -49,7 +49,7 @@ services:
 
   App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
     tags:
-      - { name: kernel.event_listener, event: task.prepare }
+      - { name: kernel.event_listener, event: task.prepare, priority: 100 }
     public: true
     arguments:
       $priority: 100
