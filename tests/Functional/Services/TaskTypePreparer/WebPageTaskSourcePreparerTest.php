@@ -13,7 +13,6 @@ use App\Services\TaskTypePreparer\WebPageTaskSourcePreparer;
 use App\Services\TaskTypeService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
-use App\Tests\Services\ContentTypeFactory;
 use App\Tests\Services\HttpMockHandler;
 use App\Tests\UnhandledGuzzleException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -171,8 +170,6 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => 'text/html']),
             new Response(200, ['content-type' => 'text/html'], 'html content'),
-            new Response(200, ['content-type' => 'text/html']),
-            new Response(200, ['content-type' => 'text/html'], 'html content'),
         ]);
 
         $taskTypeService = self::$container->get(TaskTypeService::class);
@@ -200,6 +197,13 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         );
 
         $this->preparer->prepare($task);
+
+        $this->assertEquals(
+            [
+                $url => $expectedSource,
+            ],
+            $task->getSources()
+        );
     }
 
     /**

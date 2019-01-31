@@ -67,6 +67,11 @@ class WebPageTaskSourcePreparer implements TaskPreparerInterface
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
         $taskUrl = $task->getUrl();
 
+        $existingSources = $task->getSources();
+        if (array_key_exists($taskUrl, $existingSources)) {
+            return;
+        }
+
         $source = null;
 
         try {
@@ -157,6 +162,7 @@ class WebPageTaskSourcePreparer implements TaskPreparerInterface
 
             /** @noinspection PhpUnhandledExceptionInspection */
             $reflector = new ReflectionClass(Request::class);
+            /** @noinspection PhpUnhandledExceptionInspection */
             $property = $reflector->getProperty('method');
             $property->setAccessible(true);
             $property->setValue($request, 'HEAD');
