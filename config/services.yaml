@@ -17,7 +17,6 @@ parameters:
     - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
     - Mozilla/5.0
   html_validation_invalid_character_encoding_output_transformer_priority: 90
-  html_validation_task_type_performer_priority: 100
   css_validation_task_type_performer_priority: 100
   link_integrity_task_type_performer_priority: 100
   url_discovery_task_type_performer_priority: 100
@@ -80,7 +79,6 @@ services:
     App\Services\TaskTypePerformer\Factory:
       arguments:
         $taskPerformers:
-          - '@App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer'
           - '@App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer'
           - '@App\Services\TaskTypePerformer\CssValidationTaskTypePerformer'
           - '@App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer'
@@ -111,8 +109,8 @@ services:
       factory: 'App\Services\HttpClientService:getHttpClient'
 
     App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer:
-      arguments:
-        $priority: '%html_validation_task_type_performer_priority%'
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 100 }
 
     App\Services\TaskTypePerformer\CssValidatorWrapperConfigurationFactory:
       arguments:
@@ -124,15 +122,15 @@ services:
 
     App\Services\TaskTypePerformer\CssValidationTaskTypePerformer:
       arguments:
-        $priority: '%html_validation_task_type_performer_priority%'
+        $priority: '%css_validation_task_type_performer_priority%'
 
     App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer:
       arguments:
-        $priority: '%html_validation_task_type_performer_priority%'
+        $priority: '%link_integrity_task_type_performer_priority%'
 
     App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer:
       arguments:
-        $priority: '%html_validation_task_type_performer_priority%'
+        $priority: '%url_discovery_task_type_performer_priority%'
 
     webignition\WebResource\Retriever:
       class: webignition\WebResource\Retriever
