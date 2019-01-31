@@ -32,6 +32,9 @@ class TaskPerformer
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
+        $taskEvent = new TaskEvent($task);
+        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORM, $taskEvent);
+
         $taskPerformerCollection = $this->factory->getPerformers($task->getType());
 
         foreach ($taskPerformerCollection as $taskPerformer) {
@@ -44,6 +47,6 @@ class TaskPerformer
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
-        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORMED, new TaskEvent($task));
+        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORMED, $taskEvent);
     }
 }
