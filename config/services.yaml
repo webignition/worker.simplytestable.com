@@ -100,6 +100,8 @@ services:
     App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
       tags:
         - { name: kernel.event_listener, event: task.prepare, priority: 100 }
+      arguments:
+        $webResourceRetriever: '@app.services.web-resource-retriever.web-page'
 
     App\Services\TaskTypePreparer\FinalTaskPreparer:
       tags:
