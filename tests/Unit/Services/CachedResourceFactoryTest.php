@@ -23,7 +23,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
         $this->cachedResourceFactory = new CachedResourceFactory();
     }
 
-    public function testCreateForTask()
+    public function testCreate()
     {
         $requestIdentifierFactory = new RequestIdentifierFactory();
 
@@ -47,7 +47,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
         $requestIdentifier = $requestIdentifierFactory->createFromTask($task);
         $requestHash = (string) $requestIdentifier;
 
-        $cachedResource = $this->cachedResourceFactory->createForTask($requestHash, $task, $webPage);
+        $cachedResource = $this->cachedResourceFactory->create($requestHash, $task->getUrl(), $webPage);
 
         $this->assertInstanceOf(CachedResource::class, $cachedResource);
         $this->assertEquals($requestHash, $cachedResource->getRequestHash());

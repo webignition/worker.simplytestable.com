@@ -3,18 +3,17 @@
 namespace App\Services;
 
 use App\Entity\CachedResource;
-use App\Entity\Task\Task;
-use webignition\WebResource\WebPage\WebPage;
+use webignition\WebResourceInterfaces\WebResourceInterface;
 
 class CachedResourceFactory
 {
-    public function createForTask(string $requestHash, Task $task, WebPage $webPage)
+    public function create(string $requestHash, string $resourceUrl, WebResourceInterface $resource)
     {
         return CachedResource::create(
             $requestHash,
-            $task->getUrl(),
-            (string)$webPage->getContentType(),
-            $webPage->getContent()
+            $resourceUrl,
+            (string) $resource->getContentType(),
+            $resource->getContent()
         );
     }
 }
