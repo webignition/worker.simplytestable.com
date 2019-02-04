@@ -7,8 +7,13 @@ use App\Model\RequestIdentifier;
 
 class RequestIdentifierFactory
 {
-    public function createFromTask(Task $task)
+    public function createFromTask(Task $task): RequestIdentifier
     {
-        return new RequestIdentifier($task->getUrl(), $task->getParameters()->toArray());
+        return $this->createFromTaskResource($task, $task->getUrl());
+    }
+
+    public function createFromTaskResource(Task $task, string $resourceUrl): RequestIdentifier
+    {
+        return new RequestIdentifier($resourceUrl, $task->getParameters()->toArray());
     }
 }
