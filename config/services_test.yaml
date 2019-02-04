@@ -25,3 +25,6 @@ services:
 
   App\Tests\Services\ContentTypeFactory:
     public: true
+
+  App\Services\TaskTypePreparer\CssTaskSourcePreparer:
+    public: true
