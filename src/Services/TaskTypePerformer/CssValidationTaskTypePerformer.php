@@ -112,6 +112,10 @@ class CssValidationTaskTypePerformer
      */
     private function performValidation(Task $task, WebPage $webPage)
     {
+        // @TODO: Fix in #389
+
+        return null;
+
         $cssValidatorWrapperConfiguration = $this->configurationFactory->create(
             $task,
             (string) $webPage->getUri(),
