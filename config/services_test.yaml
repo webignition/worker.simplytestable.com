@@ -25,24 +25,3 @@ services:
 
   App\Tests\Services\ContentTypeFactory:
     public: true
-
-  App\Services\ApplicationState:
-    public: true
-    arguments:
-      $stateResourcePath: '%kernel.project_dir%/config/state/%kernel.environment%'
-
-  App\Services\SourceFactory:
-    public: true
-
-  app.services.web-resource-retriever.web-page:
-    public: true
-    class: webignition\WebResource\Retriever
-    arguments:
-      $httpClient: '@GuzzleHttp\Client'
-      $allowedContentTypes:
-        - 'text/html'
-        - 'application/xhtml+xml'
-      $allowUnknownResourceTypes: false
-
-  App\Services\CachedResourceManager:
-    public: true

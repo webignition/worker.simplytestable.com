@@ -101,9 +101,9 @@ class TestTaskFactory
             $webPage = $webPage->setContentType($contentType);
         }
 
-        $cachedResource = $this->cachedResourceFactory->createForTask(
+        $cachedResource = $this->cachedResourceFactory->create(
             (string) $requestIdentifer,
-            $task,
+            $task->getUrl(),
             $webPage
         );
 
