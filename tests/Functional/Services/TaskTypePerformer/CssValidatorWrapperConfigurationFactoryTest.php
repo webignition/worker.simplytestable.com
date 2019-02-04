@@ -7,6 +7,7 @@ use App\Services\TaskTypePerformer\CssValidatorWrapperConfigurationFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\TestTaskFactory;
 use webignition\CssValidatorOutput\Parser\Configuration as OutputParserConfiguration;
+
 //use webignition\CssValidatorWrapper\Configuration\Configuration as WrapperConfiguration;
 //use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
 
