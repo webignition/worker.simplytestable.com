@@ -4272,16 +4272,16 @@
         },
         {
             "name": "webignition/html-validator-output-models",
-            "version": "0.7",
+            "version": "0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-validator-output-models.git",
-                "reference": "22473981b95a25290b2687d34ae81a72348abeb7"
+                "reference": "afb6ee67f8f67aa1e20fb88fb1f9d61461778d7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-validator-output-models/zipball/22473981b95a25290b2687d34ae81a72348abeb7",
-                "reference": "22473981b95a25290b2687d34ae81a72348abeb7",
+                "url": "https://api.github.com/repos/webignition/html-validator-output-models/zipball/afb6ee67f8f67aa1e20fb88fb1f9d61461778d7e",
+                "reference": "afb6ee67f8f67aa1e20fb88fb1f9d61461778d7e",
                 "shasum": ""
             },
             "require": {
@@ -4311,25 +4311,25 @@
                 "output",
                 "validator"
             ],
-            "time": "2019-01-31T12:44:07+00:00"
+            "time": "2019-02-04T13:19:37+00:00"
         },
         {
             "name": "webignition/html-validator-output-parser",
-            "version": "2.0",
+            "version": "2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-validator-output-parser.git",
-                "reference": "31c8700ba8ba67625dc357dea7bb09d513ed6766"
+                "reference": "4cb91d97a5d0ee1b9dc2373a7d3e81dfda894453"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-validator-output-parser/zipball/31c8700ba8ba67625dc357dea7bb09d513ed6766",
-                "reference": "31c8700ba8ba67625dc357dea7bb09d513ed6766",
+                "url": "https://api.github.com/repos/webignition/html-validator-output-parser/zipball/4cb91d97a5d0ee1b9dc2373a7d3e81dfda894453",
+                "reference": "4cb91d97a5d0ee1b9dc2373a7d3e81dfda894453",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2",
-                "webignition/html-validator-output-models": ">=0.6,<1",
+                "webignition/html-validator-output-models": ">=0.9,<1",
                 "webignition/internet-media-type": ">=2,<3"
             },
             "require-dev": {
@@ -4355,7 +4355,7 @@
                 "parser",
                 "validator"
             ],
-            "time": "2019-01-30T18:05:11+00:00"
+            "time": "2019-02-04T13:30:16+00:00"
         },
         {
             "name": "webignition/html-validator-wrapper",
