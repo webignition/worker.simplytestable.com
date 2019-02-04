@@ -4,20 +4,18 @@ namespace App\Services\TaskTypePerformer;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
-use App\Model\Task\TypeInterface;
+use App\Event\TaskEvent;
+use App\Model\Task\Type;
 use App\Services\TaskCachedSourceWebPageRetriever;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
-class UrlDiscoveryTaskTypePerformer implements TaskPerformerInterface
+class UrlDiscoveryTaskTypePerformer
 {
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
 
-    /**
-     * @var TaskCachedSourceWebPageRetriever
-     */
     private $taskCachedSourceWebPageRetriever;
 
     /**
@@ -28,15 +26,16 @@ class UrlDiscoveryTaskTypePerformer implements TaskPerformerInterface
         'https'
     ];
 
-    /**
-     * @var int
-     */
-    private $priority;
-
-    public function __construct(TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever, int $priority)
+    public function __construct(TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever)
     {
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
-        $this->priority = $priority;
+    }
+
+    public function __invoke(TaskEvent $taskEvent)
+    {
+        if (Type::TYPE_URL_DISCOVERY === (string) $taskEvent->getTask()->getType()) {
+            $this->perform($taskEvent->getTask());
+        }
     }
 
     public function perform(Task $task)
@@ -70,15 +69,5 @@ class UrlDiscoveryTaskTypePerformer implements TaskPerformerInterface
         ));
 
         $task->setState(Task::STATE_COMPLETED);
-    }
-
-    public function handles(string $taskType): bool
-    {
-        return TypeInterface::TYPE_URL_DISCOVERY === $taskType;
-    }
-
-    public function getPriority(): int
-    {
-        return $this->priority;
     }
 }

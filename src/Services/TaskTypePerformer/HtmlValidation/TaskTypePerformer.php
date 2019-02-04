@@ -4,10 +4,10 @@ namespace App\Services\TaskTypePerformer\HtmlValidation;
 
 use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
+use App\Event\TaskEvent;
 use App\Model\HtmlValidationMessageList;
-use App\Model\Task\TypeInterface;
+use App\Model\Task\Type;
 use App\Services\TaskCachedSourceWebPageRetriever;
-use App\Services\TaskTypePerformer\TaskPerformerInterface;
 use webignition\HtmlValidator\Wrapper\Wrapper as HtmlValidatorWrapper;
 use webignition\HtmlValidatorOutput\Parser\Flags;
 use webignition\InternetMediaType\InternetMediaType;
@@ -16,7 +16,7 @@ use webignition\HtmlDocumentType\Extractor as DoctypeExtractor;
 use webignition\HtmlDocumentType\Validator as DoctypeValidator;
 use webignition\HtmlDocumentType\Factory as DoctypeFactory;
 
-class TaskTypePerformer implements TaskPerformerInterface
+class TaskTypePerformer
 {
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
@@ -24,20 +24,19 @@ class TaskTypePerformer implements TaskPerformerInterface
     private $taskCachedSourceWebPageRetriever;
     private $htmlValidatorWrapper;
 
-    /**
-     * @var int
-     */
-    private $priority;
-
     public function __construct(
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
-        HtmlValidatorWrapper $htmlValidatorWrapper,
-        int $priority
+        HtmlValidatorWrapper $htmlValidatorWrapper
     ) {
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
-
         $this->htmlValidatorWrapper = $htmlValidatorWrapper;
-        $this->priority = $priority;
+    }
+
+    public function __invoke(TaskEvent $taskEvent)
+    {
+        if (Type::TYPE_HTML_VALIDATION === (string) $taskEvent->getTask()->getType()) {
+            $this->perform($taskEvent->getTask());
+        }
     }
 
     public function perform(Task $task)
@@ -47,16 +46,6 @@ class TaskTypePerformer implements TaskPerformerInterface
         }
 
         return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
-    }
-
-    public function handles(string $taskType): bool
-    {
-        return TypeInterface::TYPE_HTML_VALIDATION === $taskType;
-    }
-
-    public function getPriority(): int
-    {
-        return $this->priority;
     }
 
     /**

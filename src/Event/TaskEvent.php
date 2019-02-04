@@ -10,6 +10,7 @@ class TaskEvent extends Event
     const TYPE_CREATED = 'task.created';
     const TYPE_PREPARE = 'task.prepare';
     const TYPE_PREPARED = 'task.prepared';
+    const TYPE_PERFORM = 'task.perform';
     const TYPE_PERFORMED = 'task.performed';
     const TYPE_REPORTED_COMPLETION = 'task.reported-completion';
 

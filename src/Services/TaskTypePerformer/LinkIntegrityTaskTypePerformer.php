@@ -4,9 +4,10 @@ namespace App\Services\TaskTypePerformer;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Event\TaskEvent;
 use App\Model\LinkIntegrityResult;
 use App\Model\LinkIntegrityResultCollection;
-use App\Model\Task\TypeInterface;
+use App\Model\Task\Type;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
@@ -17,7 +18,7 @@ use webignition\WebResource\WebPage\WebPage;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkFinderConfiguration;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
-class LinkIntegrityTaskTypePerformer implements TaskPerformerInterface
+class LinkIntegrityTaskTypePerformer
 {
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
 
@@ -46,18 +47,12 @@ class LinkIntegrityTaskTypePerformer implements TaskPerformerInterface
      */
     private $httpRetryMiddleware;
 
-    /**
-     * @var int
-     */
-    private $priority;
-
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory,
-        HttpRetryMiddleware $httpRetryMiddleware,
-        int $priority
+        HttpRetryMiddleware $httpRetryMiddleware
     ) {
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
@@ -65,7 +60,13 @@ class LinkIntegrityTaskTypePerformer implements TaskPerformerInterface
 
         $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
         $this->httpRetryMiddleware = $httpRetryMiddleware;
-        $this->priority = $priority;
+    }
+
+    public function __invoke(TaskEvent $taskEvent)
+    {
+        if (Type::TYPE_LINK_INTEGRITY === (string) $taskEvent->getTask()->getType()) {
+            $this->perform($taskEvent->getTask());
+        }
     }
 
     public function perform(Task $task)
@@ -77,16 +78,6 @@ class LinkIntegrityTaskTypePerformer implements TaskPerformerInterface
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
         return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
-    }
-
-    public function handles(string $taskType): bool
-    {
-        return TypeInterface::TYPE_LINK_INTEGRITY === $taskType;
-    }
-
-    public function getPriority(): int
-    {
-        return $this->priority;
     }
 
     private function performValidation(Task $task, WebPage $webPage)

@@ -205,7 +205,7 @@ class Task implements \JsonSerializable
         $this->startDateTime = $startDateTime;
     }
 
-    public function getStartDateTime(): \DateTime
+    public function getStartDateTime(): ?\DateTime
     {
         return $this->startDateTime;
     }

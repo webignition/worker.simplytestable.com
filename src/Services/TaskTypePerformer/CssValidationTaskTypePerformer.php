@@ -4,7 +4,8 @@ namespace App\Services\TaskTypePerformer;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
-use App\Model\Task\TypeInterface;
+use App\Event\TaskEvent;
+use App\Model\Task\Type;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\TaskCachedSourceWebPageRetriever;
@@ -19,7 +20,7 @@ use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypePars
 use webignition\WebPageInspector\UnparseableContentTypeException;
 use webignition\WebResource\WebPage\WebPage;
 
-class CssValidationTaskTypePerformer implements TaskPerformerInterface
+class CssValidationTaskTypePerformer
 {
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
     const HTTP_ERROR_TITLE_PREFIX = 'http-error:';
@@ -50,18 +51,12 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
      */
     private $configurationFactory;
 
-    /**
-     * @var int
-     */
-    private $priority;
-
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         CssValidatorWrapper $cssValidatorWrapper,
-        CssValidatorWrapperConfigurationFactory $configurationFactory,
-        int $priority
+        CssValidatorWrapperConfigurationFactory $configurationFactory
     ) {
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
@@ -69,7 +64,20 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
         $this->configurationFactory = $configurationFactory;
-        $this->priority = $priority;
+    }
+
+    /**
+     * @param TaskEvent $taskEvent
+     *
+     * @throws InternetMediaTypeParseException
+     * @throws InvalidValidatorOutputException
+     * @throws UnparseableContentTypeException
+     */
+    public function __invoke(TaskEvent $taskEvent)
+    {
+        if (Type::TYPE_CSS_VALIDATION === (string) $taskEvent->getTask()->getType()) {
+            $this->perform($taskEvent->getTask());
+        }
     }
 
     /**
@@ -90,16 +98,6 @@ class CssValidationTaskTypePerformer implements TaskPerformerInterface
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
         return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
-    }
-
-    public function handles(string $taskType): bool
-    {
-        return TypeInterface::TYPE_CSS_VALIDATION === $taskType;
-    }
-
-    public function getPriority(): int
-    {
-        return $this->priority;
     }
 
     /**
