@@ -413,6 +413,9 @@
     "webignition/url-health-checker": {
         "version": "1.0"
     },
+    "webignition/url-source-map": {
+        "version": "0.2"
+    },
     "webignition/validator-message": {
         "version": "0.3"
     },
@@ -433,9 +436,6 @@
     },
     "webignition/web-resource-retriever": {
         "version": "0.7"
-    },
-    "webignition/web-resource-storage": {
-        "version": "0.1"
     },
     "webmozart/assert": {
         "version": "1.3.0"

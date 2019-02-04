@@ -16,6 +16,7 @@ parameters:
   link_integrity_user_agents:
     - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
     - Mozilla/5.0
+  java_executable_path: java
 
 services:
     # default configuration for services in *this* file
@@ -176,7 +177,32 @@ services:
 
     webignition\HtmlValidator\Wrapper\Wrapper:
 
+    webignition.cssvalidatorwrapper.sourcestorage:
+      class: webignition\CssValidatorWrapper\SourceStorage
+
+    webignition.cssvalidatorwrapper.outputmutator:
+      class: webignition\CssValidatorWrapper\OutputMutator
+
+    webignition.cssvalidatorwrapper.commandfactory:
+      class: webignition\CssValidatorWrapper\CommandFactory
+      arguments:
+        $javaExecutablePath: '%java_executable_path%'
+        $cssValidatorJarPath: '%env(CSS_VALIDATOR_JAR_PATH)%'
+
+    webignition.cssvalidatoroutput.parser.outputparser:
+      class: webignition\CssValidatorOutput\Parser\OutputParser
+
+    webignition.cssvalidatorwrapper.commandexecutor:
+      class: webignition\CssValidatorWrapper\CommandExecutor
+      arguments:
+        $outputParser: '@webignition.cssvalidatoroutput.parser.outputparser'
+
     webignition\CssValidatorWrapper\Wrapper:
+      arguments:
+        $sourceStorage: '@webignition.cssvalidatorwrapper.sourcestorage'
+        $outputMutator: '@webignition.cssvalidatorwrapper.outputmutator'
+        $commandFactory: '@webignition.cssvalidatorwrapper.commandfactory'
+        $commandExecutor: '@webignition.cssvalidatorwrapper.commandexecutor'
 
     webignition\NodeJslint\Wrapper\Wrapper:
 

@@ -164,25 +164,26 @@ class PerformCommandTest extends AbstractBaseTestCase
                     ],
                 ],
             ],
-            'css validation' => [
-                'setUp' => function () {
-                    CssValidatorFixtureFactory::set(
-                        CssValidatorFixtureFactory::load('no-messages')
-                    );
-                },
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'text/css']),
-                    new Response(200, ['content-type' => 'text/css']),
-                ],
-                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
-                    'url' => 'http://example.com/',
-                    'type' => TypeInterface::TYPE_CSS_VALIDATION,
-                ]),
-                'primarySourceContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
-                'expectedTaskState' => Task::STATE_COMPLETED,
-                'expectedErrorCount' => 0,
-                'expectedDecodedOutput' => [],
-            ],
+// @TODO: fix in #389
+//            'css validation' => [
+//                'setUp' => function () {
+//                    CssValidatorFixtureFactory::set(
+//                        CssValidatorFixtureFactory::load('no-messages')
+//                    );
+//                },
+//                'httpFixtures' => [
+//                    new Response(200, ['content-type' => 'text/css']),
+//                    new Response(200, ['content-type' => 'text/css']),
+//                ],
+//                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+//                    'url' => 'http://example.com/',
+//                    'type' => TypeInterface::TYPE_CSS_VALIDATION,
+//                ]),
+//                'primarySourceContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+//                'expectedTaskState' => Task::STATE_COMPLETED,
+//                'expectedErrorCount' => 0,
+//                'expectedDecodedOutput' => [],
+//            ],
             'link integrity' => [
                 'setUp' => function () {
                     CssValidatorFixtureFactory::set(
