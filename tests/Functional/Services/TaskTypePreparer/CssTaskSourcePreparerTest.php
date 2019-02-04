@@ -3,22 +3,18 @@
 
 namespace App\Tests\Functional\Services\TaskTypePreparer;
 
-use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
-use App\Model\Source;
 use App\Model\Task\Type;
-use App\Services\SourceFactory;
 use App\Services\TaskTypePreparer\CssTaskSourcePreparer;
-use App\Services\TaskTypePreparer\WebPageTaskSourcePreparer;
 use App\Services\TaskTypeService;
-use App\Tests\Factory\ConnectExceptionFactory;
+use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
-use App\Tests\UnhandledGuzzleException;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
+use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
+use webignition\InternetMediaType\InternetMediaType;
+use webignition\WebResource\Retriever as WebResourceRetriever;
 
 class CssTaskSourcePreparerTest extends AbstractBaseTestCase
 {
@@ -28,14 +24,14 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
     private $preparer;
 
     /**
-     * @var SourceFactory
+     * @var TestTaskFactory
      */
-    private $sourceFactory;
+    private $testTaskFactory;
 
     /**
-     * @var EntityRepository
+     * @var WebResourceRetriever
      */
-    private $cachedResourceRepository;
+    private $cssWebResourceRetriever;
 
     /**
      * @var HttpMockHandler
@@ -50,32 +46,38 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
         parent::setUp();
 
         $this->preparer = self::$container->get(CssTaskSourcePreparer::class);
-        $this->sourceFactory = self::$container->get(SourceFactory::class);
-        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
+        $this->testTaskFactory = self::$container->get(TestTaskFactory::class);
 
-        $entityManager = self::$container->get(EntityManagerInterface::class);
-        $this->cachedResourceRepository = $entityManager->getRepository(CachedResource::class);
+        $this->cssWebResourceRetriever = self::$container->get('app.services.web-resource-retriever.css');
+        $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
     }
 
     /**
-     * @dataProvider prepareWrongTaskTypeDataProvider
+     * @dataProvider wrongTaskTypeDataProvider
      */
     public function testPrepareWrongTaskType(string $taskType)
     {
         $taskTypeService = self::$container->get(TaskTypeService::class);
-
         $task = Task::create($taskTypeService->get($taskType), 'http://example.com/');
 
-        $state = $task->getState();
-        $sources = $task->getSources();
-
-        $this->preparer->prepare($task);
-
-        $this->assertEquals($state, $task->getState());
-        $this->assertEquals($sources, $task->getSources());
+        $this->assertNull($this->preparer->prepare($task));
     }
 
-    public function prepareWrongTaskTypeDataProvider(): array
+    /**
+     * @dataProvider wrongTaskTypeDataProvider
+     */
+    public function testInvokeWrongTaskType(string $taskType)
+    {
+        $taskTypeService = self::$container->get(TaskTypeService::class);
+        $task = Task::create($taskTypeService->get($taskType), 'http://example.com/');
+
+        $taskEvent = new TaskEvent($task);
+
+        $this->preparer->__invoke(new TaskEvent($task));
+        $this->assertFalse($taskEvent->isPropagationStopped());
+    }
+
+    public function wrongTaskTypeDataProvider(): array
     {
         return [
             'html validation' => [
@@ -93,279 +95,145 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
         ];
     }
 
-//    /**
-//     * @dataProvider prepareInvalidContentTypeDataProvider
-//     */
-//    public function testPrepareInvalidContentType(string $contentType)
-//    {
-//        $this->httpMockHandler->appendFixtures([
-//            new Response(200, ['content-type' => $contentType]),
-//        ]);
-//
-//        $taskTypeService = self::$container->get(TaskTypeService::class);
-//
-//        $url = 'http://example.com';
-//        $task = Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
-//
-//        $this->assertEquals([], $task->getSources());
-//
-//        $this->preparer->prepare($task);
-//
-//        $expectedSource = $this->sourceFactory->createInvalidSource($url, 'invalid-content-type');
-//
-//        $this->assertEquals(
-//            [
-//                $url => $expectedSource,
-//            ],
-//            $task->getSources()
-//        );
-//    }
-//
-//    public function prepareInvalidContentTypeDataProvider(): array
-//    {
-//        return [
-//            'disallowed content type' => [
-//                'contentType' => 'text/plain',
-//            ],
-//            'unparseable content type' => [
-//                'contentType' => 'f o o',
-//            ],
-//        ];
-//    }
-//
-//    /**
-//     * @dataProvider prepareSuccessNoPreExistingCachedResourceDataProvider
-//     */
-//    public function testPrepareSuccessNoPreExistingCachedResource(string $contentType)
-//    {
-//        $this->httpMockHandler->appendFixtures([
-//            new Response(200, ['content-type' => $contentType]),
-//            new Response(200, ['content-type' => $contentType], 'html content'),
-//        ]);
-//
-//        $taskTypeService = self::$container->get(TaskTypeService::class);
-//
-//        $url = 'http://example.com';
-//        $task = Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
-//
-//        $this->assertEquals([], $task->getSources());
-//        $this->assertEquals([], $this->cachedResourceRepository->findAll());
-//
-//        $this->preparer->prepare($task);
-//
-//        /* @var CachedResource $cachedResource */
-//        $cachedResource = $this->cachedResourceRepository->findOneBy([
-//            'url' => $url,
-//        ]);
-//
-//        $this->assertEquals($contentType, (string) $cachedResource->getContentType());
-//
-//        $expectedSource = $this->sourceFactory->fromCachedResource($cachedResource);
-//
-//        $this->assertEquals(
-//            [
-//                $url => $expectedSource,
-//            ],
-//            $task->getSources()
-//        );
-//    }
-//
-//    public function prepareSuccessNoPreExistingCachedResourceDataProvider(): array
-//    {
-//        return [
-//            'text/html' => [
-//                'contentType' => 'text/html',
-//            ],
-//            'text/html; charset=utf-8' => [
-//                'contentType' => 'text/html; charset=utf-8',
-//            ],
-//            'text/html; charset=windows-1251' => [
-//                'contentType' => 'text/html; charset=windows-1251',
-//            ],
-//        ];
-//    }
-//
-//    public function testPrepareSuccessHasPreExistingCachedResource()
-//    {
-//        $this->httpMockHandler->appendFixtures([
-//            new Response(200, ['content-type' => 'text/html']),
-//            new Response(200, ['content-type' => 'text/html'], 'html content'),
-//        ]);
-//
-//        $taskTypeService = self::$container->get(TaskTypeService::class);
-//
-//        $url = 'http://example.com';
-//        $task = Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
-//
-//        $this->assertEquals([], $task->getSources());
-//        $this->assertEquals([], $this->cachedResourceRepository->findAll());
-//
-//        $this->preparer->prepare($task);
-//
-//        /* @var CachedResource $cachedResource */
-//        $cachedResource = $this->cachedResourceRepository->findOneBy([
-//            'url' => $url,
-//        ]);
-//
-//        $expectedSource = $this->sourceFactory->fromCachedResource($cachedResource);
-//
-//        $this->assertEquals(
-//            [
-//                $url => $expectedSource,
-//            ],
-//            $task->getSources()
-//        );
-//
-//        $this->preparer->prepare($task);
-//
-//        $this->assertEquals(
-//            [
-//                $url => $expectedSource,
-//            ],
-//            $task->getSources()
-//        );
-//    }
-//
-//    /**
-//     * @dataProvider prepareFailureDataProvider
-//     */
-//    public function testPrepareFailure(array $httpFixtures, array $expectedSourceData)
-//    {
-//        $this->httpMockHandler->appendFixtures($httpFixtures);
-//
-//        $taskTypeService = self::$container->get(TaskTypeService::class);
-//
-//        $url = 'http://example.com';
-//        $task = Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
-//
-//        $this->assertEquals([], $task->getSources());
-//
-//        $this->preparer->prepare($task);
-//
-//        /* @var Source $source */
-//        $source = $task->getSources()[$url];
-//
-//        $this->assertEquals($expectedSourceData, $source->toArray());
-//    }
-//
-//    public function prepareFailureDataProvider(): array
-//    {
-//        $http404Response = new Response(404);
-//        $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
-//        $unhandledGuzzleException = new UnhandledGuzzleException();
-//
-//        return [
-//            'http 404' => [
-//                'httpFixtures' => [
-//                    $http404Response,
-//                    $http404Response,
-//                ],
-//                'expectedSourceData' => [
-//                    'url' => 'http://example.com',
-//                    'type' => Source::TYPE_UNAVAILABLE,
-//                    'value' => 'http:404',
-//                    'context' => [],
-//                ],
-//            ],
-//            'curl 28' => [
-//                'httpFixtures' => array_fill(0, 12, $curl28ConnectException),
-//                'expectedSourceData' => [
-//                    'url' => 'http://example.com',
-//                    'type' => Source::TYPE_UNAVAILABLE,
-//                    'value' => 'curl:28',
-//                    'context' => [],
-//                ],
-//            ],
-//            'http 301, not redirect loop (first 6 responses are to HEAD requests, second 6 are to GET requests)' => [
-//                'httpFixtures' => [
-//                    new Response(301, ['location' => 'http://example.com/1']),
-//                    new Response(301, ['location' => 'http://example.com/2']),
-//                    new Response(301, ['location' => 'http://example.com/3']),
-//                    new Response(301, ['location' => 'http://example.com/4']),
-//                    new Response(301, ['location' => 'http://example.com/5']),
-//                    new Response(301, ['location' => 'http://example.com/6']),
-//                    new Response(301, ['location' => 'http://example.com/1']),
-//                    new Response(301, ['location' => 'http://example.com/2']),
-//                    new Response(301, ['location' => 'http://example.com/3']),
-//                    new Response(301, ['location' => 'http://example.com/4']),
-//                    new Response(301, ['location' => 'http://example.com/5']),
-//                    new Response(301, ['location' => 'http://example.com/6']),
-//                ],
-//                'expectedSourceData' => [
-//                    'url' => 'http://example.com',
-//                    'type' => Source::TYPE_UNAVAILABLE,
-//                    'value' => 'http:301',
-//                    'context' => [
-//                        'too_many_redirects' => true,
-//                        'is_redirect_loop' => false,
-//                        'history' => [
-//                            'http://example.com',
-//                            'http://example.com/1',
-//                            'http://example.com/2',
-//                            'http://example.com/3',
-//                            'http://example.com/4',
-//                            'http://example.com/5',
-//                            'http://example.com',
-//                            'http://example.com/1',
-//                            'http://example.com/2',
-//                            'http://example.com/3',
-//                            'http://example.com/4',
-//                            'http://example.com/5',
-//                        ],
-//                    ],
-//                ],
-//            ],
-//            'http 301,  redirect loop' => [
-//                'httpFixtures' => [
-//                    new Response(301, ['location' => 'http://example.com/1']),
-//                    new Response(301, ['location' => 'http://example.com/2']),
-//                    new Response(301, ['location' => 'http://example.com/3']),
-//                    new Response(301, ['location' => 'http://example.com/1']),
-//                    new Response(301, ['location' => 'http://example.com/2']),
-//                    new Response(301, ['location' => 'http://example.com/3']),
-//                    new Response(301, ['location' => 'http://example.com/1']),
-//                    new Response(301, ['location' => 'http://example.com/2']),
-//                    new Response(301, ['location' => 'http://example.com/3']),
-//                    new Response(301, ['location' => 'http://example.com/1']),
-//                    new Response(301, ['location' => 'http://example.com/2']),
-//                    new Response(301, ['location' => 'http://example.com/3']),
-//                ],
-//                'expectedSourceData' => [
-//                    'url' => 'http://example.com',
-//                    'type' => Source::TYPE_UNAVAILABLE,
-//                    'value' => 'http:301',
-//                    'context' => [
-//                        'too_many_redirects' => true,
-//                        'is_redirect_loop' => true,
-//                        'history' => [
-//                            'http://example.com',
-//                            'http://example.com/1',
-//                            'http://example.com/2',
-//                            'http://example.com/3',
-//                            'http://example.com/1',
-//                            'http://example.com/2',
-//                            'http://example.com',
-//                            'http://example.com/1',
-//                            'http://example.com/2',
-//                            'http://example.com/3',
-//                            'http://example.com/1',
-//                            'http://example.com/2',
-//                        ],
-//                    ],
-//                ],
-//            ],
-//            'unknown' => [
-//                'httpFixtures' => [
-//                    $unhandledGuzzleException,
-//                    $unhandledGuzzleException,
-//                ],
-//                'expectedSourceData' => [
-//                    'url' => 'http://example.com',
-//                    'type' => Source::TYPE_UNAVAILABLE,
-//                    'value' => 'unknown:0',
-//                    'context' => [],
-//                ],
-//            ],
-//        ];
-//    }
+    /**
+     * @dataProvider prepareSuccessDataProvider
+     */
+    public function testPrepareSuccess(
+        array $taskValues,
+        array $httpFixtures,
+        bool $expectedPreparationIsComplete,
+        array $expectedSourceUrls
+    ) {
+        $task = $this->testTaskFactory->create($taskValues);
+        $this->httpMockHandler->appendFixtures($httpFixtures);
+
+        $preparationIsComplete = $this->preparer->prepare($task);
+
+        $this->assertEquals($expectedPreparationIsComplete, $preparationIsComplete);
+        $this->assertEquals($expectedSourceUrls, array_keys($task->getSources()));
+    }
+
+    /**
+     * @dataProvider prepareSuccessDataProvider
+     */
+    public function testInvokeSuccess(
+        array $taskValues,
+        array $httpFixtures,
+        bool $expectedPreparationIsComplete,
+        array $expectedSourceUrls
+    ) {
+        $task = $this->testTaskFactory->create($taskValues);
+        $this->httpMockHandler->appendFixtures($httpFixtures);
+
+        $taskEvent = new TaskEvent($task);
+
+        $this->preparer->__invoke($taskEvent);
+
+        $this->assertEquals(!$expectedPreparationIsComplete, $taskEvent->isPropagationStopped());
+        $this->assertEquals($expectedSourceUrls, array_keys($task->getSources()));
+    }
+
+    public function prepareSuccessDataProvider(): array
+    {
+        return [
+            'no stylesheet urls' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => '<!doctype html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [],
+                'expectedPreparationIsComplete' => true,
+                'expectedSourceUrls' => [
+                    'http://example.com',
+                ],
+            ],
+            'single stylesheet url' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css']),
+                ],
+                'expectedPreparationIsComplete' => true,
+                'expectedSourceUrls' => [
+                    'http://example.com',
+                    'http://example.com/style.css',
+                ],
+            ],
+            'two stylesheet urls, none sourced' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('empty-body-two-css-links'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css']),
+                ],
+                'expectedPreparationIsComplete' => false,
+                'expectedSourceUrls' => [
+                    'http://example.com',
+                    'http://example.com/one.css',
+                ],
+            ],
+            'two stylesheet urls, first sourced' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('empty-body-two-css-links'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://example.com/one.css',
+                            'content' => 'html {}',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css']),
+                ],
+                'expectedPreparationIsComplete' => true,
+                'expectedSourceUrls' => [
+                    'http://example.com',
+                    'http://example.com/one.css',
+                    'http://example.com/two.css',
+                ],
+            ],
+        ];
+    }
 }

@@ -4,68 +4,36 @@ namespace App\Services\TaskTypePreparer;
 
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
-use App\Model\Source;
 use App\Model\Task\Type;
-use App\Services\CachedResourceFactory;
-use App\Services\CachedResourceManager;
-use App\Services\HttpClientConfigurationService;
-use App\Services\RequestIdentifierFactory;
-use App\Services\SourceFactory;
 use App\Services\TaskCachedSourceWebPageRetriever;
-use Doctrine\ORM\EntityManagerInterface;
-use GuzzleHttp\Psr7\Request;
-use Psr\Http\Message\RequestInterface;
-use ReflectionClass;
-use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
-use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
-use webignition\WebResource\Exception\HttpException;
-use webignition\WebResource\Exception\InvalidResponseContentTypeException;
-use webignition\WebResource\Exception\TransportException;
+use App\Services\TaskSourceRetriever;
+use webignition\CssValidatorWrapper\SourceInspector as CssSourceInspector;
 use webignition\WebResource\Retriever as WebResourceRetriever;
-use webignition\WebResource\WebPage\WebPage;
 
 class CssTaskSourcePreparer
 {
-    const USER_AGENT = 'ST CSS Task Source Preparer (http://bit.ly/RlhKCL)';
-
     private $taskCachedSourceWebPageRetriever;
-//    private $webResourceRetriever;
-//    private $httpClientConfigurationService;
-//    private $httpHistoryContainer;
-//    private $cachedResourceManager;
-//    private $sourceFactory;
-//    private $entityManager;
-//    private $requestIdentifierFactory;
-//    private $cachedResourceFactory;
+    private $taskSourceRetriever;
+    private $webResourceRetriever;
 
     public function __construct(
-        TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever
-//        WebResourceRetriever $webResourceRetriever,
-//        HttpClientConfigurationService $httpClientConfigurationService,
-//        HttpHistoryContainer $httpHistoryContainer,
-//        CachedResourceManager $cachedResourceManager,
-//        SourceFactory $sourceFactory,
-//        EntityManagerInterface $entityManager,
-//        RequestIdentifierFactory $requestIdentifierFactory,
-//        CachedResourceFactory $cachedResourceFactory
+        TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
+        TaskSourceRetriever $taskSourceRetriever,
+        WebResourceRetriever $webResourceRetriever
     ) {
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
-//        $this->webResourceRetriever = $webResourceRetriever;
-//        $this->httpClientConfigurationService = $httpClientConfigurationService;
-//        $this->httpHistoryContainer = $httpHistoryContainer;
-//        $this->cachedResourceManager = $cachedResourceManager;
-//        $this->sourceFactory = $sourceFactory;
-//        $this->entityManager = $entityManager;
-//        $this->requestIdentifierFactory = $requestIdentifierFactory;
-//        $this->cachedResourceFactory = $cachedResourceFactory;
+        $this->taskSourceRetriever = $taskSourceRetriever;
+        $this->webResourceRetriever = $webResourceRetriever;
     }
 
     public function __invoke(TaskEvent $taskEvent)
     {
-        $prepareResult = $this->prepare($taskEvent->getTask());
+        if (Type::TYPE_CSS_VALIDATION === (string) $taskEvent->getTask()->getType()) {
+            $preparationIsComplete = $this->prepare($taskEvent->getTask());
 
-        if (false === $prepareResult) {
-            $taskEvent->stopPropagation();
+            if (false === $preparationIsComplete) {
+                $taskEvent->stopPropagation();
+            }
         }
     }
 
@@ -75,109 +43,33 @@ class CssTaskSourcePreparer
             return null;
         }
 
+        $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 
+        $cssSourceInspector = new CssSourceInspector($webPage);
+        $stylesheetUrls = $cssSourceInspector->findStylesheetUrls();
 
-        // find all absolute stylesheet urls
-        // per url:
-        // - check if task source exists
-        // - retrieve
-        // - store as cached resource
-        // - add task source
+        $nextUnSourcedStylesheetUrl = $this->findNextUnSourcedStylesheetUrl($stylesheetUrls, $task->getSources());
+        if (null === $nextUnSourcedStylesheetUrl) {
+            return true;
+        }
 
-        // need to do so one source at a time
-        // if, after retrieving one source, there are urls without sources, stop event propagation
-        // stopping event propagation will
+        $this->taskSourceRetriever->retrieve($this->webResourceRetriever, $task, $nextUnSourcedStylesheetUrl);
 
-        // find all absolulte stylesheet urls
-
-//        $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
-//        $taskUrl = $task->getUrl();
-//
-//        $existingSources = $task->getSources();
-//        if (array_key_exists($taskUrl, $existingSources)) {
-//            return;
-//        }
-//
-//        $source = null;
-//
-//        try {
-//            /* @var WebPage $webPage */
-//            $webPage = $this->webResourceRetriever->retrieve(new Request('GET', $taskUrl));
-//
-//            $requestIdentifier = $this->requestIdentifierFactory->createFromTask($task);
-//            $requestHash = (string) $requestIdentifier;
-//
-//            $cachedResource = $this->cachedResourceManager->find($requestHash);
-//            if (!$cachedResource) {
-//                $cachedResource = $this->cachedResourceFactory->createForTask($requestHash, $task, $webPage);
-//
-//                $this->entityManager->persist($cachedResource);
-//                $this->entityManager->flush();
-//            }
-//
-//            $source = $this->sourceFactory->fromCachedResource($cachedResource);
-//        } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
-//            $source = $this->sourceFactory->createInvalidSource($taskUrl, Source::MESSAGE_INVALID_CONTENT_TYPE);
-//        } catch (HttpException $httpException) {
-//            $source = $this->sourceFactory->createHttpFailedSource(
-//                $taskUrl,
-//                $httpException->getCode()
-//            );
-//        } catch (TransportException $transportException) {
-//            if (!$transportException->isCurlException() && !$transportException->isTooManyRedirectsException()) {
-//                $source = $this->sourceFactory->createUnknownFailedSource($taskUrl);
-//            } else {
-//                if ($transportException->isTooManyRedirectsException()) {
-//                    $this->fixHeadRequestMethods();
-//
-//                    $source = $this->sourceFactory->createHttpFailedSource(
-//                        $taskUrl,
-//                        301,
-//                        [
-//                            'too_many_redirects' => true,
-//                            'is_redirect_loop' => $this->httpHistoryContainer->hasRedirectLoop(),
-//                            'history' => $this->httpHistoryContainer->getRequestUrlsAsStrings(),
-//                        ]
-//                    );
-//                } else {
-//                    $source = $this->sourceFactory->createCurlFailedSource(
-//                        $taskUrl,
-//                        $transportException->getCode()
-//                    );
-//                }
-//            }
-//        } catch (InternetMediaTypeParseException $e) {
-//            $source = $this->sourceFactory->createInvalidSource(
-//                $taskUrl,
-//                Source::MESSAGE_INVALID_CONTENT_TYPE
-//            );
-//        }
-//
-//        $task->addSource($source);
-//        $this->entityManager->persist($task);
-//        $this->entityManager->flush();
+        return null === $this->findNextUnSourcedStylesheetUrl($stylesheetUrls, $task->getSources());
     }
 
-//    /**
-//     * Guzzle currently (incorrectly) follows a redirected HEAD request with a GET request
-//     * This modifies the method on such requests
-//     */
-//    private function fixHeadRequestMethods()
-//    {
-//        $httpTransactionCount = $this->httpHistoryContainer->count();
-//        $httpTransactions = $this->httpHistoryContainer->getTransactions();
-//        $headTransactions = array_slice($httpTransactions, 0, $httpTransactionCount / 2);
-//
-//        foreach ($headTransactions as $httpTransaction) {
-//            /* @var RequestInterface $request */
-//            $request = $httpTransaction['request'];
-//
-//            /** @noinspection PhpUnhandledExceptionInspection */
-//            $reflector = new ReflectionClass(Request::class);
-//            /** @noinspection PhpUnhandledExceptionInspection */
-//            $property = $reflector->getProperty('method');
-//            $property->setAccessible(true);
-//            $property->setValue($request, 'HEAD');
-//        }
-//    }
+    private function findNextUnSourcedStylesheetUrl(array $stylesheetUrls, array $sources): ?string
+    {
+        $nextUnSourcedStylesheetUrl = null;
+
+        foreach ($stylesheetUrls as $stylesheetUrl) {
+            $hasSource = array_key_exists($stylesheetUrl, $sources);
+
+            if (!$hasSource && null === $nextUnSourcedStylesheetUrl) {
+                $nextUnSourcedStylesheetUrl = $stylesheetUrl;
+            }
+        }
+
+        return $nextUnSourcedStylesheetUrl;
+    }
 }
