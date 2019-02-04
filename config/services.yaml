@@ -105,7 +105,7 @@ services:
 
     App\Services\TaskTypePreparer\CssTaskSourcePreparer:
       tags:
-        - { name: kernel.event_listener, event: task.prepare, priority: 110 }
+        - { name: kernel.event_listener, event: task.prepare, priority: 90 }
       arguments:
         $webResourceRetriever: '@app.services.web-resource-retriever.css'
 
