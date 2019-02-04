@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "49bf711208e5042dd7a9df1ee86ed914",
+    "content-hash": "877ffc255ee01b1a9d56b4ff00b51cca",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -3885,30 +3885,28 @@
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "4.2",
+            "version": "5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "2e2ea336bfac83037dacf62b5779fb3ced11f6ec"
+                "reference": "0f0d77fa01fc9efdf9d3d2e670e92d21405bd2dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/2e2ea336bfac83037dacf62b5779fb3ced11f6ec",
-                "reference": "2e2ea336bfac83037dacf62b5779fb3ced11f6ec",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/0f0d77fa01fc9efdf9d3d2e670e92d21405bd2dd",
+                "reference": "0f0d77fa01fc9efdf9d3d2e670e92d21405bd2dd",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "^6",
                 "php": ">=7.2.0",
+                "webignition/absolute-url-deriver": ">=3,<4",
                 "webignition/css-validator-output-parser": ">=5.1,<6",
-                "webignition/html-document-link-finder": "^4",
-                "webignition/stream-factory": ">=0.1,<1",
-                "webignition/url": ">=2,<3",
-                "webignition/web-page-model": ">=5,<6",
-                "webignition/web-resource-retriever": ">=1.1,<2",
-                "webignition/web-resource-storage": ">=1,<2"
+                "webignition/url-source-map": "^0.2.0",
+                "webignition/web-page-inspector": ">=1.2,<2",
+                "webignition/web-page-model": ">=5.9,<6"
             },
             "require-dev": {
+                "guzzlehttp/psr7": "^1.5",
                 "mockery/mockery": "^1",
                 "php-mock/php-mock-mockery": "^1.2",
                 "phpunit/phpunit": "^7",
@@ -3930,7 +3928,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2019-01-03T16:47:37+00:00"
+            "time": "2019-02-04T15:16:41+00:00"
         },
         {
             "name": "webignition/disallowed-character-terminated-string",
@@ -4972,6 +4970,47 @@
             "time": "2018-10-12T11:20:21+00:00"
         },
         {
+            "name": "webignition/url-source-map",
+            "version": "0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/url-source-map.git",
+                "reference": "b254371014f66d089d8378e0fcc5cd20c9066ef6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/url-source-map/zipball/b254371014f66d089d8378e0fcc5cd20c9066ef6",
+                "reference": "b254371014f66d089d8378e0fcc5cd20c9066ef6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.11.1",
+                "phpunit/phpunit": "^7",
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\UrlSourceMap\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Maps a collection of urls to another collection of urls",
+            "homepage": "https://github.com/webignition/url-source-map",
+            "keywords": [
+                "map",
+                "source",
+                "url"
+            ],
+            "time": "2019-01-23T15:38:48+00:00"
+        },
+        {
             "name": "webignition/validator-message",
             "version": "0.4",
             "source": {
@@ -5333,58 +5372,6 @@
                 "web-page"
             ],
             "time": "2018-10-11T17:38:05+00:00"
-        },
-        {
-            "name": "webignition/web-resource-storage",
-            "version": "1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webignition/web-resource-storage.git",
-                "reference": "32e0800d28b089a9089704f26a29089c9a3f24c0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webignition/web-resource-storage/zipball/32e0800d28b089a9089704f26a29089c9a3f24c0",
-                "reference": "32e0800d28b089a9089704f26a29089c9a3f24c0",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2.0",
-                "webignition/internet-media-type-interface": "^0.4",
-                "webignition/web-resource-interfaces": "^3"
-            },
-            "require-dev": {
-                "mockery/mockery": "^1",
-                "phpunit/phpunit": "^7",
-                "squizlabs/php_codesniffer": "^3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "webignition\\WebResource\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jon Cram",
-                    "email": "jon@webignition.net"
-                }
-            ],
-            "description": "Local storage for a retrieved web resource",
-            "homepage": "https://github.com/webignition/web-resource-storage",
-            "keywords": [
-                "json-document",
-                "psr-7",
-                "resource",
-                "storage",
-                "web",
-                "web-page"
-            ],
-            "time": "2018-10-12T15:18:13+00:00"
         },
         {
             "name": "xrstf/ip-utils",
