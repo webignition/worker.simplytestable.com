@@ -46,3 +46,6 @@ services:
 
   App\Services\CachedResourceManager:
     public: true
+
+  App\Services\TaskSourceRetriever:
+    public: true
