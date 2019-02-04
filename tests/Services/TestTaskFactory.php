@@ -13,8 +13,10 @@ use App\Services\TaskTypeService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Services\TaskService;
+use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
 use webignition\WebResource\WebPage\WebPage;
+use webignition\WebResource\WebResource;
 
 class TestTaskFactory
 {
@@ -81,6 +83,17 @@ class TestTaskFactory
             $task->setStartDateTime(new \DateTime('-' . $taskValues['age']));
         }
 
+        if (isset($taskValues['sources'])) {
+            foreach ($taskValues['sources'] as $sourceData) {
+                $this->addSourceToTask(
+                    $task,
+                    $sourceData['url'],
+                    $sourceData['content'],
+                    $sourceData['contentType']
+                );
+            }
+        }
+
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
@@ -92,19 +105,25 @@ class TestTaskFactory
         string $webPageContent,
         ?InternetMediaTypeInterface $contentType = null
     ) {
-        $requestIdentifer = $this->requestIdentifierFactory->createFromTask($task);
+        $contentType = $contentType ?? new InternetMediaType('text', 'html');
 
-        /* @var WebPage $webPage */
-        $webPage = WebPage::createFromContent($webPageContent);
+        $this->addSourceToTask($task, $task->getUrl(), $webPageContent, $contentType);
+    }
 
-        if (!empty($contentType)) {
-            $webPage = $webPage->setContentType($contentType);
-        }
+    public function addSourceToTask(
+        Task $task,
+        string $resourceUrl,
+        string $resourceContent,
+        InternetMediaTypeInterface $contentType
+    ) {
+        $requestIdentifer = $this->requestIdentifierFactory->createFromTaskResource($task, $resourceUrl);
+
+        $webResource = WebResource::createFromContent($resourceContent, $contentType);
 
         $cachedResource = $this->cachedResourceFactory->create(
             (string) $requestIdentifer,
-            $task->getUrl(),
-            $webPage
+            $resourceUrl,
+            $webResource
         );
 
         $this->cachedResourceManager->persist($cachedResource);

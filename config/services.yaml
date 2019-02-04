@@ -103,6 +103,12 @@ services:
       arguments:
         $webResourceRetriever: '@app.services.web-resource-retriever.web-page'
 
+    App\Services\TaskTypePreparer\CssTaskSourcePreparer:
+      tags:
+        - { name: kernel.event_listener, event: task.prepare, priority: 90 }
+      arguments:
+        $webResourceRetriever: '@app.services.web-resource-retriever.css'
+
     App\Services\TaskTypePreparer\FinalTaskPreparer:
       tags:
         - { name: kernel.event_listener, event: task.prepare, priority: 200 }
@@ -163,6 +169,14 @@ services:
         $allowedContentTypes:
           - 'text/html'
           - 'application/xhtml+xml'
+        $allowUnknownResourceTypes: false
+
+    app.services.web-resource-retriever.css:
+      class: webignition\WebResource\Retriever
+      arguments:
+        $httpClient: '@GuzzleHttp\Client'
+        $allowedContentTypes:
+          - 'text/css'
         $allowUnknownResourceTypes: false
 
     webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:

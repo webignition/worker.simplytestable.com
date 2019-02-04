@@ -9,6 +9,7 @@ use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
+use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Services\HttpMockHandler;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\Resque\QueueService;
@@ -97,7 +98,7 @@ class PrepareCommandTest extends AbstractBaseTestCase
                 ]),
                 'expectedPrimarySourceBody' => '<doctype html>',
             ],
-            'css validation' => [
+            'css validation, no stylesheets' => [
                 'httpFixtures' => [
                     new Response(200, ['content-type' => 'text/html']),
                     new Response(200, ['content-type' => 'text/html'], '<doctype html>'),
@@ -107,6 +108,23 @@ class PrepareCommandTest extends AbstractBaseTestCase
                     'type' => TypeInterface::TYPE_CSS_VALIDATION,
                 ]),
                 'expectedPrimarySourceBody' => '<doctype html>',
+            ],
+            'css validation, has stylesheet' => [
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
+                        200,
+                        ['content-type' => 'text/html'],
+                        HtmlDocumentFactory::load('empty-body-single-css-link')
+                    ),
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css'], 'html {}'),
+                ],
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'url' => 'http://example.com/',
+                    'type' => TypeInterface::TYPE_CSS_VALIDATION,
+                ]),
+                'expectedPrimarySourceBody' => HtmlDocumentFactory::load('empty-body-single-css-link'),
             ],
             'link integrity' => [
                 'httpFixtures' => [
