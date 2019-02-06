@@ -13,10 +13,12 @@ use App\Services\TaskTypeService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
+use App\Tests\Services\TestTaskFactory;
 use App\Tests\UnhandledGuzzleException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use GuzzleHttp\Psr7\Response;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 use webignition\WebResource\Retriever;
 
 class TaskSourceRetrieverTest extends AbstractBaseTestCase
@@ -360,6 +362,152 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
                     'value' => 'unknown:0',
                     'context' => [],
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider cookiesDataProvider
+     */
+    public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader)
+    {
+        $retrieverServiceId = 'app.services.web-resource-retriever.web-page';
+
+        $httpFixtures = [
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], 'html content'),
+        ];
+
+        $this->httpMockHandler->appendFixtures($httpFixtures);
+
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+        $httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
+
+        /* @var Retriever $retriever */
+        $retriever = self::$container->get($retrieverServiceId);
+
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'parameters' => json_encode($taskParameters),
+        ]));
+
+        $this->assertEquals([], $task->getSources());
+        $this->assertEquals([], $this->cachedResourceRepository->findAll());
+
+        $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+
+        /* @var array $historicalRequests */
+        $historicalRequests = $httpHistoryContainer->getRequests();
+        $this->assertCount(count($httpFixtures), $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $cookieHeaderLine = $historicalRequest->getHeaderLine('cookie');
+            $this->assertEquals($expectedRequestCookieHeader, $cookieHeaderLine);
+        }
+    }
+
+    public function cookiesDataProvider(): array
+    {
+        return [
+            'no cookies' => [
+                'taskParameters' => [],
+                'expectedRequestCookieHeader' => '',
+            ],
+            'single cookie' => [
+                'taskParameters' => [
+                    'cookies' => [
+                        [
+                            'Name' => 'foo',
+                            'Value' => 'bar',
+                            'Domain' => '.example.com',
+                        ],
+                    ],
+                ],
+                'expectedRequestCookieHeader' => 'foo=bar',
+            ],
+            'multiple cookies' => [
+                'taskParameters' => [
+                    'cookies' => [
+                        [
+                            'Name' => 'foo1',
+                            'Value' => 'bar1',
+                            'Domain' => '.example.com',
+                        ],
+                        [
+                            'Name' => 'foo2',
+                            'Value' => 'bar2',
+                            'Domain' => 'foo2.example.com',
+                        ],
+                        [
+                            'Name' => 'foo3',
+                            'Value' => 'bar3',
+                            'Domain' => '.example.com',
+                        ],
+                    ],
+                ],
+                'expectedRequestCookieHeader' => 'foo1=bar1; foo3=bar3',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider httpAuthDataProvider
+     */
+    public function testSetHttpAuthenticationOnRequests(
+        array $taskParameters,
+        string $expectedRequestAuthorizationHeaderValue
+    ) {
+        $retrieverServiceId = 'app.services.web-resource-retriever.web-page';
+
+        $httpFixtures = [
+            new Response(200, ['content-type' => 'text/html']),
+            new Response(200, ['content-type' => 'text/html'], 'html content'),
+        ];
+
+        $this->httpMockHandler->appendFixtures($httpFixtures);
+
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+        $httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
+
+        /* @var Retriever $retriever */
+        $retriever = self::$container->get($retrieverServiceId);
+
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'parameters' => json_encode($taskParameters),
+        ]));
+
+        $this->assertEquals([], $task->getSources());
+        $this->assertEquals([], $this->cachedResourceRepository->findAll());
+
+        $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+
+        /* @var array $historicalRequests */
+        $historicalRequests = $httpHistoryContainer->getRequests();
+        $this->assertCount(count($httpFixtures), $historicalRequests);
+
+        foreach ($historicalRequests as $historicalRequest) {
+            $authorizationHeaderLine = $historicalRequest->getHeaderLine('authorization');
+
+            $decodedAuthorizationHeaderValue = base64_decode(
+                str_replace('Basic ', '', $authorizationHeaderLine)
+            );
+
+            $this->assertEquals($expectedRequestAuthorizationHeaderValue, $decodedAuthorizationHeaderValue);
+        }
+    }
+
+    public function httpAuthDataProvider(): array
+    {
+        return [
+            'no auth' => [
+                'taskParameters' => [],
+                'expectedRequestAuthorizationHeaderValue' => '',
+            ],
+            'has auth' => [
+                'taskParameters' => [
+                    'http-auth-username' => 'foouser',
+                    'http-auth-password' => 'foopassword',
+                ],
+                'expectedRequestAuthorizationHeaderValue' => 'foouser:foopassword',
             ],
         ];
     }
