@@ -6,10 +6,7 @@ use phpmock\mockery\PHPMockery;
 
 class CssValidatorFixtureFactory
 {
-    /**
-     * @param string $fixture
-     */
-    public static function set($fixture)
+    public static function set(string $fixture)
     {
         PHPMockery::mock(
             'webignition\CssValidatorWrapper',
@@ -19,13 +16,15 @@ class CssValidatorFixtureFactory
         );
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    public static function load($name)
+
+    public static function load(string $name, array $replacements = []): string
     {
-        return file_get_contents(__DIR__ . '/../Fixtures/Data/RawCssValidatorOutput/' . $name . '.txt');
+        $content = file_get_contents(__DIR__ . '/../Fixtures/Data/RawCssValidatorOutput/' . $name . '.txt');
+
+        foreach ($replacements as $search => $replace) {
+            $content = str_replace($search, $replace, $content);
+        }
+
+        return $content;
     }
 }

@@ -6,18 +6,19 @@ use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use App\Model\Task\Type;
+use App\Services\CssValidatorErrorFactory;
+use App\Services\CssValidatorOutputParserConfigurationFactory;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\TaskCachedSourceWebPageRetriever;
-use webignition\CssValidatorOutput\Model\AbstractIssueMessage;
-use webignition\CssValidatorOutput\Model\ExceptionOutput;
-use webignition\CssValidatorOutput\Model\ValidationOutput as CssValidatorOutput;
+use App\Services\UrlSourceMapFactory;
 use webignition\CssValidatorOutput\Model\ValidationOutput;
 use webignition\CssValidatorOutput\Parser\InvalidValidatorOutputException;
+use webignition\CssValidatorWrapper\Exception\UnknownSourceException;
+use webignition\CssValidatorWrapper\SourceHandler;
+use webignition\CssValidatorWrapper\VendorExtensionSeverityLevel;
 use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
-use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
-use webignition\WebPageInspector\UnparseableContentTypeException;
 use webignition\WebResource\WebPage\WebPage;
 
 class CssValidationTaskTypePerformer
@@ -46,32 +47,34 @@ class CssValidationTaskTypePerformer
      */
     private $cssValidatorWrapper;
 
-    /**
-     * @var CssValidatorWrapperConfigurationFactory
-     */
-    private $configurationFactory;
+    private $urlSourceMapFactory;
+    private $outputParserConfigurationFactory;
+    private $cssValidatorErrorFactory;
 
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         CssValidatorWrapper $cssValidatorWrapper,
-        CssValidatorWrapperConfigurationFactory $configurationFactory
+        UrlSourceMapFactory $urlSourceMapFactory,
+        CssValidatorOutputParserConfigurationFactory $outputParserConfigurationFactory,
+        CssValidatorErrorFactory $cssValidatorErrorFactory
     ) {
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
-        $this->configurationFactory = $configurationFactory;
+        $this->urlSourceMapFactory = $urlSourceMapFactory;
+        $this->outputParserConfigurationFactory = $outputParserConfigurationFactory;
+        $this->cssValidatorErrorFactory = $cssValidatorErrorFactory;
     }
 
     /**
      * @param TaskEvent $taskEvent
      *
-     * @throws InternetMediaTypeParseException
      * @throws InvalidValidatorOutputException
-     * @throws UnparseableContentTypeException
+     * @throws UnknownSourceException
      */
     public function __invoke(TaskEvent $taskEvent)
     {
@@ -85,9 +88,8 @@ class CssValidationTaskTypePerformer
      *
      * @return null
      *
-     * @throws InternetMediaTypeParseException
      * @throws InvalidValidatorOutputException
-     * @throws UnparseableContentTypeException
+     * @throws UnknownSourceException
      */
     public function perform(Task $task)
     {
@@ -106,73 +108,55 @@ class CssValidationTaskTypePerformer
      *
      * @return null
      *
-     * @throws InternetMediaTypeParseException
      * @throws InvalidValidatorOutputException
-     * @throws UnparseableContentTypeException
+     * @throws UnknownSourceException
      */
     private function performValidation(Task $task, WebPage $webPage)
     {
-        // @TODO: Fix in #389
+        $vendorExtensionSeverityLevel = $task->getParameters()->get('vendor-extensions');
+        $vendorExtensionSeverityLevel = $vendorExtensionSeverityLevel ?? VendorExtensionSeverityLevel::LEVEL_WARN;
 
-        return null;
+        $sourceMap = $this->urlSourceMapFactory->createForTask($task);
+        $sourceHandler = new SourceHandler($webPage, $sourceMap);
+        $outputParserConfiguration = $this->outputParserConfigurationFactory->create($task);
 
-        $cssValidatorWrapperConfiguration = $this->configurationFactory->create(
-            $task,
-            (string) $webPage->getUri(),
-            $webPage->getContent()
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $output = $this->cssValidatorWrapper->validate(
+            $sourceHandler,
+            $vendorExtensionSeverityLevel,
+            $outputParserConfiguration
         );
 
-        $this->cssValidatorWrapper->setHttpClient($this->httpClientService->getHttpClient());
-        $cssValidatorOutput = $this->cssValidatorWrapper->validate($cssValidatorWrapperConfiguration);
+        if ($output instanceof ValidationOutput) {
+            $messageList = $output->getMessages();
 
-        if ($cssValidatorOutput->isExceptionOutput()) {
-            // Will only get unknown CSS validator exceptions here
-            return $this->setTaskOutputAndState(
-                $task,
-                json_encode([
-                    $this->getUnknownExceptionErrorOutput($task)
-                ]),
-                Task::STATE_FAILED_NO_RETRY_AVAILABLE,
-                1,
-                0
-            );
-        }
+            $taskSources = $task->getSources();
 
-        /* @var ValidationOutput $cssValidatorOutput */
-
-        return $this->setTaskOutputAndState(
-            $task,
-            json_encode($this->prepareCssValidatorOutput($cssValidatorOutput)),
-            Task::STATE_COMPLETED,
-            $cssValidatorOutput->getMessages()->getErrorCount(),
-            $cssValidatorOutput->getMessages()->getWarningCount()
-        );
-    }
-
-    private function prepareCssValidatorOutput(CssValidatorOutput $cssValidatorOutput): array
-    {
-        $serializableMessages = [];
-        $messageList = $cssValidatorOutput->getMessages();
-
-        foreach ($messageList->getMessages() as $index => $message) {
-            /* @var AbstractIssueMessage $message */
-            if ($message->isError()) {
-                if (ExceptionOutput::TYPE_HTTP === $message->getTitle()) {
-                    $message = $message->withTitle('http-retrieval-' . $message->getContext());
-                    $message = $message->withContext('');
-                } elseif (ExceptionOutput::TYPE_CURL === $message->getTitle()) {
-                    $message = $message->withTitle('http-retrieval-curl-code-' . $message->getContext());
-                    $message = $message->withContext('');
-                } elseif ('invalid-content-type' === $message->getTitle()) {
-                    $message = $message->withTitle('invalid-content-type:' . $message->getContext());
-                    $message = $message->withContext('');
+            foreach ($taskSources as $taskSource) {
+                if ($taskSource->isUnavailable() || $taskSource->isInvalid()) {
+                    $errorMessage = $this->cssValidatorErrorFactory->createForUnavailableTaskSource($taskSource);
+                    $messageList->addMessage($errorMessage);
                 }
             }
 
-            $serializableMessages[] = $message;
+            return $this->setTaskOutputAndState(
+                $task,
+                json_encode(array_values($messageList->getMessages())),
+                Task::STATE_COMPLETED,
+                $messageList->getErrorCount(),
+                $messageList->getWarningCount()
+            );
         }
 
-        return $serializableMessages;
+        return $this->setTaskOutputAndState(
+            $task,
+            json_encode([
+                $this->getUnknownExceptionErrorOutput($task)
+            ]),
+            Task::STATE_FAILED_NO_RETRY_AVAILABLE,
+            1,
+            0
+        );
     }
 
     private function getUnknownExceptionErrorOutput(Task $task): array
