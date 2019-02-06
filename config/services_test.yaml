@@ -31,3 +31,6 @@ services:
 
   App\Services\CssValidatorOutputParserConfigurationFactory:
     public: true
+
+  App\Services\CssValidatorErrorFactory:
+    public: true

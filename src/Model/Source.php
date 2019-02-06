@@ -106,7 +106,9 @@ class Source
 
     public function isInvalidContentType(): bool
     {
-        return 'invalid:' . self::MESSAGE_INVALID_CONTENT_TYPE === $this->value;
+        $invalidContentTypePrefix = sprintf(self::MESSAGE_INVALID_CONTENT_TYPE, '');
+
+        return preg_match('/^invalid:' . preg_quote($invalidContentTypePrefix, '/') . '/', $this->value) > 0;
     }
 
     private function getFailureComponents(): array
