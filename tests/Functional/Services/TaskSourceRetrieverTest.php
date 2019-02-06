@@ -59,8 +59,11 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
     /**
      * @dataProvider retrieveInvalidContentTypeDataProvider
      */
-    public function testRetrieveInvalidContentType(string $retrieverServiceId, string $contentType)
-    {
+    public function testRetrieveInvalidContentType(
+        string $retrieverServiceId,
+        string $contentType,
+        Source $expectedSource
+    ) {
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => $contentType]),
         ]);
@@ -77,8 +80,6 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
         $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
 
-        $expectedSource = $this->sourceFactory->createInvalidSource($url, 'invalid-content-type');
-
         $this->assertEquals(
             [
                 $url => $expectedSource,
@@ -93,10 +94,20 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             'disallowed content type' => [
                 'retrieverServiceId' => 'app.services.web-resource-retriever.web-page',
                 'contentType' => 'text/plain',
+                'expectedSource' => new Source(
+                    'http://example.com',
+                    Source::TYPE_INVALID,
+                    'invalid:invalid-content-type:text/plain'
+                )
             ],
             'unparseable content type' => [
                 'retrieverServiceId' => 'app.services.web-resource-retriever.web-page',
                 'contentType' => 'f o o',
+                'expectedSource' => new Source(
+                    'http://example.com',
+                    Source::TYPE_INVALID,
+                    'invalid:invalid-content-type:f o o'
+                )
             ],
         ];
     }

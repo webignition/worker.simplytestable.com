@@ -12,7 +12,7 @@ class Source
     const FAILURE_TYPE_CURL = 'curl';
     const FAILURE_TYPE_UNKNOWN = 'unknown';
 
-    const MESSAGE_INVALID_CONTENT_TYPE = 'invalid-content-type';
+    const MESSAGE_INVALID_CONTENT_TYPE = 'invalid-content-type:%s';
 
     private $url;
     private $type;
