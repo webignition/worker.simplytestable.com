@@ -34,7 +34,7 @@
         "webignition/html-document-type": ">=0.1.1,<1.0",
         "webignition/html-validator-wrapper": ">=2,<3",
         "webignition/http-history-container": ">=0.7,<1",
-        "webignition/internet-media-type": ">=2,<3",
+        "webignition/internet-media-type": ">=2.1,<3",
         "webignition/internet-media-type-interface": ">=0.4,<1",
         "webignition/resource-storage": ">=0.1,<1",
         "webignition/resque-bundle": "dev-master",

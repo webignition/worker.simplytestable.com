@@ -74,7 +74,13 @@ class TaskSourceRetriever
 
             $source = $this->sourceFactory->fromCachedResource($cachedResource);
         } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
-            $source = $this->sourceFactory->createInvalidSource($url, Source::MESSAGE_INVALID_CONTENT_TYPE);
+            $source = $this->sourceFactory->createInvalidSource(
+                $url,
+                sprintf(
+                    Source::MESSAGE_INVALID_CONTENT_TYPE,
+                    (string) $invalidResponseContentTypeException->getContentType()
+                )
+            );
         } catch (HttpException $httpException) {
             $source = $this->sourceFactory->createHttpFailedSource($url, $httpException->getCode());
         } catch (TransportException $transportException) {
@@ -98,7 +104,10 @@ class TaskSourceRetriever
                 }
             }
         } catch (InternetMediaTypeParseException $e) {
-            $source = $this->sourceFactory->createInvalidSource($url, Source::MESSAGE_INVALID_CONTENT_TYPE);
+            $source = $this->sourceFactory->createInvalidSource(
+                $url,
+                sprintf(Source::MESSAGE_INVALID_CONTENT_TYPE, $e->getContentTypeString())
+            );
         }
 
         $task->addSource($source);

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d41e60ff82ba5090b1dc6c1ad659b359",
+    "content-hash": "e5bc94c57e772aad0ded7d5bc99f47d8",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4455,16 +4455,16 @@
         },
         {
             "name": "webignition/internet-media-type",
-            "version": "2.0",
+            "version": "2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/internet-media-type.git",
-                "reference": "d9fa880260a9689477f132f9b2310233ecc9b30f"
+                "reference": "cd797dfc3a43099d3caf2feee7ff8c000bb121af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/internet-media-type/zipball/d9fa880260a9689477f132f9b2310233ecc9b30f",
-                "reference": "d9fa880260a9689477f132f9b2310233ecc9b30f",
+                "url": "https://api.github.com/repos/webignition/internet-media-type/zipball/cd797dfc3a43099d3caf2feee7ff8c000bb121af",
+                "reference": "cd797dfc3a43099d3caf2feee7ff8c000bb121af",
                 "shasum": ""
             },
             "require": {
@@ -4502,7 +4502,7 @@
                 "media type",
                 "media-type"
             ],
-            "time": "2018-10-09T10:03:45+00:00"
+            "time": "2019-02-06T18:14:07+00:00"
         },
         {
             "name": "webignition/internet-media-type-interface",
