@@ -133,10 +133,6 @@ services:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 90 }
 
-    App\Services\TaskTypePerformer\CssValidatorWrapperConfigurationFactory:
-      arguments:
-        - '%env(CSS_VALIDATOR_JAR_PATH)%'
-
     App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory:
       arguments:
         - '%link_integrity_user_agents%'

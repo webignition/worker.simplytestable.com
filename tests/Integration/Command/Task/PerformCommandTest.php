@@ -8,6 +8,7 @@ use App\Command\Task\PerformCommand;
 use App\Entity\CachedResource;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Resque\Job\TaskReportCompletionJob;
 use App\Tests\Factory\CssValidatorFixtureFactory;
@@ -21,6 +22,7 @@ use GuzzleHttp\Psr7\Response;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
+use webignition\InternetMediaType\InternetMediaType;
 
 /**
  * @group Command/Task/PerformCommand
@@ -46,7 +48,6 @@ class PerformCommandTest extends AbstractBaseTestCase
         callable $setUp,
         array $httpFixtures,
         array $taskValues,
-        string $primarySourceContent,
         string $expectedTaskState,
         int $expectedErrorCount,
         array $expectedDecodedOutput
@@ -60,7 +61,6 @@ class PerformCommandTest extends AbstractBaseTestCase
 
         $testTaskFactory = self::$container->get(TestTaskFactory::class);
         $task = $testTaskFactory->create($taskValues);
-        $testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $primarySourceContent);
 
         $sources = $task->getSources();
         $primarySource = $sources[$task->getUrl()];
@@ -108,8 +108,15 @@ class PerformCommandTest extends AbstractBaseTestCase
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
                     'url' => 'http://example.com/',
                     'type' => TypeInterface::TYPE_HTML_VALIDATION,
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => '<!doctype html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
                 ]),
-                'primarySourceContent' => '<!doctype html>',
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
@@ -126,8 +133,15 @@ class PerformCommandTest extends AbstractBaseTestCase
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
                     'url' => 'http://example.com/',
                     'type' => TypeInterface::TYPE_HTML_VALIDATION,
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => "\xc3\x28",
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
                 ]),
-                'primarySourceContent' => "\xc3\x28",
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedDecodedOutput' => [
@@ -150,8 +164,15 @@ class PerformCommandTest extends AbstractBaseTestCase
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
                     'url' => 'http://example.com/',
                     'type' => TypeInterface::TYPE_HTML_VALIDATION,
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => '<!doctype html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
                 ]),
-                'primarySourceContent' => '<!doctype html>',
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedDecodedOutput' => [
@@ -164,26 +185,38 @@ class PerformCommandTest extends AbstractBaseTestCase
                     ],
                 ],
             ],
-// @TODO: fix in #389
-//            'css validation' => [
-//                'setUp' => function () {
-//                    CssValidatorFixtureFactory::set(
-//                        CssValidatorFixtureFactory::load('no-messages')
-//                    );
-//                },
-//                'httpFixtures' => [
-//                    new Response(200, ['content-type' => 'text/css']),
-//                    new Response(200, ['content-type' => 'text/css']),
-//                ],
-//                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
-//                    'url' => 'http://example.com/',
-//                    'type' => TypeInterface::TYPE_CSS_VALIDATION,
-//                ]),
-//                'primarySourceContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
-//                'expectedTaskState' => Task::STATE_COMPLETED,
-//                'expectedErrorCount' => 0,
-//                'expectedDecodedOutput' => [],
-//            ],
+            'css validation' => [
+                'setUp' => function () {
+                    CssValidatorFixtureFactory::set(
+                        CssValidatorFixtureFactory::load('no-messages')
+                    );
+                },
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css']),
+                ],
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'url' => 'http://example.com/',
+                    'type' => TypeInterface::TYPE_CSS_VALIDATION,
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://example.com/style.css',
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'content' => 'body {}',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                        ],
+                    ],
+                ]),
+                'expectedTaskState' => Task::STATE_COMPLETED,
+                'expectedErrorCount' => 0,
+                'expectedDecodedOutput' => [],
+            ],
             'link integrity' => [
                 'setUp' => function () {
                     CssValidatorFixtureFactory::set(
@@ -196,9 +229,15 @@ class PerformCommandTest extends AbstractBaseTestCase
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
                     'url' => 'http://example.com/',
                     'type' => TypeInterface::TYPE_LINK_INTEGRITY,
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
                 ]),
-                'primarySourceContent' =>
-                    '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
@@ -217,9 +256,15 @@ class PerformCommandTest extends AbstractBaseTestCase
                 'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
                     'url' => 'http://example.com/',
                     'type' => TypeInterface::TYPE_URL_DISCOVERY,
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
                 ]),
-                'primarySourceContent' =>
-                    '<!doctype html><html><head></head><body><a href="/foo"></a></body></html>',
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
