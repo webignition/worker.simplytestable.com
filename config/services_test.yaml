@@ -28,3 +28,6 @@ services:
 
   App\Services\UrlSourceMapFactory:
     public: true
+
+  App\Services\CssValidatorOutputParserConfigurationFactory:
+    public: true
