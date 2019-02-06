@@ -392,6 +392,9 @@
     "webignition/quoted-string": {
         "version": "0.2.1"
     },
+    "webignition/resource-storage": {
+        "version": "0.1"
+    },
     "webignition/resque-bundle": {
         "version": "dev-master"
     },
