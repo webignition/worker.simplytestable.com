@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "42f771b264a21ffa081d46a3ec0ae7bf",
+    "content-hash": "8eadb47adc8d161ae9e267aa6535fb24",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -3885,22 +3885,23 @@
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "5.0",
+            "version": "5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "0f0d77fa01fc9efdf9d3d2e670e92d21405bd2dd"
+                "reference": "93ef66538d3a7ba733d54d51e3745c433fc6fcef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/0f0d77fa01fc9efdf9d3d2e670e92d21405bd2dd",
-                "reference": "0f0d77fa01fc9efdf9d3d2e670e92d21405bd2dd",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/93ef66538d3a7ba733d54d51e3745c433fc6fcef",
+                "reference": "93ef66538d3a7ba733d54d51e3745c433fc6fcef",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2.0",
                 "webignition/absolute-url-deriver": ">=3,<4",
                 "webignition/css-validator-output-parser": ">=5.1,<6",
+                "webignition/resource-storage": ">=0.1,<1",
                 "webignition/url-source-map": "^0.2.0",
                 "webignition/web-page-inspector": ">=1.2,<2",
                 "webignition/web-page-model": ">=5.9,<6"
@@ -3909,6 +3910,8 @@
                 "guzzlehttp/psr7": "^1.5",
                 "mockery/mockery": "^1",
                 "php-mock/php-mock-mockery": "^1.2",
+                "phpstan/phpstan": "^0.11.1",
+                "phpstan/phpstan-mockery": "^0.11.0",
                 "phpunit/phpunit": "^7",
                 "squizlabs/php_codesniffer": "^3"
             },
@@ -3928,7 +3931,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2019-02-04T15:16:41+00:00"
+            "time": "2019-02-06T12:20:40+00:00"
         },
         {
             "name": "webignition/disallowed-character-terminated-string",
@@ -4591,6 +4594,44 @@
                 "quoted-string"
             ],
             "time": "2017-05-11T11:41:31+00:00"
+        },
+        {
+            "name": "webignition/resource-storage",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/resource-storage.git",
+                "reference": "324d84f0eef0aa17c7e968ee54b46c1ee0bc6b18"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/resource-storage/zipball/324d84f0eef0aa17c7e968ee54b46c1ee0bc6b18",
+                "reference": "324d84f0eef0aa17c7e968ee54b46c1ee0bc6b18",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.0",
+                "webignition/url-source-map": ">=0.2,<1"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1",
+                "php-mock/php-mock-mockery": "^1.2",
+                "phpstan/phpstan": "^0.11.1",
+                "phpunit/phpunit": "^7",
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\ResourceStorage\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "homepage": "https://github.com/webignition/resource-storage",
+            "time": "2019-02-06T11:33:07+00:00"
         },
         {
             "name": "webignition/resque-bundle",
