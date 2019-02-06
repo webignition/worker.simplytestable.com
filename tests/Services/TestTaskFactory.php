@@ -4,6 +4,7 @@
 
 namespace App\Tests\Services;
 
+use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
@@ -15,7 +16,6 @@ use App\Entity\Task\Task;
 use App\Services\TaskService;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
-use webignition\WebResource\WebPage\WebPage;
 use webignition\WebResource\WebResource;
 
 class TestTaskFactory
@@ -85,12 +85,23 @@ class TestTaskFactory
 
         if (isset($taskValues['sources'])) {
             foreach ($taskValues['sources'] as $sourceData) {
-                $this->addSourceToTask(
-                    $task,
-                    $sourceData['url'],
-                    $sourceData['content'],
-                    $sourceData['contentType']
-                );
+                $type = $sourceData['type'] ?? Source::TYPE_CACHED_RESOURCE;
+
+                if (Source::TYPE_CACHED_RESOURCE === $type) {
+                    $this->addSourceToTask(
+                        $task,
+                        $sourceData['url'],
+                        $sourceData['content'],
+                        $sourceData['contentType']
+                    );
+                } else {
+                    $task->addSource(new Source(
+                        $sourceData['url'],
+                        $sourceData['type'],
+                        $sourceData['value'],
+                        $sourceData['context'] ?? []
+                    ));
+                }
             }
         }
 

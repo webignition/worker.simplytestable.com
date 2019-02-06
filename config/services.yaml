@@ -261,3 +261,6 @@ services:
         - method: setAttemptToRecoverFromInvalidInternalCharacter
           arguments:
               - true
+
+    webignition\ResourceStorage\ResourceStorage:
+      class: webignition\ResourceStorage\ResourceStorage
