@@ -48,7 +48,7 @@ class CssTaskSourcePreparer
 
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 
-        $stylesheetUrls = $this->cssSourceInspector->findLinkElementStylesheetUrls($webPage);
+        $stylesheetUrls = $this->cssSourceInspector->findStylesheetUrls($webPage);
 
         $nextUnSourcedStylesheetUrl = $this->findNextUnSourcedStylesheetUrl($stylesheetUrls, $task->getSources());
         if (null === $nextUnSourcedStylesheetUrl) {
