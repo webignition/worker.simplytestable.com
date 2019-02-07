@@ -152,8 +152,47 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider createImportUrlsDataProvider
+     */
+    public function testCreateImportUrls(array $importValues, string $baseUrl, array $expectedUrls)
+    {
+        $importUrls = $this->cssSourceInspector->createImportUrls($importValues, $baseUrl);
+
+        $this->assertEquals($expectedUrls, $importUrls);
+    }
+
+    public function createImportUrlsDataProvider(): array
+    {
+        return [
+            'empty' => [
+                'importValues' => [],
+                'baseUrl' => 'http://example.com/',
+                'expectedUrls' => [],
+            ],
+            'collection (1)' => [
+                'importValues' => [
+                    'one.css',
+                    '/two.css',
+                ],
+                'baseUrl' => 'http://example.com/foo/',
+                'expectedUrls' => [
+                    'http://example.com/foo/one.css',
+                    'http://example.com/two.css',
+                ],
+            ],
+            'collection (2)' => [
+                'importValues' => [
+                    'one.css',
+                    '/two.css',
+                ],
+                'baseUrl' => 'http://example.com/',
+                'expectedUrls' => [
+                    'http://example.com/one.css',
+                    'http://example.com/two.css',
+                ],
+            ],
+        ];
+    }
 }
-
-
-
-
