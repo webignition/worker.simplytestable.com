@@ -199,16 +199,16 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider findImportUrlsDataProvider
+     * @dataProvider findWebPageImportUrlsDataProvider
      */
-    public function testFindImportUrls(WebPage $webPage, array $expectedUrls)
+    public function testFindWebPageImportUrls(WebPage $webPage, array $expectedUrls)
     {
-        $importUrls = $this->cssSourceInspector->findImportUrls($webPage);
+        $importUrls = $this->cssSourceInspector->findWebPageImportUrls($webPage);
 
         $this->assertEquals($expectedUrls, $importUrls);
     }
 
-    public function findImportUrlsDataProvider(): array
+    public function findWebPageImportUrlsDataProvider(): array
     {
         return [
             'empty' => [
@@ -312,6 +312,40 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
                     'http://example.com/two.css',
                     'http://example.com/three.css',
                     'http://example.com/four.css',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider findCssImportUrlsDataProvider
+     */
+    public function testFindCssImportUrls(string $css, string $baseUrl, array $expectedUrls)
+    {
+        $importUrls = $this->cssSourceInspector->findCssImportUrls($css, $baseUrl);
+
+        $this->assertEquals($expectedUrls, $importUrls);
+    }
+
+    public function findCssImportUrlsDataProvider(): array
+    {
+        return [
+            'empty' => [
+                'css' => '',
+                'baseUrl' => 'http://example.com/',
+                'expectedUrls' => [],
+            ],
+            'has import urls' => [
+                'css' => implode("\n", [
+                    '@import "one.css";',
+                    "@import 'two.css';",
+                    '@import url("three.css");',
+                ]),
+                'baseUrl' => 'http://example.com/',
+                'expectedUrls' => [
+                    'http://example.com/one.css',
+                    'http://example.com/two.css',
+                    'http://example.com/three.css',
                 ],
             ],
         ];
