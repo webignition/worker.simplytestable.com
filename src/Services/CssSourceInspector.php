@@ -107,4 +107,25 @@ class CssSourceInspector
     {
         return $this->wrapperCssSourceInspector->findStylesheetUrls($webPage);
     }
+
+    /**
+     * @param WebPage $webPage
+     *
+     * @return string[]
+     */
+    public function findImportUrls(WebPage $webPage): array
+    {
+        $urls = [];
+
+        $styleBlocks = $this->findStyleBlocks($webPage);
+        $baseUrl = (string) $webPage->getBaseUrl();
+
+        foreach ($styleBlocks as $styleBlock) {
+            $importValues = $this->findImportValues($styleBlock);
+
+            $urls = array_merge($urls, $this->createImportUrls($importValues, $baseUrl));
+        }
+
+        return $urls;
+    }
 }
