@@ -34,3 +34,6 @@ services:
 
   App\Services\CssValidatorErrorFactory:
     public: true
+
+  App\Services\WebPageTaskCssUrlFinder:
+    public: true

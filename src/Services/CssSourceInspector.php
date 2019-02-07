@@ -99,6 +99,19 @@ class CssSourceInspector
     }
 
     /**
+     * @param string $css
+     * @param string $baseUrl
+     *
+     * @return string[]
+     */
+    public function findCssImportUrls(string $css, string $baseUrl): array
+    {
+        $importValues = $this->findImportValues($css);
+
+        return $this->createImportUrls($importValues, $baseUrl);
+    }
+
+    /**
      * @param WebPage $webPage
      *
      * @return string[]
@@ -113,7 +126,7 @@ class CssSourceInspector
      *
      * @return string[]
      */
-    public function findImportUrls(WebPage $webPage): array
+    public function findWebPageImportUrls(WebPage $webPage): array
     {
         $urls = [];
 
@@ -138,7 +151,7 @@ class CssSourceInspector
     {
         return array_values(array_unique(array_merge(
             $this->findLinkElementStylesheetUrls($webPage),
-            $this->findImportUrls($webPage)
+            $this->findWebPageImportUrls($webPage)
         )));
     }
 }
