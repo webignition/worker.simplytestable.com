@@ -45,8 +45,8 @@ class CssTaskSourcePreparer
 
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 
-        $cssSourceInspector = new CssSourceInspector($webPage);
-        $stylesheetUrls = $cssSourceInspector->findStylesheetUrls();
+        $cssSourceInspector = new CssSourceInspector();
+        $stylesheetUrls = $cssSourceInspector->findStylesheetUrls($webPage);
 
         $nextUnSourcedStylesheetUrl = $this->findNextUnSourcedStylesheetUrl($stylesheetUrls, $task->getSources());
         if (null === $nextUnSourcedStylesheetUrl) {
