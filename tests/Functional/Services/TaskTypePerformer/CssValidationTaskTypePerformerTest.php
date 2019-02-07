@@ -13,6 +13,7 @@ use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\CssValidationTaskTypePerformer;
 use App\Tests\Factory\CssValidatorFixtureFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
+use webignition\CssValidatorWrapper\SourceStorage;
 use webignition\CssValidatorWrapper\VendorExtensionSeverityLevel;
 use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
@@ -65,7 +66,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         int $expectedWarningCount,
         array $expectedDecodedOutput
     ) {
-        $sourceStorage = self::$container->get('webignition.cssvalidatorwrapper.sourcestorage');
+        $sourceStorage = self::$container->get(SourceStorage::class);
 
         $mockedSourceStorage = \Mockery::mock($sourceStorage);
         $mockedSourceStorage

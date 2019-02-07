@@ -97,4 +97,14 @@ class CssSourceInspector
 
         return $urls;
     }
+
+    /**
+     * @param WebPage $webPage
+     *
+     * @return string[]
+     */
+    public function findLinkElementStylesheetUrls(WebPage $webPage)
+    {
+        return $this->wrapperCssSourceInspector->findStylesheetUrls($webPage);
+    }
 }
