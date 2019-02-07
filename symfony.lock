@@ -176,6 +176,9 @@
     "psr/simple-cache": {
         "version": "1.0.1"
     },
+    "sabberworm/php-css-parser": {
+        "version": "8.2.0"
+    },
     "sebastian/code-unit-reverse-lookup": {
         "version": "1.0.1"
     },
