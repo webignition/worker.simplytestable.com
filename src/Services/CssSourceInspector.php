@@ -6,11 +6,19 @@ use Sabberworm\CSS\Parser as CssParser;
 use Sabberworm\CSS\Property\Charset;
 use Sabberworm\CSS\Property\Import;
 use webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver;
+use webignition\CssValidatorWrapper\SourceInspector as WrapperCssSourceInspector;
 use webignition\Uri\Uri;
 use webignition\WebResource\WebPage\WebPage;
 
 class CssSourceInspector
 {
+    private $wrapperCssSourceInspector;
+
+    public function __construct(WrapperCssSourceInspector $wrapperCssSourceInspector)
+    {
+        $this->wrapperCssSourceInspector = $wrapperCssSourceInspector;
+    }
+
     /**
      * @param WebPage $webPage
      *
@@ -88,5 +96,15 @@ class CssSourceInspector
         }
 
         return $urls;
+    }
+
+    /**
+     * @param WebPage $webPage
+     *
+     * @return string[]
+     */
+    public function findLinkElementStylesheetUrls(WebPage $webPage)
+    {
+        return $this->wrapperCssSourceInspector->findStylesheetUrls($webPage);
     }
 }

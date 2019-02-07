@@ -5,9 +5,9 @@ namespace App\Services\TaskTypePreparer;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use App\Model\Task\Type;
+use App\Services\CssSourceInspector;
 use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Services\TaskSourceRetriever;
-use webignition\CssValidatorWrapper\SourceInspector as CssSourceInspector;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 
 class CssTaskSourcePreparer
@@ -15,15 +15,18 @@ class CssTaskSourcePreparer
     private $taskCachedSourceWebPageRetriever;
     private $taskSourceRetriever;
     private $webResourceRetriever;
+    private $cssSourceInspector;
 
     public function __construct(
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         TaskSourceRetriever $taskSourceRetriever,
-        WebResourceRetriever $webResourceRetriever
+        WebResourceRetriever $webResourceRetriever,
+        CssSourceInspector $cssSourceInspector
     ) {
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
         $this->taskSourceRetriever = $taskSourceRetriever;
         $this->webResourceRetriever = $webResourceRetriever;
+        $this->cssSourceInspector = $cssSourceInspector;
     }
 
     public function __invoke(TaskEvent $taskEvent)
@@ -45,8 +48,7 @@ class CssTaskSourcePreparer
 
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 
-        $cssSourceInspector = new CssSourceInspector();
-        $stylesheetUrls = $cssSourceInspector->findStylesheetUrls($webPage);
+        $stylesheetUrls = $this->cssSourceInspector->findLinkElementStylesheetUrls($webPage);
 
         $nextUnSourcedStylesheetUrl = $this->findNextUnSourcedStylesheetUrl($stylesheetUrls, $task->getSources());
         if (null === $nextUnSourcedStylesheetUrl) {

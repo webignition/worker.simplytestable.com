@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Services;
 
 use App\Services\CssSourceInspector;
 use App\Tests\Factory\HtmlDocumentFactory;
+use webignition\CssValidatorWrapper\SourceInspector;
 use webignition\WebResource\WebPage\WebPage;
 
 class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
@@ -19,7 +20,7 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->cssSourceInspector = new CssSourceInspector();
+        $this->cssSourceInspector = new CssSourceInspector(new SourceInspector());
     }
 
     /**

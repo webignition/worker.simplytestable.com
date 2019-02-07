@@ -189,42 +189,24 @@ services:
 
     webignition\HtmlValidator\Wrapper\Wrapper:
 
-    webignition.cssvalidatorwrapper.sourceinspector:
-      class: webignition\CssValidatorWrapper\SourceInspector
+    webignition\CssValidatorWrapper\SourceInspector:
 
-    webignition.cssvalidatorwrapper.sourcemutator:
-      class: webignition\CssValidatorWrapper\SourceMutator
+    webignition\CssValidatorWrapper\SourceMutator:
 
-    webignition.cssvalidatorwrapper.sourcestorage:
-      class: webignition\CssValidatorWrapper\SourceStorage
+    webignition\CssValidatorWrapper\SourceStorage:
 
-    webignition.cssvalidatorwrapper.outputmutator:
-      class: webignition\CssValidatorWrapper\OutputMutator
+    webignition\CssValidatorWrapper\OutputMutator:
 
-    webignition.cssvalidatorwrapper.commandfactory:
-      class: webignition\CssValidatorWrapper\CommandFactory
+    webignition\CssValidatorWrapper\CommandFactory:
       arguments:
         $javaExecutablePath: '%java_executable_path%'
         $cssValidatorJarPath: '%env(CSS_VALIDATOR_JAR_PATH)%'
 
-    webignition.cssvalidatoroutput.parser.outputparser:
-      class: webignition\CssValidatorOutput\Parser\OutputParser
+    webignition\CssValidatorOutput\Parser\OutputParser:
 
-    webignition.cssvalidatorwrapper.commandexecutor:
-      class: webignition\CssValidatorWrapper\CommandExecutor
-      arguments:
-        $outputParser: '@webignition.cssvalidatoroutput.parser.outputparser'
+    webignition\CssValidatorWrapper\CommandExecutor:
 
     webignition\CssValidatorWrapper\Wrapper:
-      arguments:
-        $sourceInspector: '@webignition.cssvalidatorwrapper.sourceinspector'
-        $sourceMutator: '@webignition.cssvalidatorwrapper.sourcemutator'
-        $sourceStorage: '@webignition.cssvalidatorwrapper.sourcestorage'
-        $outputMutator: '@webignition.cssvalidatorwrapper.outputmutator'
-        $commandFactory: '@webignition.cssvalidatorwrapper.commandfactory'
-        $commandExecutor: '@webignition.cssvalidatorwrapper.commandexecutor'
-
-    webignition\NodeJslint\Wrapper\Wrapper:
 
     App\Services\Resque\QueueService:
       public: true
