@@ -15,7 +15,6 @@ use App\Services\UrlSourceMapFactory;
 use webignition\CssValidatorOutput\Model\ValidationOutput;
 use webignition\CssValidatorOutput\Parser\InvalidValidatorOutputException;
 use webignition\CssValidatorWrapper\Exception\UnknownSourceException;
-use webignition\CssValidatorWrapper\SourceHandler;
 use webignition\CssValidatorWrapper\VendorExtensionSeverityLevel;
 use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
 use webignition\InternetMediaType\InternetMediaType;
@@ -117,12 +116,12 @@ class CssValidationTaskTypePerformer
         $vendorExtensionSeverityLevel = $vendorExtensionSeverityLevel ?? VendorExtensionSeverityLevel::LEVEL_WARN;
 
         $sourceMap = $this->urlSourceMapFactory->createForTask($task);
-        $sourceHandler = new SourceHandler($webPage, $sourceMap);
         $outputParserConfiguration = $this->outputParserConfigurationFactory->create($task);
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $output = $this->cssValidatorWrapper->validate(
-            $sourceHandler,
+            $webPage,
+            $sourceMap,
             $vendorExtensionSeverityLevel,
             $outputParserConfiguration
         );
