@@ -17,6 +17,7 @@
         "doctrine/orm": "^2.6",
         "guzzlehttp/guzzle": "^6",
         "kevinrob/guzzle-cache-middleware": "^3",
+        "sabberworm/php-css-parser": "^8.2",
         "sensio/framework-extra-bundle": "^5.0.0",
         "symfony/console": "^4.1",
         "symfony/dotenv": "^4.1",
