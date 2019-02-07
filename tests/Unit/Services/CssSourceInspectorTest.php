@@ -247,6 +247,76 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    /**
+     * @dataProvider findStylesheetUrlsDataProvider
+     */
+    public function testFindStylesheetUrls(WebPage $webPage, array $expectedUrls)
+    {
+        $stylesheetUrls = $this->cssSourceInspector->findStylesheetUrls($webPage);
+
+        $this->assertEquals($expectedUrls, $stylesheetUrls);
+    }
+
+    public function findStylesheetUrlsDataProvider()
+    {
+        return [
+            'empty' => [
+                'webPage' => $this->createWebPage('', 'http://example.com/'),
+                'expectedUrls' => [],
+            ],
+            'many style elements, no import urls' => [
+                'webPage' => $this->createWebPage(
+                    HtmlDocumentFactory::load('style-elements-no-imports'),
+                    'http://example.com/'
+                ),
+                'expectedUrls' => [],
+            ],
+            'many style elements, has import urls, http://example.com/' => [
+                'webPage' => $this->createWebPage(
+                    HtmlDocumentFactory::load('style-elements-has-imports'),
+                    'http://example.com/'
+                ),
+                'expectedUrls' => [
+                    'http://example.com/one.css',
+                    'http://example.com/two.css',
+                    'http://example.com/three.css',
+                ],
+            ],
+            'many style elements, has import urls, http://example.com/foo/' => [
+                'webPage' => $this->createWebPage(
+                    HtmlDocumentFactory::load('style-elements-has-imports'),
+                    'http://example.com/foo/'
+                ),
+                'expectedUrls' => [
+                    'http://example.com/foo/one.css',
+                    'http://example.com/two.css',
+                    'http://example.com/foo/three.css',
+                ],
+            ],
+            'single linked stylesheet' => [
+                'webPage' => $this->createWebPage(
+                    HtmlDocumentFactory::load('empty-body-single-css-link'),
+                    'http://example.com/'
+                ),
+                'expectedUrls' => [
+                    'http://example.com/style.css',
+                ],
+            ],
+            'linked stylesheets and imports' => [
+                'webPage' => $this->createWebPage(
+                    HtmlDocumentFactory::load('style-elements-linked-stylesheets-has-imports'),
+                    'http://example.com/'
+                ),
+                'expectedUrls' => [
+                    'http://example.com/one.css',
+                    'http://example.com/two.css',
+                    'http://example.com/three.css',
+                    'http://example.com/four.css',
+                ],
+            ],
+        ];
+    }
+
     private function createWebPage(string $content, string $url): WebPage
     {
         /* @var WebPage $webPage */

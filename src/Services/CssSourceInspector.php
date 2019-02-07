@@ -128,4 +128,17 @@ class CssSourceInspector
 
         return $urls;
     }
+
+    /**
+     * @param WebPage $webPage
+     *
+     * @return string[]
+     */
+    public function findStylesheetUrls(WebPage $webPage): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->findLinkElementStylesheetUrls($webPage),
+            $this->findImportUrls($webPage)
+        )));
+    }
 }
