@@ -111,7 +111,7 @@ services:
 
     App\Services\TaskTypePreparer\FinalTaskPreparer:
       tags:
-        - { name: kernel.event_listener, event: task.prepare, priority: 200 }
+        - { name: kernel.event_listener, event: task.prepare, priority: 10 }
 
     App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer:
       tags:
