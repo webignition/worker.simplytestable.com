@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Task\Task;
+use webignition\CssValidatorWrapper\SourceType;
 use webignition\InternetMediaType\Parser\Parser as ContentTypeParser;
 use webignition\ResourceStorage\ResourceStorage;
 use webignition\UrlSourceMap\Source;
@@ -42,12 +43,23 @@ class UrlSourceMapFactory
                     /** @noinspection PhpUnhandledExceptionInspection */
                     $contentType = $this->contentTypeParser->parse($cachedResource->getContentType());
 
-                    $this->resourceStorage->store(
+                    $source = $this->resourceStorage->store(
                         $sources,
                         $sourceUri,
                         stream_get_contents($cachedResource->getBody()),
                         $contentType->getSubtype()
                     );
+
+                    $taskSourceContext = $taskSource->getContext();
+                    $taskSourceOrigin = $taskSourceContext['origin'] ?? null;
+
+                    if (SourceType::TYPE_IMPORT === $taskSourceOrigin) {
+                        $sources->offsetSet($sourceUri, new Source(
+                            $source->getUri(),
+                            $source->getMappedUri(),
+                            SourceType::TYPE_IMPORT
+                        ));
+                    }
                 } else {
                     $sources[$sourceUri] = new Source($sourceUri);
                 }
