@@ -8,6 +8,7 @@ use App\Model\Task\TypeInterface;
 use App\Services\UrlSourceMapFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\TestTaskFactory;
+use webignition\CssValidatorWrapper\SourceType;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\ResourceStorage\SourcePurger;
 use webignition\UrlSourceMap\Source as SourceMapSource;
@@ -60,6 +61,8 @@ class UrlSourceMapFactoryTest extends AbstractBaseTestCase
 
                 $expectedSourceContent = $expectedSourceContents[$expectedSourceIndex];
                 $this->assertEquals($expectedSourceContent, file_get_contents($localPath));
+
+                $this->assertEquals($expectedSource->getType(), $source->getType());
             }
         }
 
@@ -133,12 +136,18 @@ class UrlSourceMapFactoryTest extends AbstractBaseTestCase
                             'type' => Source::TYPE_CACHED_RESOURCE,
                             'content' => 'html {}',
                             'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'resource',
+                            ],
                         ],
                         [
                             'url' => 'http://example.com/two.css',
                             'type' => Source::TYPE_CACHED_RESOURCE,
                             'content' => 'body {}',
                             'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'import',
+                            ],
                         ],
                     ],
                 ]),
@@ -149,7 +158,8 @@ class UrlSourceMapFactoryTest extends AbstractBaseTestCase
                     ),
                     'http://example.com/two.css' => new SourceMapSource(
                         'http://example.com/two.css',
-                        '/^file:\/tmp\/[a-f0-9]{32}\.css/'
+                        '/^file:\/tmp\/[a-f0-9]{32}\.css/',
+                        SourceType::TYPE_IMPORT
                     ),
                 ]),
                 'expectedSourceContents' => [
