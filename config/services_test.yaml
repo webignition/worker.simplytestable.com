@@ -26,6 +26,9 @@ services:
   App\Tests\Services\ContentTypeFactory:
     public: true
 
+  App\Tests\Services\TaskSourceContentsLoader:
+    public: true
+
   App\Services\UrlSourceMapFactory:
     public: true
 

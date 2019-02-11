@@ -4,7 +4,6 @@
 
 namespace App\Tests\Integration\Services;
 
-use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
@@ -12,6 +11,7 @@ use App\Services\Resque\QueueService;
 use App\Services\TaskPreparer;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Services\HttpMockHandler;
+use App\Tests\Services\TaskSourceContentsLoader;
 use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -34,6 +34,11 @@ class TaskPreparerTest extends AbstractBaseTestCase
      */
     private $httpMockHandler;
 
+    /**
+     * @var TaskSourceContentsLoader
+     */
+    private $taskSourceContentsLoader;
+
     protected function setUp()
     {
         parent::setUp();
@@ -41,6 +46,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
         $this->taskPreparer = self::$container->get(TaskPreparer::class);
         $this->entityManager = self::$container->get(EntityManagerInterface::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
+        $this->taskSourceContentsLoader = self::$container->get(TaskSourceContentsLoader::class);
     }
 
     /**
@@ -69,7 +75,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
         $sources = $task->getSources();
         $this->assertEquals($expectedSources, $sources);
 
-        $sourceContents = $this->loadSourceContents($sources);
+        $sourceContents = $this->taskSourceContentsLoader->load($sources);
         $this->assertEquals($expectedSourceContents, $sourceContents);
 
         $this->assertTrue(self::$container->get(QueueService::class)->contains(
@@ -267,24 +273,6 @@ class TaskPreparerTest extends AbstractBaseTestCase
                 ],
             ],
         ];
-    }
-
-    /**
-     * @param Source[] $sources
-     *
-     * @return string[]
-     */
-    private function loadSourceContents(array $sources): array
-    {
-        $contents = [];
-
-        foreach ($sources as $source) {
-            /* @var CachedResource $cachedResource */
-            $cachedResource = $this->entityManager->find(CachedResource::class, $source->getValue());
-            $contents[$source->getUrl()] = stream_get_contents($cachedResource->getBody());
-        }
-
-        return $contents;
     }
 
     protected function assertPostConditions()

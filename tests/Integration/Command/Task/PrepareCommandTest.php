@@ -5,12 +5,12 @@
 namespace App\Tests\Integration\Command\Task;
 
 use App\Command\Task\PrepareCommand;
-use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Services\HttpMockHandler;
+use App\Tests\Services\TaskSourceContentsLoader;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\Resque\QueueService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,12 +34,18 @@ class PrepareCommandTest extends AbstractBaseTestCase
      */
     private $entityManager;
 
+    /**
+     * @var TaskSourceContentsLoader
+     */
+    private $taskSourceContentsLoader;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->command = self::$container->get(PrepareCommand::class);
         $this->entityManager = self::$container->get(EntityManagerInterface::class);
+        $this->taskSourceContentsLoader = self::$container->get(TaskSourceContentsLoader::class);
     }
 
     /**
@@ -73,7 +79,7 @@ class PrepareCommandTest extends AbstractBaseTestCase
         $sources = $task->getSources();
         $this->assertEquals($expectedSources, $sources);
 
-        $sourceContents = $this->loadSourceContents($sources);
+        $sourceContents = $this->taskSourceContentsLoader->load($sources);
         $this->assertEquals($expectedSourceContents, $sourceContents);
 
         $this->assertTrue(self::$container->get(QueueService::class)->contains(
@@ -203,24 +209,6 @@ class PrepareCommandTest extends AbstractBaseTestCase
                 ],
             ],
         ];
-    }
-
-    /**
-     * @param Source[] $sources
-     *
-     * @return string[]
-     */
-    private function loadSourceContents(array $sources): array
-    {
-        $contents = [];
-
-        foreach ($sources as $source) {
-            /* @var CachedResource $cachedResource */
-            $cachedResource = $this->entityManager->find(CachedResource::class, $source->getValue());
-            $contents[$source->getUrl()] = stream_get_contents($cachedResource->getBody());
-        }
-
-        return $contents;
     }
 
     /**
