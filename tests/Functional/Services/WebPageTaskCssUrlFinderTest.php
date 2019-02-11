@@ -4,6 +4,7 @@
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Task\Task;
+use App\Model\CssSourceUrl;
 use App\Model\Task\TypeInterface;
 use App\Services\WebPageTaskCssUrlFinder;
 use App\Tests\Factory\HtmlDocumentFactory;
@@ -37,11 +38,11 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
     /**
      * @dataProvider findDataProvider
      */
-    public function testFind(array $taskValues, array $expectedUrls)
+    public function testFind(array $taskValues, array $expectedCssSourceUrls)
     {
         $task = $this->testTaskFactory->create($taskValues);
 
-        $this->assertEquals($expectedUrls, $this->webPageTaskCssUrlFinder->find($task));
+        $this->assertEquals($expectedCssSourceUrls, $this->webPageTaskCssUrlFinder->find($task));
     }
 
     public function findDataProvider(): array
@@ -78,7 +79,7 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                     ],
                 ],
                 'expectedUrls' => [
-                    'http://example.com/style.css',
+                    new CssSourceUrl('http://example.com/style.css', CssSourceUrl::TYPE_RESOURCE),
                 ],
             ],
             'single linked stylesheet, single import, none sourced' => [
@@ -96,8 +97,8 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                     ],
                 ],
                 'expectedUrls' => [
-                    'http://example.com/one.css',
-                    'http://example.com/two.css',
+                    new CssSourceUrl('http://example.com/one.css', CssSourceUrl::TYPE_RESOURCE),
+                    new CssSourceUrl('http://example.com/two.css', CssSourceUrl::TYPE_RESOURCE),
                 ],
             ],
             'single linked stylesheet, single import, linked stylesheet sourced, no additional imports' => [
@@ -120,8 +121,8 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                     ],
                 ],
                 'expectedUrls' => [
-                    'http://example.com/one.css',
-                    'http://example.com/two.css',
+                    new CssSourceUrl('http://example.com/one.css', CssSourceUrl::TYPE_RESOURCE),
+                    new CssSourceUrl('http://example.com/two.css', CssSourceUrl::TYPE_RESOURCE),
                 ],
             ],
             'single linked stylesheet, single import, linked stylesheet sourced, additional imports in stylesheet' => [
@@ -144,9 +145,9 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                     ],
                 ],
                 'expectedUrls' => [
-                    'http://example.com/one.css',
-                    'http://example.com/two.css',
-                    'http://example.com/three.css',
+                    new CssSourceUrl('http://example.com/one.css', CssSourceUrl::TYPE_RESOURCE),
+                    new CssSourceUrl('http://example.com/two.css', CssSourceUrl::TYPE_RESOURCE),
+                    new CssSourceUrl('http://example.com/three.css', CssSourceUrl::TYPE_IMPORT),
                 ],
             ],
         ];
