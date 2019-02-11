@@ -5,6 +5,7 @@ namespace App\Tests\Functional\Services\TaskTypePreparer;
 
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
+use App\Model\Source;
 use App\Model\Task\Type;
 use App\Services\TaskTypePreparer\CssTaskSourcePreparer;
 use App\Services\TaskTypeService;
@@ -102,7 +103,7 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
         array $taskValues,
         array $httpFixtures,
         bool $expectedPreparationIsComplete,
-        array $expectedSourceUrls
+        array $expectedSources
     ) {
         $task = $this->testTaskFactory->create($taskValues);
         $this->httpMockHandler->appendFixtures($httpFixtures);
@@ -110,7 +111,7 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
         $preparationIsComplete = $this->preparer->prepare($task);
 
         $this->assertEquals($expectedPreparationIsComplete, $preparationIsComplete);
-        $this->assertEquals($expectedSourceUrls, array_keys($task->getSources()));
+        $this->assertEquals($expectedSources, $task->getSources());
     }
 
     /**
@@ -120,7 +121,7 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
         array $taskValues,
         array $httpFixtures,
         bool $expectedPreparationIsComplete,
-        array $expectedSourceUrls
+        array $expectedSources
     ) {
         $task = $this->testTaskFactory->create($taskValues);
         $this->httpMockHandler->appendFixtures($httpFixtures);
@@ -130,194 +131,294 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
         $this->preparer->__invoke($taskEvent);
 
         $this->assertEquals(!$expectedPreparationIsComplete, $taskEvent->isPropagationStopped());
-        $this->assertEquals($expectedSourceUrls, array_keys($task->getSources()));
+        $this->assertEquals($expectedSources, $task->getSources());
     }
 
     public function prepareSuccessDataProvider(): array
     {
         return [
-//            'no stylesheet urls' => [
-//                'taskValues' => [
-//                    'url' => 'http://example.com',
-//                    'type' =>  Type::TYPE_CSS_VALIDATION,
-//                    'parameters' => '',
-//                    'state' => Task::STATE_PREPARING,
-//                    'sources' => [
-//                        [
-//                            'url' => 'http://example.com',
-//                            'content' => '<!doctype html>',
-//                            'contentType' => new InternetMediaType('text', 'html'),
-//                        ],
-//                    ],
-//                ],
-//                'httpFixtures' => [],
-//                'expectedPreparationIsComplete' => true,
-//                'expectedSourceUrls' => [
-//                    'http://example.com',
-//                ],
-//            ],
-//            'single stylesheet url' => [
-//                'taskValues' => [
-//                    'url' => 'http://example.com',
-//                    'type' =>  Type::TYPE_CSS_VALIDATION,
-//                    'parameters' => '',
-//                    'state' => Task::STATE_PREPARING,
-//                    'sources' => [
-//                        [
-//                            'url' => 'http://example.com',
-//                            'content' => HtmlDocumentFactory::load('empty-body-single-css-link'),
-//                            'contentType' => new InternetMediaType('text', 'html'),
-//                        ],
-//                    ],
-//                ],
-//                'httpFixtures' => [
-//                    new Response(200, ['content-type' => 'text/css']),
-//                    new Response(200, ['content-type' => 'text/css']),
-//                ],
-//                'expectedPreparationIsComplete' => true,
-//                'expectedSourceUrls' => [
-//                    'http://example.com',
-//                    'http://example.com/style.css',
-//                ],
-//            ],
-//            'two stylesheet urls, none sourced' => [
-//                'taskValues' => [
-//                    'url' => 'http://example.com',
-//                    'type' =>  Type::TYPE_CSS_VALIDATION,
-//                    'parameters' => '',
-//                    'state' => Task::STATE_PREPARING,
-//                    'sources' => [
-//                        [
-//                            'url' => 'http://example.com',
-//                            'content' => HtmlDocumentFactory::load('empty-body-two-css-links'),
-//                            'contentType' => new InternetMediaType('text', 'html'),
-//                        ],
-//                    ],
-//                ],
-//                'httpFixtures' => [
-//                    new Response(200, ['content-type' => 'text/css']),
-//                    new Response(200, ['content-type' => 'text/css']),
-//                ],
-//                'expectedPreparationIsComplete' => false,
-//                'expectedSourceUrls' => [
-//                    'http://example.com',
-//                    'http://example.com/one.css',
-//                ],
-//            ],
-//            'two stylesheet urls, first sourced' => [
-//                'taskValues' => [
-//                    'url' => 'http://example.com',
-//                    'type' =>  Type::TYPE_CSS_VALIDATION,
-//                    'parameters' => '',
-//                    'state' => Task::STATE_PREPARING,
-//                    'sources' => [
-//                        [
-//                            'url' => 'http://example.com',
-//                            'content' => HtmlDocumentFactory::load('empty-body-two-css-links'),
-//                            'contentType' => new InternetMediaType('text', 'html'),
-//                        ],
-//                        [
-//                            'url' => 'http://example.com/one.css',
-//                            'content' => 'html {}',
-//                            'contentType' => new InternetMediaType('text', 'css'),
-//                        ],
-//                    ],
-//                ],
-//                'httpFixtures' => [
-//                    new Response(200, ['content-type' => 'text/css']),
-//                    new Response(200, ['content-type' => 'text/css']),
-//                ],
-//                'expectedPreparationIsComplete' => true,
-//                'expectedSourceUrls' => [
-//                    'http://example.com',
-//                    'http://example.com/one.css',
-//                    'http://example.com/two.css',
-//                ],
-//            ],
-//            'single linked stylesheet, single import, none sourced' => [
-//                'taskValues' => [
-//                    'url' => 'http://example.com',
-//                    'type' =>  Type::TYPE_CSS_VALIDATION,
-//                    'parameters' => '',
-//                    'state' => Task::STATE_PREPARING,
-//                    'sources' => [
-//                        [
-//                            'url' => 'http://example.com',
-//                            'content' => HtmlDocumentFactory::load('single-linked-stylesheet-single-import'),
-//                            'contentType' => new InternetMediaType('text', 'html'),
-//                        ],
-//                    ],
-//                ],
-//                'httpFixtures' => [
-//                    new Response(200, ['content-type' => 'text/css']),
-//                    new Response(200, ['content-type' => 'text/css']),
-//                ],
-//                'expectedPreparationIsComplete' => false,
-//                'expectedSourceUrls' => [
-//                    'http://example.com',
-//                    'http://example.com/one.css',
-//                ],
-//            ],
-//            'single linked stylesheet, single import, linked stylesheet sourced' => [
-//                'taskValues' => [
-//                    'url' => 'http://example.com',
-//                    'type' =>  Type::TYPE_CSS_VALIDATION,
-//                    'parameters' => '',
-//                    'state' => Task::STATE_PREPARING,
-//                    'sources' => [
-//                        [
-//                            'url' => 'http://example.com',
-//                            'content' => HtmlDocumentFactory::load('single-linked-stylesheet-single-import'),
-//                            'contentType' => new InternetMediaType('text', 'html'),
-//                        ],
-//                        [
-//                            'url' => 'http://example.com/one.css',
-//                            'content' => 'html {}',
-//                            'contentType' => new InternetMediaType('text', 'css'),
-//                        ],
-//                    ],
-//                ],
-//                'httpFixtures' => [
-//                    new Response(200, ['content-type' => 'text/css']),
-//                    new Response(200, ['content-type' => 'text/css']),
-//                ],
-//                'expectedPreparationIsComplete' => true,
-//                'expectedSourceUrls' => [
-//                    'http://example.com',
-//                    'http://example.com/one.css',
-//                    'http://example.com/two.css',
-//                ],
-//            ],
-//            'single linked stylesheet, single import, linked stylesheet sourced, import in linked stylesheet' => [
-//                'taskValues' => [
-//                    'url' => 'http://example.com',
-//                    'type' =>  Type::TYPE_CSS_VALIDATION,
-//                    'parameters' => '',
-//                    'state' => Task::STATE_PREPARING,
-//                    'sources' => [
-//                        [
-//                            'url' => 'http://example.com',
-//                            'content' => HtmlDocumentFactory::load('single-linked-stylesheet-single-import'),
-//                            'contentType' => new InternetMediaType('text', 'html'),
-//                        ],
-//                        [
-//                            'url' => 'http://example.com/one.css',
-//                            'content' => '@import "three.css";',
-//                            'contentType' => new InternetMediaType('text', 'css'),
-//                        ],
-//                    ],
-//                ],
-//                'httpFixtures' => [
-//                    new Response(200, ['content-type' => 'text/css']),
-//                    new Response(200, ['content-type' => 'text/css']),
-//                ],
-//                'expectedPreparationIsComplete' => false,
-//                'expectedSourceUrls' => [
-//                    'http://example.com',
-//                    'http://example.com/one.css',
-//                    'http://example.com/two.css',
-//                ],
-//            ],
+            'no stylesheet urls' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => '<!doctype html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [],
+                'expectedPreparationIsComplete' => true,
+                'expectedSources' => [
+                    'http://example.com' => new Source(
+                        'http://example.com',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '0d633f5a406af4dc8ebcc4201087bce6'
+                    ),
+                ],
+            ],
+            'single stylesheet url' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css']),
+                ],
+                'expectedPreparationIsComplete' => true,
+                'expectedSources' => [
+                    'http://example.com' => new Source(
+                        'http://example.com',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '0d633f5a406af4dc8ebcc4201087bce6'
+                    ),
+                    'http://example.com/style.css' => new Source(
+                        'http://example.com/style.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '10490a4daf45105812424ba6b4b77c36',
+                        [
+                            'origin' => 'resource',
+                        ]
+                    ),
+                ],
+            ],
+            'two stylesheet urls, none sourced' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('empty-body-two-css-links'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css']),
+                ],
+                'expectedPreparationIsComplete' => false,
+                'expectedSources' => [
+                    'http://example.com' => new Source(
+                        'http://example.com',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '0d633f5a406af4dc8ebcc4201087bce6'
+                    ),
+                    'http://example.com/one.css' => new Source(
+                        'http://example.com/one.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '7a39b475cf06e8626219dd25314c0e20',
+                        [
+                            'origin' => 'resource',
+                        ]
+                    ),
+                ],
+            ],
+            'two stylesheet urls, first sourced' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('empty-body-two-css-links'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://example.com/one.css',
+                            'content' => 'html {}',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'resource',
+                            ],
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css']),
+                ],
+                'expectedPreparationIsComplete' => true,
+                'expectedSources' => [
+                    'http://example.com' => new Source(
+                        'http://example.com',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '0d633f5a406af4dc8ebcc4201087bce6'
+                    ),
+                    'http://example.com/one.css' => new Source(
+                        'http://example.com/one.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '7a39b475cf06e8626219dd25314c0e20',
+                        [
+                            'origin' => 'resource',
+                        ]
+                    ),
+                    'http://example.com/two.css' => new Source(
+                        'http://example.com/two.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '71ccc1362462e64378b12fb9f1c30c02',
+                        [
+                            'origin' => 'resource',
+                        ]
+                    ),
+                ],
+            ],
+            'single linked stylesheet, single import, none sourced' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('single-linked-stylesheet-single-import'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css']),
+                ],
+                'expectedPreparationIsComplete' => false,
+                'expectedSources' => [
+                    'http://example.com' => new Source(
+                        'http://example.com',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '0d633f5a406af4dc8ebcc4201087bce6'
+                    ),
+                    'http://example.com/one.css' => new Source(
+                        'http://example.com/one.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '7a39b475cf06e8626219dd25314c0e20',
+                        [
+                            'origin' => 'resource',
+                        ]
+                    ),
+                ],
+            ],
+            'single linked stylesheet, single import, linked stylesheet sourced' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('single-linked-stylesheet-single-import'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://example.com/one.css',
+                            'content' => 'html {}',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'resource',
+                            ],
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css']),
+                ],
+                'expectedPreparationIsComplete' => true,
+                'expectedSources' => [
+                    'http://example.com' => new Source(
+                        'http://example.com',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '0d633f5a406af4dc8ebcc4201087bce6'
+                    ),
+                    'http://example.com/one.css' => new Source(
+                        'http://example.com/one.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '7a39b475cf06e8626219dd25314c0e20',
+                        [
+                            'origin' => 'resource',
+                        ]
+                    ),
+                    'http://example.com/two.css' => new Source(
+                        'http://example.com/two.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '71ccc1362462e64378b12fb9f1c30c02',
+                        [
+                            'origin' => 'import',
+                        ]
+                    ),
+                ],
+            ],
+            'single linked stylesheet, single import, linked stylesheet sourced, import in linked stylesheet' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('single-linked-stylesheet-single-import'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://example.com/one.css',
+                            'content' => '@import "three.css";',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'resource',
+                            ],
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css']),
+                ],
+                'expectedPreparationIsComplete' => false,
+                'expectedSources' => [
+                    'http://example.com' => new Source(
+                        'http://example.com',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '0d633f5a406af4dc8ebcc4201087bce6'
+                    ),
+                    'http://example.com/one.css' => new Source(
+                        'http://example.com/one.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '7a39b475cf06e8626219dd25314c0e20',
+                        [
+                            'origin' => 'resource',
+                        ]
+                    ),
+                    'http://example.com/two.css' => new Source(
+                        'http://example.com/two.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '71ccc1362462e64378b12fb9f1c30c02',
+                        [
+                            'origin' => 'import',
+                        ]
+                    ),
+                ],
+            ],
             'single linked stylesheet, single import, import in linked stylesheet, all but linked import sourced' => [
                 'taskValues' => [
                     'url' => 'http://example.com',
@@ -334,11 +435,17 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
                             'url' => 'http://example.com/one.css',
                             'content' => '@import "three.css";',
                             'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'resource',
+                            ],
                         ],
                         [
                             'url' => 'http://example.com/two.css',
                             'content' => 'body {}',
                             'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'import',
+                            ],
                         ],
                     ],
                 ],
@@ -347,51 +454,110 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
                     new Response(200, ['content-type' => 'text/css']),
                 ],
                 'expectedPreparationIsComplete' => true,
-                'expectedSourceUrls' => [
-                    'http://example.com',
-                    'http://example.com/one.css',
-                    'http://example.com/two.css',
-                    'http://example.com/three.css',
+                'expectedSources' => [
+                    'http://example.com' => new Source(
+                        'http://example.com',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '0d633f5a406af4dc8ebcc4201087bce6'
+                    ),
+                    'http://example.com/one.css' => new Source(
+                        'http://example.com/one.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '7a39b475cf06e8626219dd25314c0e20',
+                        [
+                            'origin' => 'resource',
+                        ]
+                    ),
+                    'http://example.com/two.css' => new Source(
+                        'http://example.com/two.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '71ccc1362462e64378b12fb9f1c30c02',
+                        [
+                            'origin' => 'import',
+                        ]
+                    ),
+                    'http://example.com/three.css' => new Source(
+                        'http://example.com/three.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        'e885bdfdaab2711aa9424dd7f29fd3c7',
+                        [
+                            'origin' => 'import',
+                        ]
+                    ),
                 ],
             ],
-//            'single linked stylesheet, single import, import in linked stylesheet, all sourced' => [
-//                'taskValues' => [
-//                    'url' => 'http://example.com',
-//                    'type' =>  Type::TYPE_CSS_VALIDATION,
-//                    'parameters' => '',
-//                    'state' => Task::STATE_PREPARING,
-//                    'sources' => [
-//                        [
-//                            'url' => 'http://example.com',
-//                            'content' => HtmlDocumentFactory::load('single-linked-stylesheet-single-import'),
-//                            'contentType' => new InternetMediaType('text', 'html'),
-//                        ],
-//                        [
-//                            'url' => 'http://example.com/one.css',
-//                            'content' => '@import "three.css";',
-//                            'contentType' => new InternetMediaType('text', 'css'),
-//                        ],
-//                        [
-//                            'url' => 'http://example.com/two.css',
-//                            'content' => 'body {}',
-//                            'contentType' => new InternetMediaType('text', 'css'),
-//                        ],
-//                        [
-//                            'url' => 'http://example.com/three.css',
-//                            'content' => 'html {}',
-//                            'contentType' => new InternetMediaType('text', 'css'),
-//                        ],
-//                    ],
-//                ],
-//                'httpFixtures' => [],
-//                'expectedPreparationIsComplete' => true,
-//                'expectedSourceUrls' => [
-//                    'http://example.com',
-//                    'http://example.com/one.css',
-//                    'http://example.com/two.css',
-//                    'http://example.com/three.css',
-//                ],
-//            ],
+            'single linked stylesheet, single import, import in linked stylesheet, all sourced' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  Type::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('single-linked-stylesheet-single-import'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://example.com/one.css',
+                            'content' => '@import "three.css";',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'resource',
+                            ],
+                        ],
+                        [
+                            'url' => 'http://example.com/two.css',
+                            'content' => 'body {}',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'import',
+                            ],
+                        ],
+                        [
+                            'url' => 'http://example.com/three.css',
+                            'content' => 'html {}',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'import',
+                            ],
+                        ],
+                    ],
+                ],
+                'httpFixtures' => [],
+                'expectedPreparationIsComplete' => true,
+                'expectedSources' => [
+                    'http://example.com' => new Source(
+                        'http://example.com',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '0d633f5a406af4dc8ebcc4201087bce6'
+                    ),
+                    'http://example.com/one.css' => new Source(
+                        'http://example.com/one.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '7a39b475cf06e8626219dd25314c0e20',
+                        [
+                            'origin' => 'resource',
+                        ]
+                    ),
+                    'http://example.com/two.css' => new Source(
+                        'http://example.com/two.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '71ccc1362462e64378b12fb9f1c30c02',
+                        [
+                            'origin' => 'import',
+                        ]
+                    ),
+                    'http://example.com/three.css' => new Source(
+                        'http://example.com/three.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        'e885bdfdaab2711aa9424dd7f29fd3c7',
+                        [
+                            'origin' => 'import',
+                        ]
+                    ),
+                ],
+            ],
         ];
     }
 }
