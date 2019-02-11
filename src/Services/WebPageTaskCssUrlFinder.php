@@ -37,7 +37,10 @@ class WebPageTaskCssUrlFinder
         $webPageStylesheetUrls = $this->cssSourceInspector->findStylesheetUrls($webPage);
 
         foreach ($webPageStylesheetUrls as $webPageStylesheetUrl) {
-            $cssSourceUrls[] = new CssSourceUrl($webPageStylesheetUrl, CssSourceUrl::TYPE_RESOURCE);
+            $cssSourceUrls[$webPageStylesheetUrl] = new CssSourceUrl(
+                $webPageStylesheetUrl,
+                CssSourceUrl::TYPE_RESOURCE
+            );
         }
 
         /* @var Source[] $sources */
@@ -57,28 +60,13 @@ class WebPageTaskCssUrlFinder
                 $sourceImportUrls = array_merge($sourceImportUrls, $importUrls);
 
                 foreach ($importUrls as $importUrl) {
-                    $cssSourceUrls[] = new CssSourceUrl($importUrl, CssSourceUrl::TYPE_IMPORT);
+                    if (!array_key_exists($importUrl, $cssSourceUrls)) {
+                        $cssSourceUrls[$importUrl] = new CssSourceUrl($importUrl, CssSourceUrl::TYPE_IMPORT);
+                    }
                 }
             }
         }
 
-        return $this->foo($cssSourceUrls);
-//
-//        var_dump($cssSourceUrls);
-//
-//        return array_values(array_unique(array_merge(
-//            $webPageStylesheetUrls,
-//            $sourceImportUrls
-//        )));
-    }
-
-    /**
-     * @param CssSourceUrl[] $cssSourceUrls
-     *
-     * @return CssSourceUrl[]
-     */
-    private function foo(array $cssSourceUrls): array
-    {
-        return $cssSourceUrls;
+        return array_values($cssSourceUrls);
     }
 }

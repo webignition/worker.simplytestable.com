@@ -150,6 +150,35 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                     new CssSourceUrl('http://example.com/three.css', CssSourceUrl::TYPE_IMPORT),
                 ],
             ],
+            'single linked stylesheet, single import, linked stylesheet sourced, duplicate imports in stylesheet' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  TypeInterface::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('single-linked-stylesheet-single-import'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://example.com/one.css',
+                            'content' => implode("\n", [
+                                '@import url("one.css");',
+                                '@import url("two.css");',
+                                '@import url("three.css");',
+                            ]),
+                            'contentType' => new InternetMediaType('text', 'css'),
+                        ],
+                    ],
+                ],
+                'expectedUrls' => [
+                    new CssSourceUrl('http://example.com/one.css', CssSourceUrl::TYPE_RESOURCE),
+                    new CssSourceUrl('http://example.com/two.css', CssSourceUrl::TYPE_RESOURCE),
+                    new CssSourceUrl('http://example.com/three.css', CssSourceUrl::TYPE_IMPORT),
+                ],
+            ],
         ];
     }
 }
