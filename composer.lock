@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5879298e3781e11c2b083792ccf65809",
+    "content-hash": "c21b68d357c5e65e36d89c14764d6344",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4641,16 +4641,16 @@
         },
         {
             "name": "webignition/resource-storage",
-            "version": "0.1",
+            "version": "0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/resource-storage.git",
-                "reference": "324d84f0eef0aa17c7e968ee54b46c1ee0bc6b18"
+                "reference": "7a2cc620d9d2234e38c8b5d7e0b90688046473c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/resource-storage/zipball/324d84f0eef0aa17c7e968ee54b46c1ee0bc6b18",
-                "reference": "324d84f0eef0aa17c7e968ee54b46c1ee0bc6b18",
+                "url": "https://api.github.com/repos/webignition/resource-storage/zipball/7a2cc620d9d2234e38c8b5d7e0b90688046473c7",
+                "reference": "7a2cc620d9d2234e38c8b5d7e0b90688046473c7",
                 "shasum": ""
             },
             "require": {
@@ -4675,7 +4675,7 @@
                 "MIT"
             ],
             "homepage": "https://github.com/webignition/resource-storage",
-            "time": "2019-02-06T11:33:07+00:00"
+            "time": "2019-02-11T16:00:53+00:00"
         },
         {
             "name": "webignition/resque-bundle",
