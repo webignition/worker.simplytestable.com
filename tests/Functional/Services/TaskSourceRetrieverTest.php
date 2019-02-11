@@ -117,8 +117,11 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
     /**
      * @dataProvider retrieverSuccessNoPreExistingCachedResourceDataProvider
      */
-    public function testRetrieveSuccessNoPreExistingCachedResource(string $retrieverServiceId, string $contentType)
-    {
+    public function testRetrieveSuccessNoPreExistingCachedResource(
+        string $retrieverServiceId,
+        string $contentType,
+        array $sourceContext = []
+    ) {
         $this->httpMockHandler->appendFixtures([
             new Response(200, ['content-type' => $contentType]),
             new Response(200, ['content-type' => $contentType], 'html content'),
@@ -135,7 +138,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         $this->assertEquals([], $task->getSources());
         $this->assertEquals([], $this->cachedResourceRepository->findAll());
 
-        $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+        $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl(), $sourceContext);
 
         /* @var CachedResource $cachedResource */
         $cachedResource = $this->cachedResourceRepository->findOneBy([
@@ -144,7 +147,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
         $this->assertEquals($contentType, (string) $cachedResource->getContentType());
 
-        $expectedSource = $this->sourceFactory->fromCachedResource($cachedResource);
+        $expectedSource = $this->sourceFactory->fromCachedResource($cachedResource, $sourceContext);
 
         $this->assertEquals(
             [
@@ -168,6 +171,24 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             'text/html; charset=windows-1251' => [
                 'retrieverServiceId' => 'app.services.web-resource-retriever.web-page',
                 'contentType' => 'text/html; charset=windows-1251',
+            ],
+            'text/css, no context' => [
+                'retrieverServiceId' => 'app.services.web-resource-retriever.css',
+                'contentType' => 'text/css',
+            ],
+            'text/css, resource context' => [
+                'retrieverServiceId' => 'app.services.web-resource-retriever.css',
+                'contentType' => 'text/css',
+                'sourceContext' => [
+                    'origin' => 'resource',
+                ],
+            ],
+            'text/css, import context' => [
+                'retrieverServiceId' => 'app.services.web-resource-retriever.css',
+                'contentType' => 'text/css',
+                'sourceContext' => [
+                    'origin' => 'import',
+                ],
             ],
         ];
     }
