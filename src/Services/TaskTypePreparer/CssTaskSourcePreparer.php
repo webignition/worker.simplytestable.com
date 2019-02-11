@@ -5,28 +5,24 @@ namespace App\Services\TaskTypePreparer;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use App\Model\Task\Type;
-use App\Services\CssSourceInspector;
-use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Services\TaskSourceRetriever;
+use App\Services\WebPageTaskCssUrlFinder;
 use webignition\WebResource\Retriever as WebResourceRetriever;
 
 class CssTaskSourcePreparer
 {
-    private $taskCachedSourceWebPageRetriever;
     private $taskSourceRetriever;
     private $webResourceRetriever;
-    private $cssSourceInspector;
+    private $webPageTaskCssUrlFinder;
 
     public function __construct(
-        TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         TaskSourceRetriever $taskSourceRetriever,
         WebResourceRetriever $webResourceRetriever,
-        CssSourceInspector $cssSourceInspector
+        WebPageTaskCssUrlFinder $webPageTaskCssUrlFinder
     ) {
-        $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
         $this->taskSourceRetriever = $taskSourceRetriever;
         $this->webResourceRetriever = $webResourceRetriever;
-        $this->cssSourceInspector = $cssSourceInspector;
+        $this->webPageTaskCssUrlFinder = $webPageTaskCssUrlFinder;
     }
 
     public function __invoke(TaskEvent $taskEvent)
@@ -46,9 +42,7 @@ class CssTaskSourcePreparer
             return null;
         }
 
-        $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
-
-        $stylesheetUrls = $this->cssSourceInspector->findStylesheetUrls($webPage);
+        $stylesheetUrls = $this->webPageTaskCssUrlFinder->find($task);
 
         $nextUnSourcedStylesheetUrl = $this->findNextUnSourcedStylesheetUrl($stylesheetUrls, $task->getSources());
         if (null === $nextUnSourcedStylesheetUrl) {
@@ -56,6 +50,7 @@ class CssTaskSourcePreparer
         }
 
         $this->taskSourceRetriever->retrieve($this->webResourceRetriever, $task, $nextUnSourcedStylesheetUrl);
+        $stylesheetUrls = $this->webPageTaskCssUrlFinder->find($task);
 
         return null === $this->findNextUnSourcedStylesheetUrl($stylesheetUrls, $task->getSources());
     }
