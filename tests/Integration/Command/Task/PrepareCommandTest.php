@@ -29,21 +29,30 @@ class PrepareCommandTest extends AbstractBaseTestCase
      */
     private $command;
 
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->command = self::$container->get(PrepareCommand::class);
+        $this->entityManager = self::$container->get(EntityManagerInterface::class);
     }
 
     /**
      * @dataProvider runDataProvider
      */
-    public function testRun(array $httpFixtures, array $taskValues, string $expectedPrimarySourceBody)
-    {
+    public function testRun(
+        array $httpFixtures,
+        array $taskValues,
+        array $expectedSources,
+        array $expectedSourceContents
+    ) {
         $testTaskFactory = self::$container->get(TestTaskFactory::class);
         $httpMockHandler = self::$container->get(HttpMockHandler::class);
-        $entityManager = self::$container->get(EntityManagerInterface::class);
 
         $httpMockHandler->appendFixtures($httpFixtures);
 
@@ -62,19 +71,10 @@ class PrepareCommandTest extends AbstractBaseTestCase
         $this->assertEquals(Task::STATE_PREPARED, $task->getState());
 
         $sources = $task->getSources();
-        $this->assertNotEmpty($sources);
+        $this->assertEquals($expectedSources, $sources);
 
-        $primarySource = $sources[$task->getUrl()] ?? null;
-        $this->assertInstanceOf(Source::class, $primarySource);
-        $this->assertEquals($task->getUrl(), $primarySource->getUrl());
-        $this->assertTrue($primarySource->isCachedResource());
-
-        /* @var CachedResource $cachedResource */
-        $cachedResource = $entityManager->find(CachedResource::class, $primarySource->getValue());
-        $this->assertInstanceOf(CachedResource::class, $cachedResource);
-        $this->assertEquals($task->getUrl(), $cachedResource->getUrl());
-        $this->assertEquals('text/html', $cachedResource->getContentType());
-        $this->assertEquals($expectedPrimarySourceBody, stream_get_contents($cachedResource->getBody()));
+        $sourceContents = $this->loadSourceContents($sources);
+        $this->assertEquals($expectedSourceContents, $sourceContents);
 
         $this->assertTrue(self::$container->get(QueueService::class)->contains(
             'task-perform',
@@ -96,7 +96,16 @@ class PrepareCommandTest extends AbstractBaseTestCase
                     'url' => 'http://example.com/',
                     'type' => TypeInterface::TYPE_HTML_VALIDATION,
                 ]),
-                'expectedPrimarySourceBody' => '<doctype html>',
+                'expectedSources' => [
+                    'http://example.com/' => new Source(
+                        'http://example.com/',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '4c2297fd8f408fa415ebfbc2d991f9ce'
+                    ),
+                ],
+                'expectedSourceContents' => [
+                    'http://example.com/' => '<doctype html>',
+                ],
             ],
             'css validation, no stylesheets' => [
                 'httpFixtures' => [
@@ -107,9 +116,18 @@ class PrepareCommandTest extends AbstractBaseTestCase
                     'url' => 'http://example.com/',
                     'type' => TypeInterface::TYPE_CSS_VALIDATION,
                 ]),
-                'expectedPrimarySourceBody' => '<doctype html>',
+                'expectedSources' => [
+                    'http://example.com/' => new Source(
+                        'http://example.com/',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '4c2297fd8f408fa415ebfbc2d991f9ce'
+                    ),
+                ],
+                'expectedSourceContents' => [
+                    'http://example.com/' => '<doctype html>',
+                ],
             ],
-            'css validation, has stylesheet' => [
+            'css validation, single linked stylesheet' => [
                 'httpFixtures' => [
                     new Response(200, ['content-type' => 'text/html']),
                     new Response(
@@ -124,7 +142,25 @@ class PrepareCommandTest extends AbstractBaseTestCase
                     'url' => 'http://example.com/',
                     'type' => TypeInterface::TYPE_CSS_VALIDATION,
                 ]),
-                'expectedPrimarySourceBody' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                'expectedSources' => [
+                    'http://example.com/' => new Source(
+                        'http://example.com/',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '4c2297fd8f408fa415ebfbc2d991f9ce'
+                    ),
+                    'http://example.com/style.css' => new Source(
+                        'http://example.com/style.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '10490a4daf45105812424ba6b4b77c36',
+                        [
+                            'origin' => 'resource',
+                        ]
+                    ),
+                ],
+                'expectedSourceContents' => [
+                    'http://example.com/' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                    'http://example.com/style.css' => 'html {}',
+                ],
             ],
             'link integrity' => [
                 'httpFixtures' => [
@@ -135,7 +171,16 @@ class PrepareCommandTest extends AbstractBaseTestCase
                     'url' => 'http://example.com/',
                     'type' => TypeInterface::TYPE_LINK_INTEGRITY,
                 ]),
-                'expectedPrimarySourceBody' => '<doctype html>',
+                'expectedSources' => [
+                    'http://example.com/' => new Source(
+                        'http://example.com/',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '4c2297fd8f408fa415ebfbc2d991f9ce'
+                    ),
+                ],
+                'expectedSourceContents' => [
+                    'http://example.com/' => '<doctype html>',
+                ],
             ],
             'url discovery' => [
                 'httpFixtures' => [
@@ -146,9 +191,36 @@ class PrepareCommandTest extends AbstractBaseTestCase
                     'url' => 'http://example.com/',
                     'type' => TypeInterface::TYPE_URL_DISCOVERY,
                 ]),
-                'expectedPrimarySourceBody' => '<doctype html>',
+                'expectedSources' => [
+                    'http://example.com/' => new Source(
+                        'http://example.com/',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '4c2297fd8f408fa415ebfbc2d991f9ce'
+                    ),
+                ],
+                'expectedSourceContents' => [
+                    'http://example.com/' => '<doctype html>',
+                ],
             ],
         ];
+    }
+
+    /**
+     * @param Source[] $sources
+     *
+     * @return string[]
+     */
+    private function loadSourceContents(array $sources): array
+    {
+        $contents = [];
+
+        foreach ($sources as $source) {
+            /* @var CachedResource $cachedResource */
+            $cachedResource = $this->entityManager->find(CachedResource::class, $source->getValue());
+            $contents[$source->getUrl()] = stream_get_contents($cachedResource->getBody());
+        }
+
+        return $contents;
     }
 
     /**
