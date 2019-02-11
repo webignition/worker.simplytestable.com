@@ -208,6 +208,64 @@ class TaskPreparerTest extends AbstractBaseTestCase
                     'http://example.com/two.css' => '.import {}',
                 ],
             ],
+            'css validation, single linked stylesheet, single import, additional import in inmport' => [
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
+                        200,
+                        ['content-type' => 'text/html'],
+                        HtmlDocumentFactory::load('single-linked-stylesheet-single-import')
+                    ),
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css'], '.linked {}'),
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css'], '@import "import-import.css";'),
+                    new Response(200, ['content-type' => 'text/css']),
+                    new Response(200, ['content-type' => 'text/css'], '.import-import {}'),
+                ],
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'url' => 'http://example.com/',
+                    'type' => TypeInterface::TYPE_CSS_VALIDATION,
+                ]),
+                'prepareRunCount' => 3,
+                'expectedSources' => [
+                    'http://example.com/' => new Source(
+                        'http://example.com/',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '4c2297fd8f408fa415ebfbc2d991f9ce'
+                    ),
+                    'http://example.com/one.css' => new Source(
+                        'http://example.com/one.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '7a39b475cf06e8626219dd25314c0e20',
+                        [
+                            'origin' => 'resource',
+                        ]
+                    ),
+                    'http://example.com/two.css' => new Source(
+                        'http://example.com/two.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '71ccc1362462e64378b12fb9f1c30c02',
+                        [
+                            'origin' => 'import',
+                        ]
+                    ),
+                    'http://example.com/import-import.css' => new Source(
+                        'http://example.com/import-import.css',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '5a1b452d6bb96c17137bbde519bd3881',
+                        [
+                            'origin' => 'import',
+                        ]
+                    ),
+                ],
+                'expectedSourceContents' => [
+                    'http://example.com/' => HtmlDocumentFactory::load('single-linked-stylesheet-single-import'),
+                    'http://example.com/one.css' => '.linked {}',
+                    'http://example.com/two.css' => '@import "import-import.css";',
+                    'http://example.com/import-import.css' => '.import-import {}',
+                ],
+            ],
         ];
     }
 
