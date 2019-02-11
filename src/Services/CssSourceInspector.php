@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Model\CssSourceUrl;
 use Sabberworm\CSS\Parser as CssParser;
 use Sabberworm\CSS\Property\Charset;
 use Sabberworm\CSS\Property\Import;
@@ -145,13 +146,27 @@ class CssSourceInspector
     /**
      * @param WebPage $webPage
      *
-     * @return string[]
+     * @return CssSourceUrl[]
      */
     public function findStylesheetUrls(WebPage $webPage): array
     {
-        return array_values(array_unique(array_merge(
-            $this->findLinkElementStylesheetUrls($webPage),
-            $this->findWebPageImportUrls($webPage)
-        )));
+        $resourceUrls = $this->findLinkElementStylesheetUrls($webPage);
+        $importUrls = $this->findWebPageImportUrls($webPage);
+
+        $cssSourceUrls = [];
+
+        foreach ($resourceUrls as $resourceUrl) {
+            if (!array_key_exists($resourceUrl, $cssSourceUrls)) {
+                $cssSourceUrls[$resourceUrl] = new CssSourceUrl($resourceUrl, CssSourceUrl::TYPE_RESOURCE);
+            }
+        }
+
+        foreach ($importUrls as $importUrl) {
+            if (!array_key_exists($importUrl, $cssSourceUrls)) {
+                $cssSourceUrls[$importUrl] = new CssSourceUrl($importUrl, CssSourceUrl::TYPE_IMPORT);
+            }
+        }
+
+        return $cssSourceUrls;
     }
 }
