@@ -46,8 +46,12 @@ class TaskSourceRetriever
         $this->cachedResourceFactory = $cachedResourceFactory;
     }
 
-    public function retrieve(WebResourceRetriever $webResourceRetriever, Task $task, string $url)
-    {
+    public function retrieve(
+        WebResourceRetriever $webResourceRetriever,
+        Task $task,
+        string $url,
+        array $sourceContext = []
+    ) {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
         $existingSources = $task->getSources();
@@ -72,7 +76,7 @@ class TaskSourceRetriever
                 $this->entityManager->flush();
             }
 
-            $source = $this->sourceFactory->fromCachedResource($cachedResource);
+            $source = $this->sourceFactory->fromCachedResource($cachedResource, $sourceContext);
         } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
             $source = $this->sourceFactory->createInvalidSource(
                 $url,

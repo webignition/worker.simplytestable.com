@@ -4,6 +4,8 @@ namespace App\Services\TaskTypePreparer;
 
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
+use App\Model\CssSourceUrl;
+use App\Model\Source;
 use App\Model\Task\Type;
 use App\Services\TaskSourceRetriever;
 use App\Services\WebPageTaskCssUrlFinder;
@@ -42,31 +44,46 @@ class CssTaskSourcePreparer
             return null;
         }
 
-        $stylesheetUrls = $this->webPageTaskCssUrlFinder->find($task);
+        $cssSourceUrls = $this->webPageTaskCssUrlFinder->find($task);
 
-        $nextUnSourcedStylesheetUrl = $this->findNextUnSourcedStylesheetUrl($stylesheetUrls, $task->getSources());
-        if (null === $nextUnSourcedStylesheetUrl) {
+        $nextUnSourcedCssSourceUrl = $this->findNextUnSourcedStylesheetUrl($cssSourceUrls, $task->getSources());
+        if (null === $nextUnSourcedCssSourceUrl) {
             return true;
         }
 
-        $this->taskSourceRetriever->retrieve($this->webResourceRetriever, $task, $nextUnSourcedStylesheetUrl);
-        $stylesheetUrls = $this->webPageTaskCssUrlFinder->find($task);
+        $this->taskSourceRetriever->retrieve(
+            $this->webResourceRetriever,
+            $task,
+            $nextUnSourcedCssSourceUrl->getUrl(),
+            [
+                'origin' => $nextUnSourcedCssSourceUrl->getType()
+            ]
+        );
+        $cssSourceUrls = $this->webPageTaskCssUrlFinder->find($task);
 
-        return null === $this->findNextUnSourcedStylesheetUrl($stylesheetUrls, $task->getSources());
+        return null === $this->findNextUnSourcedStylesheetUrl($cssSourceUrls, $task->getSources());
     }
 
-    private function findNextUnSourcedStylesheetUrl(array $stylesheetUrls, array $sources): ?string
+    /**
+     * @param CssSourceUrl[] $cssSourceUrls
+     * @param Source[] $sources
+     *
+     * @return CssSourceUrl|null
+     */
+    private function findNextUnSourcedStylesheetUrl(array $cssSourceUrls, array $sources): ?CssSourceUrl
     {
-        $nextUnSourcedStylesheetUrl = null;
+        $nextUnsourcedCssSourceUrl = null;
 
-        foreach ($stylesheetUrls as $stylesheetUrl) {
-            $hasSource = array_key_exists($stylesheetUrl, $sources);
+        foreach ($cssSourceUrls as $cssSourceUrl) {
+            $url = $cssSourceUrl->getUrl();
 
-            if (!$hasSource && null === $nextUnSourcedStylesheetUrl) {
-                $nextUnSourcedStylesheetUrl = $stylesheetUrl;
+            $hasSource = array_key_exists($url, $sources);
+
+            if (!$hasSource && null === $nextUnsourcedCssSourceUrl) {
+                $nextUnsourcedCssSourceUrl = $cssSourceUrl;
             }
         }
 
-        return $nextUnSourcedStylesheetUrl;
+        return $nextUnsourcedCssSourceUrl;
     }
 }

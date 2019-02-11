@@ -92,7 +92,8 @@ class TestTaskFactory
                         $task,
                         $sourceData['url'],
                         $sourceData['content'],
-                        $sourceData['contentType']
+                        $sourceData['contentType'],
+                        $sourceData['context'] ?? []
                     );
                 } else {
                     $task->addSource(new Source(
@@ -125,7 +126,8 @@ class TestTaskFactory
         Task $task,
         string $resourceUrl,
         string $resourceContent,
-        InternetMediaTypeInterface $contentType
+        InternetMediaTypeInterface $contentType,
+        array $context = []
     ) {
         $requestIdentifer = $this->requestIdentifierFactory->createFromTaskResource($task, $resourceUrl);
 
@@ -139,7 +141,7 @@ class TestTaskFactory
 
         $this->cachedResourceManager->persist($cachedResource);
 
-        $source = $this->sourceFactory->fromCachedResource($cachedResource);
+        $source = $this->sourceFactory->fromCachedResource($cachedResource, $context);
         $task->addSource($source);
 
         $this->entityManager->persist($task);

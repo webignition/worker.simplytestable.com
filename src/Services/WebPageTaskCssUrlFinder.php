@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Task\Task;
+use App\Model\CssSourceUrl;
 use App\Model\Source;
 
 class WebPageTaskCssUrlFinder
@@ -24,14 +25,14 @@ class WebPageTaskCssUrlFinder
     /**
      * @param Task $task
      *
-     * @return string[]
+     * @return CssSourceUrl[]
      */
     public function find(Task $task): array
     {
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
         $webPageUrl = (string) $webPage->getBaseUrl();
 
-        $webPageStylesheetUrls = $this->cssSourceInspector->findStylesheetUrls($webPage);
+        $cssSourceUrls = $this->cssSourceInspector->findStylesheetUrls($webPage);
 
         /* @var Source[] $sources */
         $sources = $task->getSources();
@@ -39,7 +40,7 @@ class WebPageTaskCssUrlFinder
         $sourceImportUrls = [];
 
         foreach ($sources as $source) {
-            $isStylesheetSource = in_array($source->getUrl(), $webPageStylesheetUrls);
+            $isStylesheetSource = array_key_exists($source->getUrl(), $cssSourceUrls);
 
             if ($source->isCachedResource() && $isStylesheetSource) {
                 $cachedResource = $this->cachedResourceManager->find($source->getValue());
@@ -48,12 +49,15 @@ class WebPageTaskCssUrlFinder
                 $importUrls = $this->cssSourceInspector->findCssImportUrls($css, $webPageUrl);
 
                 $sourceImportUrls = array_merge($sourceImportUrls, $importUrls);
+
+                foreach ($importUrls as $importUrl) {
+                    if (!array_key_exists($importUrl, $cssSourceUrls)) {
+                        $cssSourceUrls[$importUrl] = new CssSourceUrl($importUrl, CssSourceUrl::TYPE_IMPORT);
+                    }
+                }
             }
         }
 
-        return array_values(array_unique(array_merge(
-            $webPageStylesheetUrls,
-            $sourceImportUrls
-        )));
+        return $cssSourceUrls;
     }
 }

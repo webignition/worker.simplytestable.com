@@ -4,6 +4,7 @@
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Task\Task;
+use App\Model\CssSourceUrl;
 use App\Model\Task\TypeInterface;
 use App\Services\WebPageTaskCssUrlFinder;
 use App\Tests\Factory\HtmlDocumentFactory;
@@ -37,11 +38,11 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
     /**
      * @dataProvider findDataProvider
      */
-    public function testFind(array $taskValues, array $expectedUrls)
+    public function testFind(array $taskValues, array $expectedCssSourceUrls)
     {
         $task = $this->testTaskFactory->create($taskValues);
 
-        $this->assertEquals($expectedUrls, $this->webPageTaskCssUrlFinder->find($task));
+        $this->assertEquals($expectedCssSourceUrls, $this->webPageTaskCssUrlFinder->find($task));
     }
 
     public function findDataProvider(): array
@@ -61,7 +62,7 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                         ],
                     ],
                 ],
-                'expectedUrls' => [],
+                'expectedCssSourceUrls' => [],
             ],
             'single linked stylesheet' => [
                 'taskValues' => [
@@ -77,8 +78,11 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                         ],
                     ],
                 ],
-                'expectedUrls' => [
-                    'http://example.com/style.css',
+                'expectedCssSourceUrls' => [
+                    'http://example.com/style.css' => new CssSourceUrl(
+                        'http://example.com/style.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
                 ],
             ],
             'single linked stylesheet, single import, none sourced' => [
@@ -95,9 +99,15 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                         ],
                     ],
                 ],
-                'expectedUrls' => [
-                    'http://example.com/one.css',
-                    'http://example.com/two.css',
+                'expectedCssSourceUrls' => [
+                    'http://example.com/one.css' => new CssSourceUrl(
+                        'http://example.com/one.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/two.css' => new CssSourceUrl(
+                        'http://example.com/two.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
                 ],
             ],
             'single linked stylesheet, single import, linked stylesheet sourced, no additional imports' => [
@@ -119,9 +129,15 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                         ],
                     ],
                 ],
-                'expectedUrls' => [
-                    'http://example.com/one.css',
-                    'http://example.com/two.css',
+                'expectedCssSourceUrls' => [
+                    'http://example.com/one.css' => new CssSourceUrl(
+                        'http://example.com/one.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/two.css' => new CssSourceUrl(
+                        'http://example.com/two.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
                 ],
             ],
             'single linked stylesheet, single import, linked stylesheet sourced, additional imports in stylesheet' => [
@@ -143,10 +159,57 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                         ],
                     ],
                 ],
-                'expectedUrls' => [
-                    'http://example.com/one.css',
-                    'http://example.com/two.css',
-                    'http://example.com/three.css',
+                'expectedCssSourceUrls' => [
+                    'http://example.com/one.css' => new CssSourceUrl(
+                        'http://example.com/one.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/two.css' => new CssSourceUrl(
+                        'http://example.com/two.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                    'http://example.com/three.css' => new CssSourceUrl(
+                        'http://example.com/three.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                ],
+            ],
+            'single linked stylesheet, single import, linked stylesheet sourced, duplicate imports in stylesheet' => [
+                'taskValues' => [
+                    'url' => 'http://example.com',
+                    'type' =>  TypeInterface::TYPE_CSS_VALIDATION,
+                    'parameters' => '',
+                    'state' => Task::STATE_PREPARING,
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com',
+                            'content' => HtmlDocumentFactory::load('single-linked-stylesheet-single-import'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://example.com/one.css',
+                            'content' => implode("\n", [
+                                '@import url("one.css");',
+                                '@import url("two.css");',
+                                '@import url("three.css");',
+                            ]),
+                            'contentType' => new InternetMediaType('text', 'css'),
+                        ],
+                    ],
+                ],
+                'expectedCssSourceUrls' => [
+                    'http://example.com/one.css' => new CssSourceUrl(
+                        'http://example.com/one.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/two.css' => new CssSourceUrl(
+                        'http://example.com/two.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                    'http://example.com/three.css' => new CssSourceUrl(
+                        'http://example.com/three.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
                 ],
             ],
         ];

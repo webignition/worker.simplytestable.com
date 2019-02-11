@@ -4,6 +4,7 @@
 
 namespace App\Tests\Unit\Services;
 
+use App\Model\CssSourceUrl;
 use App\Services\CssSourceInspector;
 use App\Tests\Factory\HtmlDocumentFactory;
 use webignition\CssValidatorWrapper\SourceInspector;
@@ -250,11 +251,11 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findStylesheetUrlsDataProvider
      */
-    public function testFindStylesheetUrls(WebPage $webPage, array $expectedUrls)
+    public function testFindStylesheetUrls(WebPage $webPage, array $expectedCssSourceUrls)
     {
-        $stylesheetUrls = $this->cssSourceInspector->findStylesheetUrls($webPage);
+        $cssSourceUrls = $this->cssSourceInspector->findStylesheetUrls($webPage);
 
-        $this->assertEquals($expectedUrls, $stylesheetUrls);
+        $this->assertEquals($expectedCssSourceUrls, $cssSourceUrls);
     }
 
     public function findStylesheetUrlsDataProvider()
@@ -262,24 +263,33 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
         return [
             'empty' => [
                 'webPage' => $this->createWebPage('', 'http://example.com/'),
-                'expectedUrls' => [],
+                'expectedCssSourceUrls' => [],
             ],
             'many style elements, no import urls' => [
                 'webPage' => $this->createWebPage(
                     HtmlDocumentFactory::load('style-elements-no-imports'),
                     'http://example.com/'
                 ),
-                'expectedUrls' => [],
+                'expectedCssSourceUrls' => [],
             ],
             'many style elements, has import urls, http://example.com/' => [
                 'webPage' => $this->createWebPage(
                     HtmlDocumentFactory::load('style-elements-has-imports'),
                     'http://example.com/'
                 ),
-                'expectedUrls' => [
-                    'http://example.com/one.css',
-                    'http://example.com/two.css',
-                    'http://example.com/three.css',
+                'expectedCssSourceUrls' => [
+                    'http://example.com/one.css' => new CssSourceUrl(
+                        'http://example.com/one.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                    'http://example.com/two.css' => new CssSourceUrl(
+                        'http://example.com/two.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                    'http://example.com/three.css' => new CssSourceUrl(
+                        'http://example.com/three.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
                 ],
             ],
             'many style elements, has import urls, http://example.com/foo/' => [
@@ -287,10 +297,19 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
                     HtmlDocumentFactory::load('style-elements-has-imports'),
                     'http://example.com/foo/'
                 ),
-                'expectedUrls' => [
-                    'http://example.com/foo/one.css',
-                    'http://example.com/two.css',
-                    'http://example.com/foo/three.css',
+                'expectedCssSourceUrls' => [
+                    'http://example.com/foo/one.css' => new CssSourceUrl(
+                        'http://example.com/foo/one.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                    'http://example.com/two.css' => new CssSourceUrl(
+                        'http://example.com/two.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                    'http://example.com/foo/three.css' => new CssSourceUrl(
+                        'http://example.com/foo/three.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
                 ],
             ],
             'single linked stylesheet' => [
@@ -298,8 +317,11 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
                     HtmlDocumentFactory::load('empty-body-single-css-link'),
                     'http://example.com/'
                 ),
-                'expectedUrls' => [
-                    'http://example.com/style.css',
+                'expectedCssSourceUrls' => [
+                    'http://example.com/style.css' => new CssSourceUrl(
+                        'http://example.com/style.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
                 ],
             ],
             'linked stylesheets and imports' => [
@@ -307,11 +329,23 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
                     HtmlDocumentFactory::load('style-elements-linked-stylesheets-has-imports'),
                     'http://example.com/'
                 ),
-                'expectedUrls' => [
-                    'http://example.com/one.css',
-                    'http://example.com/two.css',
-                    'http://example.com/three.css',
-                    'http://example.com/four.css',
+                'expectedCssSourceUrls' => [
+                    'http://example.com/one.css' => new CssSourceUrl(
+                        'http://example.com/one.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/two.css' => new CssSourceUrl(
+                        'http://example.com/two.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/three.css' => new CssSourceUrl(
+                        'http://example.com/three.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                    'http://example.com/four.css' => new CssSourceUrl(
+                        'http://example.com/four.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
                 ],
             ],
         ];
