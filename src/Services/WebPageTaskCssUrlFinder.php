@@ -25,23 +25,14 @@ class WebPageTaskCssUrlFinder
     /**
      * @param Task $task
      *
-     * @return string[]
+     * @return CssSourceUrl[]
      */
     public function find(Task $task): array
     {
-        $cssSourceUrls = [];
-
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
         $webPageUrl = (string) $webPage->getBaseUrl();
 
-        $webPageStylesheetUrls = $this->cssSourceInspector->findStylesheetUrls($webPage);
-
-        foreach ($webPageStylesheetUrls as $webPageStylesheetUrl) {
-            $cssSourceUrls[$webPageStylesheetUrl] = new CssSourceUrl(
-                $webPageStylesheetUrl,
-                CssSourceUrl::TYPE_RESOURCE
-            );
-        }
+        $cssSourceUrls = $this->cssSourceInspector->findStylesheetUrls($webPage);
 
         /* @var Source[] $sources */
         $sources = $task->getSources();
@@ -49,7 +40,7 @@ class WebPageTaskCssUrlFinder
         $sourceImportUrls = [];
 
         foreach ($sources as $source) {
-            $isStylesheetSource = in_array($source->getUrl(), $webPageStylesheetUrls);
+            $isStylesheetSource = array_key_exists($source->getUrl(), $cssSourceUrls);
 
             if ($source->isCachedResource() && $isStylesheetSource) {
                 $cachedResource = $this->cachedResourceManager->find($source->getValue());
@@ -67,6 +58,6 @@ class WebPageTaskCssUrlFinder
             }
         }
 
-        return array_values($cssSourceUrls);
+        return $cssSourceUrls;
     }
 }

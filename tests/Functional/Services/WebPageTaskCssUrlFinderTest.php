@@ -62,7 +62,7 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                         ],
                     ],
                 ],
-                'expectedUrls' => [],
+                'expectedCssSourceUrls' => [],
             ],
             'single linked stylesheet' => [
                 'taskValues' => [
@@ -78,8 +78,11 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                         ],
                     ],
                 ],
-                'expectedUrls' => [
-                    new CssSourceUrl('http://example.com/style.css', CssSourceUrl::TYPE_RESOURCE),
+                'expectedCssSourceUrls' => [
+                    'http://example.com/style.css' => new CssSourceUrl(
+                        'http://example.com/style.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
                 ],
             ],
             'single linked stylesheet, single import, none sourced' => [
@@ -96,9 +99,15 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                         ],
                     ],
                 ],
-                'expectedUrls' => [
-                    new CssSourceUrl('http://example.com/one.css', CssSourceUrl::TYPE_RESOURCE),
-                    new CssSourceUrl('http://example.com/two.css', CssSourceUrl::TYPE_RESOURCE),
+                'expectedCssSourceUrls' => [
+                    'http://example.com/one.css' => new CssSourceUrl(
+                        'http://example.com/one.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/two.css' => new CssSourceUrl(
+                        'http://example.com/two.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
                 ],
             ],
             'single linked stylesheet, single import, linked stylesheet sourced, no additional imports' => [
@@ -120,9 +129,15 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                         ],
                     ],
                 ],
-                'expectedUrls' => [
-                    new CssSourceUrl('http://example.com/one.css', CssSourceUrl::TYPE_RESOURCE),
-                    new CssSourceUrl('http://example.com/two.css', CssSourceUrl::TYPE_RESOURCE),
+                'expectedCssSourceUrls' => [
+                    'http://example.com/one.css' => new CssSourceUrl(
+                        'http://example.com/one.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/two.css' => new CssSourceUrl(
+                        'http://example.com/two.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
                 ],
             ],
             'single linked stylesheet, single import, linked stylesheet sourced, additional imports in stylesheet' => [
@@ -144,10 +159,19 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                         ],
                     ],
                 ],
-                'expectedUrls' => [
-                    new CssSourceUrl('http://example.com/one.css', CssSourceUrl::TYPE_RESOURCE),
-                    new CssSourceUrl('http://example.com/two.css', CssSourceUrl::TYPE_RESOURCE),
-                    new CssSourceUrl('http://example.com/three.css', CssSourceUrl::TYPE_IMPORT),
+                'expectedCssSourceUrls' => [
+                    'http://example.com/one.css' => new CssSourceUrl(
+                        'http://example.com/one.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/two.css' => new CssSourceUrl(
+                        'http://example.com/two.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                    'http://example.com/three.css' => new CssSourceUrl(
+                        'http://example.com/three.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
                 ],
             ],
             'single linked stylesheet, single import, linked stylesheet sourced, duplicate imports in stylesheet' => [
@@ -173,10 +197,19 @@ class WebPageTaskCssUrlFinderTest extends AbstractBaseTestCase
                         ],
                     ],
                 ],
-                'expectedUrls' => [
-                    new CssSourceUrl('http://example.com/one.css', CssSourceUrl::TYPE_RESOURCE),
-                    new CssSourceUrl('http://example.com/two.css', CssSourceUrl::TYPE_RESOURCE),
-                    new CssSourceUrl('http://example.com/three.css', CssSourceUrl::TYPE_IMPORT),
+                'expectedCssSourceUrls' => [
+                    'http://example.com/one.css' => new CssSourceUrl(
+                        'http://example.com/one.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/two.css' => new CssSourceUrl(
+                        'http://example.com/two.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                    'http://example.com/three.css' => new CssSourceUrl(
+                        'http://example.com/three.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
                 ],
             ],
         ];
