@@ -74,22 +74,14 @@ class TaskRepository extends EntityRepository
         return $ids;
     }
 
-    /**
-     * @param array $states
-     *
-     * @return int
-     */
-    public function getCountByStates($states = [])
+    public function getCountByStates(array $states = []): int
     {
         $queryBuilder = $this->createQueryBuilder('Task');
         $queryBuilder->select('COUNT(Task.id)');
+        $queryBuilder->andWhere('Task.state IN (:TaskStates)');
+        $queryBuilder->setParameter('TaskStates', $states);
 
-        if (count($states)) {
-            $queryBuilder->andWhere('Task.state IN (:TaskStates)')
-                ->setParameter('TaskStates', $states);
-        }
-
-        return (int)$queryBuilder->getQuery()->getResult()[0][1];
+        return (int) $queryBuilder->getQuery()->getResult()[0][1];
     }
 
     public function getTypeById(int $taskId): ?string

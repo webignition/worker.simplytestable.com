@@ -266,6 +266,66 @@ class TaskRepositoryTest extends AbstractBaseTestCase
     }
 
     /**
+     * @dataProvider getCountByStatesDataProvider
+     */
+    public function testGetCountByStates(array $taskValuesCollection, array $states, int $expectedCount)
+    {
+        $this->createTaskCollection($taskValuesCollection);
+        $count = $this->taskRepository->getCountByStates($states);
+
+        $this->assertEquals($expectedCount, $count);
+    }
+
+    public function getCountByStatesDataProvider(): array
+    {
+        return [
+            'no tasks, no states' => [
+                'taskValuesCollection' => [],
+                'states' => [],
+                'expectedCount' => 0,
+            ],
+            'has tasks, no states' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/queued/1',
+                        'state' => Task::STATE_QUEUED,
+                    ]),
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/queued/2',
+                        'state' => Task::STATE_QUEUED,
+                    ]),
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/cancelled/1',
+                        'state' => Task::STATE_CANCELLED,
+                    ]),
+                ],
+                'states' => [],
+                'expectedCount' => 0,
+            ],
+            'queued state match' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/queued/1',
+                        'state' => Task::STATE_QUEUED,
+                    ]),
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/queued/2',
+                        'state' => Task::STATE_QUEUED,
+                    ]),
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/cancelled/1',
+                        'state' => Task::STATE_CANCELLED,
+                    ]),
+                ],
+                'states' => [
+                    Task::STATE_QUEUED
+                ],
+                'expectedCount' => 2,
+            ],
+        ];
+    }
+
+    /**
      * @param array $taskValuesCollection
      *
      * @return Task[]
