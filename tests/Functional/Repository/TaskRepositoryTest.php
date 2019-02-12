@@ -327,9 +327,9 @@ class TaskRepositoryTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider getTypeByIdDataProvider
+     * @dataProvider getTypeByIdHasMatchDataProvider
      */
-    public function testGetTypeById(array $taskValues, string $expectedType)
+    public function testGetTypeByIdHasMatch(array $taskValues, string $expectedType)
     {
         $task = $this->testTaskFactory->create($taskValues);
         $type = $this->taskRepository->getTypeById($task->getId());
@@ -337,7 +337,7 @@ class TaskRepositoryTest extends AbstractBaseTestCase
         $this->assertEquals($expectedType, $type);
     }
 
-    public function getTypeByIdDataProvider(): array
+    public function getTypeByIdHasMatchDataProvider(): array
     {
         return [
             'html validation' => [
@@ -353,6 +353,11 @@ class TaskRepositoryTest extends AbstractBaseTestCase
                 'expectedType' => TypeInterface::TYPE_CSS_VALIDATION,
             ],
         ];
+    }
+
+    public function testGetTypeByIdNoMatch()
+    {
+        $this->assertNull($this->taskRepository->getTypeById(0));
     }
 
     /**
