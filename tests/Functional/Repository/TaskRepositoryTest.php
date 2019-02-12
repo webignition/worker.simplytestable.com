@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Repository;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Repository\TaskRepository;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -358,6 +359,87 @@ class TaskRepositoryTest extends AbstractBaseTestCase
     public function testGetTypeByIdNoMatch()
     {
         $this->assertNull($this->taskRepository->getTypeById(0));
+    }
+
+    /**
+     * @dataProvider isSourceValueInUseDataProvider
+     */
+    public function testIsSourceValueInUse(array $taskValuesCollection, string $value, bool $expectedIsInUse)
+    {
+        $tasks = $this->createTaskCollection($taskValuesCollection);
+        $task = $tasks[0];
+
+        $isInUse = $this->taskRepository->isSourceValueInUse($task->getId(), $value);
+
+        $this->assertEquals($expectedIsInUse, $isInUse);
+    }
+
+    public function isSourceValueInUseDataProvider(): array
+    {
+        return [
+            'single task, single source, wrong value' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'sources' => [
+                            [
+                                'type' => Source::TYPE_INVALID,
+                                'url' => 'http://example.com/',
+                                'value' => 'correct-value',
+                            ],
+                        ],
+                    ]),
+                ],
+                'value' => 'incorrect-value',
+                'expectedIsInUse' => false,
+            ],
+            'single task, single source, correct value, in use only by parent task' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'sources' => [
+                            [
+                                'type' => Source::TYPE_INVALID,
+                                'url' => 'http://example.com/',
+                                'value' => 'correct-value',
+                            ],
+                        ],
+                    ]),
+                ],
+                'value' => 'correct-value',
+                'expectedIsInUse' => false,
+            ],
+            'two tasks, single source, in use by parent and other tasks' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'sources' => [
+                            [
+                                'type' => Source::TYPE_INVALID,
+                                'url' => 'http://example.com/',
+                                'value' => 'correct-value',
+                            ],
+                        ],
+                    ]),
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'sources' => [
+                            [
+                                'type' => Source::TYPE_INVALID,
+                                'url' => 'http://example.com/',
+                                'value' => 'correct-value',
+                            ],
+                        ],
+                    ]),
+                ],
+                'value' => 'correct-value',
+                'expectedIsInUse' => true,
+            ],
+        ];
     }
 
     /**
