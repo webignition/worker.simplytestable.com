@@ -222,20 +222,20 @@ class TaskRepositoryTest extends AbstractBaseTestCase
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
                         'state' => Task::STATE_IN_PROGRESS,
-                        'age' => '10 minute',
+                        'age' => '20 minute',
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/3/',
                         'state' => Task::STATE_IN_PROGRESS,
-                        'age' => '8 minute',
+                        'age' => '5 minute',
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
                         'state' => Task::STATE_IN_PROGRESS,
-                        'age' => '9 minute',
+                        'age' => '15 minute',
                     ]),
                 ],
-                'maxStartDate' => new \DateTime('-9 minute'),
+                'maxStartDate' => new \DateTime('-10 minute'),
                 'expectedTaskIndices' => [
                     0, 2,
                 ],
@@ -245,20 +245,20 @@ class TaskRepositoryTest extends AbstractBaseTestCase
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1/',
                         'state' => Task::STATE_IN_PROGRESS,
-                        'age' => '10 minute',
+                        'age' => '20 minute',
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/3/',
                         'state' => Task::STATE_IN_PROGRESS,
-                        'age' => '8 minute',
+                        'age' => '5 minute',
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/2/',
                         'state' => Task::STATE_IN_PROGRESS,
-                        'age' => '9 minute',
+                        'age' => '15 minute',
                     ]),
                 ],
-                'maxStartDate' => new \DateTime('-8 minute'),
+                'maxStartDate' => new \DateTime('-3 minute'),
                 'expectedTaskIndices' => [
                     0, 1, 2,
                 ],
