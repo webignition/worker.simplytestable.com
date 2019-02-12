@@ -107,6 +107,7 @@ class TaskRepository extends EntityRepository
         $queryBuilder->where('Task.sources IS NOT NULL AND Task.state IN (:States)');
 
         $queryBuilder->setParameter('States', [
+            Task::STATE_PREPARING,
             Task::STATE_PREPARED,
             Task::STATE_IN_PROGRESS,
         ]);
