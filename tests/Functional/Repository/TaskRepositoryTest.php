@@ -362,6 +362,113 @@ class TaskRepositoryTest extends AbstractBaseTestCase
     }
 
     /**
+     * @dataProvider isSourceValueInUseForSingleTaskDataProvider
+     */
+    public function testIsSourceValueInUseForSingleTask(string $state, string $value, bool $expectedIsInUse)
+    {
+        $taskValues = TestTaskFactory::createTaskValuesFromDefaults([
+            'url' => 'http://example.com/1',
+            'state' => $state,
+            'sources' => [
+                [
+                    'type' => Source::TYPE_INVALID,
+                    'url' => 'http://example.com/',
+                    'value' => 'correct-value',
+                ],
+            ],
+        ]);
+
+        $task = $this->testTaskFactory->create($taskValues);
+        $isInUse = $this->taskRepository->isSourceValueInUse($task->getId(), $value);
+
+        $this->assertEquals($expectedIsInUse, $isInUse);
+    }
+
+    public function isSourceValueInUseForSingleTaskDataProvider(): array
+    {
+        return [
+            'wrong value' => [
+                'state' => Task::STATE_IN_PROGRESS,
+                'value' => 'incorrect-value',
+                'expectedIsInUse' => false,
+            ],
+            'preparing task' => [
+                'state' => Task::STATE_PREPARING,
+                'value' => 'correct-value',
+                'expectedIsInUse' => false,
+            ],
+            'prepared task' => [
+                'state' => Task::STATE_PREPARED,
+                'value' => 'correct-value',
+                'expectedIsInUse' => false,
+            ],
+            'in-progress task' => [
+                'state' => Task::STATE_IN_PROGRESS,
+                'value' => 'correct-value',
+                'expectedIsInUse' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider isSourceValueInUseForTwoTasksDataProvider
+     */
+    public function testIsSourceValueInUseForTwoTasks(string $state, bool $expectedIsInUse)
+    {
+        $sourceValue = 'source-value';
+
+        $taskValuesCollection = [
+            TestTaskFactory::createTaskValuesFromDefaults([
+                'url' => 'http://example.com/1',
+                'state' => $state,
+                'sources' => [
+                    [
+                        'type' => Source::TYPE_INVALID,
+                        'url' => 'http://example.com/',
+                        'value' => $sourceValue,
+                    ],
+                ],
+            ]),
+            TestTaskFactory::createTaskValuesFromDefaults([
+                'url' => 'http://example.com/2',
+                'state' => $state,
+                'sources' => [
+                    [
+                        'type' => Source::TYPE_INVALID,
+                        'url' => 'http://example.com/',
+                        'value' => $sourceValue,
+                    ],
+                ],
+            ]),
+        ];
+
+        $tasks = $this->createTaskCollection($taskValuesCollection);
+        $task = $tasks[0];
+
+        $isInUse = $this->taskRepository->isSourceValueInUse($task->getId(), $sourceValue);
+
+        $this->assertEquals($expectedIsInUse, $isInUse);
+    }
+
+    public function isSourceValueInUseForTwoTasksDataProvider(): array
+    {
+        return [
+            'two preparing tasks' => [
+                'state' => Task::STATE_PREPARING,
+                'expectedIsInUse' => true,
+            ],
+            'two prepared tasks' => [
+                'state' => Task::STATE_PREPARED,
+                'expectedIsInUse' => true,
+            ],
+            'two in-progress tasks' => [
+                'state' => Task::STATE_IN_PROGRESS,
+                'expectedIsInUse' => true,
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider isSourceValueInUseDataProvider
      */
     public function testIsSourceValueInUse(array $taskValuesCollection, string $value, bool $expectedIsInUse)
@@ -394,7 +501,41 @@ class TaskRepositoryTest extends AbstractBaseTestCase
                 'value' => 'incorrect-value',
                 'expectedIsInUse' => false,
             ],
-            'single task, single source, correct value, in use only by parent task' => [
+            'single preparing task, single source, correct value, in use only by parent task' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1',
+                        'state' => Task::STATE_PREPARING,
+                        'sources' => [
+                            [
+                                'type' => Source::TYPE_INVALID,
+                                'url' => 'http://example.com/',
+                                'value' => 'correct-value',
+                            ],
+                        ],
+                    ]),
+                ],
+                'value' => 'correct-value',
+                'expectedIsInUse' => false,
+            ],
+            'single prepared task, single source, correct value, in use only by parent task' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1',
+                        'state' => Task::STATE_PREPARED,
+                        'sources' => [
+                            [
+                                'type' => Source::TYPE_INVALID,
+                                'url' => 'http://example.com/',
+                                'value' => 'correct-value',
+                            ],
+                        ],
+                    ]),
+                ],
+                'value' => 'correct-value',
+                'expectedIsInUse' => false,
+            ],
+            'single in-progress task, single source, correct value, in use only by parent task' => [
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1',
@@ -411,7 +552,63 @@ class TaskRepositoryTest extends AbstractBaseTestCase
                 'value' => 'correct-value',
                 'expectedIsInUse' => false,
             ],
-            'two tasks, single source, in use by parent and other tasks' => [
+            'two preparing tasks, single source, in use by parent and other tasks' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1',
+                        'state' => Task::STATE_PREPARING,
+                        'sources' => [
+                            [
+                                'type' => Source::TYPE_INVALID,
+                                'url' => 'http://example.com/',
+                                'value' => 'correct-value',
+                            ],
+                        ],
+                    ]),
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2',
+                        'state' => Task::STATE_PREPARING,
+                        'sources' => [
+                            [
+                                'type' => Source::TYPE_INVALID,
+                                'url' => 'http://example.com/',
+                                'value' => 'correct-value',
+                            ],
+                        ],
+                    ]),
+                ],
+                'value' => 'correct-value',
+                'expectedIsInUse' => true,
+            ],
+            'two prepared tasks, single source, in use by parent and other tasks' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1',
+                        'state' => Task::STATE_PREPARED,
+                        'sources' => [
+                            [
+                                'type' => Source::TYPE_INVALID,
+                                'url' => 'http://example.com/',
+                                'value' => 'correct-value',
+                            ],
+                        ],
+                    ]),
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2',
+                        'state' => Task::STATE_PREPARED,
+                        'sources' => [
+                            [
+                                'type' => Source::TYPE_INVALID,
+                                'url' => 'http://example.com/',
+                                'value' => 'correct-value',
+                            ],
+                        ],
+                    ]),
+                ],
+                'value' => 'correct-value',
+                'expectedIsInUse' => true,
+            ],
+            'two in-progress tasks, single source, in use by parent and other tasks' => [
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/1',
