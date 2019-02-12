@@ -8,13 +8,11 @@ use Doctrine\ORM\EntityRepository;
 class TaskRepository extends EntityRepository
 {
     /**
-     * Get collection of task ids for tasks in given state
-     *
      * @param string $state
      *
      * @return int[]
      */
-    public function getIdsByState(string $state)
+    public function getIdsByState(string $state): array
     {
         $queryBuilder = $this->createQueryBuilder('Task');
         $queryBuilder->select('Task.id');
@@ -23,7 +21,7 @@ class TaskRepository extends EntityRepository
 
         $repostitoryResult = $queryBuilder->getQuery()->getResult();
 
-        $taskIds = array();
+        $taskIds = [];
         foreach ($repostitoryResult as $taskId) {
             $taskIds[] = $taskId['id'];
         }
