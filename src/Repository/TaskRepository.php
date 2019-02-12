@@ -55,7 +55,7 @@ class TaskRepository extends EntityRepository
      *
      * @return int[]
      */
-    public function getUnfinishedIdsByMaxStartDate(\DateTime $startDateTime)
+    public function getUnfinishedIdsByMaxStartDate(\DateTime $startDateTime): array
     {
         $queryBuilder = $this->createQueryBuilder('Task');
         $queryBuilder->select('Task.id as TaskId');
@@ -65,11 +65,7 @@ class TaskRepository extends EntityRepository
 
         $result = $queryBuilder->getQuery()->getResult();
 
-        if (count($result) === 0) {
-            return array();
-        }
-
-        $ids = array();
+        $ids = [];
 
         foreach ($result as $taskOutputIdResult) {
             $ids[] = $taskOutputIdResult['TaskId'];

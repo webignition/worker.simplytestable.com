@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Repository;
@@ -38,22 +39,10 @@ class TaskRepositoryTest extends AbstractBaseTestCase
      */
     public function testGetIdsByState(array $taskValuesCollection, string $state, array $expectedTaskIndices)
     {
-        /* @var Task[] $tasks */
-        $tasks = [];
-
-        foreach ($taskValuesCollection as $taskValues) {
-            $tasks[] = $this->testTaskFactory->create($taskValues);
-        }
-
-        $expectedTaskIds = [];
-
-        foreach ($tasks as $taskIndex => $task) {
-            if (in_array($taskIndex, $expectedTaskIndices)) {
-                $expectedTaskIds[] = $task->getId();
-            }
-        }
-
+        $tasks = $this->createTaskCollection($taskValuesCollection);
+        $expectedTaskIds = $this->createExpectedTaskIds($tasks, $expectedTaskIndices);
         $taskIds = $this->taskRepository->getIdsByState($state);
+
         $this->assertEquals($expectedTaskIds, $taskIds);
     }
 
@@ -122,22 +111,10 @@ class TaskRepositoryTest extends AbstractBaseTestCase
      */
     public function testGetIdsWithOutput(array $taskValuesCollection, array $expectedTaskIndices)
     {
-        /* @var Task[] $tasks */
-        $tasks = [];
-
-        foreach ($taskValuesCollection as $taskValues) {
-            $tasks[] = $this->testTaskFactory->create($taskValues);
-        }
-
-        $expectedTaskIds = [];
-
-        foreach ($tasks as $taskIndex => $task) {
-            if (in_array($taskIndex, $expectedTaskIndices)) {
-                $expectedTaskIds[] = $task->getId();
-            }
-        }
-
+        $tasks = $this->createTaskCollection($taskValuesCollection);
+        $expectedTaskIds = $this->createExpectedTaskIds($tasks, $expectedTaskIndices);
         $taskIds = $this->taskRepository->getIdsWithOutput();
+
         $this->assertEquals($expectedTaskIds, $taskIds);
     }
 
@@ -190,5 +167,136 @@ class TaskRepositoryTest extends AbstractBaseTestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * @dataProvider getUnfinishedIdsByMaxStartDateDataProvider
+     */
+    public function testGetUnfinishedIdsByMaxStartDate(
+        array $taskValuesCollection,
+        \DateTime $maxStartDate,
+        array $expectedTaskIndices
+    ) {
+        $tasks = $this->createTaskCollection($taskValuesCollection);
+        $expectedTaskIds = $this->createExpectedTaskIds($tasks, $expectedTaskIndices);
+        $taskIds = $this->taskRepository->getUnfinishedIdsByMaxStartDate($maxStartDate);
+
+        $this->assertEquals($expectedTaskIds, $taskIds);
+    }
+
+    public function getUnfinishedIdsByMaxStartDateDataProvider(): array
+    {
+        return [
+            'no tasks' => [
+                'taskValuesCollection' => [],
+                'maxStartDate' => new \DateTime(),
+                'expectedTaskIndices' => [],
+            ],
+            'one task not of suitable age' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1/',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'age' => '10 minute',
+                    ]),
+                ],
+                'maxStartDate' => new \DateTime('-11 minute'),
+                'expectedTaskIndices' => [],
+            ],
+            'one task is of suitable age' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1/',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'age' => '10 minute',
+                    ]),
+                ],
+                'maxStartDate' => new \DateTime(),
+                'expectedTaskIndices' => [
+                    0
+                ],
+            ],
+            'some tasks of suitable age' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1/',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'age' => '10 minute',
+                    ]),
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/3/',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'age' => '8 minute',
+                    ]),
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2/',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'age' => '9 minute',
+                    ]),
+                ],
+                'maxStartDate' => new \DateTime('-9 minute'),
+                'expectedTaskIndices' => [
+                    0, 2,
+                ],
+            ],
+            'all tasks of suitable age' => [
+                'taskValuesCollection' => [
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/1/',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'age' => '10 minute',
+                    ]),
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/3/',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'age' => '8 minute',
+                    ]),
+                    TestTaskFactory::createTaskValuesFromDefaults([
+                        'url' => 'http://example.com/2/',
+                        'state' => Task::STATE_IN_PROGRESS,
+                        'age' => '9 minute',
+                    ]),
+                ],
+                'maxStartDate' => new \DateTime('-8 minute'),
+                'expectedTaskIndices' => [
+                    0, 1, 2,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param array $taskValuesCollection
+     *
+     * @return Task[]
+     */
+    private function createTaskCollection(array $taskValuesCollection): array
+    {
+        $tasks = [];
+
+        foreach ($taskValuesCollection as $taskValues) {
+            $tasks[] = $this->testTaskFactory->create($taskValues);
+        }
+
+        return $tasks;
+    }
+
+    /**
+     * @param Task[] $tasks
+     * @param int[]  $expectedTaskIndices
+     *
+     * @return int[]
+     */
+    private function createExpectedTaskIds(array $tasks, array $expectedTaskIndices)
+    {
+        $expectedTaskIds = [];
+
+        foreach ($tasks as $taskIndex => $task) {
+            if (in_array($taskIndex, $expectedTaskIndices)) {
+                $expectedTaskIds[] = $task->getId();
+            }
+        }
+
+        return $expectedTaskIds;
     }
 }
