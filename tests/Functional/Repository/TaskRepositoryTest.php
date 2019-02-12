@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Repository;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Model\Task\TypeInterface;
 use App\Repository\TaskRepository;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\TestTaskFactory;
@@ -321,6 +322,35 @@ class TaskRepositoryTest extends AbstractBaseTestCase
                     Task::STATE_QUEUED
                 ],
                 'expectedCount' => 2,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getTypeByIdDataProvider
+     */
+    public function testGetTypeById(array $taskValues, string $expectedType)
+    {
+        $task = $this->testTaskFactory->create($taskValues);
+        $type = $this->taskRepository->getTypeById($task->getId());
+
+        $this->assertEquals($expectedType, $type);
+    }
+
+    public function getTypeByIdDataProvider(): array
+    {
+        return [
+            'html validation' => [
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'type' => TypeInterface::TYPE_HTML_VALIDATION,
+                ]),
+                'expectedType' => TypeInterface::TYPE_HTML_VALIDATION,
+            ],
+            'css validation' => [
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'type' => TypeInterface::TYPE_CSS_VALIDATION,
+                ]),
+                'expectedType' => TypeInterface::TYPE_CSS_VALIDATION,
             ],
         ];
     }
