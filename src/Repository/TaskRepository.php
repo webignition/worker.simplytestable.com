@@ -32,7 +32,7 @@ class TaskRepository extends EntityRepository
     /**
      * @return int[]
      */
-    public function getIdsWithOutput()
+    public function getIdsWithOutput(): array
     {
         $queryBuilder = $this->createQueryBuilder('Task');
         $queryBuilder->join('Task.output', 'TaskOutput');
@@ -41,11 +41,7 @@ class TaskRepository extends EntityRepository
 
         $result = $queryBuilder->getQuery()->getResult();
 
-        if (count($result) === 0) {
-            return array();
-        }
-
-        $ids = array();
+        $ids = [];
 
         foreach ($result as $taskOutputIdResult) {
             $ids[] = $taskOutputIdResult['TaskId'];

@@ -4,6 +4,7 @@
 
 namespace App\Tests\Services;
 
+use App\Entity\Task\Output;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\CachedResourceFactory;
@@ -81,6 +82,10 @@ class TestTaskFactory
 
         if (isset($taskValues['age'])) {
             $task->setStartDateTime(new \DateTime('-' . $taskValues['age']));
+        }
+
+        if (isset($taskValues['output'])) {
+            $task->setOutput($taskValues['output']);
         }
 
         if (isset($taskValues['sources'])) {
