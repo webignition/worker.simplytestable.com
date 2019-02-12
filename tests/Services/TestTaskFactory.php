@@ -135,16 +135,20 @@ class TestTaskFactory
         array $context = []
     ) {
         $requestIdentifer = $this->requestIdentifierFactory->createFromTaskResource($task, $resourceUrl);
+        $requestHash = (string) $requestIdentifer;
 
         $webResource = WebResource::createFromContent($resourceContent, $contentType);
 
-        $cachedResource = $this->cachedResourceFactory->create(
-            (string) $requestIdentifer,
-            $resourceUrl,
-            $webResource
-        );
+        $cachedResource = $this->cachedResourceManager->find($requestHash);
+        if (!$cachedResource) {
+            $cachedResource = $this->cachedResourceFactory->create(
+                $requestHash,
+                $resourceUrl,
+                $webResource
+            );
 
-        $this->cachedResourceManager->persist($cachedResource);
+            $this->cachedResourceManager->persist($cachedResource);
+        }
 
         $source = $this->sourceFactory->fromCachedResource($cachedResource, $context);
         $task->addSource($source);
