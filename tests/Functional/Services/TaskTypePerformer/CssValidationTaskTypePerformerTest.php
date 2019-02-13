@@ -70,7 +70,11 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $mockedSourceStorage = \Mockery::mock($sourceStorage);
         $mockedSourceStorage
-            ->shouldReceive('store')
+            ->shouldReceive('storeCssResources')
+            ->andReturn($wrapperLocalSourceMap);
+
+        $mockedSourceStorage
+            ->shouldReceive('storeWebPage')
             ->andReturn($wrapperLocalSourceMap);
 
         $cssValidatorWrapper = self::$container->get(CssValidatorWrapper::class);
