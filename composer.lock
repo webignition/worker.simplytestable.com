@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c21b68d357c5e65e36d89c14764d6344",
+    "content-hash": "ee63b8277cbceab6cafa7b8df45713d1",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -3929,16 +3929,16 @@
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "5.4",
+            "version": "5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "aa910ee6635f1dfa3c9ae5a6db38031baee5ca21"
+                "reference": "36167c9d10a8c385f2e5a28f6e4f4312cecf86cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/aa910ee6635f1dfa3c9ae5a6db38031baee5ca21",
-                "reference": "aa910ee6635f1dfa3c9ae5a6db38031baee5ca21",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/36167c9d10a8c385f2e5a28f6e4f4312cecf86cd",
+                "reference": "36167c9d10a8c385f2e5a28f6e4f4312cecf86cd",
                 "shasum": ""
             },
             "require": {
@@ -3975,7 +3975,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2019-02-07T17:03:01+00:00"
+            "time": "2019-02-13T14:35:07+00:00"
         },
         {
             "name": "webignition/disallowed-character-terminated-string",
