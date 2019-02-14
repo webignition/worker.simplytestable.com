@@ -348,6 +348,30 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
                     ),
                 ],
             ],
+            'linked stylesheets, ie conditional comments and imports' => [
+                'webPage' => $this->createWebPage(
+                    HtmlDocumentFactory::load('linked-stylesheets-and-ie-conditional-stylesheets-and-import'),
+                    'http://example.com/'
+                ),
+                'expectedCssSourceUrls' => [
+                    'http://example.com/link.css' => new CssSourceUrl(
+                        'http://example.com/link.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/conditional.css' => new CssSourceUrl(
+                        'http://example.com/conditional.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                    'http://example.com/downlevel-revealed.css' => new CssSourceUrl(
+                        'http://example.com/downlevel-revealed.css',
+                        CssSourceUrl::TYPE_RESOURCE
+                    ),
+                    'http://example.com/import.css' => new CssSourceUrl(
+                        'http://example.com/import.css',
+                        CssSourceUrl::TYPE_IMPORT
+                    ),
+                ],
+            ],
         ];
     }
 

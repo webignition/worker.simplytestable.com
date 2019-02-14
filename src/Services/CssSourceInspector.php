@@ -152,6 +152,7 @@ class CssSourceInspector
     {
         $resourceUrls = $this->findLinkElementStylesheetUrls($webPage);
         $importUrls = $this->findWebPageImportUrls($webPage);
+        $ieConditionalUrls = $this->wrapperCssSourceInspector->findIeConditionalCommentStylesheetUrls($webPage);
 
         $cssSourceUrls = [];
 
@@ -164,6 +165,12 @@ class CssSourceInspector
         foreach ($importUrls as $importUrl) {
             if (!array_key_exists($importUrl, $cssSourceUrls)) {
                 $cssSourceUrls[$importUrl] = new CssSourceUrl($importUrl, CssSourceUrl::TYPE_IMPORT);
+            }
+        }
+
+        foreach ($ieConditionalUrls as $ieConditionalUrl) {
+            if (!array_key_exists($ieConditionalUrl, $cssSourceUrls)) {
+                $cssSourceUrls[$ieConditionalUrl] = new CssSourceUrl($ieConditionalUrl, CssSourceUrl::TYPE_IMPORT);
             }
         }
 
