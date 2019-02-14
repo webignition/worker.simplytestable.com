@@ -54,6 +54,10 @@ class CssSourceInspector
     {
         $importValues = [];
 
+        if (substr_count($css, '@import') === 0) {
+            return $importValues;
+        }
+
         $cssParser = new CssParser($css);
 
         $cssDocument = $cssParser->parse();
