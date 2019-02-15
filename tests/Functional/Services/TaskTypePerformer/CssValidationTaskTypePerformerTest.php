@@ -6,14 +6,19 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Model\Source;
 use App\Model\Task\TypeInterface;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
-use GuzzleHttp\Psr7\Response;
 use App\Services\TaskTypePerformer\CssValidationTaskTypePerformer;
-use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\CssValidatorFixtureFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
-use webignition\CssValidatorWrapper\Configuration\VendorExtensionSeverityLevel;
+use webignition\CssValidatorWrapper\SourceStorage;
+use webignition\CssValidatorWrapper\VendorExtensionSeverityLevel;
+use webignition\CssValidatorWrapper\Wrapper as CssValidatorWrapper;
+use webignition\InternetMediaType\InternetMediaType;
+use webignition\UrlSourceMap\Source as SourceMapSource;
+use webignition\UrlSourceMap\SourceMap;
 
 class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -53,22 +58,36 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
-        array $httpFixtures,
-        array $taskParameters,
-        string $webPageContent,
+        array $taskValues,
+        SourceMap $wrapperLocalSourceMap,
         string $cssValidatorOutput,
         string $expectedTaskState,
         int $expectedErrorCount,
         int $expectedWarningCount,
         array $expectedDecodedOutput
     ) {
-        $this->httpMockHandler->appendFixtures($httpFixtures);
+        $sourceStorage = self::$container->get(SourceStorage::class);
 
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => TypeInterface::TYPE_CSS_VALIDATION,
-            'parameters' => json_encode($taskParameters),
-        ]));
-        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, $webPageContent);
+        $mockedSourceStorage = \Mockery::mock($sourceStorage);
+        $mockedSourceStorage
+            ->shouldReceive('storeCssResources')
+            ->andReturn($wrapperLocalSourceMap);
+
+        $mockedSourceStorage
+            ->shouldReceive('storeWebPage')
+            ->andReturn($wrapperLocalSourceMap);
+
+        $cssValidatorWrapper = self::$container->get(CssValidatorWrapper::class);
+
+        ObjectPropertySetter::setProperty(
+            $cssValidatorWrapper,
+            CssValidatorWrapper::class,
+            'sourceStorage',
+            $mockedSourceStorage
+        );
+
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults($taskValues));
+
 
         CssValidatorFixtureFactory::set($cssValidatorOutput);
 
@@ -92,9 +111,20 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
     {
         return [
             'unknown validator exception' => [
-                'httpFixtures' => [],
-                'taskParameters' => [],
-                'webPageContent' => 'foo',
+                'taskValues' => [
+                    'url' => 'http://example.com/',
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => '<!doctype html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
+                ],
+                'wrapperLocalSourceMap' => new SourceMap([
+                    new SourceMapSource('http://example.com/', 'file:/tmp/web-page-hash.html'),
+                ]),
                 'cssValidatorOutput' => CssValidatorFixtureFactory::load('unknown-exception'),
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
@@ -111,36 +141,78 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
             'no errors, ignore warnings' => [
-                'httpFixtures' => [],
-                'taskParameters' => [
-                    'ignore-warnings' => true,
+                'taskValues' => [
+                    'url' => 'http://example.com/',
+                    'parameters' => json_encode([
+                        'ignore-warnings' => true,
+                    ]),
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => '<!doctype html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
                 ],
-                'webPageContent' => 'foo',
-                'cssValidatorOutput' => CssValidatorFixtureFactory::load('1-vendor-extension-warning'),
+                'wrapperLocalSourceMap' => new SourceMap([
+                    new SourceMapSource('http://example.com/', 'file:/tmp/web-page-hash.html'),
+                ]),
+                'cssValidatorOutput' => CssValidatorFixtureFactory::load('1-vendor-extension-warning', [
+                    '{{ webPageMappedUri }}' => 'file:/tmp/web-page-hash.html',
+                ]),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
             'no errors, ignore vendor extension warnings' => [
-                'httpFixtures' => [],
-                'taskParameters' => [
-                    'vendor-extensions' => VendorExtensionSeverityLevel::LEVEL_IGNORE,
+                'taskValues' => [
+                    'url' => 'http://example.com/',
+                    'parameters' => json_encode([
+                        'vendor-extensions' => VendorExtensionSeverityLevel::LEVEL_IGNORE,
+                    ]),
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => '<!doctype html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
                 ],
-                'webPageContent' => 'foo',
-                'cssValidatorOutput' => CssValidatorFixtureFactory::load('1-vendor-extension-warning'),
+                'wrapperLocalSourceMap' => new SourceMap([
+                    new SourceMapSource('http://example.com/', 'file:/tmp/web-page-hash.html'),
+                ]),
+                'cssValidatorOutput' => CssValidatorFixtureFactory::load('1-vendor-extension-warning', [
+                    '{{ webPageMappedUri }}' => 'file:/tmp/web-page-hash.html',
+                ]),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedWarningCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
             'three errors' => [
-                'httpFixtures' => [],
-                'taskParameters' => [
-                    'ignore-warnings' => true,
+                'taskValues' => [
+                    'url' => 'http://example.com/',
+                    'parameters' => json_encode([
+                        'ignore-warnings' => true,
+                    ]),
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => '<!doctype html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                    ],
                 ],
-                'webPageContent' => 'foo',
-                'cssValidatorOutput' => CssValidatorFixtureFactory::load('3-errors'),
+                'wrapperLocalSourceMap' => new SourceMap([
+                    new SourceMapSource('http://example.com/', 'file:/tmp/web-page-hash.html'),
+                ]),
+                'cssValidatorOutput' => CssValidatorFixtureFactory::load('3-errors', [
+                    '{{ webPageMappedUri }}' => 'file:/tmp/web-page-hash.html',
+                ]),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 3,
                 'expectedWarningCount' => 0,
@@ -168,14 +240,32 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                     ],
                 ],
             ],
-            'http 404 getting linked resource' => [
-                'httpFixtures' => [
-                    new Response(404),
-                    new Response(404),
+            'http 404 on linked resource' => [
+                'taskValues' => [
+                    'url' => 'http://example.com/',
+                    'parameters' => json_encode([
+                        'ignore-warnings' => true,
+                    ]),
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://example.com/style.css',
+                            'type' => Source::TYPE_UNAVAILABLE,
+                            'value' => 'http:404',
+                        ],
+                    ],
                 ],
-                'taskParameters' => [],
-                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
-                'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
+                'wrapperLocalSourceMap' => new SourceMap([
+                    new SourceMapSource('http://example.com/', 'file:/tmp/web-page-hash.html'),
+                ]),
+                'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages', [
+                    '{{ webPageMappedUri }}' => 'file:/tmp/web-page-hash.html',
+                ]),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
@@ -189,11 +279,32 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                     ],
                 ],
             ],
-            'http 500 getting linked resource' => [
-                'httpFixtures' => array_fill(0, 12, new Response(500)),
-                'taskParameters' => [],
-                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
-                'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
+            'http 500 on linked resource' => [
+                'taskValues' => [
+                    'url' => 'http://example.com/',
+                    'parameters' => json_encode([
+                        'ignore-warnings' => true,
+                    ]),
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://example.com/style.css',
+                            'type' => Source::TYPE_UNAVAILABLE,
+                            'value' => 'http:500',
+                        ],
+                    ],
+                ],
+                'wrapperLocalSourceMap' => new SourceMap([
+                    new SourceMapSource('http://example.com/', 'file:/tmp/web-page-hash.html'),
+                ]),
+                'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages', [
+                    '{{ webPageMappedUri }}' => 'file:/tmp/web-page-hash.html',
+                ]),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
@@ -207,31 +318,32 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                     ],
                 ],
             ],
-            'curl 6 getting linked resource' => [
-                'httpFixtures' => array_fill(0, 12, ConnectExceptionFactory::create('CURL/6 foo')),
-                'taskParameters' => [],
-                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
-                'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
-                'expectedTaskState' => Task::STATE_COMPLETED,
-                'expectedErrorCount' => 1,
-                'expectedWarningCount' => 0,
-                'expectedDecodedOutput' => [
-                    [
-                        'message' => 'http-retrieval-curl-code-6',
-                        'type' => 'error',
-                        'context' => '',
-                        'ref' => 'http://example.com/style.css',
-                        'line_number' => 0,
+            'invalid content type on linked resource' => [
+                'taskValues' => [
+                    'url' => 'http://example.com/',
+                    'parameters' => json_encode([
+                        'ignore-warnings' => true,
+                    ]),
+                    'sources' => [
+                        [
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'url' => 'http://example.com/',
+                            'content' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://example.com/style.css',
+                            'type' => Source::TYPE_INVALID,
+                            'value' => 'invalid:invalid-content-type:application/pdf',
+                        ],
                     ],
                 ],
-            ],
-            'invalid content type getting linked resource' => [
-                'httpFixtures' => [
-                    new Response(200, ['content-type' => 'application/pdf']),
-                ],
-                'taskParameters' => [],
-                'webPageContent' => HtmlDocumentFactory::load('empty-body-single-css-link'),
-                'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages'),
+                'wrapperLocalSourceMap' => new SourceMap([
+                    new SourceMapSource('http://example.com/', 'file:/tmp/web-page-hash.html'),
+                ]),
+                'cssValidatorOutput' => CssValidatorFixtureFactory::load('no-messages', [
+                    '{{ webPageMappedUri }}' => 'file:/tmp/web-page-hash.html',
+                ]),
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 1,
                 'expectedWarningCount' => 0,
@@ -246,66 +358,6 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
                 ],
             ],
         ];
-    }
-
-    /**
-     * @dataProvider cookiesDataProvider
-     */
-    public function testSetCookiesOnRequests(array $taskParameters, string $expectedRequestCookieHeader)
-    {
-        $httpFixtures = [
-            new Response(200, ['content-type' => 'text/css']),
-            new Response(200, ['content-type' => 'text/css']),
-        ];
-
-        $this->httpMockHandler->appendFixtures($httpFixtures);
-
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => TypeInterface::TYPE_CSS_VALIDATION,
-            'parameters' => json_encode($taskParameters),
-        ]));
-
-        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask(
-            $task,
-            HtmlDocumentFactory::load('empty-body-single-css-link')
-        );
-
-        CssValidatorFixtureFactory::set(CssValidatorFixtureFactory::load('no-messages'));
-
-        $this->taskTypePerformer->perform($task);
-
-        $this->assertCookieHeadeSetOnAllRequests(count($httpFixtures), $expectedRequestCookieHeader);
-    }
-
-    /**
-     * @dataProvider httpAuthDataProvider
-     */
-    public function testSetHttpAuthenticationOnRequests(
-        array $taskParameters,
-        string $expectedRequestAuthorizationHeaderValue
-    ) {
-        $httpFixtures = [
-            new Response(200, ['content-type' => 'text/css']),
-            new Response(200, ['content-type' => 'text/css']),
-        ];
-
-        $this->httpMockHandler->appendFixtures($httpFixtures);
-
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => TypeInterface::TYPE_CSS_VALIDATION,
-            'parameters' => json_encode($taskParameters),
-        ]));
-
-        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask(
-            $task,
-            HtmlDocumentFactory::load('empty-body-single-css-link')
-        );
-
-        CssValidatorFixtureFactory::set(CssValidatorFixtureFactory::load('no-messages'));
-
-        $this->taskTypePerformer->perform($task);
-
-        $this->assertHttpAuthorizationSetOnAllRequests(count($httpFixtures), $expectedRequestAuthorizationHeaderValue);
     }
 
     protected function tearDown()

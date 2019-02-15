@@ -176,6 +176,9 @@
     "psr/simple-cache": {
         "version": "1.0.1"
     },
+    "sabberworm/php-css-parser": {
+        "version": "8.2.0"
+    },
     "sebastian/code-unit-reverse-lookup": {
         "version": "1.0.1"
     },
@@ -392,6 +395,9 @@
     "webignition/quoted-string": {
         "version": "0.2.1"
     },
+    "webignition/resource-storage": {
+        "version": "0.1"
+    },
     "webignition/resque-bundle": {
         "version": "dev-master"
     },
@@ -413,6 +419,9 @@
     "webignition/url-health-checker": {
         "version": "1.0"
     },
+    "webignition/url-source-map": {
+        "version": "0.2"
+    },
     "webignition/validator-message": {
         "version": "0.3"
     },
@@ -433,9 +442,6 @@
     },
     "webignition/web-resource-retriever": {
         "version": "0.7"
-    },
-    "webignition/web-resource-storage": {
-        "version": "0.1"
     },
     "webmozart/assert": {
         "version": "1.3.0"

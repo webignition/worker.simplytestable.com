@@ -16,6 +16,7 @@ parameters:
   link_integrity_user_agents:
     - ST Link Integrity Task Driver (http://bit.ly/RlhKCL)
     - Mozilla/5.0
+  java_executable_path: java
 
 services:
     # default configuration for services in *this* file
@@ -99,10 +100,18 @@ services:
     App\Services\TaskTypePreparer\WebPageTaskSourcePreparer:
       tags:
         - { name: kernel.event_listener, event: task.prepare, priority: 100 }
+      arguments:
+        $webResourceRetriever: '@app.services.web-resource-retriever.web-page'
+
+    App\Services\TaskTypePreparer\CssTaskSourcePreparer:
+      tags:
+        - { name: kernel.event_listener, event: task.prepare, priority: 90 }
+      arguments:
+        $webResourceRetriever: '@app.services.web-resource-retriever.css'
 
     App\Services\TaskTypePreparer\FinalTaskPreparer:
       tags:
-        - { name: kernel.event_listener, event: task.prepare, priority: 200 }
+        - { name: kernel.event_listener, event: task.prepare, priority: 10 }
 
     App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer:
       tags:
@@ -123,10 +132,6 @@ services:
     App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 90 }
-
-    App\Services\TaskTypePerformer\CssValidatorWrapperConfigurationFactory:
-      arguments:
-        - '%env(CSS_VALIDATOR_JAR_PATH)%'
 
     App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory:
       arguments:
@@ -162,6 +167,14 @@ services:
           - 'application/xhtml+xml'
         $allowUnknownResourceTypes: false
 
+    app.services.web-resource-retriever.css:
+      class: webignition\WebResource\Retriever
+      arguments:
+        $httpClient: '@GuzzleHttp\Client'
+        $allowedContentTypes:
+          - 'text/css'
+        $allowUnknownResourceTypes: false
+
     webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
 
     webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware:
@@ -176,9 +189,24 @@ services:
 
     webignition\HtmlValidator\Wrapper\Wrapper:
 
-    webignition\CssValidatorWrapper\Wrapper:
+    webignition\CssValidatorWrapper\SourceInspector:
 
-    webignition\NodeJslint\Wrapper\Wrapper:
+    webignition\CssValidatorWrapper\SourceMutator:
+
+    webignition\CssValidatorWrapper\SourceStorage:
+
+    webignition\CssValidatorWrapper\OutputMutator:
+
+    webignition\CssValidatorWrapper\CommandFactory:
+      arguments:
+        $javaExecutablePath: '%java_executable_path%'
+        $cssValidatorJarPath: '%env(CSS_VALIDATOR_JAR_PATH)%'
+
+    webignition\CssValidatorOutput\Parser\OutputParser:
+
+    webignition\CssValidatorWrapper\CommandExecutor:
+
+    webignition\CssValidatorWrapper\Wrapper:
 
     App\Services\Resque\QueueService:
       public: true
@@ -219,3 +247,6 @@ services:
         - method: setAttemptToRecoverFromInvalidInternalCharacter
           arguments:
               - true
+
+    webignition\ResourceStorage\ResourceStorage:
+      class: webignition\ResourceStorage\ResourceStorage

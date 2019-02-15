@@ -7,12 +7,13 @@ use App\Model\Source;
 
 class SourceFactory
 {
-    public function fromCachedResource(CachedResource $cachedResource): Source
+    public function fromCachedResource(CachedResource $cachedResource, array $context = []): Source
     {
         return new Source(
             $cachedResource->getUrl(),
             Source::TYPE_CACHED_RESOURCE,
-            $cachedResource->getRequestHash()
+            $cachedResource->getRequestHash(),
+            $context
         );
     }
 

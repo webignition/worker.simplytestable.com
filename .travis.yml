@@ -1,7 +1,6 @@
-sudo: false
 services:
   - redis-server
-  - memcache
+  - memcached
 
 env:
   global:

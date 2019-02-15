@@ -4,6 +4,8 @@
 
 namespace App\Tests\Services;
 
+use App\Entity\Task\Output;
+use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
@@ -13,8 +15,9 @@ use App\Services\TaskTypeService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Services\TaskService;
+use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
-use webignition\WebResource\WebPage\WebPage;
+use webignition\WebResource\WebResource;
 
 class TestTaskFactory
 {
@@ -81,6 +84,33 @@ class TestTaskFactory
             $task->setStartDateTime(new \DateTime('-' . $taskValues['age']));
         }
 
+        if (isset($taskValues['output'])) {
+            $task->setOutput($taskValues['output']);
+        }
+
+        if (isset($taskValues['sources'])) {
+            foreach ($taskValues['sources'] as $sourceData) {
+                $type = $sourceData['type'] ?? Source::TYPE_CACHED_RESOURCE;
+
+                if (Source::TYPE_CACHED_RESOURCE === $type) {
+                    $this->addSourceToTask(
+                        $task,
+                        $sourceData['url'],
+                        $sourceData['content'],
+                        $sourceData['contentType'],
+                        $sourceData['context'] ?? []
+                    );
+                } else {
+                    $task->addSource(new Source(
+                        $sourceData['url'],
+                        $sourceData['type'],
+                        $sourceData['value'],
+                        $sourceData['context'] ?? []
+                    ));
+                }
+            }
+        }
+
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
@@ -92,24 +122,35 @@ class TestTaskFactory
         string $webPageContent,
         ?InternetMediaTypeInterface $contentType = null
     ) {
-        $requestIdentifer = $this->requestIdentifierFactory->createFromTask($task);
+        $contentType = $contentType ?? new InternetMediaType('text', 'html');
 
-        /* @var WebPage $webPage */
-        $webPage = WebPage::createFromContent($webPageContent);
+        $this->addSourceToTask($task, $task->getUrl(), $webPageContent, $contentType);
+    }
 
-        if (!empty($contentType)) {
-            $webPage = $webPage->setContentType($contentType);
+    public function addSourceToTask(
+        Task $task,
+        string $resourceUrl,
+        string $resourceContent,
+        InternetMediaTypeInterface $contentType,
+        array $context = []
+    ) {
+        $requestIdentifer = $this->requestIdentifierFactory->createFromTaskResource($task, $resourceUrl);
+        $requestHash = (string) $requestIdentifer;
+
+        $webResource = WebResource::createFromContent($resourceContent, $contentType);
+
+        $cachedResource = $this->cachedResourceManager->find($requestHash);
+        if (!$cachedResource) {
+            $cachedResource = $this->cachedResourceFactory->create(
+                $requestHash,
+                $resourceUrl,
+                $webResource
+            );
+
+            $this->cachedResourceManager->persist($cachedResource);
         }
 
-        $cachedResource = $this->cachedResourceFactory->createForTask(
-            (string) $requestIdentifer,
-            $task,
-            $webPage
-        );
-
-        $this->cachedResourceManager->persist($cachedResource);
-
-        $source = $this->sourceFactory->fromCachedResource($cachedResource);
+        $source = $this->sourceFactory->fromCachedResource($cachedResource, $context);
         $task->addSource($source);
 
         $this->entityManager->persist($task);

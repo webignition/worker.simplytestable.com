@@ -8,13 +8,11 @@ use Doctrine\ORM\EntityRepository;
 class TaskRepository extends EntityRepository
 {
     /**
-     * Get collection of task ids for tasks in given state
-     *
      * @param string $state
      *
      * @return int[]
      */
-    public function getIdsByState(string $state)
+    public function getIdsByState(string $state): array
     {
         $queryBuilder = $this->createQueryBuilder('Task');
         $queryBuilder->select('Task.id');
@@ -23,7 +21,7 @@ class TaskRepository extends EntityRepository
 
         $repostitoryResult = $queryBuilder->getQuery()->getResult();
 
-        $taskIds = array();
+        $taskIds = [];
         foreach ($repostitoryResult as $taskId) {
             $taskIds[] = $taskId['id'];
         }
@@ -34,7 +32,7 @@ class TaskRepository extends EntityRepository
     /**
      * @return int[]
      */
-    public function getIdsWithOutput()
+    public function getIdsWithOutput(): array
     {
         $queryBuilder = $this->createQueryBuilder('Task');
         $queryBuilder->join('Task.output', 'TaskOutput');
@@ -43,11 +41,7 @@ class TaskRepository extends EntityRepository
 
         $result = $queryBuilder->getQuery()->getResult();
 
-        if (count($result) === 0) {
-            return array();
-        }
-
-        $ids = array();
+        $ids = [];
 
         foreach ($result as $taskOutputIdResult) {
             $ids[] = $taskOutputIdResult['TaskId'];
@@ -61,7 +55,7 @@ class TaskRepository extends EntityRepository
      *
      * @return int[]
      */
-    public function getUnfinishedIdsByMaxStartDate(\DateTime $startDateTime)
+    public function getUnfinishedIdsByMaxStartDate(\DateTime $startDateTime): array
     {
         $queryBuilder = $this->createQueryBuilder('Task');
         $queryBuilder->select('Task.id as TaskId');
@@ -71,11 +65,7 @@ class TaskRepository extends EntityRepository
 
         $result = $queryBuilder->getQuery()->getResult();
 
-        if (count($result) === 0) {
-            return array();
-        }
-
-        $ids = array();
+        $ids = [];
 
         foreach ($result as $taskOutputIdResult) {
             $ids[] = $taskOutputIdResult['TaskId'];
@@ -84,22 +74,14 @@ class TaskRepository extends EntityRepository
         return $ids;
     }
 
-    /**
-     * @param array $states
-     *
-     * @return int
-     */
-    public function getCountByStates($states = [])
+    public function getCountByStates(array $states = []): int
     {
         $queryBuilder = $this->createQueryBuilder('Task');
         $queryBuilder->select('COUNT(Task.id)');
+        $queryBuilder->andWhere('Task.state IN (:TaskStates)');
+        $queryBuilder->setParameter('TaskStates', $states);
 
-        if (count($states)) {
-            $queryBuilder->andWhere('Task.state IN (:TaskStates)')
-                ->setParameter('TaskStates', $states);
-        }
-
-        return (int)$queryBuilder->getQuery()->getResult()[0][1];
+        return (int) $queryBuilder->getQuery()->getResult()[0][1];
     }
 
     public function getTypeById(int $taskId): ?string
@@ -125,6 +107,7 @@ class TaskRepository extends EntityRepository
         $queryBuilder->where('Task.sources IS NOT NULL AND Task.state IN (:States)');
 
         $queryBuilder->setParameter('States', [
+            Task::STATE_PREPARING,
             Task::STATE_PREPARED,
             Task::STATE_IN_PROGRESS,
         ]);

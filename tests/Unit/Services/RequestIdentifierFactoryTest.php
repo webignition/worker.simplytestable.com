@@ -23,19 +23,40 @@ class RequestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateFromTask()
     {
-        $url = 'http://example.com';
-        $parameters = json_encode([
+        $taskUrl = 'http://example.com';
+        $taskParameters = json_encode([
             'foo' => 'bar',
         ]);
 
         $task = Task::create(
             new Type(Type::TYPE_HTML_VALIDATION, true, null),
-            $url,
-            $parameters
+            $taskUrl,
+            $taskParameters
         );
 
         $requestIdentifier = $this->requestIdentifierFactory->createFromTask($task);
 
         $this->assertInstanceOf(RequestIdentifier::class, $requestIdentifier);
+        $this->assertEquals('200ba358c289f923fde315f55b688ab8', $requestIdentifier->getHash());
+    }
+
+    public function testCreateFromTaskSource()
+    {
+        $taskUrl = 'http://example.com';
+        $resourceUrl = 'http://example.com/style.css';
+        $taskParameters = json_encode([
+            'foo' => 'bar',
+        ]);
+
+        $task = Task::create(
+            new Type(Type::TYPE_HTML_VALIDATION, true, null),
+            $taskUrl,
+            $taskParameters
+        );
+
+        $requestIdentifier = $this->requestIdentifierFactory->createFromTaskResource($task, $resourceUrl);
+
+        $this->assertInstanceOf(RequestIdentifier::class, $requestIdentifier);
+        $this->assertEquals('5fc2e6bd14ea7bd11b0733d650ddc855', $requestIdentifier->getHash());
     }
 }

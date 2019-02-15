@@ -26,23 +26,17 @@ services:
   App\Tests\Services\ContentTypeFactory:
     public: true
 
-  App\Services\ApplicationState:
-    public: true
-    arguments:
-      $stateResourcePath: '%kernel.project_dir%/config/state/%kernel.environment%'
-
-  App\Services\SourceFactory:
+  App\Tests\Services\TaskSourceContentsLoader:
     public: true
 
-  app.services.web-resource-retriever.web-page:
+  App\Services\UrlSourceMapFactory:
     public: true
-    class: webignition\WebResource\Retriever
-    arguments:
-      $httpClient: '@GuzzleHttp\Client'
-      $allowedContentTypes:
-        - 'text/html'
-        - 'application/xhtml+xml'
-      $allowUnknownResourceTypes: false
 
-  App\Services\CachedResourceManager:
+  App\Services\CssValidatorOutputParserConfigurationFactory:
+    public: true
+
+  App\Services\CssValidatorErrorFactory:
+    public: true
+
+  App\Services\WebPageTaskCssUrlFinder:
     public: true
