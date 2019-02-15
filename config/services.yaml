@@ -250,3 +250,5 @@ services:
 
     webignition\ResourceStorage\ResourceStorage:
       class: webignition\ResourceStorage\ResourceStorage
+
+    webignition\IgnoredUrlVerifier\IgnoredUrlVerifier:
