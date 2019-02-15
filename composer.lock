@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ba24173e88201a61cfa7efe9da450171",
+    "content-hash": "928270e3a12ddaf5455188791c0f8f65",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -3881,16 +3881,16 @@
         },
         {
             "name": "webignition/css-validator-output-parser",
-            "version": "5.1",
+            "version": "5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-output-parser.git",
-                "reference": "c7fd93edced9a54ec774c7d2c873715c79e8eade"
+                "reference": "66cb21ca1c340ed017fe3bf29d1d99f0a1992acd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/c7fd93edced9a54ec774c7d2c873715c79e8eade",
-                "reference": "c7fd93edced9a54ec774c7d2c873715c79e8eade",
+                "url": "https://api.github.com/repos/webignition/css-validator-output-parser/zipball/66cb21ca1c340ed017fe3bf29d1d99f0a1992acd",
+                "reference": "66cb21ca1c340ed017fe3bf29d1d99f0a1992acd",
                 "shasum": ""
             },
             "require": {
@@ -3899,6 +3899,7 @@
                 "webignition/url": ">=2,<3"
             },
             "require-dev": {
+                "phpstan/phpstan": "^0.11.2",
                 "phpunit/phpunit": "^7",
                 "squizlabs/php_codesniffer": "^3"
             },
@@ -3925,27 +3926,28 @@
                 "parser",
                 "validator"
             ],
-            "time": "2019-01-03T12:34:51+00:00"
+            "time": "2019-02-15T14:54:30+00:00"
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "5.7",
+            "version": "5.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "ad6b2493b6acc6094a15ed72fcbd90c28823746e"
+                "reference": "583420ac059e7fdce8b8240ffd02c48bccaa14ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/ad6b2493b6acc6094a15ed72fcbd90c28823746e",
-                "reference": "ad6b2493b6acc6094a15ed72fcbd90c28823746e",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/583420ac059e7fdce8b8240ffd02c48bccaa14ad",
+                "reference": "583420ac059e7fdce8b8240ffd02c48bccaa14ad",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2.0",
                 "webignition/absolute-url-deriver": ">=3,<4",
-                "webignition/css-validator-output-parser": ">=5.1,<6",
+                "webignition/css-validator-output-parser": ">=5.2,<6",
                 "webignition/resource-storage": ">=0.1,<1",
+                "webignition/uri": ">=0.3,<1",
                 "webignition/url-source-map": "^0.2.0",
                 "webignition/web-page-inspector": ">=1.4,<2",
                 "webignition/web-page-model": ">=5.9,<6"
@@ -3975,7 +3977,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2019-02-14T18:34:31+00:00"
+            "time": "2019-02-15T16:40:30+00:00"
         },
         {
             "name": "webignition/disallowed-character-terminated-string",

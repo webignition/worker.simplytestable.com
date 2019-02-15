@@ -26,7 +26,7 @@
         "symfony/monolog-bundle": "^3.1.0",
         "symfony/yaml": "^4.1",
         "webignition/absolute-url-deriver": ">=3,<4",
-        "webignition/css-validator-wrapper": ">=5.7,<6",
+        "webignition/css-validator-wrapper": ">=5.8,<6",
         "webignition/guzzle-curl-exception": ">=1,<2",
         "webignition/guzzle-http-authentication-middleware": "0.2",
         "webignition/guzzle-request-headers-middleware": ">=0.1,<1",
