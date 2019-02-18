@@ -43,6 +43,6 @@ class TaskPerformer
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
-        $this->eventDispatcher->dispatch($nextEvent, $taskEvent);
+        $this->eventDispatcher->dispatch($nextEvent, new TaskEvent($task));
     }
 }
