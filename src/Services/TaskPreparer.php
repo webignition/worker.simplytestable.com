@@ -29,9 +29,26 @@ class TaskPreparer
         $taskEvent = new TaskEvent($task);
         $this->eventDispatcher->dispatch(TaskEvent::TYPE_PREPARE, $taskEvent);
 
-        $nextEvent = Task::STATE_PREPARED === $task->getState()
-            ? TaskEvent::TYPE_PREPARED
-            : TaskEvent::TYPE_CREATED;
+        $nextEvent = TaskEvent::TYPE_PREPARED;
+
+        if ($task->isIncomplete()) {
+            if (Task::STATE_PREPARED !== $task->getState()) {
+                $nextEvent = TaskEvent::TYPE_CREATED;
+            }
+        } else {
+            if (empty($task->getStartDateTime())) {
+                /** @noinspection PhpUnhandledExceptionInspection */
+                $task->setStartDateTime(new \DateTime());
+            }
+
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $task->setEndDateTime(new \DateTime());
+
+            $nextEvent = TaskEvent::TYPE_PERFORMED;
+        }
+
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
 
         $this->eventDispatcher->dispatch($nextEvent, new TaskEvent($task));
     }

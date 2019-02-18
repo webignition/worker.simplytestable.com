@@ -84,7 +84,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
     /**
      * @dataProvider prepareDataProvider
      */
-    public function testPrepareIsNotPrepared(array $taskValues)
+    public function testPrepareTaskRemainsPreparing(array $taskValues)
     {
         $taskPreparer = self::$container->get(TaskPreparer::class);
         $testTaskFactory = self::$container->get(TestTaskFactory::class);
@@ -162,6 +162,72 @@ class TaskPreparerTest extends AbstractBaseTestCase
                 ]),
             ],
         ];
+    }
+
+    public function testPrepareTaskCompletes()
+    {
+        $taskValues = TestTaskFactory::createTaskValuesFromDefaults([
+            TestTaskFactory::DEFAULT_TASK_TYPE => Type::TYPE_HTML_VALIDATION,
+        ]);
+
+        $taskPreparer = self::$container->get(TaskPreparer::class);
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+
+        $task = $testTaskFactory->create($taskValues);
+
+        $this->assertNull($task->getStartDateTime());
+        $this->assertNull($task->getEndDateTime());
+
+        $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
+
+        $dispatchCallCount = 0;
+        $expectedEventNames = [
+            TaskEvent::TYPE_PREPARE,
+            TaskEvent::TYPE_PERFORMED,
+        ];
+
+        $historicalTaskEvents = [];
+
+        $eventDispatcher
+            ->shouldReceive('dispatch')
+            ->withArgs(function (
+                string $eventName,
+                TaskEvent $taskEvent
+            ) use (
+                &$task,
+                &$dispatchCallCount,
+                &$historicalTaskEvents,
+                $expectedEventNames
+            ) {
+                $this->assertEquals($expectedEventNames[$dispatchCallCount], $eventName);
+                $this->assertSame($task, $taskEvent->getTask());
+
+                if (TaskEvent::TYPE_PREPARE === $eventName) {
+                    $task->setState(Task::STATE_SKIPPED);
+                }
+
+                foreach ($historicalTaskEvents as $historicalTaskEvent) {
+                    $this->assertNotSame($historicalTaskEvent, $taskEvent);
+                }
+
+                $historicalTaskEvents[] = $taskEvent;
+
+                $dispatchCallCount++;
+
+                return true;
+            });
+
+        ObjectPropertySetter::setProperty(
+            $taskPreparer,
+            TaskPreparer::class,
+            'eventDispatcher',
+            $eventDispatcher
+        );
+
+        $taskPreparer->prepare($task);
+
+        $this->assertNotNull($task->getStartDateTime());
+        $this->assertNotNull($task->getEndDateTime());
     }
 
     protected function tearDown()

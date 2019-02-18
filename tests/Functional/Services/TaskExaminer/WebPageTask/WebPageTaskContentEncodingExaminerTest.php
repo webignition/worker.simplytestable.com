@@ -5,6 +5,7 @@ namespace App\Tests\Functional\Services\TaskExaminer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Event\TaskEvent;
 use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Services\TaskExaminer\WebPageTask\ContentEncodingExaminer;
 use App\Tests\Factory\HtmlDocumentFactory;
@@ -12,6 +13,7 @@ use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\ContentTypeFactory;
 use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
+use Mockery\MockInterface;
 use webignition\WebResource\WebPage\WebPage;
 
 class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
@@ -22,46 +24,61 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
     private $examiner;
 
     /**
+     * @var Task
+     */
+    private $task;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
         parent::setUp();
+
         $this->examiner = self::$container->get(ContentEncodingExaminer::class);
+
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+        $this->task = $testTaskFactory->create(
+            TestTaskFactory::createTaskValuesFromDefaults()
+        );
     }
 
     /**
      * @dataProvider examineNoChangesDataProvider
      */
-    public function testExamineNoChanges(callable $webPageCreator)
+    public function testInvokeNoChanges(callable $webPageCreator, bool $expectedPropagationIsStopped)
     {
         $webPage = $webPageCreator();
 
-        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+        $taskCachedSourceWebPageRetriever = $this->createTaskCachedSourceWebPageRetriever($this->task, $webPage);
+        $this->setExaminerTaskCachedSourceWebPageRetriever($taskCachedSourceWebPageRetriever);
 
-        $task = $testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults()
-        );
+        $taskEvent = new TaskEvent($this->task);
 
-        $taskCachedResourceWebPageRetriever = \Mockery::mock(TaskCachedSourceWebPageRetriever::class);
-        $taskCachedResourceWebPageRetriever
-            ->shouldReceive('retrieve')
-            ->with($task)
-            ->andReturn($webPage);
+        $this->examiner->__invoke($taskEvent);
 
-        ObjectPropertySetter::setProperty(
-            $this->examiner,
-            ContentEncodingExaminer::class,
-            'taskCachedSourceWebPageRetriever',
-            $taskCachedResourceWebPageRetriever
-        );
+        $this->assertEquals($expectedPropagationIsStopped, $taskEvent->isPropagationStopped());
+    }
 
-        $taskState = $task->getState();
+    /**
+     * @dataProvider examineNoChangesDataProvider
+     */
+    public function testExamineNoChanges(callable $webPageCreator, bool $expectedPropagationIsStopped)
+    {
+        $webPage = $webPageCreator();
 
-        $this->examiner->examine($task);
+        $taskCachedSourceWebPageRetriever = $this->createTaskCachedSourceWebPageRetriever($this->task, $webPage);
+        $this->setExaminerTaskCachedSourceWebPageRetriever($taskCachedSourceWebPageRetriever);
 
-        $this->assertEquals($taskState, $task->getState());
-        $this->assertNull($task->getOutput());
+        $taskState = $this->task->getState();
+
+        $expectedReturnValue = !$expectedPropagationIsStopped;
+
+        $returnValue = $this->examiner->examine($this->task);
+        $this->assertEquals($expectedReturnValue, $returnValue);
+
+        $this->assertEquals($taskState, $this->task->getState());
+        $this->assertNull($this->task->getOutput());
     }
 
     public function examineNoChangesDataProvider()
@@ -71,6 +88,7 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
                 'webPageCreator' => function () {
                     return null;
                 },
+                'expectedPropagationIsStopped' => true,
             ],
             'task as valid web page as primary source' => [
                 'webPageCreator' => function (): WebPage {
@@ -81,8 +99,26 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
 
                     return $webPage;
                 },
+                'expectedPropagationIsStopped' => false,
             ],
         ];
+    }
+
+    /**
+     * @dataProvider examineSetsTaskAsFailedDataProvider
+     */
+    public function testInvokeSetsTaskAsFailed(callable $webPageCreator)
+    {
+        $webPage = $webPageCreator();
+
+        $taskCachedSourceWebPageRetriever = $this->createTaskCachedSourceWebPageRetriever($this->task, $webPage);
+        $this->setExaminerTaskCachedSourceWebPageRetriever($taskCachedSourceWebPageRetriever);
+
+        $taskEvent = new TaskEvent($this->task);
+
+        $this->examiner->__invoke($taskEvent);
+
+        $this->assertTrue($taskEvent->isPropagationStopped());
     }
 
     /**
@@ -93,30 +129,14 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
         /* @var WebPage $webPage */
         $webPage = $webPageCreator();
 
-        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+        $taskCachedSourceWebPageRetriever = $this->createTaskCachedSourceWebPageRetriever($this->task, $webPage);
+        $this->setExaminerTaskCachedSourceWebPageRetriever($taskCachedSourceWebPageRetriever);
 
-        $task = $testTaskFactory->create(
-            TestTaskFactory::createTaskValuesFromDefaults()
-        );
+        $this->examiner->examine($this->task);
 
-        $taskCachedResourceWebPageRetriever = \Mockery::mock(TaskCachedSourceWebPageRetriever::class);
-        $taskCachedResourceWebPageRetriever
-            ->shouldReceive('retrieve')
-            ->with($task)
-            ->andReturn($webPage);
+        $this->assertEquals(Task::STATE_FAILED_NO_RETRY_AVAILABLE, $this->task->getState());
 
-        ObjectPropertySetter::setProperty(
-            $this->examiner,
-            ContentEncodingExaminer::class,
-            'taskCachedSourceWebPageRetriever',
-            $taskCachedResourceWebPageRetriever
-        );
-
-        $this->examiner->examine($task);
-
-        $this->assertEquals(Task::STATE_FAILED_NO_RETRY_AVAILABLE, $task->getState());
-
-        $taskOutput = $task->getOutput();
+        $taskOutput = $this->task->getOutput();
         $this->assertInstanceOf(Output::class, $taskOutput);
         $this->assertEquals(1, $taskOutput->getErrorCount());
         $this->assertEquals(0, $taskOutput->getWarningCount());
@@ -212,6 +232,68 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
                 'expectedCharacterSetInOutput' => 'windows-1251',
             ],
         ];
+    }
+
+    /**
+     * @dataProvider examineCompleteTaskDataProvider
+     */
+    public function testExamineCompleteTask(string $state)
+    {
+        $this->task->setState($state);
+
+        $this->assertFalse($this->examiner->examine($this->task));
+    }
+
+    public function examineCompleteTaskDataProvider(): array
+    {
+        return [
+            'completed' => [
+                'state' => Task::STATE_COMPLETED,
+            ],
+            'cancelled' => [
+                'state' => Task::STATE_CANCELLED,
+            ],
+            'failed no retry available' => [
+                'state' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
+            ],
+            'failed retry available' => [
+                'state' => Task::STATE_FAILED_RETRY_AVAILABLE,
+            ],
+            'failed retry limit reached' => [
+                'state' => Task::STATE_FAILED_RETRY_LIMIT_REACHED,
+            ],
+            'skipped' => [
+                'state' => Task::STATE_SKIPPED,
+            ],
+        ];
+    }
+
+    /**
+     * @param Task $task
+     * @param WebPage|null $webPage
+     *
+     * @return TaskCachedSourceWebPageRetriever|MockInterface
+     */
+    private function createTaskCachedSourceWebPageRetriever(Task $task, ?WebPage $webPage = null)
+    {
+        $taskCachedSourceWebPageRetriever = \Mockery::mock(TaskCachedSourceWebPageRetriever::class);
+        $taskCachedSourceWebPageRetriever
+            ->shouldReceive('retrieve')
+            ->with($task)
+            ->andReturn($webPage);
+
+        return $taskCachedSourceWebPageRetriever;
+    }
+
+    private function setExaminerTaskCachedSourceWebPageRetriever(
+        TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever
+    ) {
+        ObjectPropertySetter::setProperty(
+            $this->examiner,
+            ContentEncodingExaminer::class,
+            'taskCachedSourceWebPageRetriever',
+            $taskCachedSourceWebPageRetriever
+        );
     }
 
     protected function tearDown()

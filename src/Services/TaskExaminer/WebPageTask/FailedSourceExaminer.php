@@ -20,17 +20,25 @@ class FailedSourceExaminer
 
     public function __invoke(TaskEvent $taskEvent)
     {
-        $this->examine($taskEvent->getTask());
+        $propagationCanContinue = $this->examine($taskEvent->getTask());
+
+        if (false === $propagationCanContinue) {
+            $taskEvent->stopPropagation();
+        }
     }
 
-    public function examine(Task $task)
+    public function examine(Task $task): bool
     {
+        if (!$task->isIncomplete()) {
+            return false;
+        }
+
         $sources = $task->getSources();
         /* @var Source $primarySource */
         $primarySource = $sources[$task->getUrl()] ?? null;
 
         if (empty($primarySource)) {
-            return;
+            return false;
         }
 
         if ($primarySource->isUnavailable()) {
@@ -43,6 +51,10 @@ class FailedSourceExaminer
                 new InternetMediaType('application', 'json'),
                 1
             ));
+
+            return false;
         }
+
+        return true;
     }
 }
