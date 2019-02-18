@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Tests\Functional\Services\TaskTypePerformer\WebPageTask;
+namespace App\Tests\Functional\Services\TaskExaminer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Services\SourceFactory;
-use App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer;
+use App\Services\TaskExaminer\WebPageTask\FailedSourceExaminer;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\TestTaskFactory;
 

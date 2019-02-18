@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Functional\Services\TaskTypePerformer\WebPageTask;
+namespace App\Tests\Functional\Services\TaskExaminer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
@@ -8,7 +8,7 @@ use App\Model\Source;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\SourceFactory;
-use App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer;
+use App\Services\TaskExaminer\WebPageTask\InvalidSourceExaminer;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\TestTaskFactory;
 

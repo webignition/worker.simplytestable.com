@@ -1,12 +1,12 @@
 <?php
 /** @noinspection PhpDocSignatureInspection */
 
-namespace App\Tests\Functional\Services\TaskTypePerformer\WebPageTask;
+namespace App\Tests\Functional\Services\TaskExaminer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Services\TaskCachedSourceWebPageRetriever;
-use App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer;
+use App\Services\TaskExaminer\WebPageTask\ContentEncodingExaminer;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\ContentTypeFactory;
