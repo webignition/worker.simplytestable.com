@@ -1,12 +1,12 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services\TaskExaminer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Event\TaskEvent;
 use App\Model\Source;
-use App\Services\CachedResourceFactory;
-use App\Services\CachedResourceManager;
 use App\Services\SourceFactory;
 use App\Services\TaskExaminer\WebPageTask\InvalidSourceExaminer;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -30,18 +30,33 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider examineNoChangesDataProvider
-     *
-     * @param callable $taskCreator
      */
-    public function testExamineNoChanges(callable $taskCreator)
+    public function testInvokeNoChanges(callable $taskCreator, bool $expectedPropagationIsStopped)
+    {
+        /* @var Task $task */
+        $task = $taskCreator();
+        $taskEvent = new TaskEvent($task);
+
+        $this->examiner->__invoke($taskEvent);
+
+        $this->assertEquals($expectedPropagationIsStopped, $taskEvent->isPropagationStopped());
+    }
+
+    /**
+     * @dataProvider examineNoChangesDataProvider
+     */
+    public function testExamineNoChanges(callable $taskCreator, bool $expectedPropagationIsStopped)
     {
         /* @var Task $task */
         $task = $taskCreator();
 
         $taskState = $task->getState();
 
-        $this->examiner->examine($task);
+        $expectedReturnValue = !$expectedPropagationIsStopped;
 
+        $returnValue = $this->examiner->examine($task);
+
+        $this->assertEquals($expectedReturnValue, $returnValue);
         $this->assertEquals($taskState, $task->getState());
         $this->assertNull($task->getOutput());
     }
@@ -57,6 +72,7 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
                         TestTaskFactory::createTaskValuesFromDefaults()
                     );
                 },
+                'expectedPropagationIsStopped' => true,
             ],
             'no primary source' => [
                 'taskCreator' => function (): Task {
@@ -73,6 +89,7 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
 
                     return $task;
                 },
+                'expectedPropagationIsStopped' => true,
             ],
             'invalid primary source, not invalid content type' => [
                 'taskCreator' => function (): Task {
@@ -89,6 +106,7 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
 
                     return $task;
                 },
+                'expectedPropagationIsStopped' => false,
             ],
             'non-empty cached resource' => [
                 'taskCreator' => function (): Task {
@@ -102,24 +120,32 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
 
                     return $task;
                 },
+                'expectedPropagationIsStopped' => false,
             ],
         ];
     }
 
     /**
      * @dataProvider examineSetsTaskAsSkippedDataProvider
-     *
-     * @param callable $taskCreator
+     */
+    public function testInvokeSetsTaskAsSkipped(callable $taskCreator)
+    {
+        /* @var Task $task */
+        $task = $taskCreator();
+        $taskEvent = new TaskEvent($task);
+
+        $this->examiner->__invoke($taskEvent);
+
+        $this->assertTrue($taskEvent->isPropagationStopped());
+    }
+
+    /**
+     * @dataProvider examineSetsTaskAsSkippedDataProvider
      */
     public function testExamineSetsTaskAsSkipped(callable $taskCreator)
     {
-        $testTaskFactory = self::$container->get(TestTaskFactory::class);
-        $sourceFactory = self::$container->get(SourceFactory::class);
-        $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
-        $cachedResourceManager = self::$container->get(CachedResourceManager::class);
-
         /* @var Task $task */
-        $task = $taskCreator($testTaskFactory, $sourceFactory, $cachedResourceFactory, $cachedResourceManager);
+        $task = $taskCreator();
 
         $this->assertEquals(Task::STATE_QUEUED, $task->getState());
         $this->assertNull($task->getOutput());
@@ -168,6 +194,41 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
 
                     return $task;
                 },
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider examineCompleteTaskDataProvider
+     */
+    public function testExamineCompleteTask(string $state)
+    {
+        $task = new Task();
+        $task->setState($state);
+
+        $this->assertFalse($this->examiner->examine($task));
+    }
+
+    public function examineCompleteTaskDataProvider(): array
+    {
+        return [
+            'completed' => [
+                'state' => Task::STATE_COMPLETED,
+            ],
+            'cancelled' => [
+                'state' => Task::STATE_CANCELLED,
+            ],
+            'failed no retry available' => [
+                'state' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
+            ],
+            'failed retry available' => [
+                'state' => Task::STATE_FAILED_RETRY_AVAILABLE,
+            ],
+            'failed retry limit reached' => [
+                'state' => Task::STATE_FAILED_RETRY_LIMIT_REACHED,
+            ],
+            'skipped' => [
+                'state' => Task::STATE_SKIPPED,
             ],
         ];
     }
