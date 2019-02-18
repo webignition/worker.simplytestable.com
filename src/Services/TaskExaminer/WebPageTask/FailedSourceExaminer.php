@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\TaskTypePerformer\WebPageTask;
+namespace App\Services\TaskExaminer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;

@@ -113,15 +113,15 @@ services:
       tags:
         - { name: kernel.event_listener, event: task.prepare, priority: 10 }
 
-    App\Services\TaskTypePerformer\WebPageTask\InvalidSourceExaminer:
+    App\Services\TaskExaminer\WebPageTask\InvalidSourceExaminer:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 200 }
 
-    App\Services\TaskTypePerformer\WebPageTask\FailedSourceExaminer:
+    App\Services\TaskExaminer\WebPageTask\FailedSourceExaminer:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 190 }
 
-    App\Services\TaskTypePerformer\WebPageTask\ContentEncodingExaminer:
+    App\Services\TaskExaminer\WebPageTask\ContentEncodingExaminer:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 180 }
 
