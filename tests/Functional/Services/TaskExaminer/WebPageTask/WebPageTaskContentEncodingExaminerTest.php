@@ -31,9 +31,9 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider performNoChangesDataProvider
+     * @dataProvider examineNoChangesDataProvider
      */
-    public function testPerformNoChanges(callable $webPageCreator)
+    public function testExamineNoChanges(callable $webPageCreator)
     {
         $webPage = $webPageCreator();
 
@@ -58,13 +58,13 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
 
         $taskState = $task->getState();
 
-        $this->examiner->perform($task);
+        $this->examiner->examine($task);
 
         $this->assertEquals($taskState, $task->getState());
         $this->assertNull($task->getOutput());
     }
 
-    public function performNoChangesDataProvider()
+    public function examineNoChangesDataProvider()
     {
         return [
             'task has no web page primary source' => [
@@ -86,9 +86,9 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider performSetsTaskAsFailedDataProvider
+     * @dataProvider examineSetsTaskAsFailedDataProvider
      */
-    public function testPerformSetsTaskAsFailed(callable $webPageCreator, string $expectedCharacterSetInOutput)
+    public function testExamineSetsTaskAsFailed(callable $webPageCreator, string $expectedCharacterSetInOutput)
     {
         /* @var WebPage $webPage */
         $webPage = $webPageCreator();
@@ -112,7 +112,7 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
             $taskCachedResourceWebPageRetriever
         );
 
-        $this->examiner->perform($task);
+        $this->examiner->examine($task);
 
         $this->assertEquals(Task::STATE_FAILED_NO_RETRY_AVAILABLE, $task->getState());
 
@@ -131,7 +131,7 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
         ]), $taskOutput->getOutput());
     }
 
-    public function performSetsTaskAsFailedDataProvider()
+    public function examineSetsTaskAsFailedDataProvider()
     {
         return [
             'Invalid two-octet sequence with no specific encoding' => [

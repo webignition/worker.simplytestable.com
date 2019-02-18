@@ -21,10 +21,10 @@ class InvalidSourceExaminer
 
     public function __invoke(TaskEvent $taskEvent)
     {
-        $this->perform($taskEvent->getTask());
+        $this->examine($taskEvent->getTask());
     }
 
-    public function perform(Task $task)
+    public function examine(Task $task)
     {
         $sources = $task->getSources();
         /* @var Source $primarySource */

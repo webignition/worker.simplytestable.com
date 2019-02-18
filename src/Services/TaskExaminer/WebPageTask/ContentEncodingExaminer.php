@@ -25,10 +25,10 @@ class ContentEncodingExaminer
 
     public function __invoke(TaskEvent $taskEvent)
     {
-        $this->perform($taskEvent->getTask());
+        $this->examine($taskEvent->getTask());
     }
 
-    public function perform(Task $task)
+    public function examine(Task $task)
     {
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 

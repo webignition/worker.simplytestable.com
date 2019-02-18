@@ -27,24 +27,24 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider performNoChangesDataProvider
+     * @dataProvider examineNoChangesDataProvider
      *
      * @param callable $taskCreator
      */
-    public function testPerformNoChanges(callable $taskCreator)
+    public function testExamineNoChanges(callable $taskCreator)
     {
         /* @var Task $task */
         $task = $taskCreator();
 
         $taskState = $task->getState();
 
-        $this->examiner->perform($task);
+        $this->examiner->examine($task);
 
         $this->assertEquals($taskState, $task->getState());
         $this->assertNull($task->getOutput());
     }
 
-    public function performNoChangesDataProvider()
+    public function examineNoChangesDataProvider()
     {
         return [
             'no sources' => [
@@ -107,12 +107,12 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider performSetsTaskAsFailedDataProvider
+     * @dataProvider examineSetsTaskAsFailedDataProvider
      *
      * @param callable $taskCreator
      * @param array $expectedOutput
      */
-    public function testPerformSetsTaskAsFailed(callable $taskCreator, array $expectedOutput)
+    public function testExamineSetsTaskAsFailed(callable $taskCreator, array $expectedOutput)
     {
         /* @var Task $task */
         $task = $taskCreator();
@@ -120,7 +120,7 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
         $this->assertEquals(Task::STATE_QUEUED, $task->getState());
         $this->assertNull($task->getOutput());
 
-        $this->examiner->perform($task);
+        $this->examiner->examine($task);
 
         $this->assertEquals(Task::STATE_FAILED_NO_RETRY_AVAILABLE, $task->getState());
 
@@ -131,7 +131,7 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
         $this->assertEquals(json_encode($expectedOutput), $taskOutput->getOutput());
     }
 
-    public function performSetsTaskAsFailedDataProvider()
+    public function examineSetsTaskAsFailedDataProvider()
     {
         return [
             'redirect loop' => [
