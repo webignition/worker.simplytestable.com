@@ -5,10 +5,10 @@ namespace App\Controller;
 use App\Resque\Job\TasksRequestJob;
 use App\Services\Resque\QueueService;
 use App\Services\TasksService;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class TasksController extends Controller
+class TasksController extends AbstractController
 {
     /**
      * @param QueueService $resqueQueueService
