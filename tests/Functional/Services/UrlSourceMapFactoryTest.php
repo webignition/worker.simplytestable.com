@@ -203,6 +203,9 @@ class UrlSourceMapFactoryTest extends AbstractBaseTestCase
                     ],
                 ]),
                 'expectedSources' => new SourceMap([
+                    'http://foo.example.com/one.css' => new SourceMapSource(
+                        'http://foo.example.com/one.css'
+                    ),
                     'http://bar.example.com/two.css' => new SourceMapSource(
                         'http://bar.example.com/two.css',
                         '/^file:\/tmp\/[a-f0-9]{32}\.css/',
@@ -249,7 +252,14 @@ class UrlSourceMapFactoryTest extends AbstractBaseTestCase
                         ],
                     ],
                 ]),
-                'expectedSources' => new SourceMap(),
+                'expectedSources' => new SourceMap([
+                    'http://foo.example.com/one.css' => new SourceMapSource(
+                        'http://foo.example.com/one.css'
+                    ),
+                    'http://bar.example.com/two.css' => new SourceMapSource(
+                        'http://bar.example.com/two.css'
+                    ),
+                ]),
                 'expectedSourceContents' => [],
             ],
         ];

@@ -47,6 +47,8 @@ class UrlSourceMapFactory
 
             if ($taskSource->isCachedResource()) {
                 if ($this->ignoredUrlVerifier->isUrlIgnored($sourceUri, $domainsToIgnore)) {
+                    $sources[$sourceUri] = new Source($sourceUri);
+
                     continue;
                 }
 
