@@ -38,6 +38,8 @@ class TaskPreparerTest extends AbstractBaseTestCase
             TaskEvent::TYPE_PREPARED,
         ];
 
+        $historicalTaskEvents = [];
+
         $eventDispatcher
             ->shouldReceive('dispatch')
             ->withArgs(function (
@@ -46,6 +48,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
             ) use (
                 &$task,
                 &$dispatchCallCount,
+                &$historicalTaskEvents,
                 $expectedEventNames
             ) {
                 $this->assertEquals($expectedEventNames[$dispatchCallCount], $eventName);
@@ -54,6 +57,12 @@ class TaskPreparerTest extends AbstractBaseTestCase
                 if (TaskEvent::TYPE_PREPARE === $eventName) {
                     $task->setState(Task::STATE_PREPARED);
                 }
+
+                foreach ($historicalTaskEvents as $historicalTaskEvent) {
+                    $this->assertNotSame($historicalTaskEvent, $taskEvent);
+                }
+
+                $historicalTaskEvents[] = $taskEvent;
 
                 $dispatchCallCount++;
 
@@ -90,6 +99,8 @@ class TaskPreparerTest extends AbstractBaseTestCase
             TaskEvent::TYPE_CREATED,
         ];
 
+        $historicalTaskEvents = [];
+
         $eventDispatcher
             ->shouldReceive('dispatch')
             ->withArgs(function (
@@ -98,10 +109,17 @@ class TaskPreparerTest extends AbstractBaseTestCase
             ) use (
                 &$task,
                 &$dispatchCallCount,
+                &$historicalTaskEvents,
                 $expectedEventNames
             ) {
                 $this->assertEquals($expectedEventNames[$dispatchCallCount], $eventName);
                 $this->assertSame($task, $taskEvent->getTask());
+
+                foreach ($historicalTaskEvents as $historicalTaskEvent) {
+                    $this->assertNotSame($historicalTaskEvent, $taskEvent);
+                }
+
+                $historicalTaskEvents[] = $taskEvent;
 
                 $dispatchCallCount++;
 
