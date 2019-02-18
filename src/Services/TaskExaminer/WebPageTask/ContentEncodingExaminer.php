@@ -32,7 +32,7 @@ class ContentEncodingExaminer
         }
     }
 
-    public function examine(Task $task)
+    public function examine(Task $task): bool
     {
         if (!$task->isIncomplete()) {
             return false;
