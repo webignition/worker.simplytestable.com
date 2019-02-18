@@ -29,24 +29,24 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider performNoChangesDataProvider
+     * @dataProvider examineNoChangesDataProvider
      *
      * @param callable $taskCreator
      */
-    public function testPerformNoChanges(callable $taskCreator)
+    public function testExamineNoChanges(callable $taskCreator)
     {
         /* @var Task $task */
         $task = $taskCreator();
 
         $taskState = $task->getState();
 
-        $this->examiner->perform($task);
+        $this->examiner->examine($task);
 
         $this->assertEquals($taskState, $task->getState());
         $this->assertNull($task->getOutput());
     }
 
-    public function performNoChangesDataProvider()
+    public function examineNoChangesDataProvider()
     {
         return [
             'no sources' => [
@@ -107,11 +107,11 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider performSetsTaskAsSkippedDataProvider
+     * @dataProvider examineSetsTaskAsSkippedDataProvider
      *
      * @param callable $taskCreator
      */
-    public function testPerformSetsTaskAsSkipped(callable $taskCreator)
+    public function testExamineSetsTaskAsSkipped(callable $taskCreator)
     {
         $testTaskFactory = self::$container->get(TestTaskFactory::class);
         $sourceFactory = self::$container->get(SourceFactory::class);
@@ -124,7 +124,7 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
         $this->assertEquals(Task::STATE_QUEUED, $task->getState());
         $this->assertNull($task->getOutput());
 
-        $this->examiner->perform($task);
+        $this->examiner->examine($task);
 
         $this->assertEquals(Task::STATE_SKIPPED, $task->getState());
 
@@ -135,7 +135,7 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
         $this->assertEquals('', $taskOutput->getOutput());
     }
 
-    public function performSetsTaskAsSkippedDataProvider()
+    public function examineSetsTaskAsSkippedDataProvider()
     {
         return [
             'invalid primary source, is invalid content type' => [
