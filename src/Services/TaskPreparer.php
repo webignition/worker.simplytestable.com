@@ -33,6 +33,6 @@ class TaskPreparer
             ? TaskEvent::TYPE_PREPARED
             : TaskEvent::TYPE_CREATED;
 
-        $this->eventDispatcher->dispatch($nextEvent, $taskEvent);
+        $this->eventDispatcher->dispatch($nextEvent, new TaskEvent($task));
     }
 }

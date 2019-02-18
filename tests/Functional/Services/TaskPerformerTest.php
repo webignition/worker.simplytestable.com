@@ -53,6 +53,7 @@ class TaskPerformerTest extends AbstractBaseTestCase
         $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
 
         $dispatchCallCount = 0;
+        $historicalTaskEvents = [];
 
         $eventDispatcher
             ->shouldReceive('dispatch')
@@ -62,11 +63,18 @@ class TaskPerformerTest extends AbstractBaseTestCase
             ) use (
                 &$task,
                 &$dispatchCallCount,
+                &$historicalTaskEvents,
                 $expectedEventNames,
                 $expectedFinishedStateName
             ) {
                 $this->assertEquals($expectedEventNames[$dispatchCallCount], $eventName);
                 $this->assertSame($task, $taskEvent->getTask());
+
+                foreach ($historicalTaskEvents as $historicalTaskEvent) {
+                    $this->assertNotSame($historicalTaskEvent, $taskEvent);
+                }
+
+                $historicalTaskEvents[] = $taskEvent;
 
                 if (TaskEvent::TYPE_PERFORM === $eventName) {
                     $task->setState($expectedFinishedStateName);
