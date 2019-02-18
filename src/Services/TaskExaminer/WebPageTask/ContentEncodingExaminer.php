@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\TaskTypePerformer\WebPageTask;
+namespace App\Services\TaskExaminer\WebPageTask;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
@@ -25,18 +25,27 @@ class ContentEncodingExaminer
 
     public function __invoke(TaskEvent $taskEvent)
     {
-        $this->perform($taskEvent->getTask());
+        $propagationCanContinue = $this->examine($taskEvent->getTask());
+
+        if (false === $propagationCanContinue) {
+            $taskEvent->stopPropagation();
+        }
     }
 
-    public function perform(Task $task)
+    public function examine(Task $task): bool
     {
+        if (!$task->isIncomplete()) {
+            return false;
+        }
+
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 
         if (empty($webPage)) {
-            return;
+            return false;
         }
 
         $contentEncodingValidator = new ContentEncodingValidator();
+
         if (!$contentEncodingValidator->isValid($webPage)) {
             $task->setState(Task::STATE_FAILED_NO_RETRY_AVAILABLE);
             $webPageCharacterSet = $webPage->getCharacterSet();
@@ -52,6 +61,10 @@ class ContentEncodingExaminer
                 new InternetMediaType('application', 'json'),
                 1
             ));
+
+            return false;
         }
+
+        return true;
     }
 }
