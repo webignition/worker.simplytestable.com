@@ -7,7 +7,7 @@ use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use App\Model\Task\Type;
 use App\Services\CssValidatorErrorFactory;
-use App\Services\CssValidatorOutputParserConfigurationFactory;
+use App\Services\CssValidatorOutputParserFlagsFactory;
 use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\TaskCachedSourceWebPageRetriever;
@@ -47,7 +47,7 @@ class CssValidationTaskTypePerformer
     private $cssValidatorWrapper;
 
     private $urlSourceMapFactory;
-    private $outputParserConfigurationFactory;
+    private $cssValidatorOutputParserFlagsFactory;
     private $cssValidatorErrorFactory;
 
     public function __construct(
@@ -56,7 +56,7 @@ class CssValidationTaskTypePerformer
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         CssValidatorWrapper $cssValidatorWrapper,
         UrlSourceMapFactory $urlSourceMapFactory,
-        CssValidatorOutputParserConfigurationFactory $outputParserConfigurationFactory,
+        CssValidatorOutputParserFlagsFactory $cssValidatorOutputParserFlagsFactory,
         CssValidatorErrorFactory $cssValidatorErrorFactory
     ) {
         $this->httpClientService = $httpClientService;
@@ -65,7 +65,7 @@ class CssValidationTaskTypePerformer
 
         $this->cssValidatorWrapper = $cssValidatorWrapper;
         $this->urlSourceMapFactory = $urlSourceMapFactory;
-        $this->outputParserConfigurationFactory = $outputParserConfigurationFactory;
+        $this->cssValidatorOutputParserFlagsFactory = $cssValidatorOutputParserFlagsFactory;
         $this->cssValidatorErrorFactory = $cssValidatorErrorFactory;
     }
 
@@ -112,18 +112,21 @@ class CssValidationTaskTypePerformer
      */
     private function performValidation(Task $task, WebPage $webPage)
     {
-        $vendorExtensionSeverityLevel = $task->getParameters()->get('vendor-extensions');
+        $taskParameters = $task->getParameters();
+
+        $vendorExtensionSeverityLevel = $taskParameters->get('vendor-extensions');
         $vendorExtensionSeverityLevel = $vendorExtensionSeverityLevel ?? VendorExtensionSeverityLevel::LEVEL_WARN;
 
         $sourceMap = $this->urlSourceMapFactory->createForTask($task);
-        $outputParserConfiguration = $this->outputParserConfigurationFactory->create($task);
+        $outputParserFlags = $this->cssValidatorOutputParserFlagsFactory->create($task);
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $output = $this->cssValidatorWrapper->validate(
             $webPage,
             $sourceMap,
             $vendorExtensionSeverityLevel,
-            $outputParserConfiguration
+            $taskParameters->get('domains-to-ignore') ?? [],
+            $outputParserFlags
         );
 
         if ($output instanceof ValidationOutput) {

@@ -167,6 +167,101 @@ class UrlSourceMapFactoryTest extends AbstractBaseTestCase
                     'http://example.com/two.css' => 'body {}',
                 ],
             ],
+            'available source, has css resources, one ignored' => [
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'type' => TypeInterface::TYPE_CSS_VALIDATION,
+                    'parameters' => json_encode([
+                        'domains-to-ignore' => [
+                            'foo.example.com',
+                        ],
+                    ]),
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com/',
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'content' => '<!doctype html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://foo.example.com/one.css',
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'content' => 'html {}',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'resource',
+                            ],
+                        ],
+                        [
+                            'url' => 'http://bar.example.com/two.css',
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'content' => 'body {}',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'import',
+                            ],
+                        ],
+                    ],
+                ]),
+                'expectedSources' => new SourceMap([
+                    'http://foo.example.com/one.css' => new SourceMapSource(
+                        'http://foo.example.com/one.css'
+                    ),
+                    'http://bar.example.com/two.css' => new SourceMapSource(
+                        'http://bar.example.com/two.css',
+                        '/^file:\/tmp\/[a-f0-9]{32}\.css/',
+                        SourceType::TYPE_IMPORT
+                    ),
+                ]),
+                'expectedSourceContents' => [
+                    'http://bar.example.com/two.css' => 'body {}',
+                ],
+            ],
+            'available source, has css resources, both ignored' => [
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'type' => TypeInterface::TYPE_CSS_VALIDATION,
+                    'parameters' => json_encode([
+                        'domains-to-ignore' => [
+                            'foo.example.com',
+                            'bar.example.com',
+                        ],
+                    ]),
+                    'sources' => [
+                        [
+                            'url' => 'http://example.com/',
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'content' => '<!doctype html>',
+                            'contentType' => new InternetMediaType('text', 'html'),
+                        ],
+                        [
+                            'url' => 'http://foo.example.com/one.css',
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'content' => 'html {}',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'resource',
+                            ],
+                        ],
+                        [
+                            'url' => 'http://bar.example.com/two.css',
+                            'type' => Source::TYPE_CACHED_RESOURCE,
+                            'content' => 'body {}',
+                            'contentType' => new InternetMediaType('text', 'css'),
+                            'context' => [
+                                'origin' => 'import',
+                            ],
+                        ],
+                    ],
+                ]),
+                'expectedSources' => new SourceMap([
+                    'http://foo.example.com/one.css' => new SourceMapSource(
+                        'http://foo.example.com/one.css'
+                    ),
+                    'http://bar.example.com/two.css' => new SourceMapSource(
+                        'http://bar.example.com/two.css'
+                    ),
+                ]),
+                'expectedSourceContents' => [],
+            ],
         ];
     }
 }

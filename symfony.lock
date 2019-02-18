@@ -386,6 +386,9 @@
     "webignition/http-history-container": {
         "version": "0.5"
     },
+    "webignition/ignored-url-verifier": {
+        "version": "0.1"
+    },
     "webignition/internet-media-type": {
         "version": "1.2"
     },
