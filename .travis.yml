@@ -24,7 +24,7 @@ before_install:
   - "mkdir -p ~/.composer"
   - cp .travis.composer.config.json ~/.composer/config.json
   - rm phpunit.xml.dist
-  - mv phpunit.travis-ci.xml phpunit.xml.dist
+#  - mv phpunit.travis-ci.xml phpunit.xml.dist
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - mysql -e 'CREATE DATABASE myapp_test;'
   - chmod +x ./bin/console
