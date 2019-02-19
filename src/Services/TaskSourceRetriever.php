@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
 use ReflectionClass;
+use Symfony\Component\Lock\Factory;
 use webignition\InternetMediaType\Parser\ParseException as InternetMediaTypeParseException;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 use webignition\WebResource\Exception\HttpException;
@@ -19,6 +20,7 @@ use webignition\WebResource\WebResource;
 class TaskSourceRetriever
 {
     const USER_AGENT = 'ST Task Source Retriever (http://bit.ly/RlhKCL)';
+    const LOCK_KEY = 'task-source-retriever-%s';
 
     private $httpClientConfigurationService;
     private $httpHistoryContainer;
@@ -27,6 +29,7 @@ class TaskSourceRetriever
     private $entityManager;
     private $requestIdentifierFactory;
     private $cachedResourceFactory;
+    private $lockFactory;
 
     public function __construct(
         HttpClientConfigurationService $httpClientConfigurationService,
@@ -35,7 +38,8 @@ class TaskSourceRetriever
         SourceFactory $sourceFactory,
         EntityManagerInterface $entityManager,
         RequestIdentifierFactory $requestIdentifierFactory,
-        CachedResourceFactory $cachedResourceFactory
+        CachedResourceFactory $cachedResourceFactory,
+        Factory $lockFactory
     ) {
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->httpHistoryContainer = $httpHistoryContainer;
@@ -44,6 +48,7 @@ class TaskSourceRetriever
         $this->entityManager = $entityManager;
         $this->requestIdentifierFactory = $requestIdentifierFactory;
         $this->cachedResourceFactory = $cachedResourceFactory;
+        $this->lockFactory = $lockFactory;
     }
 
     public function retrieve(
@@ -51,22 +56,27 @@ class TaskSourceRetriever
         Task $task,
         string $url,
         array $sourceContext = []
-    ) {
+    ): bool {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
         $existingSources = $task->getSources();
         if (array_key_exists($url, $existingSources)) {
-            return;
+            return true;
         }
 
         $source = null;
+        $requestIdentifier = $this->requestIdentifierFactory->createFromTaskResource($task, $url);
+        $requestHash = (string) $requestIdentifier;
+        $lockKey = sprintf(self::LOCK_KEY, $requestHash);
+
+        $lock = $this->lockFactory->createLock($lockKey);
+        if (!$lock->acquire()) {
+            return false;
+        }
 
         try {
             /* @var WebResource $resource */
             $resource = $webResourceRetriever->retrieve(new Request('GET', $url));
-
-            $requestIdentifier = $this->requestIdentifierFactory->createFromTaskResource($task, $url);
-            $requestHash = (string) $requestIdentifier;
 
             $cachedResource = $this->cachedResourceManager->find($requestHash);
             if (!$cachedResource) {
@@ -112,11 +122,15 @@ class TaskSourceRetriever
                 $url,
                 sprintf(Source::MESSAGE_INVALID_CONTENT_TYPE, $e->getContentTypeString())
             );
+        } finally {
+            $lock->release();
         }
 
         $task->addSource($source);
         $this->entityManager->persist($task);
         $this->entityManager->flush();
+
+        return true;
     }
 
     /**

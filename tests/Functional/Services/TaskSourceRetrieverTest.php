@@ -13,11 +13,14 @@ use App\Services\TaskTypeService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use App\Tests\UnhandledGuzzleException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use GuzzleHttp\Psr7\Response;
+use Symfony\Component\Lock\Factory as LockFactory;
+use Symfony\Component\Lock\LockInterface;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 use webignition\WebResource\Retriever;
 
@@ -44,6 +47,11 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
     private $httpMockHandler;
 
     /**
+     * @var TaskTypeService
+     */
+    private $taskTypeService;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -56,6 +64,35 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
         $entityManager = self::$container->get(EntityManagerInterface::class);
         $this->cachedResourceRepository = $entityManager->getRepository(CachedResource::class);
+        $this->taskTypeService = self::$container->get(TaskTypeService::class);
+    }
+
+    public function testRetrieveCannotAcquireLock()
+    {
+        $lock = \Mockery::mock(LockInterface::class);
+        $lock
+            ->shouldReceive('acquire')
+            ->andReturn(false);
+
+        $lockFactory = \Mockery::mock(LockFactory::class);
+        $lockFactory
+            ->shouldReceive('createLock')
+            ->andReturn($lock);
+
+        ObjectPropertySetter::setProperty(
+            $this->taskSourceRetriever,
+            TaskSourceRetriever::class,
+            'lockFactory',
+            $lockFactory
+        );
+
+        /* @var Retriever $retriever */
+        $retriever = self::$container->get('app.services.web-resource-retriever.web-page');
+
+        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), 'http://example.com');
+
+        $retrieveResult = $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+        $this->assertFalse($retrieveResult);
     }
 
     /**
@@ -70,17 +107,16 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             new Response(200, ['content-type' => $contentType]),
         ]);
 
-        $taskTypeService = self::$container->get(TaskTypeService::class);
-
         /* @var Retriever $retriever */
         $retriever = self::$container->get($retrieverServiceId);
 
         $url = 'http://example.com';
-        $task = Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
 
         $this->assertEquals([], $task->getSources());
 
-        $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+        $retrieveResult = $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+        $this->assertTrue($retrieveResult);
 
         $this->assertEquals(
             [
@@ -127,18 +163,17 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             new Response(200, ['content-type' => $contentType], 'html content'),
         ]);
 
-        $taskTypeService = self::$container->get(TaskTypeService::class);
-
         /* @var Retriever $retriever */
         $retriever = self::$container->get($retrieverServiceId);
 
         $url = 'http://example.com';
-        $task = Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
 
         $this->assertEquals([], $task->getSources());
         $this->assertEquals([], $this->cachedResourceRepository->findAll());
 
-        $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl(), $sourceContext);
+        $retrieveResult = $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl(), $sourceContext);
+        $this->assertTrue($retrieveResult);
 
         /* @var CachedResource $cachedResource */
         $cachedResource = $this->cachedResourceRepository->findOneBy([
@@ -202,18 +237,17 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             new Response(200, ['content-type' => 'text/html'], 'html content'),
         ]);
 
-        $taskTypeService = self::$container->get(TaskTypeService::class);
-
         /* @var Retriever $retriever */
         $retriever = self::$container->get($retrieverServiceId);
 
         $url = 'http://example.com';
-        $task = Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
 
         $this->assertEquals([], $task->getSources());
         $this->assertEquals([], $this->cachedResourceRepository->findAll());
 
-        $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+        $retrieveResult = $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+        $this->assertTrue($retrieveResult);
 
         /* @var CachedResource $cachedResource */
         $cachedResource = $this->cachedResourceRepository->findOneBy([
@@ -248,17 +282,16 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $taskTypeService = self::$container->get(TaskTypeService::class);
-
         /* @var Retriever $retriever */
         $retriever = self::$container->get($retrieverServiceId);
 
         $url = 'http://example.com';
-        $task = Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
 
         $this->assertEquals([], $task->getSources());
 
-        $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+        $retrieveResult = $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+        $this->assertTrue($retrieveResult);
 
         /* @var Source $source */
         $source = $task->getSources()[$url];
