@@ -4,6 +4,7 @@ namespace App\Services\TaskTypePreparer;
 
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
+use App\Exception\UnableToRetrieveResourceException;
 use App\Model\CssSourceUrl;
 use App\Model\Source;
 use App\Model\Task\Type;
@@ -27,6 +28,11 @@ class CssTaskSourcePreparer
         $this->webPageTaskCssUrlFinder = $webPageTaskCssUrlFinder;
     }
 
+    /**
+     * @param TaskEvent $taskEvent
+     *
+     * @throws UnableToRetrieveResourceException
+     */
     public function __invoke(TaskEvent $taskEvent)
     {
         if (Type::TYPE_CSS_VALIDATION === (string) $taskEvent->getTask()->getType()) {
@@ -38,6 +44,13 @@ class CssTaskSourcePreparer
         }
     }
 
+    /**
+     * @param Task $task
+     *
+     * @return bool|null
+     *
+     * @throws UnableToRetrieveResourceException
+     */
     public function prepare(Task $task)
     {
         if (Type::TYPE_CSS_VALIDATION !== (string) $task->getType()) {
@@ -51,7 +64,7 @@ class CssTaskSourcePreparer
             return true;
         }
 
-        $this->taskSourceRetriever->retrieve(
+        $retrieveResult = $this->taskSourceRetriever->retrieve(
             $this->webResourceRetriever,
             $task,
             $nextUnSourcedCssSourceUrl->getUrl(),
@@ -59,6 +72,11 @@ class CssTaskSourcePreparer
                 'origin' => $nextUnSourcedCssSourceUrl->getType()
             ]
         );
+
+        if (false === $retrieveResult) {
+            throw new UnableToRetrieveResourceException();
+        }
+
         $cssSourceUrls = $this->webPageTaskCssUrlFinder->find($task);
 
         return null === $this->findNextUnSourcedStylesheetUrl($cssSourceUrls, $task->getSources());
