@@ -18,7 +18,7 @@ env:
     - LOCK_DATABASE_HOST=127.0.0.1
     - LOCK_DATABASE_NAME=myapp_test
     - LOCK_DATABASE_USER=root
-    - LOCK_DATABASE_PASSWORD=root
+    - LOCK_DATABASE_PASSWORD=
 
 language: php
 php:
