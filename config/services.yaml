@@ -257,6 +257,12 @@ services:
       class: Doctrine\DBAL\Driver\PDOConnection
       factory: 'Doctrine\DBAL\Connection:getWrappedConnection'
 
-    Symfony\Component\Lock\Store\PdoStore:
+    simplytestable.services.pdostore:
+      class: Symfony\Component\Lock\Store\PdoStore
       arguments:
         $connOrDsn: '@simplytestable.services.pdoconnection'
+
+    Symfony\Component\Lock\Factory:
+      class: Symfony\Component\Lock\Factory
+      arguments:
+        $store: '@simplytestable.services.pdostore'
