@@ -1,17 +1,22 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services\TaskTypePreparer;
 
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
+use App\Exception\UnableToRetrieveResourceException;
 use App\Model\Source;
 use App\Model\Task\Type;
+use App\Model\Task\TypeInterface;
+use App\Services\TaskSourceRetriever;
 use App\Services\TaskTypePreparer\CssTaskSourcePreparer;
 use App\Services\TaskTypeService;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use webignition\InternetMediaType\InternetMediaType;
@@ -559,5 +564,42 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
                 ],
             ],
         ];
+    }
+
+    public function testPrepareCannotAcquireLock()
+    {
+        $taskSourceRetriever = \Mockery::mock(TaskSourceRetriever::class);
+        $taskSourceRetriever
+            ->shouldReceive('retrieve')
+            ->andReturn(false);
+
+        ObjectPropertySetter::setProperty(
+            $this->preparer,
+            CssTaskSourcePreparer::class,
+            'taskSourceRetriever',
+            $taskSourceRetriever
+        );
+
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_CSS_VALIDATION,
+            'sources' => [
+                [
+                    'url' => 'http://example.com/',
+                    'content' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+                    'contentType' => new InternetMediaType('text', 'html'),
+                ],
+            ],
+        ]));
+
+        $this->expectException(UnableToRetrieveResourceException::class);
+
+        $this->preparer->prepare($task);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        \Mockery::close();
     }
 }

@@ -1,10 +1,12 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services\TaskTypePreparer;
 
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
+use App\Exception\UnableToRetrieveResourceException;
 use App\Model\Source;
 use App\Model\Task\Type;
 use App\Services\TaskSourceRetriever;
@@ -47,7 +49,7 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         $source = new Source(self::TASK_URL, Source::TYPE_CACHED_RESOURCE, 'request-hash');
         $this->task->addSource($source);
 
-        $this->setTaskSourceRetrievrOnWebPageTaskSourcePreparer($taskSourceRetriever);
+        $this->setTaskSourceRetrieverOnWebPageTaskSourcePreparer($taskSourceRetriever);
 
         $taskEvent = new TaskEvent($this->task);
 
@@ -64,7 +66,7 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         $source = new Source(self::TASK_URL, Source::TYPE_CACHED_RESOURCE, 'request-hash');
         $this->task->addSource($source);
 
-        $this->setTaskSourceRetrievrOnWebPageTaskSourcePreparer($taskSourceRetriever);
+        $this->setTaskSourceRetrieverOnWebPageTaskSourcePreparer($taskSourceRetriever);
 
         $this->preparer->prepare($this->task);
         $this->addToAssertionCount(\Mockery::getContainer()->mockery_getExpectationCount());
@@ -79,12 +81,32 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
                 self::$container->get('app.services.web-resource-retriever.web-page'),
                 $this->task,
                 self::TASK_URL
-            );
+            )
+            ->andReturn(true);
 
-        $this->setTaskSourceRetrievrOnWebPageTaskSourcePreparer($taskSourceRetriever);
+        $this->setTaskSourceRetrieverOnWebPageTaskSourcePreparer($taskSourceRetriever);
 
         $this->preparer->prepare($this->task);
         $this->addToAssertionCount(\Mockery::getContainer()->mockery_getExpectationCount());
+    }
+
+    public function testPrepareCannotAcquireLock()
+    {
+        $taskSourceRetriever = \Mockery::mock(TaskSourceRetriever::class);
+        $taskSourceRetriever
+            ->shouldReceive('retrieve')
+            ->with(
+                self::$container->get('app.services.web-resource-retriever.web-page'),
+                $this->task,
+                self::TASK_URL
+            )
+            ->andReturn(false);
+
+        $this->setTaskSourceRetrieverOnWebPageTaskSourcePreparer($taskSourceRetriever);
+
+        $this->expectException(UnableToRetrieveResourceException::class);
+
+        $this->preparer->prepare($this->task);
     }
 
     private function createTask(): Task
@@ -94,7 +116,7 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         return Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), self::TASK_URL);
     }
 
-    private function setTaskSourceRetrievrOnWebPageTaskSourcePreparer(TaskSourceRetriever $taskSourceRetriever)
+    private function setTaskSourceRetrieverOnWebPageTaskSourcePreparer(TaskSourceRetriever $taskSourceRetriever)
     {
         ObjectPropertySetter::setProperty(
             $this->preparer,
