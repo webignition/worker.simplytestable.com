@@ -10,7 +10,6 @@
     <php>
         <ini name="error_reporting" value="-1" />
         <server name="KERNEL_CLASS" value="App\Kernel" />
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" />
 
         <env name="CORE_URL" value="http://test.app.simplytestable.com"/>
         <env name="HTML_VALIDATOR_PATH" value="/usr/local/validator/cgi-bin/check"/>
