@@ -9,8 +9,12 @@ use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\Resque\QueueService;
 use App\Services\TaskPreparer;
+use App\Services\TaskSourceRetriever;
+use App\Services\TaskTypePreparer\CssTaskSourcePreparer;
+use App\Services\TaskTypePreparer\WebPageTaskSourcePreparer;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Services\HttpMockHandler;
+use App\Tests\Services\ObjectPropertySetter;
 use App\Tests\Services\TaskSourceContentsLoader;
 use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -270,6 +274,116 @@ class TaskPreparerTest extends AbstractBaseTestCase
                     'http://example.com/one.css' => '.linked {}',
                     'http://example.com/two.css' => '@import "import-import.css";',
                     'http://example.com/import-import.css' => '.import-import {}',
+                ],
+            ],
+        ];
+    }
+    /**
+     * @dataProvider prepareUnableToAcquireLockRetrievingResourceDataProvider
+     */
+    public function testPrepareUnableToAcquireLockRetrievingResource(
+        callable $eventListenerMutator,
+        array $httpFixtures,
+        array $taskValues,
+        int $prepareRunCount,
+        array $expectedSources,
+        array $expectedSourceContents
+    ) {
+        $eventListenerMutator();
+
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+
+        $this->httpMockHandler->appendFixtures($httpFixtures);
+
+        $task = $testTaskFactory->create($taskValues);
+        $this->assertEquals(Task::STATE_QUEUED, $task->getState());
+
+        for ($runCount = 0; $runCount < $prepareRunCount; $runCount++) {
+            $this->taskPreparer->prepare($task);
+        }
+
+        $this->assertEquals(Task::STATE_PREPARING, $task->getState());
+
+        $sources = $task->getSources();
+        $this->assertEquals($expectedSources, $sources);
+
+        $sourceContents = $this->taskSourceContentsLoader->load($sources);
+        $this->assertEquals($expectedSourceContents, $sourceContents);
+
+        $this->assertTrue(self::$container->get(QueueService::class)->contains(
+            'task-prepare',
+            [
+                'id' => $task->getId()
+            ]
+        ));
+    }
+
+    public function prepareUnableToAcquireLockRetrievingResourceDataProvider(): array
+    {
+        return [
+            'html validation, unable to acquire lock to retrieve web page' => [
+                'eventListenerMutator' => function () {
+                    $webPageTaskSourcePreparer = self::$container->get(WebPageTaskSourcePreparer::class);
+
+                    $taskSourceRetriever = \Mockery::mock(TaskSourceRetriever::class);
+                    $taskSourceRetriever
+                        ->shouldReceive('retrieve')
+                        ->andReturn(false);
+
+                    ObjectPropertySetter::setProperty(
+                        $webPageTaskSourcePreparer,
+                        WebPageTaskSourcePreparer::class,
+                        'taskSourceRetriever',
+                        $taskSourceRetriever
+                    );
+                },
+                'httpFixtures' => [],
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'url' => 'http://example.com/',
+                    'type' => TypeInterface::TYPE_HTML_VALIDATION,
+                ]),
+                'prepareRunCount' => 1,
+                'expectedSources' => [],
+                'expectedSourceContents' => [],
+            ],
+            'css validation, single linked stylesheet, unable to acquire lock retrieving stylesheet' => [
+                'eventListenerMutator' => function () {
+                    $cssTaskSourcePreparer = self::$container->get(CssTaskSourcePreparer::class);
+
+                    $taskSourceRetriever = \Mockery::mock(TaskSourceRetriever::class);
+                    $taskSourceRetriever
+                        ->shouldReceive('retrieve')
+                        ->andReturn(false);
+
+                    ObjectPropertySetter::setProperty(
+                        $cssTaskSourcePreparer,
+                        CssTaskSourcePreparer::class,
+                        'taskSourceRetriever',
+                        $taskSourceRetriever
+                    );
+                },
+                'httpFixtures' => [
+                    new Response(200, ['content-type' => 'text/html']),
+                    new Response(
+                        200,
+                        ['content-type' => 'text/html'],
+                        HtmlDocumentFactory::load('empty-body-single-css-link')
+                    ),
+                ],
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'url' => 'http://example.com/',
+                    'type' => TypeInterface::TYPE_CSS_VALIDATION,
+                ]),
+                'prepareRunCount' => 1,
+                'expectedSources' => [
+                    'http://example.com/' => new Source(
+                        'http://example.com/',
+                        Source::TYPE_CACHED_RESOURCE,
+                        '4c2297fd8f408fa415ebfbc2d991f9ce'
+                    ),
+                ],
+                'expectedSourceContents' => [
+                    'http://example.com/' => HtmlDocumentFactory::load('empty-body-single-css-link'),
                 ],
             ],
         ];
