@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Event\TaskEvent;
+use App\Exception\UnableToRetrieveResourceException;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -27,24 +28,29 @@ class TaskPreparer
         $this->entityManager->flush();
 
         $taskEvent = new TaskEvent($task);
-        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PREPARE, $taskEvent);
 
         $nextEvent = TaskEvent::TYPE_PREPARED;
 
-        if ($task->isIncomplete()) {
-            if (Task::STATE_PREPARED !== $task->getState()) {
-                $nextEvent = TaskEvent::TYPE_CREATED;
-            }
-        } else {
-            if (empty($task->getStartDateTime())) {
+        try {
+            $this->eventDispatcher->dispatch(TaskEvent::TYPE_PREPARE, $taskEvent);
+
+            if ($task->isIncomplete()) {
+                if (Task::STATE_PREPARED !== $task->getState()) {
+                    $nextEvent = TaskEvent::TYPE_CREATED;
+                }
+            } else {
+                if (empty($task->getStartDateTime())) {
+                    /** @noinspection PhpUnhandledExceptionInspection */
+                    $task->setStartDateTime(new \DateTime());
+                }
+
                 /** @noinspection PhpUnhandledExceptionInspection */
-                $task->setStartDateTime(new \DateTime());
+                $task->setEndDateTime(new \DateTime());
+
+                $nextEvent = TaskEvent::TYPE_PERFORMED;
             }
-
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $task->setEndDateTime(new \DateTime());
-
-            $nextEvent = TaskEvent::TYPE_PERFORMED;
+        } catch (UnableToRetrieveResourceException $unableToRetrieveResourceException) {
+            $nextEvent = TaskEvent::TYPE_CREATED;
         }
 
         $this->entityManager->persist($task);
