@@ -253,16 +253,15 @@ services:
 
     webignition\IgnoredUrlVerifier\IgnoredUrlVerifier:
 
-    simplytestable.services.pdoconnection:
-      class: Doctrine\DBAL\Driver\PDOConnection
-      factory: 'Doctrine\DBAL\Connection:getWrappedConnection'
-
-    simplytestable.services.pdostore:
-      class: Symfony\Component\Lock\Store\PdoStore
+    Symfony\Component\Lock\Store\PdoStore:
       arguments:
-        $connOrDsn: '@simplytestable.services.pdoconnection'
+        $connOrDsn: 'mysql:host=%env(LOCK_DATABASE_HOST)%;dbname=%env(LOCK_DATABASE_NAME)%'
+        $options:
+          db_username: '%env(LOCK_DATABASE_USER)%'
+          db_password: '%env(LOCK_DATABASE_PASSWORD)%'
 
     Symfony\Component\Lock\Factory:
       class: Symfony\Component\Lock\Factory
       arguments:
-        $store: '@simplytestable.services.pdostore'
+        $store: '@Symfony\Component\Lock\Store\PdoStore'
+
