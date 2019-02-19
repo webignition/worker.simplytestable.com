@@ -31,7 +31,6 @@ class TaskSourceRetriever
     private $cachedResourceFactory;
     private $lockFactory;
 
-
     public function __construct(
         HttpClientConfigurationService $httpClientConfigurationService,
         HttpHistoryContainer $httpHistoryContainer,
@@ -57,12 +56,12 @@ class TaskSourceRetriever
         Task $task,
         string $url,
         array $sourceContext = []
-    ) {
+    ): bool {
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
         $existingSources = $task->getSources();
         if (array_key_exists($url, $existingSources)) {
-            return;
+            return true;
         }
 
         $source = null;
@@ -71,7 +70,9 @@ class TaskSourceRetriever
         $lockKey = sprintf(self::LOCK_KEY, $requestHash);
 
         $lock = $this->lockFactory->createLock($lockKey);
-        $lock->acquire();
+        if (!$lock->acquire()) {
+            return false;
+        }
 
         try {
             /* @var WebResource $resource */
@@ -128,6 +129,8 @@ class TaskSourceRetriever
         $task->addSource($source);
         $this->entityManager->persist($task);
         $this->entityManager->flush();
+
+        return true;
     }
 
     /**
