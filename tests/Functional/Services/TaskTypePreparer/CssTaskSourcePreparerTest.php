@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services\TaskTypePreparer;
@@ -7,6 +8,7 @@ use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use App\Model\Source;
 use App\Model\Task\Type;
+use App\Model\Task\TypeInterface;
 use App\Services\TaskTypePreparer\CssTaskSourcePreparer;
 use App\Services\TaskTypeService;
 use App\Tests\Factory\HtmlDocumentFactory;
@@ -560,4 +562,22 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
             ],
         ];
     }
+
+//    public function testPrepareCannotAcquireLock()
+//    {
+//
+//
+//        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+//            'type' => TypeInterface::TYPE_CSS_VALIDATION,
+//            'sources' => [
+//                [
+//                    'url' => 'http://example.com/',
+//                    'content' => HtmlDocumentFactory::load('empty-body-single-css-link'),
+//                    'contentType' => new InternetMediaType('text', 'html'),
+//                ],
+//            ],
+//        ]));
+//
+//        $this->preparer->prepare($task);
+//    }
 }
