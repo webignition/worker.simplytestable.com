@@ -252,3 +252,11 @@ services:
       class: webignition\ResourceStorage\ResourceStorage
 
     webignition\IgnoredUrlVerifier\IgnoredUrlVerifier:
+
+    simplytestable.services.pdoconnection:
+      class: Doctrine\DBAL\Driver\PDOConnection
+      factory: 'Doctrine\DBAL\Connection:getWrappedConnection'
+
+    Symfony\Component\Lock\Store\PdoStore:
+      arguments:
+        $connOrDsn: '@simplytestable.services.pdoconnection'
