@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services;
@@ -7,6 +8,9 @@ use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\Type;
+use App\Services\CachedResourceFactory;
+use App\Services\CachedResourceManager;
+use App\Services\RequestIdentifierFactory;
 use App\Services\SourceFactory;
 use App\Services\TaskSourceRetriever;
 use App\Services\TaskTypeService;
@@ -23,6 +27,7 @@ use Symfony\Component\Lock\Factory as LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 use webignition\WebResource\Retriever;
+use webignition\WebResource\WebPage\WebPage;
 
 class TaskSourceRetrieverTest extends AbstractBaseTestCase
 {
@@ -228,7 +233,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         ];
     }
 
-    public function testRetrieveSuccessHasPreExistingCachedResource()
+    public function testRetrieveSuccessHasPreExistingSource()
     {
         $retrieverServiceId = 'app.services.web-resource-retriever.web-page';
 
@@ -264,6 +269,43 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         );
 
         $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+
+        $this->assertEquals(
+            [
+                $url => $expectedSource,
+            ],
+            $task->getSources()
+        );
+    }
+
+    public function testRetrieveSuccessHasPreExistingCachedResource()
+    {
+        $retrieverServiceId = 'app.services.web-resource-retriever.web-page';
+
+        /* @var Retriever $retriever */
+        $retriever = self::$container->get($retrieverServiceId);
+        $requestIdentifierFactory = self::$container->get(RequestIdentifierFactory::class);
+        $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
+        $cachedResourceManager = self::$container->get(CachedResourceManager::class);
+
+        $url = 'http://example.com';
+        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+
+        $this->assertEquals([], $task->getSources());
+
+        $requestIdentifier = $requestIdentifierFactory->createFromTaskResource($task, $url);
+        $requestHash = (string) $requestIdentifier;
+        $resource = WebPage::createFromContent('html content');
+
+        $cachedResource = $cachedResourceFactory->create($requestHash, $url, $resource);
+        $cachedResourceManager->persist($cachedResource);
+
+        $this->assertEquals([$cachedResource], $this->cachedResourceRepository->findAll());
+
+        $retrieveResult = $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+        $this->assertTrue($retrieveResult);
+
+        $expectedSource = $this->sourceFactory->fromCachedResource($cachedResource);
 
         $this->assertEquals(
             [
