@@ -67,63 +67,70 @@ class TaskSourceRetriever
         $source = null;
         $requestIdentifier = $this->requestIdentifierFactory->createFromTaskResource($task, $url);
         $requestHash = (string) $requestIdentifier;
-        $lockKey = sprintf(self::LOCK_KEY, $requestHash);
 
-        $lock = $this->lockFactory->createLock($lockKey);
-        if (!$lock->acquire()) {
-            return false;
-        }
+        $cachedResource = $this->cachedResourceManager->find($requestHash);
 
-        try {
-            /* @var WebResource $resource */
-            $resource = $webResourceRetriever->retrieve(new Request('GET', $url));
-
-            $cachedResource = $this->cachedResourceManager->find($requestHash);
-            if (!$cachedResource) {
-                $cachedResource = $this->cachedResourceFactory->create($requestHash, $url, $resource);
-
-                $this->entityManager->persist($cachedResource);
-                $this->entityManager->flush();
-            }
-
+        if ($cachedResource) {
             $source = $this->sourceFactory->fromCachedResource($cachedResource, $sourceContext);
-        } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
-            $source = $this->sourceFactory->createInvalidSource(
-                $url,
-                sprintf(
-                    Source::MESSAGE_INVALID_CONTENT_TYPE,
-                    (string) $invalidResponseContentTypeException->getContentType()
-                )
-            );
-        } catch (HttpException $httpException) {
-            $source = $this->sourceFactory->createHttpFailedSource($url, $httpException->getCode());
-        } catch (TransportException $transportException) {
-            if (!$transportException->isCurlException() && !$transportException->isTooManyRedirectsException()) {
-                $source = $this->sourceFactory->createUnknownFailedSource($url);
-            } else {
-                if ($transportException->isTooManyRedirectsException()) {
-                    $this->fixHeadRequestMethods();
+        } else {
+            $lockKey = sprintf(self::LOCK_KEY, $requestHash);
 
-                    $source = $this->sourceFactory->createHttpFailedSource(
-                        $url,
-                        301,
-                        [
-                            'too_many_redirects' => true,
-                            'is_redirect_loop' => $this->httpHistoryContainer->hasRedirectLoop(),
-                            'history' => $this->httpHistoryContainer->getRequestUrlsAsStrings(),
-                        ]
-                    );
-                } else {
-                    $source = $this->sourceFactory->createCurlFailedSource($url, $transportException->getCode());
-                }
+            $lock = $this->lockFactory->createLock($lockKey);
+            if (!$lock->acquire()) {
+                return false;
             }
-        } catch (InternetMediaTypeParseException $e) {
-            $source = $this->sourceFactory->createInvalidSource(
-                $url,
-                sprintf(Source::MESSAGE_INVALID_CONTENT_TYPE, $e->getContentTypeString())
-            );
-        } finally {
-            $lock->release();
+
+            try {
+                /* @var WebResource $resource */
+                $resource = $webResourceRetriever->retrieve(new Request('GET', $url));
+
+                $cachedResource = $this->cachedResourceManager->find($requestHash);
+                if (!$cachedResource) {
+                    $cachedResource = $this->cachedResourceFactory->create($requestHash, $url, $resource);
+
+                    $this->entityManager->persist($cachedResource);
+                    $this->entityManager->flush();
+                }
+
+                $source = $this->sourceFactory->fromCachedResource($cachedResource, $sourceContext);
+            } catch (InvalidResponseContentTypeException $invalidResponseContentTypeException) {
+                $source = $this->sourceFactory->createInvalidSource(
+                    $url,
+                    sprintf(
+                        Source::MESSAGE_INVALID_CONTENT_TYPE,
+                        (string) $invalidResponseContentTypeException->getContentType()
+                    )
+                );
+            } catch (HttpException $httpException) {
+                $source = $this->sourceFactory->createHttpFailedSource($url, $httpException->getCode());
+            } catch (TransportException $transportException) {
+                if (!$transportException->isCurlException() && !$transportException->isTooManyRedirectsException()) {
+                    $source = $this->sourceFactory->createUnknownFailedSource($url);
+                } else {
+                    if ($transportException->isTooManyRedirectsException()) {
+                        $this->fixHeadRequestMethods();
+
+                        $source = $this->sourceFactory->createHttpFailedSource(
+                            $url,
+                            301,
+                            [
+                                'too_many_redirects' => true,
+                                'is_redirect_loop' => $this->httpHistoryContainer->hasRedirectLoop(),
+                                'history' => $this->httpHistoryContainer->getRequestUrlsAsStrings(),
+                            ]
+                        );
+                    } else {
+                        $source = $this->sourceFactory->createCurlFailedSource($url, $transportException->getCode());
+                    }
+                }
+            } catch (InternetMediaTypeParseException $e) {
+                $source = $this->sourceFactory->createInvalidSource(
+                    $url,
+                    sprintf(Source::MESSAGE_INVALID_CONTENT_TYPE, $e->getContentTypeString())
+                );
+            } finally {
+                $lock->release();
+            }
         }
 
         $task->addSource($source);
