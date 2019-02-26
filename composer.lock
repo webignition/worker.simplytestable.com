@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bd271a333df1de9558cf00e2822309ef",
+    "content-hash": "7b448719f07e3a58f690c9f43ab5ccc7",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -1758,12 +1758,12 @@
             "version": "v1.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/phlylabs/idna-convert.git",
+                "url": "https://github.com/algo26-matthias/idna-convert.git",
                 "reference": "a6dfb6f87611e3a89d2eec4924a0f51db755c573"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phlylabs/idna-convert/zipball/a6dfb6f87611e3a89d2eec4924a0f51db755c573",
+                "url": "https://api.github.com/repos/algo26-matthias/idna-convert/zipball/a6dfb6f87611e3a89d2eec4924a0f51db755c573",
                 "reference": "a6dfb6f87611e3a89d2eec4924a0f51db755c573",
                 "shasum": ""
             },
@@ -1800,6 +1800,7 @@
                 "idna",
                 "php"
             ],
+            "abandoned": "algo26-matthias/idna-convert",
             "time": "2016-06-19T18:08:43+00:00"
         },
         {
@@ -4198,16 +4199,16 @@
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "5.8.1",
+            "version": "5.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "719d28d0c1489876b48700fdf1a86dc81f1e1061"
+                "reference": "ac5aa4b09439ae39c15650a248fa12c18a14481f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/719d28d0c1489876b48700fdf1a86dc81f1e1061",
-                "reference": "719d28d0c1489876b48700fdf1a86dc81f1e1061",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/ac5aa4b09439ae39c15650a248fa12c18a14481f",
+                "reference": "ac5aa4b09439ae39c15650a248fa12c18a14481f",
                 "shasum": ""
             },
             "require": {
@@ -4246,7 +4247,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2019-02-15T17:59:32+00:00"
+            "time": "2019-02-26T17:06:33+00:00"
         },
         {
             "name": "webignition/disallowed-character-terminated-string",
