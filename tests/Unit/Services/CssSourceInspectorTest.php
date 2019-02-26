@@ -153,6 +153,32 @@ class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
                     'two.css',
                 ],
             ],
+            'invalid css (unexpected end of document); no leading content' => [
+                'css' => implode("\n", [
+                    '@media all and (min-width: 32em) {',
+                    '  html {',
+                    '  }',
+                ]),
+                'expectedImportValues' => [],
+            ],
+            'invalid css (unexpected end of document); leading charset' => [
+                'css' => implode("\n", [
+                    '@charset "utf-8";',
+                    '@media all and (min-width: 32em) {',
+                    '  html {',
+                    '  }',
+                ]),
+                'expectedImportValues' => [],
+            ],
+            'invalid css (unexpected end of document); leading import' => [
+                'css' => implode("\n", [
+                    '@import url("import.css");',
+                    '@media all and (min-width: 32em) {',
+                    '  html {',
+                    '  }',
+                ]),
+                'expectedImportValues' => [],
+            ],
         ];
     }
 

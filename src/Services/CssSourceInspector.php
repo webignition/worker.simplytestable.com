@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Model\CssSourceUrl;
 use Sabberworm\CSS\Parser as CssParser;
+use Sabberworm\CSS\Parsing\SourceException;
 use Sabberworm\CSS\Property\Charset;
 use Sabberworm\CSS\Property\Import;
 use webignition\AbsoluteUrlDeriver\AbsoluteUrlDeriver;
@@ -58,10 +59,15 @@ class CssSourceInspector
             return $importValues;
         }
 
-        $cssParser = new CssParser($css);
+        $cssContents = [];
 
-        $cssDocument = $cssParser->parse();
-        $cssContents = $cssDocument->getContents();
+        try {
+            $cssParser = new CssParser($css);
+            $cssDocument = $cssParser->parse();
+            $cssContents = $cssDocument->getContents();
+        } catch (SourceException $sourceException) {
+            // Unparseable CSS, intentionally do nothing
+        }
 
         $nonImportFound = false;
 
