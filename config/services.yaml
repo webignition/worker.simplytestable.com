@@ -82,6 +82,9 @@ services:
     GuzzleHttp\Cookie\CookieJarInterface:
       class: GuzzleHttp\Cookie\CookieJar
 
+    webignition\Guzzle\Middleware\ResponseLocationUriFixer\Factory:
+      class: webignition\Guzzle\Middleware\ResponseLocationUriFixer\Factory
+
     GuzzleHttp\HandlerStack:
       factory: 'App\Services\HttpHandlerStackFactory:create'
 

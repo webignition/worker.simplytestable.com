@@ -383,6 +383,9 @@
     "webignition/guzzle-request-headers-middleware": {
         "version": "0.1"
     },
+    "webignition/guzzle-response-location-uri-fixer-middleware": {
+        "version": "0.1"
+    },
     "webignition/html-document-link-checker": {
         "version": "3.2"
     },
@@ -430,6 +433,9 @@
     },
     "webignition/string-parser": {
         "version": "0.2.3"
+    },
+    "webignition/unparseable-url-fixer": {
+        "version": "0.1"
     },
     "webignition/uri": {
         "version": "0.3"
