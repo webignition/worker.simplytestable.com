@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b448719f07e3a58f690c9f43ab5ccc7",
+    "content-hash": "116857d30d7701eef77356cdd513aa03",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4436,6 +4436,51 @@
             "time": "2018-05-14T12:05:14+00:00"
         },
         {
+            "name": "webignition/guzzle-response-location-uri-fixer-middleware",
+            "version": "0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/guzzle-response-location-uri-fixer-middleware.git",
+                "reference": "788b066404228e205e25f2b34b7ffb2da29f0c49"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/guzzle-response-location-uri-fixer-middleware/zipball/788b066404228e205e25f2b34b7ffb2da29f0c49",
+                "reference": "788b066404228e205e25f2b34b7ffb2da29f0c49",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6",
+                "php": ">=7.2.0",
+                "psr/http-message": "^1",
+                "webignition/unparseable-url-fixer": ">=0.1,<1"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.11.1",
+                "phpunit/phpunit": "^7",
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\Guzzle\\Middleware\\ResponseLocationUriFixer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Guzzle middleware for fixing response location URIs",
+            "homepage": "https://github.com/webignition/guzzle-response-location-uri-fixer-middleware",
+            "keywords": [
+                "Guzzle",
+                "location",
+                "middleware",
+                "response"
+            ],
+            "time": "2019-02-27T14:04:54+00:00"
+        },
+        {
             "name": "webignition/html-document-link-checker",
             "version": "3.2",
             "source": {
@@ -5206,6 +5251,47 @@
                 "string"
             ],
             "time": "2017-05-11T10:04:12+00:00"
+        },
+        {
+            "name": "webignition/unparseable-url-fixer",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/unparseable-url-fixer.git",
+                "reference": "d24ab06143a5e41cc56e74d30445f31e65df6928"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/unparseable-url-fixer/zipball/d24ab06143a5e41cc56e74d30445f31e65df6928",
+                "reference": "d24ab06143a5e41cc56e74d30445f31e65df6928",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.11.1",
+                "phpunit/phpunit": "^7",
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\UnparseableUrlFixer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Applies some fixes to otherwise-unparseable URLs to make them parseable",
+            "homepage": "https://github.com/webignition/unparseable-url-fixer",
+            "keywords": [
+                "fixer",
+                "parse",
+                "url"
+            ],
+            "time": "2019-02-27T13:02:57+00:00"
         },
         {
             "name": "webignition/uri",
