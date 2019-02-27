@@ -7,8 +7,8 @@ use App\Event\TaskEvent;
 use App\EventListener\TaskPerformedEventListener;
 use App\Resque\Job\TaskReportCompletionJob;
 use App\Services\TaskUnusedCachedResourceRemover;
-use App\Tests\Services\ObjectPropertySetter;
 use App\Services\Resque\QueueService;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 
 class TaskPerformedEventListenerTest extends AbstractTaskEventListenerTest
@@ -25,14 +25,14 @@ class TaskPerformedEventListenerTest extends AbstractTaskEventListenerTest
         $resqueQueueService = \Mockery::spy(QueueService::class);
         $taskUnusedCachedResourceRemover = \Mockery::spy(TaskUnusedCachedResourceRemover::class);
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $taskPerformedEventListener,
             TaskPerformedEventListener::class,
             'resqueQueueService',
             $resqueQueueService
         );
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $taskPerformedEventListener,
             TaskPerformedEventListener::class,
             'taskUnusedCachedResourceRemover',

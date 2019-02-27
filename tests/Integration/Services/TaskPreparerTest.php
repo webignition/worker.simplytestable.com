@@ -14,7 +14,7 @@ use App\Services\TaskTypePreparer\CssTaskSourcePreparer;
 use App\Services\TaskTypePreparer\WebPageTaskSourcePreparer;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Services\HttpMockHandler;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TaskSourceContentsLoader;
 use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -330,7 +330,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
                         ->shouldReceive('retrieve')
                         ->andReturn(false);
 
-                    ObjectPropertySetter::setProperty(
+                    ObjectReflector::setProperty(
                         $webPageTaskSourcePreparer,
                         WebPageTaskSourcePreparer::class,
                         'taskSourceRetriever',
@@ -355,7 +355,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
                         ->shouldReceive('retrieve')
                         ->andReturn(false);
 
-                    ObjectPropertySetter::setProperty(
+                    ObjectReflector::setProperty(
                         $cssTaskSourcePreparer,
                         CssTaskSourcePreparer::class,
                         'taskSourceRetriever',

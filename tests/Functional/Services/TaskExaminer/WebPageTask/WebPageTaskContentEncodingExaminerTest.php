@@ -11,7 +11,7 @@ use App\Services\TaskExaminer\WebPageTask\ContentEncodingExaminer;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\ContentTypeFactory;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use Mockery\MockInterface;
 use webignition\WebResource\WebPage\WebPage;
@@ -288,7 +288,7 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
     private function setExaminerTaskCachedSourceWebPageRetriever(
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever
     ) {
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $this->examiner,
             ContentEncodingExaminer::class,
             'taskCachedSourceWebPageRetriever',

@@ -3,7 +3,7 @@
 namespace App\Tests\Functional\Command\Tasks;
 
 use App\Model\Task\TypeInterface;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use App\Command\Task\PerformCommand as TaskPerformCommand;
 use App\Command\Tasks\PerformCommand;
@@ -58,7 +58,7 @@ class PerformCommandTest extends AbstractBaseTestCase
 
         $command = self::$container->get(PerformCommand::class);
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $command,
             PerformCommand::class,
             'taskPerformCommand',

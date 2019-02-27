@@ -8,7 +8,7 @@ use App\Exception\UnableToRetrieveResourceException;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskPreparer;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use App\Entity\Task\Task;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -70,7 +70,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
                 return true;
             });
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $taskPreparer,
             TaskPreparer::class,
             'eventDispatcher',
@@ -127,7 +127,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
                 return true;
             });
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $taskPreparer,
             TaskPreparer::class,
             'eventDispatcher',
@@ -218,7 +218,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
                 return true;
             });
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $taskPreparer,
             TaskPreparer::class,
             'eventDispatcher',
@@ -252,7 +252,7 @@ class TaskPreparerTest extends AbstractBaseTestCase
             ->shouldReceive('dispatch')
             ->with(TaskEvent::TYPE_CREATED, \Mockery::any());
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $taskPreparer,
             TaskPreparer::class,
             'eventDispatcher',

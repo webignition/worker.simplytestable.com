@@ -6,7 +6,7 @@ use App\Command\Task\ReportCompletionCommand;
 use App\Entity\Task\Task;
 use App\Services\TaskCompletionReporter;
 use App\Tests\Functional\AbstractBaseTestCase;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use Mockery\MockInterface;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -61,7 +61,7 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
             ->once()
             ->andReturn($taskCompletionReporterReturnValue);
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $this->command,
             ReportCompletionCommand::class,
             'taskCompletionReporter',

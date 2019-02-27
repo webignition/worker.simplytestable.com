@@ -10,7 +10,7 @@ use App\Event\TaskReportCompletionSuccessEvent;
 use App\EventListener\TaskReportedCompletionEventListener;
 use App\Model\Task\Type;
 use App\Services\TaskService;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Psr\Log\LoggerInterface;
@@ -64,7 +64,7 @@ class TaskReportedCompletionEventListenerTest extends AbstractTaskEventListenerT
 
         $taskReportedCompletionEventListener = self::$container->get(TaskReportedCompletionEventListener::class);
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $taskReportedCompletionEventListener,
             TaskReportedCompletionEventListener::class,
             'logger',
@@ -87,7 +87,7 @@ class TaskReportedCompletionEventListenerTest extends AbstractTaskEventListenerT
     public function invokeForTaskReportCompletionFailureEventDataProvider(): array
     {
         $task = new Task();
-        ObjectPropertySetter::setProperty($task, Task::class, 'id', self::TASK_ID);
+        ObjectReflector::setProperty($task, Task::class, 'id', self::TASK_ID);
 
         return [
             'http 404' => [

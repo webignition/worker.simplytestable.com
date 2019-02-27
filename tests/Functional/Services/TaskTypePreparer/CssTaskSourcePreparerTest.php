@@ -16,7 +16,7 @@ use App\Services\TaskTypeService;
 use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use webignition\InternetMediaType\InternetMediaType;
@@ -573,7 +573,7 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
             ->shouldReceive('retrieve')
             ->andReturn(false);
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $this->preparer,
             CssTaskSourcePreparer::class,
             'taskSourceRetriever',

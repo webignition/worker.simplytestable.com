@@ -5,7 +5,7 @@ namespace App\Tests\Functional\Command\Task;
 use App\Command\Task\PrepareCommand;
 use App\Entity\Task\Task;
 use App\Services\TaskPreparer;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -50,7 +50,7 @@ class PrepareCommandTest extends AbstractBaseTestCase
             ->once()
             ->with($this->task);
 
-        ObjectPropertySetter::setProperty($this->command, PrepareCommand::class, 'taskPreparer', $taskPreparer);
+        ObjectReflector::setProperty($this->command, PrepareCommand::class, 'taskPreparer', $taskPreparer);
 
         $this->assertEquals(Task::STATE_QUEUED, $this->task->getState());
 

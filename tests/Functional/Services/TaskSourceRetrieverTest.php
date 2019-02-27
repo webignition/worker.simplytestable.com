@@ -17,7 +17,7 @@ use App\Services\TaskTypeService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use App\Tests\UnhandledGuzzleException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -84,7 +84,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             ->shouldReceive('createLock')
             ->andReturn($lock);
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $this->taskSourceRetriever,
             TaskSourceRetriever::class,
             'lockFactory',

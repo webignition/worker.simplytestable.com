@@ -3,7 +3,7 @@
 namespace App\Tests\Functional\Command\Tasks;
 
 use App\Entity\Task\Output;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Command\Task\ReportCompletionCommand as TaskReportCompletionCommand;
@@ -63,7 +63,7 @@ class ReportCompletionCommandTest extends AbstractBaseTestCase
                 return true;
             });
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $command,
             ReportCompletionCommand::class,
             'taskReportCompletionCommand',
