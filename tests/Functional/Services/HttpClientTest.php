@@ -1,9 +1,10 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services;
 
 use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
@@ -15,13 +16,8 @@ use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddlewar
 use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class HttpClientServiceTest extends AbstractBaseTestCase
+class HttpClientTest extends AbstractBaseTestCase
 {
-    /**
-     * @var HttpClientService
-     */
-    private $httpClientService;
-
     /**
      * @var HttpClient
      */
@@ -37,28 +33,20 @@ class HttpClientServiceTest extends AbstractBaseTestCase
      */
     private $httpHistoryContainer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp()
     {
         parent::setUp();
 
-        $this->httpClientService = self::$container->get(HttpClientService::class);
-        $this->httpClient = $this->httpClientService->getHttpClient();
+        $httpClientService = self::$container->get(HttpClientService::class);
+        $this->httpClient = $httpClientService->getHttpClient();
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
 
     /**
      * @dataProvider setHeaderDataProvider
-     *
-     * @param string $name
-     * @param string $value
-     *
-     * @throws GuzzleException
      */
-    public function testSetHeader($name, $value)
+    public function testRequestHeadersMiddlewareSetHeader(string $name, ?string $value)
     {
         $requestHeadersMiddleware = self::$container->get(RequestHeadersMiddleware::class);
 
@@ -76,6 +64,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         $this->httpClient->send($request);
         $this->httpClient->send($request);
 
+        /* @var RequestInterface[] $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
 
         foreach ($historicalRequests as $historicalRequest) {
@@ -83,10 +72,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function setHeaderDataProvider()
+    public function setHeaderDataProvider(): array
     {
         return [
             'empty name, empty value' => [
@@ -104,10 +90,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         ];
     }
 
-    /**
-     * @throws GuzzleException
-     */
-    public function testClearHeader()
+    public function testRequestHeadersMiddlewareClearHeader()
     {
         $requestHeadersMiddleware = self::$container->get(RequestHeadersMiddleware::class);
 
@@ -133,17 +116,11 @@ class HttpClientServiceTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider setBasicHttpAuthorizationDataProvider
-     *
-     * @param RequestInterface $request
-     * @param HttpAuthenticationCredentials $httpAuthenticationCredentials
-     * @param $expectedAuthorizationHeader
-     *
-     * @throws GuzzleException
      */
-    public function testSetBasicHttpAuthorization(
+    public function testHttpAuthenticationMiddleware(
         RequestInterface $request,
         HttpAuthenticationCredentials $httpAuthenticationCredentials,
-        $expectedAuthorizationHeader
+        string $expectedAuthorizationHeader
     ) {
         $httpAuthenticationMiddleware = self::$container->get(HttpAuthenticationMiddleware::class);
 
@@ -159,6 +136,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         $this->httpClient->send($request);
         $this->httpClient->send($request);
 
+        /* @var RequestInterface[] $historicalRequests */
         $historicalRequests = $this->httpHistoryContainer->getRequests();
 
         foreach ($historicalRequests as $historicalRequest) {
@@ -166,10 +144,7 @@ class HttpClientServiceTest extends AbstractBaseTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function setBasicHttpAuthorizationDataProvider()
+    public function setBasicHttpAuthorizationDataProvider(): array
     {
         return [
             'no username' => [
