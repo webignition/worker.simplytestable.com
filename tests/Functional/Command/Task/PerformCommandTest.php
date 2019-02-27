@@ -5,7 +5,7 @@ namespace App\Tests\Functional\Command\Task;
 use App\Entity\Task\Task;
 use App\Resque\Job\TasksRequestJob;
 use App\Services\TaskPerformer;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use App\Command\Task\PerformCommand;
 use App\Services\Resque\QueueService;
@@ -54,7 +54,7 @@ class PerformCommandTest extends AbstractBaseTestCase
             ->once()
             ->with($this->task);
 
-        ObjectPropertySetter::setProperty($this->command, PerformCommand::class, 'taskPerformer', $taskPerformer);
+        ObjectReflector::setProperty($this->command, PerformCommand::class, 'taskPerformer', $taskPerformer);
 
         $returnCode = $this->command->run(
             new ArrayInput([

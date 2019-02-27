@@ -4,7 +4,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Services\ApplicationState;
 use App\Tests\Functional\AbstractBaseTestCase;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 
 class ApplicationStateTest extends AbstractBaseTestCase
 {
@@ -25,7 +25,7 @@ class ApplicationStateTest extends AbstractBaseTestCase
 
     public function testGetWithNoStateFile()
     {
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $this->applicationState,
             ApplicationState::class,
             'state',

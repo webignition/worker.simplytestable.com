@@ -8,7 +8,7 @@ use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\SourceFactory;
 use App\Services\TaskPerformer;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use App\Entity\Task\Task;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -85,7 +85,7 @@ class TaskPerformerTest extends AbstractBaseTestCase
                 return true;
             });
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $this->taskPerformer,
             TaskPerformer::class,
             'eventDispatcher',

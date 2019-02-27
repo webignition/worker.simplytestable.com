@@ -9,7 +9,7 @@ use App\Event\TaskReportCompletionSuccessEvent;
 use App\Model\Task\Type;
 use App\Services\CoreApplicationHttpClient;
 use App\Services\TaskCompletionReporter;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
@@ -64,14 +64,14 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
         $coreApplicationHttpClient = \Mockery::mock(CoreApplicationHttpClient::class);
         $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $this->taskCompletionReporter,
             TaskCompletionReporter::class,
             'coreApplicationHttpClient',
             $coreApplicationHttpClient
         );
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $this->taskCompletionReporter,
             TaskCompletionReporter::class,
             'eventDispatcher',
@@ -212,7 +212,7 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
 
         $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $this->taskCompletionReporter,
             TaskCompletionReporter::class,
             'eventDispatcher',

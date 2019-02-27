@@ -13,7 +13,7 @@ use App\Services\TaskSourceRetriever;
 use App\Services\TaskTypePreparer\WebPageTaskSourcePreparer;
 use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 
 class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
 {
@@ -118,7 +118,7 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
 
     private function setTaskSourceRetrieverOnWebPageTaskSourcePreparer(TaskSourceRetriever $taskSourceRetriever)
     {
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $this->preparer,
             WebPageTaskSourcePreparer::class,
             'taskSourceRetriever',

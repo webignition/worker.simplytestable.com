@@ -2,7 +2,7 @@
 
 namespace App\Tests\Services;
 
-class ObjectPropertySetter
+class ObjectReflector
 {
     /**
      * @param object $object
@@ -23,5 +23,27 @@ class ObjectPropertySetter
             $property->setValue($object, $propertyValue);
         } catch (\ReflectionException $exception) {
         }
+    }
+
+    /**
+     * @param $object
+     * @param string $propertyName
+     *
+     * @return mixed
+     */
+    public static function getProperty($object, string $propertyName)
+    {
+        $value = null;
+
+        try {
+            $reflector = new \ReflectionObject($object);
+            $property = $reflector->getProperty($propertyName);
+            $property->setAccessible(true);
+
+            $value =  $property->getValue($object);
+        } catch (\ReflectionException $exception) {
+        }
+
+        return $value;
     }
 }

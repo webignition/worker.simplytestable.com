@@ -8,7 +8,7 @@ use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
-use App\Tests\Services\ObjectPropertySetter;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\CssValidationTaskTypePerformer;
 use App\Tests\Factory\CssValidatorFixtureFactory;
@@ -79,7 +79,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $cssValidatorWrapper = self::$container->get(CssValidatorWrapper::class);
 
-        ObjectPropertySetter::setProperty(
+        ObjectReflector::setProperty(
             $cssValidatorWrapper,
             CssValidatorWrapper::class,
             'sourceStorage',
