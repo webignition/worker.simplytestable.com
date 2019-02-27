@@ -11,6 +11,7 @@ use Psr\Http\Message\RequestInterface;
 use App\Services\HttpClientService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
+use Psr\Http\Message\ResponseInterface;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
 use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
@@ -193,5 +194,19 @@ class HttpClientTest extends AbstractBaseTestCase
                 'expectedAuthorizationHeader' => 'Basic Zm9vOmJhcg==',
             ],
         ];
+    }
+
+    public function testResponseUriFixerMiddleware()
+    {
+        $this->httpMockHandler->appendFixtures([
+            new Response(302, [
+                'Location' => 'https:///example.com/',
+            ]),
+            new Response(200),
+        ]);
+
+        $response = $this->httpClient->get('http://example.com/');
+
+        $this->assertInstanceOf(ResponseInterface::class, $response);
     }
 }

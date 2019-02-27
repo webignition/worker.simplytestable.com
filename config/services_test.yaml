@@ -17,6 +17,7 @@ services:
       - '@webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware'
       - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'
       - '@webignition\HttpHistoryContainer\Container'
+      - '@webignition\Guzzle\Middleware\ResponseLocationUriFixer\Factory'
       - '@Kevinrob\GuzzleCache\CacheMiddleware'
       - '@App\Tests\Services\HttpMockHandler'
 
