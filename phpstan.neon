@@ -1,3 +1,6 @@
 parameters:
   excludes_analyse:
     - %currentWorkingDirectory%/src/Migrations/*
+
+includes:
+  - vendor/phpstan/phpstan-mockery/extension.neon
