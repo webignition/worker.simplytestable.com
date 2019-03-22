@@ -1,10 +1,9 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace App\Tests\Unit\Services;
 
-use App\Exception\Services\TasksService\RequestException;
 use App\Services\ApplicationConfiguration;
-use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use App\Services\CoreApplicationHttpClient;
 use App\Services\TaskService;
@@ -12,10 +11,6 @@ use App\Services\TasksService;
 
 class TasksServiceTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @throws RequestException
-     * @throws GuzzleException
-     */
     public function testRequestNotWithinThreshold()
     {
         $workerProcessCount = 1;
@@ -34,12 +29,7 @@ class TasksServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($tasksService->request());
     }
 
-    /**
-     * @param array $services
-     *
-     * @return TasksService
-     */
-    private function createTasksService($services = [])
+    private function createTasksService(array $services = []): TasksService
     {
         if (!isset($services[LoggerInterface::class])) {
             $services[LoggerInterface::class] = \Mockery::mock(LoggerInterface::class);
