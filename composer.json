@@ -89,7 +89,8 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "static-analysis": "./vendor/bin/phpstan analyse src tests --level=0",
+        "static-analysis": "./vendor/bin/phpstan analyse src --level=0",
+        "static-analysis-tests-level-2": "./vendor/bin/phpstan analyse tests --level=2",
         "test-unit": "./vendor/bin/phpunit --colors tests/Unit",
         "test-functional": "./vendor/bin/phpunit --colors tests/Functional/",
         "test": [
@@ -99,6 +100,7 @@
         "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php --ignore=src/Migrations src/ tests/",
         "ci": [
             "@composer static-analysis",
+            "@composer static-analysis-tests-level-2",
             "@composer cs",
             "@composer test"
         ]
