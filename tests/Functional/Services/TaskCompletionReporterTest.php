@@ -88,7 +88,6 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
                 array $routeParameters,
                 array $postData
             ) use (
-                $task,
                 $expectedCreatePostRequestRouteParameters,
                 $expectedCreatePostRequestPostData
             ) {
