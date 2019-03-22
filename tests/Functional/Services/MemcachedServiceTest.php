@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Functional\Guzzle;
+namespace App\Tests\Functional\Services;
 
 use Memcached;
 use App\Services\MemcachedService;
