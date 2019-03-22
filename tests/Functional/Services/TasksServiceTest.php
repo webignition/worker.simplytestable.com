@@ -1,8 +1,9 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services;
 
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use App\Exception\Services\TasksService\RequestException;
 use App\Services\TasksService;
@@ -59,15 +60,12 @@ class TasksServiceTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider requestHttpRequestFailureDataProvider
-     *
-     * @param array $httpFixtures
-     * @param string $expectedLogErrorMessage
-     * @param array $expectedException
-     *
-     * @throws GuzzleException
      */
-    public function testRequestHttpRequestFailure(array $httpFixtures, $expectedLogErrorMessage, $expectedException)
-    {
+    public function testRequestHttpRequestFailure(
+        array $httpFixtures,
+        string $expectedLogErrorMessage,
+        array $expectedException
+    ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
         try {
@@ -82,10 +80,7 @@ class TasksServiceTest extends AbstractBaseTestCase
         $this->assertRegExp('/' . preg_quote($expectedLogErrorMessage) .'/', $lastLogLine);
     }
 
-    /**
-     * @return array
-     */
-    public function requestHttpRequestFailureDataProvider()
+    public function requestHttpRequestFailureDataProvider(): array
     {
         $internalServerErrorResponse = new Response(500);
         $curl28ConnectException = ConnectExceptionFactory::create('CURL/28 Operation timed out.');
@@ -103,14 +98,7 @@ class TasksServiceTest extends AbstractBaseTestCase
                 ],
             ],
             'http-500' => [
-                'httpFixtures' => [
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                    $internalServerErrorResponse,
-                ],
+                'httpFixtures' => array_fill(0, 6, $internalServerErrorResponse),
                 'expectedLogErrorMessage' => 'TasksService:request:GuzzleHttp\Exception\ServerException [500]',
                 'expectedException' => [
                     'class' => RequestException::class,
@@ -119,14 +107,7 @@ class TasksServiceTest extends AbstractBaseTestCase
                 ],
             ],
             'curl-28' => [
-                'httpFixtures' => [
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                    $curl28ConnectException,
-                ],
+                'httpFixtures' => array_fill(0, 6, $curl28ConnectException),
                 'expectedLogErrorMessage' => 'TasksService:request:GuzzleHttp\Exception\ConnectException [28]',
                 'expectedException' => [
                     'class' => RequestException::class,
@@ -139,14 +120,8 @@ class TasksServiceTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider requestSuccessDataProvider
-     *
-     * @param int $requestedLimit
-     * @param int $expectedLimit
-     *
-     * @throws GuzzleException
-     * @throws RequestException
      */
-    public function testRequestSuccess($requestedLimit, $expectedLimit)
+    public function testRequestSuccess(?int $requestedLimit, int $expectedLimit)
     {
         $this->httpMockHandler->appendFixtures([
             new Response(200),
@@ -172,10 +147,7 @@ class TasksServiceTest extends AbstractBaseTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function requestSuccessDataProvider()
+    public function requestSuccessDataProvider(): array
     {
         return [
             'null' => [

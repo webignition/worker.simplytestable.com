@@ -26,7 +26,7 @@ class ObjectReflector
     }
 
     /**
-     * @param $object
+     * @param object $object
      * @param string $propertyName
      *
      * @return mixed
