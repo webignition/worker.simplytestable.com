@@ -8,9 +8,10 @@ abstract class Job extends ContainerAwareJob
 {
     abstract protected function getQueueName();
 
-    public function __construct($args = [])
+    public function __construct(array $args = [])
     {
-        $this->args = $args;
+        parent::__construct($args);
+
         $this->setQueue($this->getQueueName());
     }
 
