@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpDocMissingThrowsInspection */
 /** @noinspection PhpDocSignatureInspection */
 /** @noinspection PhpUnhandledExceptionInspection */
 
@@ -10,6 +11,7 @@ use App\Tests\Factory\HtmlDocumentFactory;
 use webignition\CssValidatorWrapper\SourceInspector;
 use webignition\Uri\Uri;
 use webignition\WebResource\WebPage\WebPage;
+use webignition\WebResourceInterfaces\WebResourceInterface;
 
 class CssSourceInspectorTest extends \PHPUnit\Framework\TestCase
 {

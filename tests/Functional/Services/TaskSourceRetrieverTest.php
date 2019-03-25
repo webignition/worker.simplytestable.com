@@ -20,6 +20,7 @@ use App\Tests\Services\HttpMockHandler;
 use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use App\Tests\UnhandledGuzzleException;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use GuzzleHttp\Psr7\Response;
@@ -42,7 +43,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
     private $sourceFactory;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository|ObjectRepository
      */
     private $cachedResourceRepository;
 

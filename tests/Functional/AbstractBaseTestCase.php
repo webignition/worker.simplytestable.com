@@ -3,14 +3,13 @@
 namespace App\Tests\Functional;
 
 use App\Services\ApplicationState;
-use App\Services\WorkerService;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractBaseTestCase extends WebTestCase
 {
     /**
-     * @var Client
+     * @var Client|null
      */
     protected $client;
 
@@ -19,6 +18,8 @@ abstract class AbstractBaseTestCase extends WebTestCase
      */
     protected function setUp()
     {
+        parent::setUp();
+
         $this->client = static::createClient();
 
         self::$container->get(ApplicationState::class)->set(ApplicationState::STATE_ACTIVE);

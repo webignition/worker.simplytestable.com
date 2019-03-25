@@ -4,13 +4,14 @@
 
 namespace App\Tests\Functional\Services;
 
+use App\Tests\Services\ObjectReflector;
 use GuzzleHttp\Psr7\Response;
 use App\Exception\Services\TasksService\RequestException;
 use App\Services\TasksService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Services\HttpMockHandler;
-use App\Tests\Utility\File;
+use Psr\Log\LoggerInterface;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class TasksServiceTest extends AbstractBaseTestCase
@@ -66,6 +67,22 @@ class TasksServiceTest extends AbstractBaseTestCase
         string $expectedLogErrorMessage,
         array $expectedException
     ) {
+        $logger = \Mockery::mock(LoggerInterface::class);
+        $logger
+            ->shouldReceive('error')
+            ->withArgs(function (string $logErrorMessage) use ($expectedLogErrorMessage) {
+                $this->assertEquals($expectedLogErrorMessage, $logErrorMessage);
+
+                return true;
+            });
+
+        ObjectReflector::setProperty(
+            $this->tasksService,
+            TasksService::class,
+            'logger',
+            $logger
+        );
+
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
         try {
@@ -75,9 +92,6 @@ class TasksServiceTest extends AbstractBaseTestCase
             $this->assertEquals($expectedException['message'], $requestException->getMessage());
             $this->assertEquals($expectedException['code'], $requestException->getCode());
         }
-
-        $lastLogLine = File::tail(self::$container->get('kernel')->getLogDir() . '/test.log');
-        $this->assertRegExp('/' . preg_quote($expectedLogErrorMessage) .'/', $lastLogLine);
     }
 
     public function requestHttpRequestFailureDataProvider(): array

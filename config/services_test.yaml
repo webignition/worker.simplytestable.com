@@ -4,12 +4,6 @@ services:
     autoconfigure: true
     public: false
 
-  App\Services\TasksService:
-    class:   App\Tests\Services\TestTasksService
-    calls:
-      - [setWorkerProcessCount, ['%env(WORKER_PROCESS_COUNT)%']]
-      - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
-
   App\Tests\Services\HttpMockHandler:
 
   App\Services\HttpHandlerStackFactory:
