@@ -24,7 +24,7 @@ class RequestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateFromTask()
     {
         $taskUrl = 'http://example.com';
-        $taskParameters = json_encode([
+        $taskParameters = (string) json_encode([
             'foo' => 'bar',
         ]);
 
@@ -44,7 +44,7 @@ class RequestIdentifierFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $taskUrl = 'http://example.com';
         $resourceUrl = 'http://example.com/style.css';
-        $taskParameters = json_encode([
+        $taskParameters = (string) json_encode([
             'foo' => 'bar',
         ]);
 

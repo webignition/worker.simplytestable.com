@@ -116,6 +116,6 @@ class CssValidatorOutputParserFlagsFactoryTest extends \PHPUnit\Framework\TestCa
         Flags::IGNORE_FALSE_IMAGE_DATA_URL_MESSAGES;
         Flags::REPORT_VENDOR_EXTENSION_ISSUES_AS_WARNINGS;
 
-        return Task::create($type, $url, json_encode($parameters));
+        return Task::create($type, $url, (string) json_encode($parameters));
     }
 }

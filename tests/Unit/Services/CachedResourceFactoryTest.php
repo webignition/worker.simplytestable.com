@@ -28,7 +28,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
         $requestIdentifierFactory = new RequestIdentifierFactory();
 
         $url = 'http://example.com';
-        $parameters = json_encode([
+        $parameters = (string) json_encode([
             'foo' => 'bar',
         ]);
 
