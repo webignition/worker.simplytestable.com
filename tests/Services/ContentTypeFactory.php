@@ -16,6 +16,12 @@ class ContentTypeFactory
         $contentTypeParser->setIgnoreInvalidAttributes(true);
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        return $contentTypeParser->parse($contentTypeString);
+        $contentType = $contentTypeParser->parse($contentTypeString);
+
+        if (!$contentType instanceof InternetMediaTypeInterface) {
+            throw new \RuntimeException();
+        }
+
+        return $contentType;
     }
 }
