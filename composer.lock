@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e7034634e3d4e812c2ecf20f71705989",
+    "content-hash": "edff77340d553c144e25bb981052ab6f",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -4339,16 +4339,16 @@
         },
         {
             "name": "webignition/guzzle-http-authentication-middleware",
-            "version": "0.4",
+            "version": "0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/guzzle-http-authentication-middleware.git",
-                "reference": "2f3d4570988b5e4e26f2db99e7f062188d24d727"
+                "reference": "9f91ae580d279d6ab654517f19d158a3bcce8750"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/guzzle-http-authentication-middleware/zipball/2f3d4570988b5e4e26f2db99e7f062188d24d727",
-                "reference": "2f3d4570988b5e4e26f2db99e7f062188d24d727",
+                "url": "https://api.github.com/repos/webignition/guzzle-http-authentication-middleware/zipball/9f91ae580d279d6ab654517f19d158a3bcce8750",
+                "reference": "9f91ae580d279d6ab654517f19d158a3bcce8750",
                 "shasum": ""
             },
             "require": {
@@ -4384,7 +4384,7 @@
                 "middleware",
                 "psr7"
             ],
-            "time": "2018-12-19T09:06:43+00:00"
+            "time": "2019-03-25T16:47:40+00:00"
         },
         {
             "name": "webignition/guzzle-request-headers-middleware",

@@ -178,6 +178,8 @@ services:
           - 'text/css'
         $allowUnknownResourceTypes: false
 
+    webignition\Guzzle\Middleware\HttpAuthentication\HostComparer:
+
     webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
 
     webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware:
