@@ -50,9 +50,12 @@ class CachedResourceManagerTest extends AbstractBaseTestCase
         $cachedResource = $this->cachedResourceManager->find($requestHash);
 
         $this->assertInstanceOf(CachedResource::class, $cachedResource);
-        $this->assertEquals($requestHash, $cachedResource->getRequestHash());
-        $this->assertEquals($url, $cachedResource->getUrl());
-        $this->assertEquals($contentType, $cachedResource->getContentType());
-        $this->assertEquals($body, stream_get_contents($cachedResource->getBody()));
+
+        if ($cachedResource instanceof CachedResource) {
+            $this->assertEquals($requestHash, $cachedResource->getRequestHash());
+            $this->assertEquals($url, $cachedResource->getUrl());
+            $this->assertEquals($contentType, $cachedResource->getContentType());
+            $this->assertEquals($body, stream_get_contents($cachedResource->getBody()));
+        }
     }
 }

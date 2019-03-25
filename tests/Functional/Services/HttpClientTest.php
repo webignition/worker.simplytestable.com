@@ -106,13 +106,17 @@ class HttpClientTest extends AbstractBaseTestCase
         $this->httpClient->send($request);
 
         $lastRequest = $this->httpHistoryContainer->getLastRequest();
-        $this->assertEquals('bar', $lastRequest->getHeaderLine('foo'));
+        if ($lastRequest instanceof RequestInterface) {
+            $this->assertEquals('bar', $lastRequest->getHeaderLine('foo'));
+        }
 
         $requestHeadersMiddleware->setHeader('foo', null);
         $this->httpClient->send($request);
 
         $lastRequest = $this->httpHistoryContainer->getLastRequest();
-        $this->assertArrayNotHasKey('foo', $lastRequest->getHeaders());
+        if ($lastRequest instanceof RequestInterface) {
+            $this->assertArrayNotHasKey('foo', $lastRequest->getHeaders());
+        }
     }
 
     /**

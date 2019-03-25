@@ -138,17 +138,20 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
 
         $taskOutput = $this->task->getOutput();
         $this->assertInstanceOf(Output::class, $taskOutput);
-        $this->assertEquals(1, $taskOutput->getErrorCount());
-        $this->assertEquals(0, $taskOutput->getWarningCount());
-        $this->assertEquals(json_encode([
-            'messages' => [
-                [
-                    'message' => $expectedCharacterSetInOutput,
-                    'messageId' => 'invalid-character-encoding',
-                    'type' => 'error',
+
+        if ($taskOutput instanceof Output) {
+            $this->assertEquals(1, $taskOutput->getErrorCount());
+            $this->assertEquals(0, $taskOutput->getWarningCount());
+            $this->assertEquals(json_encode([
+                'messages' => [
+                    [
+                        'message' => $expectedCharacterSetInOutput,
+                        'messageId' => 'invalid-character-encoding',
+                        'type' => 'error',
+                    ],
                 ],
-            ],
-        ]), $taskOutput->getOutput());
+            ]), $taskOutput->getOutput());
+        }
     }
 
     public function examineSetsTaskAsFailedDataProvider()

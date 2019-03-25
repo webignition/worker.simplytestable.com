@@ -50,9 +50,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testCreate(string $url, string $taskTypeName, string $parameters)
     {
-        $taskTypeService = self::$container->get(TaskTypeService::class);
-
-        $task = $this->taskService->create($url, $taskTypeService->get($taskTypeName), $parameters);
+        $task = $this->taskService->create($url, $this->getTaskType($taskTypeName), $parameters);
 
         $parametersArray = json_decode($parameters, true) ?? [];
 
@@ -99,11 +97,10 @@ class TaskServiceTest extends AbstractBaseTestCase
     public function testCreateUsesExistingMatchingTask()
     {
         $entityManager = self::$container->get(EntityManagerInterface::class);
-        $taskTypeService = self::$container->get(TaskTypeService::class);
 
         $existingTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
-            $taskTypeService->get(TypeInterface::TYPE_HTML_VALIDATION),
+            $this->getTaskType(TypeInterface::TYPE_HTML_VALIDATION),
             ''
         );
 
@@ -112,7 +109,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $newTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
-            $taskTypeService->get(TypeInterface::TYPE_HTML_VALIDATION),
+            $this->getTaskType(TypeInterface::TYPE_HTML_VALIDATION),
             ''
         );
         $this->assertEquals($existingTask->getId(), $newTask->getId());
@@ -121,7 +118,7 @@ class TaskServiceTest extends AbstractBaseTestCase
     public function testGetById()
     {
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
-        $id = $task->getId();
+        $id = (int) $task->getId();
 
         $entityManager = self::$container->get('doctrine.orm.entity_manager');
         $entityManager->detach($task);
@@ -154,5 +151,16 @@ class TaskServiceTest extends AbstractBaseTestCase
     {
         parent::tearDown();
         \Mockery::close();
+    }
+
+    private function getTaskType(string $name): Type
+    {
+        $type = self::$container->get(TaskTypeService::class)->get($name);
+
+        if (!$type instanceof Type) {
+            throw new \RuntimeException();
+        }
+
+        return $type;
     }
 }

@@ -43,16 +43,11 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
 
     public function testRetrievePrimarySourceIsNotCachedResource()
     {
-        $taskTypeService = self::$container->get(TaskTypeService::class);
         $taskUrl = 'http://example.com';
 
         $source = new Source($taskUrl, Source::TYPE_UNAVAILABLE, 'http:404');
 
-        $task = Task::create(
-            $taskTypeService->get(Type::TYPE_HTML_VALIDATION),
-            $taskUrl
-        );
-
+        $task = Task::create($this->getHtmlValidationTaskType(), $taskUrl);
         $task->addSource($source);
 
         $this->assertNull($this->taskCachedSourceWebPageRetriever->retrieve($task));
@@ -60,16 +55,11 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
 
     public function testRetrieveNoPrimaryResource()
     {
-        $taskTypeService = self::$container->get(TaskTypeService::class);
         $taskUrl = 'http://example.com';
 
         $source = new Source('http://example.com/foo', Source::TYPE_CACHED_RESOURCE, 'request-hash');
 
-        $task = Task::create(
-            $taskTypeService->get(Type::TYPE_HTML_VALIDATION),
-            $taskUrl
-        );
-
+        $task = Task::create($this->getHtmlValidationTaskType(), $taskUrl);
         $task->addSource($source);
 
         $this->assertNull($this->taskCachedSourceWebPageRetriever->retrieve($task));
@@ -77,16 +67,11 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
 
     public function testRetrieveInvalidCachedResource()
     {
-        $taskTypeService = self::$container->get(TaskTypeService::class);
         $taskUrl = 'http://example.com';
 
         $source = new Source($taskUrl, Source::TYPE_CACHED_RESOURCE, 'invalid-request-hash');
 
-        $task = Task::create(
-            $taskTypeService->get(Type::TYPE_HTML_VALIDATION),
-            $taskUrl
-        );
-
+        $task = Task::create($this->getHtmlValidationTaskType(), $taskUrl);
         $task->addSource($source);
 
         $this->assertNull($this->taskCachedSourceWebPageRetriever->retrieve($task));
@@ -125,9 +110,12 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 
         $this->assertInstanceOf(WebPage::class, $webPage);
-        $this->assertEquals($taskUrl, (string) $webPage->getUri());
-        $this->assertEquals($webPageContent, $webPage->getContent());
-        $this->assertEquals($contentType, $webPage->getContentType());
+
+        if ($webPage instanceof WebPage) {
+            $this->assertEquals($taskUrl, (string) $webPage->getUri());
+            $this->assertEquals($webPageContent, $webPage->getContent());
+            $this->assertEquals($contentType, $webPage->getContentType());
+        }
     }
 
     public function retrieveValidCachedResourceDataProvider(): array
@@ -142,5 +130,16 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
                 'contentTypeString' => 'text/html; charset=utf-8',
             ],
         ];
+    }
+
+    private function getHtmlValidationTaskType(): Type
+    {
+        $type = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
+
+        if (!$type instanceof Type) {
+            throw new \RuntimeException();
+        }
+
+        return $type;
     }
 }

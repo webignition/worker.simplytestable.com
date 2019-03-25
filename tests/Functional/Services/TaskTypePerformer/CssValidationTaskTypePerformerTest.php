@@ -97,14 +97,17 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
         $output = $task->getOutput();
         $this->assertInstanceOf(Output::class, $output);
-        $this->assertEquals('application/json', $output->getContentType());
-        $this->assertEquals($expectedErrorCount, $output->getErrorCount());
-        $this->assertEquals($expectedWarningCount, $output->getWarningCount());
 
-        $this->assertEquals(
-            $expectedDecodedOutput,
-            json_decode($output->getOutput(), true)
-        );
+        if ($output instanceof Output) {
+            $this->assertEquals('application/json', $output->getContentType());
+            $this->assertEquals($expectedErrorCount, $output->getErrorCount());
+            $this->assertEquals($expectedWarningCount, $output->getWarningCount());
+
+            $this->assertEquals(
+                $expectedDecodedOutput,
+                json_decode((string) $output->getOutput(), true)
+            );
+        }
     }
 
     public function performSuccessDataProvider(): array

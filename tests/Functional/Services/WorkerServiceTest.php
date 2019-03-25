@@ -10,6 +10,7 @@ use App\Services\WorkerService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Services\HttpMockHandler;
+use Psr\Http\Message\RequestInterface;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class WorkerServiceTest extends AbstractBaseTestCase
@@ -71,18 +72,20 @@ class WorkerServiceTest extends AbstractBaseTestCase
         $this->assertEquals($expectedApplicationState, $this->applicationState->get());
 
         $lastRequest = $this->httpHistoryContainer->getLastRequest();
-        $this->assertEquals('application/x-www-form-urlencoded', $lastRequest->getHeaderLine('content-type'));
+        if ($lastRequest instanceof RequestInterface) {
+            $this->assertEquals('application/x-www-form-urlencoded', $lastRequest->getHeaderLine('content-type'));
 
-        $postedData = [];
-        parse_str(urldecode($lastRequest->getBody()->getContents()), $postedData);
+            $postedData = [];
+            parse_str(urldecode($lastRequest->getBody()->getContents()), $postedData);
 
-        $this->assertEquals(
-            [
-                'hostname' => self::$container->getParameter('hostname'),
-                'token' => self::$container->getParameter('token'),
-            ],
-            $postedData
-        );
+            $this->assertEquals(
+                [
+                    'hostname' => self::$container->getParameter('hostname'),
+                    'token' => self::$container->getParameter('token'),
+                ],
+                $postedData
+            );
+        }
     }
 
     public function activateDataProvider(): array

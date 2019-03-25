@@ -331,7 +331,7 @@ class TaskRepositoryTest extends AbstractBaseTestCase
     public function testGetTypeByIdHasMatch(array $taskValues, string $expectedType)
     {
         $task = $this->testTaskFactory->create($taskValues);
-        $type = $this->taskRepository->getTypeById($task->getId());
+        $type = $this->taskRepository->getTypeById((int) $task->getId());
 
         $this->assertEquals($expectedType, $type);
     }
@@ -377,7 +377,7 @@ class TaskRepositoryTest extends AbstractBaseTestCase
         ]);
 
         $task = $this->testTaskFactory->create($taskValues);
-        $isInUse = $this->taskRepository->isSourceValueInUse($task->getId(), $value);
+        $isInUse = $this->taskRepository->isSourceValueInUse((int) $task->getId(), $value);
 
         $this->assertEquals($expectedIsInUse, $isInUse);
     }
@@ -443,7 +443,7 @@ class TaskRepositoryTest extends AbstractBaseTestCase
         $tasks = $this->createTaskCollection($taskValuesCollection);
         $task = $tasks[0];
 
-        $isInUse = $this->taskRepository->isSourceValueInUse($task->getId(), $sourceValue);
+        $isInUse = $this->taskRepository->isSourceValueInUse((int) $task->getId(), $sourceValue);
 
         $this->assertEquals($expectedIsInUse, $isInUse);
     }
@@ -494,7 +494,7 @@ class TaskRepositoryTest extends AbstractBaseTestCase
 
         foreach ($tasks as $taskIndex => $task) {
             if (in_array($taskIndex, $expectedTaskIndices)) {
-                $expectedTaskIds[] = $task->getId();
+                $expectedTaskIds[] = (int) $task->getId();
             }
         }
 

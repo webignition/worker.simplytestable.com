@@ -11,6 +11,7 @@ use App\Services\TasksService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Services\HttpMockHandler;
+use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
@@ -146,19 +147,21 @@ class TasksServiceTest extends AbstractBaseTestCase
         );
 
         $lastRequest = $this->httpHistoryContainer->getLastRequest();
-        $this->assertEquals('application/x-www-form-urlencoded', $lastRequest->getHeaderLine('content-type'));
+        if ($lastRequest instanceof RequestInterface) {
+            $this->assertEquals('application/x-www-form-urlencoded', $lastRequest->getHeaderLine('content-type'));
 
-        $postedData = [];
-        parse_str(urldecode($lastRequest->getBody()->getContents()), $postedData);
+            $postedData = [];
+            parse_str(urldecode($lastRequest->getBody()->getContents()), $postedData);
 
-        $this->assertEquals(
-            [
-                'worker_hostname' => self::$container->getParameter('hostname'),
-                'worker_token' => self::$container->getParameter('token'),
-                'limit' => $expectedLimit,
-            ],
-            $postedData
-        );
+            $this->assertEquals(
+                [
+                    'worker_hostname' => self::$container->getParameter('hostname'),
+                    'worker_token' => self::$container->getParameter('token'),
+                    'limit' => $expectedLimit,
+                ],
+                $postedData
+            );
+        }
     }
 
     public function requestSuccessDataProvider(): array

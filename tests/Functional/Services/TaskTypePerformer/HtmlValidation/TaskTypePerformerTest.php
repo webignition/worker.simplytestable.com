@@ -42,13 +42,16 @@ class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 
         $output = $task->getOutput();
         $this->assertInstanceOf(Output::class, $output);
-        $this->assertEquals('application/json', $output->getContentType());
-        $this->assertEquals(1, $output->getErrorCount());
 
-        $outputContent = json_decode($output->getOutput(), true);
-        $outputMessage = $outputContent['messages'][0];
+        if ($output instanceof Output) {
+            $this->assertEquals('application/json', $output->getContentType());
+            $this->assertEquals(1, $output->getErrorCount());
 
-        $this->assertEquals($expectedOutputMessage, $outputMessage);
+            $outputContent = json_decode((string) $output->getOutput(), true);
+            $outputMessage = $outputContent['messages'][0];
+
+            $this->assertEquals($expectedOutputMessage, $outputMessage);
+        }
     }
 
     public function badDocumentTypeDataProvider(): array
@@ -135,13 +138,16 @@ class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
         $output = $task->getOutput();
 
         $this->assertInstanceOf(Output::class, $output);
-        $this->assertEquals('application/json', $output->getContentType());
-        $this->assertEquals($expectedErrorCount, $output->getErrorCount());
 
-        $this->assertEquals(
-            $expectedDecodedOutput,
-            json_decode($output->getOutput(), true)
-        );
+        if ($output instanceof Output) {
+            $this->assertEquals('application/json', $output->getContentType());
+            $this->assertEquals($expectedErrorCount, $output->getErrorCount());
+
+            $this->assertEquals(
+                $expectedDecodedOutput,
+                json_decode((string) $output->getOutput(), true)
+            );
+        }
     }
 
     public function performSuccessDataProvider(): array

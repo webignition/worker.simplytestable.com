@@ -63,8 +63,7 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
      */
     public function testPrepareWrongTaskType(string $taskType)
     {
-        $taskTypeService = self::$container->get(TaskTypeService::class);
-        $task = Task::create($taskTypeService->get($taskType), 'http://example.com/');
+        $task = Task::create($this->getTaskType($taskType), 'http://example.com/');
 
         $this->assertNull($this->preparer->prepare($task));
     }
@@ -74,8 +73,7 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
      */
     public function testInvokeWrongTaskType(string $taskType)
     {
-        $taskTypeService = self::$container->get(TaskTypeService::class);
-        $task = Task::create($taskTypeService->get($taskType), 'http://example.com/');
+        $task = Task::create($this->getTaskType($taskType), 'http://example.com/');
 
         $taskEvent = new TaskEvent($task);
 
@@ -601,5 +599,16 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
         parent::tearDown();
 
         \Mockery::close();
+    }
+
+    private function getTaskType(string $name): Type
+    {
+        $type = self::$container->get(TaskTypeService::class)->get($name);
+
+        if (!$type instanceof Type) {
+            throw new \RuntimeException();
+        }
+
+        return $type;
     }
 }
