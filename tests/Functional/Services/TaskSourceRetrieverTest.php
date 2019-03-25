@@ -105,7 +105,6 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
      * @dataProvider retrieveInvalidContentTypeDataProvider
      */
     public function testRetrieveInvalidContentType(
-        string $retrieverServiceId,
         string $contentType,
         Source $expectedSource
     ) {
@@ -114,7 +113,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         ]);
 
         /* @var Retriever $retriever */
-        $retriever = self::$container->get($retrieverServiceId);
+        $retriever = self::$container->get('app.services.web-resource-retriever.web-page');
 
         $url = 'http://example.com';
         $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
@@ -136,7 +135,6 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
     {
         return [
             'disallowed content type' => [
-                'retrieverServiceId' => 'app.services.web-resource-retriever.web-page',
                 'contentType' => 'text/plain',
                 'expectedSource' => new Source(
                     'http://example.com',
@@ -145,7 +143,6 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
                 )
             ],
             'unparseable content type' => [
-                'retrieverServiceId' => 'app.services.web-resource-retriever.web-page',
                 'contentType' => 'f o o',
                 'expectedSource' => new Source(
                     'http://example.com',
@@ -157,10 +154,71 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
     }
 
     /**
-     * @dataProvider retrieverSuccessNoPreExistingCachedResourceDataProvider
+     * @dataProvider retrieverSuccessNoPreExistingCachedResourceForWebPageRetrieverDataProvider
      */
-    public function testRetrieveSuccessNoPreExistingCachedResource(
-        string $retrieverServiceId,
+    public function testRetrieveSuccessNoPreExistingCachedResourceForWebPageRetriever(
+        string $contentType,
+        array $sourceContext = []
+    ) {
+        $this->assertRetrieveSuccessNoPreExistingCachedResource(
+            self::$container->get('app.services.web-resource-retriever.web-page'),
+            $contentType,
+            $sourceContext
+        );
+    }
+
+    public function retrieverSuccessNoPreExistingCachedResourceForWebPageRetrieverDataProvider(): array
+    {
+        return [
+            'text/html' => [
+                'contentType' => 'text/html',
+            ],
+            'text/html; charset=utf-8' => [
+                'contentType' => 'text/html; charset=utf-8',
+            ],
+            'text/html; charset=windows-1251' => [
+                'contentType' => 'text/html; charset=windows-1251',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider retrieverSuccessNoPreExistingCachedResourceForCssRetrieverDataProvider
+     */
+    public function testRetrieveSuccessNoPreExistingCachedResourceForCssRetriever(
+        string $contentType,
+        array $sourceContext = []
+    ) {
+        $this->assertRetrieveSuccessNoPreExistingCachedResource(
+            self::$container->get('app.services.web-resource-retriever.css'),
+            $contentType,
+            $sourceContext
+        );
+    }
+
+    public function retrieverSuccessNoPreExistingCachedResourceForCssRetrieverDataProvider(): array
+    {
+        return [
+            'text/css, no context' => [
+                'contentType' => 'text/css',
+            ],
+            'text/css, resource context' => [
+                'contentType' => 'text/css',
+                'sourceContext' => [
+                    'origin' => 'resource',
+                ],
+            ],
+            'text/css, import context' => [
+                'contentType' => 'text/css',
+                'sourceContext' => [
+                    'origin' => 'import',
+                ],
+            ],
+        ];
+    }
+
+    public function assertRetrieveSuccessNoPreExistingCachedResource(
+        Retriever $retriever,
         string $contentType,
         array $sourceContext = []
     ) {
@@ -168,9 +226,6 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             new Response(200, ['content-type' => $contentType]),
             new Response(200, ['content-type' => $contentType], 'html content'),
         ]);
-
-        /* @var Retriever $retriever */
-        $retriever = self::$container->get($retrieverServiceId);
 
         $url = 'http://example.com';
         $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
@@ -186,52 +241,18 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             'url' => $url,
         ]);
 
-        $this->assertEquals($contentType, (string) $cachedResource->getContentType());
+        if ($cachedResource instanceof CachedResource) {
+            $this->assertEquals($contentType, (string) $cachedResource->getContentType());
 
-        $expectedSource = $this->sourceFactory->fromCachedResource($cachedResource, $sourceContext);
+            $expectedSource = $this->sourceFactory->fromCachedResource($cachedResource, $sourceContext);
 
-        $this->assertEquals(
-            [
-                $url => $expectedSource,
-            ],
-            $task->getSources()
-        );
-    }
-
-    public function retrieverSuccessNoPreExistingCachedResourceDataProvider(): array
-    {
-        return [
-            'text/html' => [
-                'retrieverServiceId' => 'app.services.web-resource-retriever.web-page',
-                'contentType' => 'text/html',
-            ],
-            'text/html; charset=utf-8' => [
-                'retrieverServiceId' => 'app.services.web-resource-retriever.web-page',
-                'contentType' => 'text/html; charset=utf-8',
-            ],
-            'text/html; charset=windows-1251' => [
-                'retrieverServiceId' => 'app.services.web-resource-retriever.web-page',
-                'contentType' => 'text/html; charset=windows-1251',
-            ],
-            'text/css, no context' => [
-                'retrieverServiceId' => 'app.services.web-resource-retriever.css',
-                'contentType' => 'text/css',
-            ],
-            'text/css, resource context' => [
-                'retrieverServiceId' => 'app.services.web-resource-retriever.css',
-                'contentType' => 'text/css',
-                'sourceContext' => [
-                    'origin' => 'resource',
+            $this->assertEquals(
+                [
+                    $url => $expectedSource,
                 ],
-            ],
-            'text/css, import context' => [
-                'retrieverServiceId' => 'app.services.web-resource-retriever.css',
-                'contentType' => 'text/css',
-                'sourceContext' => [
-                    'origin' => 'import',
-                ],
-            ],
-        ];
+                $task->getSources()
+            );
+        }
     }
 
     public function testRetrieveSuccessHasPreExistingSource()
@@ -260,23 +281,25 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             'url' => $url,
         ]);
 
-        $expectedSource = $this->sourceFactory->fromCachedResource($cachedResource);
+        if ($cachedResource instanceof CachedResource) {
+            $expectedSource = $this->sourceFactory->fromCachedResource($cachedResource);
 
-        $this->assertEquals(
-            [
-                $url => $expectedSource,
-            ],
-            $task->getSources()
-        );
+            $this->assertEquals(
+                [
+                    $url => $expectedSource,
+                ],
+                $task->getSources()
+            );
 
-        $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
+            $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
 
-        $this->assertEquals(
-            [
-                $url => $expectedSource,
-            ],
-            $task->getSources()
-        );
+            $this->assertEquals(
+                [
+                    $url => $expectedSource,
+                ],
+                $task->getSources()
+            );
+        }
     }
 
     public function testRetrieveSuccessHasPreExistingCachedResource()
