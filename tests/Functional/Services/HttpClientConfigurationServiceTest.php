@@ -10,6 +10,7 @@ use Mockery\Mock;
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
 use App\Tests\Functional\AbstractBaseTestCase;
+use webignition\Guzzle\Middleware\HttpAuthentication\AuthorizationType;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
 use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
 
@@ -159,6 +160,11 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
 
         /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
         $httpAuthenticationMiddleware = \Mockery::mock(HttpAuthenticationMiddleware::class);
+
+        $httpAuthenticationMiddleware
+            ->shouldReceive('setType')
+            ->with(AuthorizationType::BASIC);
+
         $httpAuthenticationMiddleware
             ->shouldReceive('setHost')
             ->with($expectedHost);
