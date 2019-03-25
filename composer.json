@@ -51,6 +51,7 @@
         "webignition/web-resource-retriever": ">=1,<2"
     },
     "require-dev": {
+        "dama/doctrine-test-bundle": "^5.0",
         "mockery/mockery": "^1",
         "php-mock/php-mock-mockery": "^1",
         "phpstan/phpstan": "^0.11.4",

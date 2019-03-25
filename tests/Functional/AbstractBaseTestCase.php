@@ -23,7 +23,6 @@ abstract class AbstractBaseTestCase extends WebTestCase
         $this->client = static::createClient();
 
         self::$container->get(ApplicationState::class)->set(ApplicationState::STATE_ACTIVE);
-        self::$container->get('doctrine')->getConnection()->beginTransaction();
     }
 
     protected function clearRedis()
@@ -45,8 +44,6 @@ abstract class AbstractBaseTestCase extends WebTestCase
      */
     protected function tearDown()
     {
-        self::$container->get('doctrine')->getConnection()->close();
-
         \Mockery::close();
 
         $this->client = null;
