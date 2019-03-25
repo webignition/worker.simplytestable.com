@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Command\Maintenance;
 
 use App\Command\Maintenance\RequeueInProgressTasksCommand;
 use App\Entity\Task\Task;
+use App\Repository\TaskRepository;
 use App\Tests\Services\TestTaskFactory;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -30,9 +31,8 @@ class RequeueInProgressTasksCommandTest extends AbstractBaseTestCase
     ) {
         $this->clearRedis();
 
-        $entityManager = self::$container->get('doctrine.orm.entity_manager');
         $testTaskFactory = self::$container->get(TestTaskFactory::class);
-        $taskRepository = $entityManager->getRepository(Task::class);
+        $taskRepository = self::$container->get(TaskRepository::class);
 
         /* @var Task[] $tasks */
         $tasks = [];
