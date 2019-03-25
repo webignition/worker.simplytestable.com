@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services;
 
@@ -9,7 +10,7 @@ use Mockery\Mock;
 use App\Entity\Task\Task;
 use App\Services\HttpClientConfigurationService;
 use App\Tests\Functional\AbstractBaseTestCase;
-use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
+use webignition\Guzzle\Middleware\HttpAuthentication\AuthorizationType;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
 use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
 
@@ -62,9 +63,6 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider configureForTaskHasCookiesDataProvider
-     *
-     * @param array $taskParameters
-     * @param array $expectedCookieStrings
      */
     public function testConfigureForTaskHasCookies(array $taskParameters, array $expectedCookieStrings)
     {
@@ -107,10 +105,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
         $httpClientConfigurationService->configureForTask($task, $userAgentString);
     }
 
-    /**
-     * @return array
-     */
-    public function configureForTaskHasCookiesDataProvider()
+    public function configureForTaskHasCookiesDataProvider(): array
     {
         return [
             'single cookie' => [
@@ -152,13 +147,11 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider configureForTaskHasHttpAuthenticationCredentialsDataProvider
-     *
-     * @param array $taskParameters
-     * @param array $expectedHttpAuthenticationCredentials
      */
     public function testConfigureForTaskHasHttpAuthenticationCredentials(
         array $taskParameters,
-        array $expectedHttpAuthenticationCredentials
+        string $expectedHost,
+        string $expectedCredentials
     ) {
         $taskType = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
 
@@ -167,29 +160,18 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
 
         /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
         $httpAuthenticationMiddleware = \Mockery::mock(HttpAuthenticationMiddleware::class);
+
         $httpAuthenticationMiddleware
-            ->shouldReceive('setHttpAuthenticationCredentials')
-            ->once()
-            ->withArgs(function (
-                HttpAuthenticationCredentials $httpAuthenticationCredentials
-            ) use ($expectedHttpAuthenticationCredentials) {
-                $this->assertEquals(
-                    $expectedHttpAuthenticationCredentials['username'],
-                    $httpAuthenticationCredentials->getUsername()
-                );
+            ->shouldReceive('setType')
+            ->with(AuthorizationType::BASIC);
 
-                $this->assertEquals(
-                    $expectedHttpAuthenticationCredentials['password'],
-                    $httpAuthenticationCredentials->getPassword()
-                );
+        $httpAuthenticationMiddleware
+            ->shouldReceive('setHost')
+            ->with($expectedHost);
 
-                $this->assertEquals(
-                    $expectedHttpAuthenticationCredentials['domain'],
-                    $httpAuthenticationCredentials->getDomain()
-                );
-
-                return true;
-            });
+        $httpAuthenticationMiddleware
+            ->shouldReceive('setCredentials')
+            ->with($expectedCredentials);
 
         /* @var RequestHeadersMiddleware|Mock $requestHeadersMiddleware */
         $requestHeadersMiddleware = \Mockery::mock(RequestHeadersMiddleware::class);
@@ -216,32 +198,23 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
         $this->addToAssertionCount(\Mockery::getContainer()->mockery_getExpectationCount());
     }
 
-    /**
-     * @return array
-     */
-    public function configureForTaskHasHttpAuthenticationCredentialsDataProvider()
+    public function configureForTaskHasHttpAuthenticationCredentialsDataProvider(): array
     {
         return [
             'has username, no password' => [
                 'taskParameters' => [
                     'http-auth-username' => 'username value',
                 ],
-                'expectedHttpAuthenticationCredentials' => [
-                    'username' => 'username value',
-                    'password' => '',
-                    'domain' => 'example.com',
-                ],
+                'expectedHost' => 'example.com',
+                'expectedCredentials' => 'dXNlcm5hbWUgdmFsdWU6'
             ],
             'has username, has password' => [
                 'taskParameters' => [
                     'http-auth-username' => 'username value',
                     'http-auth-password' => 'password value',
                 ],
-                'expectedHttpAuthenticationCredentials' => [
-                    'username' => 'username value',
-                    'password' => 'password value',
-                    'domain' => 'example.com',
-                ],
+                'expectedHost' => 'example.com',
+                'expectedCredentials' => 'dXNlcm5hbWUgdmFsdWU6cGFzc3dvcmQgdmFsdWU='
             ],
         ];
     }

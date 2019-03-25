@@ -4,24 +4,16 @@ namespace App\Services;
 
 use GuzzleHttp\Cookie\CookieJarInterface;
 use App\Entity\Task\Task;
+use webignition\Guzzle\Middleware\HttpAuthentication\AuthorizationType;
+use webignition\Guzzle\Middleware\HttpAuthentication\CredentialsFactory;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
 use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
+use webignition\Uri\Uri;
 
 class HttpClientConfigurationService
 {
-    /**
-     * @var HttpAuthenticationMiddleware
-     */
     private $httpAuthenticationMiddleware;
-
-    /**
-     * @var RequestHeadersMiddleware
-     */
     private $requestHeadersMiddleware;
-
-    /**
-     * @var CookieJarInterface
-     */
     private $cookieJar;
 
     /**
@@ -56,9 +48,18 @@ class HttpClientConfigurationService
             }
         }
 
-        $httpAuthenticationCredentials = $parametersObject->getHttpAuthenticationCredentials();
-        if (!$httpAuthenticationCredentials->isEmpty()) {
-            $this->httpAuthenticationMiddleware->setHttpAuthenticationCredentials($httpAuthenticationCredentials);
+        $httpAuthenticationUsername = $parametersObject->getHttpAuthenticationUsername();
+        if (!empty($httpAuthenticationUsername)) {
+            $taskUri = new Uri($task->getUrl());
+
+            $this->httpAuthenticationMiddleware->setType(AuthorizationType::BASIC);
+            $this->httpAuthenticationMiddleware->setHost($taskUri->getHost());
+            $this->httpAuthenticationMiddleware->setCredentials(
+                CredentialsFactory::createBasicCredentials(
+                    $httpAuthenticationUsername,
+                    $parametersObject->getHttpAuthenticationPassword()
+                )
+            );
         }
 
         $this->requestHeadersMiddleware->setHeader('User-Agent', $userAgentString);

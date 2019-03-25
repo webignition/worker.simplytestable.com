@@ -1,17 +1,14 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Unit\Model\Task;
 
 use App\Model\Task\Parameters;
-use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
 
 class ParametersTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getCookiesDataProvider
-     *
-     * @param array $taskParametersArray
-     * @param array $expectedCookieStrings
      */
     public function testGetCookies(array $taskParametersArray, array $expectedCookieStrings)
     {
@@ -26,10 +23,7 @@ class ParametersTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getCookiesDataProvider()
+    public function getCookiesDataProvider(): array
     {
         return [
             'no parameters' => [
@@ -107,110 +101,47 @@ class ParametersTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getHttpAuthenticationCredentialsDataProvider
-     *
-     * @param string $taskUrl
-     * @param array $taskParametersArray
-     * @param array $expectedHttpAuthenticationCredentialsValues
      */
     public function testGetHttpAuthenticationCredentials(
-        $taskUrl,
         array $taskParametersArray,
-        array $expectedHttpAuthenticationCredentialsValues
+        string $expectedHttpAuthenticationUsername,
+        string $expectedHttpAuthenticationPassword
     ) {
-        $parametersObject = new Parameters($taskParametersArray, $taskUrl);
+        $parametersObject = new Parameters($taskParametersArray, 'http://example.com/');
 
-        $httpAuthenticationCredentials = $parametersObject->getHttpAuthenticationCredentials();
-
-        $this->assertInstanceOf(HttpAuthenticationCredentials::class, $httpAuthenticationCredentials);
-
-        $this->assertEquals(
-            $expectedHttpAuthenticationCredentialsValues['username'],
-            $httpAuthenticationCredentials->getUsername()
-        );
-
-        $this->assertEquals(
-            $expectedHttpAuthenticationCredentialsValues['password'],
-            $httpAuthenticationCredentials->getPassword()
-        );
-
-        $this->assertEquals(
-            $expectedHttpAuthenticationCredentialsValues['domain'],
-            $httpAuthenticationCredentials->getDomain()
-        );
+        $this->assertEquals($expectedHttpAuthenticationUsername, $parametersObject->getHttpAuthenticationUsername());
+        $this->assertEquals($expectedHttpAuthenticationPassword, $parametersObject->getHttpAuthenticationPassword());
     }
 
-    /**
-     * @return array
-     */
-    public function getHttpAuthenticationCredentialsDataProvider()
+    public function getHttpAuthenticationCredentialsDataProvider(): array
     {
         return [
             'no parameters' => [
-                'taskUrl' => 'http://example.com/',
                 'taskParametersArray' => [],
-                'expectedHttpAuthenticationCredentialsValues' => [
-                    'username' => '',
-                    'password' => '',
-                    'domain' => '',
-                ],
+                'expectedHttpAuthenticationUsername' => '',
+                'expectedHttpAuthenticationPassword' => '',
             ],
             'http auth parameters; no username, has password' => [
-                'taskUrl' => 'http://example.com/',
                 'taskParametersArray' => [
                     'http-auth-password' => 'password value',
                 ],
-                'expectedHttpAuthenticationCredentialsValues' => [
-                    'username' => '',
-                    'password' => '',
-                    'domain' => '',
-                ],
+                'expectedHttpAuthenticationUsername' => '',
+                'expectedHttpAuthenticationPassword' => 'password value',
             ],
             'http auth parameters; has username, no password' => [
-                'taskUrl' => 'http://example.com/',
                 'taskParametersArray' => [
                     'http-auth-username' => 'username value',
                 ],
-                'expectedHttpAuthenticationCredentialsValues' => [
-                    'username' => 'username value',
-                    'password' => '',
-                    'domain' => 'example.com',
-                ],
+                'expectedHttpAuthenticationUsername' => 'username value',
+                'expectedHttpAuthenticationPassword' => '',
             ],
             'http auth parameters; has username, has password' => [
-                'taskUrl' => 'http://example.com/',
                 'taskParametersArray' => [
                     'http-auth-username' => 'username value',
                     'http-auth-password' => 'password value',
                 ],
-                'expectedHttpAuthenticationCredentialsValues' => [
-                    'username' => 'username value',
-                    'password' => 'password value',
-                    'domain' => 'example.com',
-                ],
-            ],
-            'http auth parameters; different domain' => [
-                'taskUrl' => 'http://example.org/',
-                'taskParametersArray' => [
-                    'http-auth-username' => 'username value',
-                    'http-auth-password' => 'password value',
-                ],
-                'expectedHttpAuthenticationCredentialsValues' => [
-                    'username' => 'username value',
-                    'password' => 'password value',
-                    'domain' => 'example.org',
-                ],
-            ],
-            'http auth parameters; different domain, subdomain' => [
-                'taskUrl' => 'http://foo.example.org/',
-                'taskParametersArray' => [
-                    'http-auth-username' => 'username value',
-                    'http-auth-password' => 'password value',
-                ],
-                'expectedHttpAuthenticationCredentialsValues' => [
-                    'username' => 'username value',
-                    'password' => 'password value',
-                    'domain' => 'foo.example.org',
-                ],
+                'expectedHttpAuthenticationUsername' => 'username value',
+                'expectedHttpAuthenticationPassword' => 'password value',
             ],
         ];
     }

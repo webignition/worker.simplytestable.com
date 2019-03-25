@@ -29,7 +29,7 @@
         "webignition/absolute-url-deriver": ">=3,<4",
         "webignition/css-validator-wrapper": ">=5.9,<6",
         "webignition/guzzle-curl-exception": ">=1,<2",
-        "webignition/guzzle-http-authentication-middleware": "0.2",
+        "webignition/guzzle-http-authentication-middleware": "0.5",
         "webignition/guzzle-request-headers-middleware": ">=0.1,<1",
         "webignition/guzzle-response-location-uri-fixer-middleware": ">=0.2,<1",
         "webignition/html-document-link-checker": ">=3.2,<4",

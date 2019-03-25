@@ -12,7 +12,7 @@ use App\Services\HttpClientService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
 use Psr\Http\Message\ResponseInterface;
-use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationCredentials;
+use webignition\Guzzle\Middleware\HttpAuthentication\AuthorizationType;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
 use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
@@ -120,9 +120,11 @@ class HttpClientTest extends AbstractBaseTestCase
      */
     public function testHttpAuthenticationMiddleware(
         RequestInterface $request,
-        HttpAuthenticationCredentials $httpAuthenticationCredentials,
+        string $host,
+        string $credentials,
         string $expectedAuthorizationHeader
     ) {
+        /* @var HttpAuthenticationMiddleware $httpAuthenticationMiddleware */
         $httpAuthenticationMiddleware = self::$container->get(HttpAuthenticationMiddleware::class);
 
         $this->httpMockHandler->appendFixtures([
@@ -131,7 +133,9 @@ class HttpClientTest extends AbstractBaseTestCase
             new Response(),
         ]);
 
-        $httpAuthenticationMiddleware->setHttpAuthenticationCredentials($httpAuthenticationCredentials);
+        $httpAuthenticationMiddleware->setType(AuthorizationType::BASIC);
+        $httpAuthenticationMiddleware->setHost($host);
+        $httpAuthenticationMiddleware->setCredentials($credentials);
 
         $this->httpClient->send($request);
         $this->httpClient->send($request);
@@ -148,50 +152,29 @@ class HttpClientTest extends AbstractBaseTestCase
     public function setBasicHttpAuthorizationDataProvider(): array
     {
         return [
-            'no username' => [
+            'empty credentials' => [
                 'request' => new Request('GET', 'http://example.com'),
-                'httpAuthenticationCredentials' => new HttpAuthenticationCredentials(
-                    null,
-                    null,
-                    'example.com'
-                ),
+                'host' => 'example.com',
+                'credentials' => '',
                 'expectedAuthorizationHeader' => '',
             ],
-            'has username, no password' => [
+            'non-empty credentials; host exactly matches domain' => [
                 'request' => new Request('GET', 'http://example.com'),
-                'httpAuthenticationCredentials' => new HttpAuthenticationCredentials(
-                    'foo',
-                    null,
-                    'example.com'
-                ),
+                'host' => 'example.com',
+                'credentials' => 'Zm9vOg==',
                 'expectedAuthorizationHeader' => 'Basic Zm9vOg==',
             ],
-            'host exactly matches domain' => [
+            'non-empty credentials; host exactly matches domain, domain is uppercase' => [
                 'request' => new Request('GET', 'http://example.com'),
-                'httpAuthenticationCredentials' => new HttpAuthenticationCredentials(
-                    'foo',
-                    'bar',
-                    'example.com'
-                ),
-                'expectedAuthorizationHeader' => 'Basic Zm9vOmJhcg==',
-            ],
-            'host exactly matches domain; given domain is uppercase' => [
-                'request' => new Request('GET', 'http://example.com'),
-                'httpAuthenticationCredentials' => new HttpAuthenticationCredentials(
-                    'foo',
-                    'bar',
-                    'EXAMPLE.com'
-                ),
-                'expectedAuthorizationHeader' => 'Basic Zm9vOmJhcg==',
+                'host' => 'EXAMPLE.com',
+                'credentials' => 'Zm9vOg==',
+                'expectedAuthorizationHeader' => 'Basic Zm9vOg==',
             ],
             'host ends with domain' => [
-                'request' => new Request('GET', 'http://www.example.com'),
-                'httpAuthenticationCredentials' => new HttpAuthenticationCredentials(
-                    'foo',
-                    'bar',
-                    'example.com'
-                ),
-                'expectedAuthorizationHeader' => 'Basic Zm9vOmJhcg==',
+                'request' => new Request('GET', 'http://foo.example.com'),
+                'host' => 'example.com',
+                'credentials' => 'Zm9vOg==',
+                'expectedAuthorizationHeader' => 'Basic Zm9vOg==',
             ],
         ];
     }
