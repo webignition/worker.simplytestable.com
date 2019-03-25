@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Command\Tasks;
 
+use App\Tests\Services\ObjectReflector;
 use GuzzleHttp\Psr7\Response;
 use App\Command\Tasks\RequestCommand;
 use App\Services\Resque\QueueService;
@@ -51,9 +52,17 @@ class RequestCommandTest extends AbstractBaseTestCase
     {
         $this->clearRedis();
 
-        $tasksService = self::$container->get(TasksService::class);
+        $tasksService = \Mockery::mock(TasksService::class);
         $tasksService
-            ->setRequestResult($tasksServiceRequestReturnValue);
+            ->shouldReceive('request')
+            ->andReturn($tasksServiceRequestReturnValue);
+
+        ObjectReflector::setProperty(
+            $this->command,
+            RequestCommand::class,
+            'tasksService',
+            $tasksService
+        );
 
         $returnCode = $this->command->run(new ArrayInput([]), new NullOutput());
 
