@@ -1,0 +1,6 @@
+parameters:
+  excludes_analyse:
+    - %currentWorkingDirectory%/src/Migrations/*
+
+includes:
+  - phpstan.neon

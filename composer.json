@@ -90,8 +90,8 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "static-analysis": "./vendor/bin/phpstan analyse src --level=0",
-        "static-analysis-tests-level-3": "./vendor/bin/phpstan analyse tests --level=3",
+        "static-analysis": "./vendor/bin/phpstan analyse src --level=0 -c phpstan.src.neon",
+        "static-analysis-tests-level-3": "./vendor/bin/phpstan analyse tests --level=3 -c phpstan.tests.neon",
         "test-unit": "./vendor/bin/phpunit --colors tests/Unit",
         "test-functional": "./vendor/bin/phpunit --colors tests/Functional/",
         "test": [

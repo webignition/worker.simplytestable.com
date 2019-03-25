@@ -1,19 +1,6 @@
 parameters:
-  excludes_analyse:
-    - %currentWorkingDirectory%/src/Migrations/*
-
   symfony:
     container_xml_path: '%rootDir%/../../../var/cache/test/srcApp_KernelTestDebugContainer.xml'
-
-  ignoreErrors:
-    - message: '#^Service "[^"]+" is private.$#'
-      path: %currentWorkingDirectory%/tests/
-    -
-      message: '#::createWebPage\(\) should return webignition\\WebResource\\WebPage\\WebPage#'
-      path: %currentWorkingDirectory%/tests/Unit/Services/CssSourceInspectorTest.php
-    -
-      message: '#should return webignition\\WebResource\\WebPage\\WebPage but returns webignition\\WebResourceInterfaces\\WebResourceInterface#'
-      path: %currentWorkingDirectory%/tests/
 
 includes:
   - vendor/phpstan/phpstan-mockery/extension.neon
