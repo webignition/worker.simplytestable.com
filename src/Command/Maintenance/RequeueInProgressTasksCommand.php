@@ -17,42 +17,17 @@ class RequeueInProgressTasksCommand extends Command
 {
     const DEFAULT_AGE_IN_HOURS = 1;
 
-    /**
-     * @var EntityManagerInterface
-     */
     private $entityManager;
-
-    /**
-     * @var TaskService
-     */
     private $taskService;
-
-    /**
-     * @var ResqueQueueService
-     */
     private $resqueQueueService;
-
-    /**
-     * @var TaskRepository
-     */
     private $taskRepository;
 
-    /**
-     * @var InputInterface
-     */
-    private $input;
-
-    /**
-     * @param EntityManagerInterface $entityManager
-     * @param TaskService $taskService
-     * @param ResqueQueueService $resqueQueueService
-     * @param string|null $name
-     */
     public function __construct(
+        TaskRepository $taskRepository,
         EntityManagerInterface $entityManager,
         TaskService $taskService,
         ResqueQueueService $resqueQueueService,
-        $name = null
+        ?string $name = null
     ) {
         parent::__construct($name);
 
@@ -60,7 +35,7 @@ class RequeueInProgressTasksCommand extends Command
         $this->taskService = $taskService;
         $this->resqueQueueService = $resqueQueueService;
 
-        $this->taskRepository = $entityManager->getRepository(Task::class);
+        $this->taskRepository = $taskRepository;
     }
 
     /**
@@ -81,19 +56,20 @@ class RequeueInProgressTasksCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input = $input;
+        $isDryRun = $input->getOption('dry-run') !== false;
+        $ageInHours = $this->getAgeInHours($input);
 
-        if ($this->isDryRun()) {
+        if ($isDryRun) {
             $output->writeln('<comment>This is a DRY RUN, no data will be written</comment>');
         }
 
-        $output->writeln('Using age-in-hours: <info>'.$this->getAgeInHours().'</info>');
+        $output->writeln('Using age-in-hours: <info>'.$ageInHours.'</info>');
 
-        $startDateTime = new \DateTime('-'.$this->getAgeInHours().' hour');
+        $startDateTime = new \DateTime('-'.$ageInHours.' hour');
         $taskIds = $this->taskRepository->getUnfinishedIdsByMaxStartDate($startDateTime);
 
         $output->writeln(
-            'Tasks started more than '.$this->getAgeInHours().' hours ago: <info>'.count($taskIds).'</info>'
+            'Tasks started more than '.$ageInHours.' hours ago: <info>'.count($taskIds).'</info>'
         );
         $output->writeln('');
 
@@ -106,7 +82,7 @@ class RequeueInProgressTasksCommand extends Command
             $inProgressTask = $this->taskService->getById($taskId);
             $inProgressTask->setState(Task::STATE_QUEUED);
 
-            if ($this->isDryRun()) {
+            if ($isDryRun) {
                 $this->entityManager->detach($inProgressTask);
             } else {
                 $this->entityManager->persist($inProgressTask);
@@ -119,24 +95,13 @@ class RequeueInProgressTasksCommand extends Command
         $output->writeln('');
     }
 
-    /**
-     * @return boolean
-     */
-    private function isDryRun()
+    private function getAgeInHours(InputInterface $input): int
     {
-        return $this->input->getOption('dry-run') !== false;
-    }
-
-    /**
-     * @return int
-     */
-    private function getAgeInHours()
-    {
-        $age = $this->input->getOption('age-in-hours');
+        $age = $input->getOption('age-in-hours');
         if (!is_int($age) || $age < self::DEFAULT_AGE_IN_HOURS) {
             $age = self::DEFAULT_AGE_IN_HOURS;
         }
 
-        return $age;
+        return (int) $age;
     }
 }
