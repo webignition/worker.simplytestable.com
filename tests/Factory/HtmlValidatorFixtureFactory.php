@@ -6,10 +6,7 @@ use phpmock\mockery\PHPMockery;
 
 class HtmlValidatorFixtureFactory
 {
-    /**
-     * @param string $fixture
-     */
-    public static function set($fixture)
+    public static function set(string $fixture)
     {
         PHPMockery::mock(
             'webignition\HtmlValidator\Wrapper',
@@ -19,13 +16,8 @@ class HtmlValidatorFixtureFactory
         );
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    public static function load($name)
+    public static function load(string $name): string
     {
-        return file_get_contents(__DIR__ . '/../Fixtures/Data/RawHtmlValidatorOutput/' . $name . '.txt');
+        return (string) file_get_contents(__DIR__ . '/../Fixtures/Data/RawHtmlValidatorOutput/' . $name . '.txt');
     }
 }

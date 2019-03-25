@@ -27,7 +27,7 @@ class TaskSourceContentsLoader
         foreach ($sources as $source) {
             /* @var CachedResource $cachedResource */
             $cachedResource = $this->entityManager->find(CachedResource::class, $source->getValue());
-            $contents[$source->getUrl()] = stream_get_contents($cachedResource->getBody());
+            $contents[$source->getUrl()] = (string) stream_get_contents($cachedResource->getBody());
         }
 
         return $contents;

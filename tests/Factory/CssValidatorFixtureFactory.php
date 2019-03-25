@@ -19,7 +19,7 @@ class CssValidatorFixtureFactory
 
     public static function load(string $name, array $replacements = []): string
     {
-        $content = file_get_contents(__DIR__ . '/../Fixtures/Data/RawCssValidatorOutput/' . $name . '.txt');
+        $content = (string) file_get_contents(__DIR__ . '/../Fixtures/Data/RawCssValidatorOutput/' . $name . '.txt');
 
         foreach ($replacements as $search => $replace) {
             $content = str_replace($search, $replace, $content);
