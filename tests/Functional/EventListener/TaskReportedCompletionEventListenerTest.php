@@ -51,7 +51,7 @@ class TaskReportedCompletionEventListenerTest extends AbstractTaskEventListenerT
 
         $output = $task->getOutput();
         if ($output instanceof Output) {
-            $this->assertNotNull($output->getId());
+            $this->assertNull($output->getId());
         }
     }
 
