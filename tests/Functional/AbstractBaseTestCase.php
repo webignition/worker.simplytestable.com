@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 abstract class AbstractBaseTestCase extends WebTestCase
 {
     /**
-     * @var Client|null
+     * @var Client
      */
     protected $client;
 
@@ -46,7 +46,7 @@ abstract class AbstractBaseTestCase extends WebTestCase
     {
         \Mockery::close();
 
-        $this->client = null;
+        unset($this->client);
 
         parent::tearDown();
     }
