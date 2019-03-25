@@ -118,7 +118,9 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
         /** @noinspection PhpUnhandledExceptionInspection */
         $cachedResource = $entityManager->find(CachedResource::class, $requestHash);
 
-        $this->assertEquals($webPageContent, stream_get_contents($cachedResource->getBody()));
+        if ($cachedResource instanceof CachedResource) {
+            $this->assertEquals($webPageContent, stream_get_contents($cachedResource->getBody()));
+        }
 
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
 

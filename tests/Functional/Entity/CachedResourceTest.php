@@ -46,10 +46,12 @@ class CachedResourceTest extends AbstractBaseTestCase
         /* @var CachedResource $retrievedResource */
         $retrievedResource = $this->entityManager->find(CachedResource::class, $requestHash);
 
-        $this->assertEquals($requestHash, $retrievedResource->getRequestHash());
-        $this->assertEquals($url, $retrievedResource->getUrl());
-        $this->assertEquals($contentType, $retrievedResource->getContentType());
-        $this->assertEquals($body, stream_get_contents($retrievedResource->getBody()));
+        if ($retrievedResource instanceof CachedResource) {
+            $this->assertEquals($requestHash, $retrievedResource->getRequestHash());
+            $this->assertEquals($url, $retrievedResource->getUrl());
+            $this->assertEquals($contentType, $retrievedResource->getContentType());
+            $this->assertEquals($body, stream_get_contents($retrievedResource->getBody()));
+        }
     }
 
     public function createDataProvider(): array

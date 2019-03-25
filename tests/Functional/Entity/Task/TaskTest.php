@@ -152,6 +152,8 @@ class TaskTest extends AbstractBaseTestCase
 
         $retievedTask = $this->entityManager->find(Task::class, $taskId);
 
-        $this->assertEquals($expectedTaskSources, $retievedTask->getSources());
+        if ($retievedTask instanceof Task) {
+            $this->assertEquals($expectedTaskSources, $retievedTask->getSources());
+        }
     }
 }
