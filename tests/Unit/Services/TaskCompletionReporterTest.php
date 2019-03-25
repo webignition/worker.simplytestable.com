@@ -1,19 +1,16 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace App\Tests\Unit\Services;
 
 use App\Services\CoreApplicationHttpClient;
 use App\Services\TaskCompletionReporter;
-use GuzzleHttp\Exception\GuzzleException;
 use App\Entity\Task\Task;
 use Mockery\MockInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TaskCompletionReporterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @throws GuzzleException
-     */
     public function testReportCompletionNoOutput()
     {
         /* @var CoreApplicationHttpClient|MockInterface $coreApplicationHttpClient */

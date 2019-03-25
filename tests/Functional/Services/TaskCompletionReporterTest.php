@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services;
 
@@ -11,7 +13,6 @@ use App\Services\CoreApplicationHttpClient;
 use App\Services\TaskCompletionReporter;
 use App\Tests\Services\ObjectReflector;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use App\Entity\Task\Task;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -47,13 +48,6 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider reportCompletionSuccessDataProvider
-     *
-     * @param Task $task
-     * @param ResponseInterface $responseFixture
-     * @param array $expectedCreatePostRequestRouteParameters
-     * @param array $expectedCreatePostRequestPostData
-     *
-     * @throws GuzzleException
      */
     public function testReportCompletionSuccess(
         Task $task,
@@ -125,11 +119,7 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
         $this->assertTrue($returnValue);
     }
 
-    /**
-     * @return array
-     * @throws \Exception
-     */
-    public function reportCompletionSuccessDataProvider()
+    public function reportCompletionSuccessDataProvider(): array
     {
         $dateTime = new \DateTime('2018-12-11 16:08:30');
 
@@ -193,13 +183,6 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider reportCompletionFailureDataProvider
-     *
-     * @param Task $task
-     * @param array $responseFixtures
-     * @param string $expectedEventFailureType
-     * @param int $expectedEventStatusCode
-     *
-     * @throws GuzzleException
      */
     public function testReportCompletionFailure(
         Task $task,
@@ -243,11 +226,7 @@ class TaskCompletionReporterTest extends AbstractBaseTestCase
         $this->assertFalse($returnValue);
     }
 
-    /**
-     * @return array
-     * @throws \Exception
-     */
-    public function reportCompletionFailureDataProvider()
+    public function reportCompletionFailureDataProvider(): array
     {
         $dateTime = new \DateTime('2018-12-11 16:08:30');
 

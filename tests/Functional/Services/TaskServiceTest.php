@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Functional\Services;
 
@@ -7,7 +9,7 @@ use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskTypeService;
 use App\Tests\Services\TestTaskFactory;
-use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Services\TaskService;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -45,10 +47,6 @@ class TaskServiceTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider createDataProvider
-     *
-     * @param $url
-     * @param $taskTypeName
-     * @param $parameters
      */
     public function testCreate(string $url, string $taskTypeName, string $parameters)
     {
@@ -64,10 +62,8 @@ class TaskServiceTest extends AbstractBaseTestCase
         $this->assertEquals(strtolower($taskTypeName), strtolower($task->getType()));
         $this->assertEquals(new Parameters($parametersArray, $url), $task->getParameters());
     }
-    /**
-     * @return array
-     */
-    public function createDataProvider()
+
+    public function createDataProvider(): array
     {
         return [
             'html validation default' => [
@@ -100,13 +96,9 @@ class TaskServiceTest extends AbstractBaseTestCase
         ];
     }
 
-    /**
-     * @throws OptimisticLockException
-     * @throws \Doctrine\ORM\ORMException
-     */
     public function testCreateUsesExistingMatchingTask()
     {
-        $entityManager = self::$container->get('doctrine.orm.entity_manager');
+        $entityManager = self::$container->get(EntityManagerInterface::class);
         $taskTypeService = self::$container->get(TaskTypeService::class);
 
         $existingTask = $this->taskService->create(

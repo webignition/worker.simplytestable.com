@@ -1,9 +1,10 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace App\Tests\Functional\Services;
 
 use App\Services\ApplicationState;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use App\Services\WorkerService;
 use App\Tests\Functional\AbstractBaseTestCase;
@@ -46,9 +47,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
         $this->applicationState = self::$container->get(ApplicationState::class);
     }
 
-    /**
-     * @throws GuzzleException
-     */
     public function testActivateWhenNotNew()
     {
         $this->applicationState->set(ApplicationState::STATE_ACTIVE);
@@ -58,12 +56,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider activateDataProvider
-     *
-     * @param array $httpFixtures
-     * @param int $expectedReturnCode
-     * @param string $expectedApplicationState
-     *
-     * @throws GuzzleException
      */
     public function testActivate(array $httpFixtures, int $expectedReturnCode, string $expectedApplicationState)
     {
@@ -122,9 +114,6 @@ class WorkerServiceTest extends AbstractBaseTestCase
 
     /**
      * @dataProvider verifyDataProvider
-     *
-     * @param string $applicationState
-     * @param string $expectedApplicationState
      */
     public function testVerify(string $applicationState, string $expectedApplicationState)
     {
