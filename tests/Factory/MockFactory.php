@@ -2,7 +2,7 @@
 
 namespace App\Tests\Factory;
 
-use Mockery\Mock;
+use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 use App\Services\Request\Factory\Task\CancelRequestCollectionFactory;
 use App\Services\Request\Factory\Task\CancelRequestFactory;
@@ -19,11 +19,11 @@ class MockFactory
     /**
      * @param array $calls
      *
-     * @return Mock|TaskService
+     * @return MockInterface|TaskService
      */
     public static function createTaskService($calls = [])
     {
-        /* @var Mock|TaskService $taskService */
+        /* @var MockInterface|TaskService $taskService */
         $taskService = \Mockery::mock(TaskService::class);
 
         if (isset($calls['getById'])) {
@@ -44,11 +44,11 @@ class MockFactory
     /**
      * @param array $calls
      *
-     * @return Mock|ResqueQueueService
+     * @return MockInterface|ResqueQueueService
      */
     public static function createResqueQueueService($calls = [])
     {
-        /* @var Mock|ResqueQueueService $resqueQueueService */
+        /* @var MockInterface|ResqueQueueService $resqueQueueService */
         $resqueQueueService = \Mockery::mock(ResqueQueueService::class);
 
         if (isset($calls['isEmpty'])) {
@@ -83,11 +83,11 @@ class MockFactory
     /**
      * @param array $calls
      *
-     * @return Mock|LoggerInterface
+     * @return MockInterface|LoggerInterface
      */
     public static function createLogger($calls = [])
     {
-        /* @var Mock|LoggerInterface $logger */
+        /* @var MockInterface|LoggerInterface $logger */
         $logger = \Mockery::mock(LoggerInterface::class);
 
         if (isset($calls['error'])) {
@@ -104,11 +104,11 @@ class MockFactory
     /**
      * @param array $calls
      *
-     * @return Mock|WorkerService
+     * @return MockInterface|WorkerService
      */
     public static function createWorkerService($calls = [])
     {
-        /* @var Mock|WorkerService $workerService */
+        /* @var MockInterface|WorkerService $workerService */
         $workerService = \Mockery::mock(WorkerService::class);
 
         if (isset($calls['activate'])) {
@@ -133,11 +133,11 @@ class MockFactory
     /**
      * @param array $calls
      *
-     * @return Mock|TasksService
+     * @return MockInterface|TasksService
      */
     public static function createTasksService($calls = [])
     {
-        /* @var Mock|TasksService $tasksService */
+        /* @var MockInterface|TasksService $tasksService */
         $tasksService = \Mockery::mock(TasksService::class);
 
         if (isset($calls['getWorkerProcessCount'])) {
@@ -152,22 +152,22 @@ class MockFactory
     }
 
     /**
-     * @return Mock|CreateRequestCollectionFactory
+     * @return MockInterface|CreateRequestCollectionFactory
      */
     public static function createCreateRequestCollectionFactory()
     {
-        /* @var Mock|CreateRequestCollectionFactory $createRequestCollectionFactory */
+        /* @var MockInterface|CreateRequestCollectionFactory $createRequestCollectionFactory */
         $createRequestCollectionFactory = \Mockery::mock(CreateRequestCollectionFactory::class);
 
         return $createRequestCollectionFactory;
     }
 
     /**
-     * @return Mock|TaskFactory
+     * @return MockInterface|TaskFactory
      */
     public static function createTaskFactory()
     {
-        /* @var Mock|TaskFactory $taskFactory */
+        /* @var MockInterface|TaskFactory $taskFactory */
         $taskFactory = \Mockery::mock(TaskFactory::class);
 
         return $taskFactory;
@@ -176,11 +176,11 @@ class MockFactory
     /**
      * @param array $calls
      *
-     * @return Mock|CancelRequestFactory
+     * @return MockInterface|CancelRequestFactory
      */
     public static function createCancelRequestFactory($calls = [])
     {
-        /* @var Mock|CancelRequestFactory $cancelRequestFactory */
+        /* @var MockInterface|CancelRequestFactory $cancelRequestFactory */
         $cancelRequestFactory = \Mockery::mock(CancelRequestFactory::class);
 
         if (isset($calls['create'])) {
@@ -195,11 +195,11 @@ class MockFactory
     }
 
     /**
-     * @return Mock|CancelRequestCollectionFactory
+     * @return MockInterface|CancelRequestCollectionFactory
      */
     public static function createCancelRequestCollectionFactory()
     {
-        /* @var Mock|CancelRequestCollectionFactory $cancelRequestCollectionFactory */
+        /* @var MockInterface|CancelRequestCollectionFactory $cancelRequestCollectionFactory */
         $cancelRequestCollectionFactory = \Mockery::mock(CancelRequestCollectionFactory::class);
 
         return $cancelRequestCollectionFactory;
@@ -208,11 +208,11 @@ class MockFactory
     /**
      * @param array $calls
      *
-     * @return Mock|VerifyRequestFactory
+     * @return MockInterface|VerifyRequestFactory
      */
     public static function createVerifyRequestFactory($calls = [])
     {
-        /* @var Mock|VerifyRequestFactory $verifyRequestFactory */
+        /* @var MockInterface|VerifyRequestFactory $verifyRequestFactory */
         $verifyRequestFactory = \Mockery::mock(VerifyRequestFactory::class);
 
         if (isset($calls['create'])) {

@@ -2,9 +2,9 @@
 
 namespace App\Tests\Unit\Command\Tasks;
 
-use Mockery\Mock;
 use App\Command\Tasks\RequestIfEmptyCommand;
 use App\Resque\Job\TasksRequestJob;
+use Mockery\MockInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Factory\MockFactory;
@@ -49,7 +49,7 @@ class RequestIfEmptyCommandTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Mock|ResqueQueueService
+     * @return MockInterface|ResqueQueueService
      */
     private function createResqueQueueServiceWithEnqueueCall()
     {
@@ -68,7 +68,7 @@ class RequestIfEmptyCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * @param bool $isEmpty
      *
-     * @return Mock|ResqueQueueService
+     * @return MockInterface|ResqueQueueService
      */
     private function createResqueQueueService($isEmpty)
     {
