@@ -5,6 +5,7 @@ namespace App\Tests\Functional\Services;
 use App\Entity\CachedResource;
 use App\Services\CachedResourceManager;
 use App\Tests\Functional\AbstractBaseTestCase;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 
@@ -21,7 +22,7 @@ class CachedResourceManagerTest extends AbstractBaseTestCase
     private $entityManager;
 
     /**
-     * @var EntityRepository
+     * @var EntityRepository|ObjectRepository
      */
     private $entityRepository;
 
