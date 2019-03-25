@@ -12,7 +12,7 @@ class CreateRequestTest extends \PHPUnit\Framework\TestCase
      * @dataProvider createDataProvider
      *
      * @param string $taskTypeName
-     * @param string|null $url
+     * @param string $url
      * @param string|null $parameters
      * @param bool $expectedIsValid
      * @param string|null $expectedTaskType
@@ -21,7 +21,7 @@ class CreateRequestTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreate(
         string $taskTypeName,
-        ?string $url,
+        string $url,
         ?string $parameters,
         bool $expectedIsValid,
         ?string $expectedTaskType,
