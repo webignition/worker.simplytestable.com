@@ -4388,24 +4388,26 @@
         },
         {
             "name": "webignition/guzzle-request-headers-middleware",
-            "version": "0.1",
+            "version": "0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/guzzle-request-headers-middleware.git",
-                "reference": "6594152c92f7bd9d52e37fe2687bba858702e7e0"
+                "reference": "1b71eff28fc831e95f1b48f72e924a8971dd5d4e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/guzzle-request-headers-middleware/zipball/6594152c92f7bd9d52e37fe2687bba858702e7e0",
-                "reference": "6594152c92f7bd9d52e37fe2687bba858702e7e0",
+                "url": "https://api.github.com/repos/webignition/guzzle-request-headers-middleware/zipball/1b71eff28fc831e95f1b48f72e924a8971dd5d4e",
+                "reference": "1b71eff28fc831e95f1b48f72e924a8971dd5d4e",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.6.0",
+                "php": ">=7.2.0",
                 "psr/http-message": "~1.0"
             },
             "require-dev": {
                 "mockery/mockery": "~1",
+                "phpstan/phpstan": "^0.11.4",
+                "phpstan/phpstan-mockery": "^0.11.0",
                 "phpunit/phpunit": "^5",
                 "squizlabs/php_codesniffer": "3.*"
             },
@@ -4433,7 +4435,7 @@
                 "middleware",
                 "psr7"
             ],
-            "time": "2018-05-14T12:05:14+00:00"
+            "time": "2019-03-25T12:56:04+00:00"
         },
         {
             "name": "webignition/guzzle-response-location-uri-fixer-middleware",
