@@ -3,18 +3,12 @@
 namespace App\Services;
 
 use App\Model\Task\Type;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use App\Repository\TaskRepository;
 use ReflectionClass;
 
 class TaskService
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
     /**
      * @var TaskRepository
      */
@@ -25,12 +19,10 @@ class TaskService
      */
     private $taskTypeService;
 
-    public function __construct(EntityManagerInterface $entityManager, TaskTypeService $taskTypeFactory)
+    public function __construct(TaskTypeService $taskTypeFactory, TaskRepository $taskRepository)
     {
-        $this->entityManager = $entityManager;
         $this->taskTypeService = $taskTypeFactory;
-
-        $this->taskRepository = $entityManager->getRepository(Task::class);
+        $this->taskRepository = $taskRepository;
     }
 
     public function create(string $url, Type $type, string $parameters): Task

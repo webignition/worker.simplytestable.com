@@ -2,9 +2,7 @@
 
 namespace App\Command\Tasks;
 
-use Doctrine\ORM\EntityManagerInterface;
 use App\Command\Task\ReportCompletionCommand as TaskReportCompletionCommand;
-use App\Entity\Task\Task;
 use App\Repository\TaskRepository;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,13 +17,13 @@ class ReportCompletionCommand extends AbstractTaskCollectionCommand
     private $taskReportCompletionCommand;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
+        TaskRepository $taskRepository,
         TaskReportCompletionCommand $taskReportCompletionCommand
     ) {
         parent::__construct(null);
 
         $this->taskReportCompletionCommand = $taskReportCompletionCommand;
-        $this->taskRepository = $entityManager->getRepository(Task::class);
+        $this->taskRepository = $taskRepository;
     }
 
     /**

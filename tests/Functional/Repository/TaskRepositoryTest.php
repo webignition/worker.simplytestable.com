@@ -11,7 +11,6 @@ use App\Model\Task\TypeInterface;
 use App\Repository\TaskRepository;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\TestTaskFactory;
-use Doctrine\ORM\EntityManagerInterface;
 
 class TaskRepositoryTest extends AbstractBaseTestCase
 {
@@ -29,8 +28,7 @@ class TaskRepositoryTest extends AbstractBaseTestCase
     {
         parent::setUp();
 
-        $entityManager = self::$container->get(EntityManagerInterface::class);
-        $this->taskRepository = $entityManager->getRepository(Task::class);
+        $this->taskRepository = self::$container->get(TaskRepository::class);
         $this->assertInstanceOf(TaskRepository::class, $this->taskRepository);
 
         $this->testTaskFactory = self::$container->get(TestTaskFactory::class);
