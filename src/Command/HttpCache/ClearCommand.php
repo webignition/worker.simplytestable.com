@@ -1,27 +1,21 @@
 <?php
+
 namespace App\Command\HttpCache;
 
-use App\Services\HttpCache;
+use Doctrine\Common\Cache\MemcachedCache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ClearCommand extends Command
 {
-    /**
-     * @var HttpCache
-     */
-    private $httpCache;
+    private $cache;
 
-    /**
-     * @param HttpCache $httpCache
-     *
-     * @param string|null $name
-     */
-    public function __construct(HttpCache $httpCache, $name = null)
+    public function __construct(MemcachedCache $memcachedCache, ?string $name = null)
     {
         parent::__construct($name);
-        $this->httpCache = $httpCache;
+
+        $this->cache = $memcachedCache;
     }
 
     /**
@@ -40,6 +34,6 @@ class ClearCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->httpCache->clear() ? 0 : 1;
+        return (int) !$this->cache->deleteAll();
     }
 }

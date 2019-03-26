@@ -1,10 +1,11 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace App\Tests\Unit\Command\HttpCache;
 
-use Mockery\Mock;
+use Doctrine\Common\Cache\MemcachedCache;
 use App\Command\HttpCache\ClearCommand;
-use App\Services\HttpCache;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\ArrayInput;
 
@@ -15,20 +16,15 @@ class ClearCommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider runDataProvider
-     *
-     * @param bool $httpCacheClearReturnValue
-     * @param int $expectedReturnCode
-     * @throws \Exception
      */
-    public function testRun($httpCacheClearReturnValue, $expectedReturnCode)
+    public function testRun(bool $cachedDeleteAllReturnValue, int $expectedReturnCode)
     {
-        /* @var HttpCache|Mock $httpCache */
-        $httpCache = \Mockery::mock(HttpCache::class);
-        $httpCache
-            ->shouldReceive('clear')
-            ->andReturn($httpCacheClearReturnValue);
+        $memcachedCache = \Mockery::mock(MemcachedCache::class);
+        $memcachedCache
+            ->shouldReceive('deleteAll')
+            ->andReturn($cachedDeleteAllReturnValue);
 
-        $command = new ClearCommand($httpCache);
+        $command = new ClearCommand($memcachedCache);
 
         $returnCode = $command->run(new ArrayInput([]), new NullOutput());
 
@@ -38,18 +34,15 @@ class ClearCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function runDataProvider()
+    public function runDataProvider(): array
     {
         return [
             'fail' => [
-                'httpCacheClearReturnValue' => false,
+                'cachedDeleteAllReturnValue' => false,
                 'expectedReturnCode' => 1,
             ],
             'success' => [
-                'httpCacheClearReturnValue' => true,
+                'cachedDeleteAllReturnValue' => true,
                 'expectedReturnCode' => 0,
             ],
         ];

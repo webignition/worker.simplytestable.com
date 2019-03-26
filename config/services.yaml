@@ -7,6 +7,8 @@ imports:
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+  memcached_host: localhost
+  memcached_port: 11211
   hostname: '%env(HOSTNAME)%'
   token: '%env(TOKEN)%'
   curl_options:
@@ -87,9 +89,6 @@ services:
 
     GuzzleHttp\HandlerStack:
       factory: 'App\Services\HttpHandlerStackFactory:create'
-
-    Kevinrob\GuzzleCache\CacheMiddleware:
-      factory: 'App\Services\HttpCacheMiddlewareFactory:create'
 
     webignition\HttpHistoryContainer\Container:
 
@@ -270,3 +269,25 @@ services:
       arguments:
         $store: '@Symfony\Component\Lock\Store\PdoStore'
 
+    Memcached:
+      class: Memcached
+      calls:
+        - method: addServer
+          arguments:
+            - '%memcached_host%'
+            - '%memcached_port%'
+
+    Doctrine\Common\Cache\MemcachedCache:
+      calls:
+        - method: setMemcached
+          arguments:
+            - '@Memcached'
+
+    Doctrine\Common\Cache\Cache:
+      alias: Doctrine\Common\Cache\MemcachedCache
+
+    Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage:
+
+    Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy:
+
+    Kevinrob\GuzzleCache\CacheMiddleware:

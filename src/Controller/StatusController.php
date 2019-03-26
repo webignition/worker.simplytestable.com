@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Model\HttpCacheStats;
 use App\Services\ApplicationConfiguration;
 use App\Services\ApplicationState;
-use App\Services\HttpCache;
+use Doctrine\Common\Cache\MemcachedCache;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -14,7 +14,7 @@ class StatusController extends AbstractController
     public function indexAction(
         ApplicationConfiguration $applicationConfiguration,
         ApplicationState $applicationState,
-        HttpCache $httpCache
+        MemcachedCache $memcachedCache
     ): JsonResponse {
         $status = [
             'hostname' => $applicationConfiguration->getHostname(),
@@ -22,10 +22,8 @@ class StatusController extends AbstractController
             'version' => $this->getLatestGitHash(),
         ];
 
-        if ($httpCache->has()) {
-            $httpCacheStats = new HttpCacheStats($httpCache->get()->getStats());
-            $status['http_cache_stats'] = $httpCacheStats->getFormattedStats();
-        }
+        $httpCacheStats = new HttpCacheStats($memcachedCache->getStats());
+        $status['http_cache_stats'] = $httpCacheStats->getFormattedStats();
 
         return new JsonResponse($status);
     }
