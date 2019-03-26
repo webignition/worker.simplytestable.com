@@ -6,12 +6,11 @@ use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\RequestIdentifier;
 use App\Model\Source;
-use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\SourceFactory;
 use App\Services\TaskService;
-use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
+use App\Tests\Services\TaskTypeRetriever;
 use Doctrine\ORM\EntityManagerInterface;
 
 class TaskTest extends AbstractBaseTestCase
@@ -27,9 +26,9 @@ class TaskTest extends AbstractBaseTestCase
     private $taskService;
 
     /**
-     * @var TaskTypeService
+     * @var TaskTypeRetriever
      */
-    private $taskTypeService;
+    private $taskTypeRetriever;
 
     protected function setUp()
     {
@@ -37,12 +36,12 @@ class TaskTest extends AbstractBaseTestCase
 
         $this->entityManager = self::$container->get(EntityManagerInterface::class);
         $this->taskService = self::$container->get(TaskService::class);
-        $this->taskTypeService = self::$container->get(TaskTypeService::class);
+        $this->taskTypeRetriever = self::$container->get(TaskTypeRetriever::class);
     }
 
     public function testParentChildRelationship()
     {
-        $linkIntegrityTaskType = $this->getTaskType(TypeInterface::TYPE_LINK_INTEGRITY);
+        $linkIntegrityTaskType = $this->taskTypeRetriever->retrieve(TypeInterface::TYPE_LINK_INTEGRITY);
 
         $parentTask = Task::create($linkIntegrityTaskType, 'http://example.com');
         $parentTask->setState(Task::STATE_IN_PROGRESS);
@@ -79,7 +78,7 @@ class TaskTest extends AbstractBaseTestCase
 
         $task = $this->taskService->create(
             'http://example.com/',
-            $this->getTaskType(TypeInterface::TYPE_HTML_VALIDATION),
+            $this->taskTypeRetriever->retrieve(TypeInterface::TYPE_HTML_VALIDATION),
             ''
         );
 
@@ -156,16 +155,5 @@ class TaskTest extends AbstractBaseTestCase
         if ($retievedTask instanceof Task) {
             $this->assertEquals($expectedTaskSources, $retievedTask->getSources());
         }
-    }
-
-    private function getTaskType(string $name): Type
-    {
-        $type = $this->taskTypeService->get($name);
-
-        if (!$type instanceof Type) {
-            throw new \InvalidArgumentException();
-        }
-
-        return $type;
     }
 }

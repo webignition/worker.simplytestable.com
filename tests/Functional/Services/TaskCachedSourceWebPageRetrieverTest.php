@@ -1,4 +1,5 @@
-<?php /** @noinspection PhpDocSignatureInspection */
+<?php
+/** @noinspection PhpDocSignatureInspection */
 /** @noinspection PhpDocSignatureInspection */
 /** @noinspection PhpUnhandledExceptionInspection */
 
@@ -7,18 +8,19 @@ namespace App\Tests\Functional\Services;
 use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\Source;
-use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskCachedSourceWebPageRetriever;
-use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\ContentTypeFactory;
+use App\Tests\Services\TaskTypeRetriever;
 use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use webignition\WebResource\WebPage\WebPage;
 
 class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
 {
+    const TASK_URL = 'http://example.com/';
+
     /**
      * @var TaskCachedSourceWebPageRetriever
      */
@@ -43,11 +45,9 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
 
     public function testRetrievePrimarySourceIsNotCachedResource()
     {
-        $taskUrl = 'http://example.com';
+        $source = new Source(self::TASK_URL, Source::TYPE_UNAVAILABLE, 'http:404');
 
-        $source = new Source($taskUrl, Source::TYPE_UNAVAILABLE, 'http:404');
-
-        $task = Task::create($this->getHtmlValidationTaskType(), $taskUrl);
+        $task = $this->createTask();
         $task->addSource($source);
 
         $this->assertNull($this->taskCachedSourceWebPageRetriever->retrieve($task));
@@ -55,11 +55,9 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
 
     public function testRetrieveNoPrimaryResource()
     {
-        $taskUrl = 'http://example.com';
-
         $source = new Source('http://example.com/foo', Source::TYPE_CACHED_RESOURCE, 'request-hash');
 
-        $task = Task::create($this->getHtmlValidationTaskType(), $taskUrl);
+        $task = $this->createTask();
         $task->addSource($source);
 
         $this->assertNull($this->taskCachedSourceWebPageRetriever->retrieve($task));
@@ -67,11 +65,9 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
 
     public function testRetrieveInvalidCachedResource()
     {
-        $taskUrl = 'http://example.com';
+        $source = new Source(self::TASK_URL, Source::TYPE_CACHED_RESOURCE, 'invalid-request-hash');
 
-        $source = new Source($taskUrl, Source::TYPE_CACHED_RESOURCE, 'invalid-request-hash');
-
-        $task = Task::create($this->getHtmlValidationTaskType(), $taskUrl);
+        $task = $this->createTask();
         $task->addSource($source);
 
         $this->assertNull($this->taskCachedSourceWebPageRetriever->retrieve($task));
@@ -132,14 +128,14 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
         ];
     }
 
-    private function getHtmlValidationTaskType(): Type
+    private function createTask(): Task
     {
-        $type = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
+        $taskTypeRetriever = self::$container->get(TaskTypeRetriever::class);
 
-        if (!$type instanceof Type) {
-            throw new \RuntimeException();
-        }
-
-        return $type;
+        return Task::create(
+            $taskTypeRetriever->retrieve(TypeInterface::TYPE_HTML_VALIDATION),
+            self::TASK_URL,
+            ''
+        );
     }
 }

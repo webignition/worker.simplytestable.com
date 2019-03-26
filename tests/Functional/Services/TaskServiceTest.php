@@ -8,6 +8,7 @@ use App\Model\Task\Parameters;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskTypeService;
+use App\Tests\Services\TaskTypeRetriever;
 use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
@@ -35,6 +36,11 @@ class TaskServiceTest extends AbstractBaseTestCase
     private $testTaskFactory;
 
     /**
+     * @var TaskTypeRetriever
+     */
+    private $taskTypeRetriever;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -43,6 +49,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $this->taskService = self::$container->get(TaskService::class);
         $this->testTaskFactory = self::$container->get(TestTaskFactory::class);
+        $this->taskTypeRetriever = self::$container->get(TaskTypeRetriever::class);
     }
 
     /**
@@ -50,7 +57,7 @@ class TaskServiceTest extends AbstractBaseTestCase
      */
     public function testCreate(string $url, string $taskTypeName, string $parameters)
     {
-        $task = $this->taskService->create($url, $this->getTaskType($taskTypeName), $parameters);
+        $task = $this->taskService->create($url, $this->taskTypeRetriever->retrieve($taskTypeName), $parameters);
 
         $parametersArray = json_decode($parameters, true) ?? [];
 
@@ -100,7 +107,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $existingTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
-            $this->getTaskType(TypeInterface::TYPE_HTML_VALIDATION),
+            $this->taskTypeRetriever->retrieve(TypeInterface::TYPE_HTML_VALIDATION),
             ''
         );
 
@@ -109,7 +116,7 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $newTask = $this->taskService->create(
             self::DEFAULT_TASK_URL,
-            $this->getTaskType(TypeInterface::TYPE_HTML_VALIDATION),
+            $this->taskTypeRetriever->retrieve(TypeInterface::TYPE_HTML_VALIDATION),
             ''
         );
         $this->assertEquals($existingTask->getId(), $newTask->getId());
@@ -151,16 +158,5 @@ class TaskServiceTest extends AbstractBaseTestCase
     {
         parent::tearDown();
         \Mockery::close();
-    }
-
-    private function getTaskType(string $name): Type
-    {
-        $type = self::$container->get(TaskTypeService::class)->get($name);
-
-        if (!$type instanceof Type) {
-            throw new \RuntimeException();
-        }
-
-        return $type;
     }
 }

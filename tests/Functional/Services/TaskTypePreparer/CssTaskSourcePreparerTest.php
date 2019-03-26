@@ -17,6 +17,7 @@ use App\Tests\Factory\HtmlDocumentFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
 use App\Tests\Services\ObjectReflector;
+use App\Tests\Services\TaskTypeRetriever;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
 use webignition\InternetMediaType\InternetMediaType;
@@ -45,6 +46,11 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
     private $httpMockHandler;
 
     /**
+     * @var TaskTypeRetriever
+     */
+    private $taskTypeRetriever;
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -56,6 +62,7 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
 
         $this->cssWebResourceRetriever = self::$container->get('app.services.web-resource-retriever.css');
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
+        $this->taskTypeRetriever = self::$container->get(TaskTypeRetriever::class);
     }
 
     /**
@@ -63,7 +70,7 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
      */
     public function testPrepareWrongTaskType(string $taskType)
     {
-        $task = Task::create($this->getTaskType($taskType), 'http://example.com/');
+        $task = Task::create($this->taskTypeRetriever->retrieve($taskType), 'http://example.com/');
 
         $this->assertNull($this->preparer->prepare($task));
     }
@@ -73,7 +80,7 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
      */
     public function testInvokeWrongTaskType(string $taskType)
     {
-        $task = Task::create($this->getTaskType($taskType), 'http://example.com/');
+        $task = Task::create($this->taskTypeRetriever->retrieve($taskType), 'http://example.com/');
 
         $taskEvent = new TaskEvent($task);
 
@@ -599,16 +606,5 @@ class CssTaskSourcePreparerTest extends AbstractBaseTestCase
         parent::tearDown();
 
         \Mockery::close();
-    }
-
-    private function getTaskType(string $name): Type
-    {
-        $type = self::$container->get(TaskTypeService::class)->get($name);
-
-        if (!$type instanceof Type) {
-            throw new \RuntimeException();
-        }
-
-        return $type;
     }
 }

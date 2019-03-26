@@ -3,8 +3,8 @@
 
 namespace App\Tests\Functional\Services;
 
-use App\Model\Task\Type;
-use App\Services\TaskTypeService;
+use App\Model\Task\TypeInterface;
+use App\Tests\Services\TaskTypeRetriever;
 use GuzzleHttp\Cookie\CookieJarInterface;
 use Mockery\Mock;
 use App\Entity\Task\Task;
@@ -16,6 +16,19 @@ use webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware;
 
 class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
 {
+    /**
+     * @var TypeInterface
+     */
+    private $htmlValidationTaskType;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $taskTypeRetriever = self::$container->get(TaskTypeRetriever::class);
+        $this->htmlValidationTaskType = $taskTypeRetriever->retrieve(TypeInterface::TYPE_HTML_VALIDATION);
+    }
+
     public function testGetFromContainer()
     {
         $this->assertInstanceOf(
@@ -26,9 +39,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
 
     public function testConfigureForTaskNoCookiesNoHttpAuthentication()
     {
-        $taskType = $this->getHtmlValidationTaskType();
-
-        $task = Task::create($taskType, 'http://example.com/');
+        $task = $this->createTask();
         $userAgentString = 'Foo User Agent';
 
         /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
@@ -66,9 +77,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
      */
     public function testConfigureForTaskHasCookies(array $taskParameters, array $expectedCookieStrings)
     {
-        $taskType = $this->getHtmlValidationTaskType();
-
-        $task = Task::create($taskType, 'http://example.com/', (string) json_encode($taskParameters));
+        $task = $this->createTask($taskParameters);
 
         $userAgentString = 'Foo User Agent';
 
@@ -153,9 +162,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
         string $expectedHost,
         string $expectedCredentials
     ) {
-        $taskType = $this->getHtmlValidationTaskType();
-
-        $task = Task::create($taskType, 'http://example.com/', (string) json_encode($taskParameters));
+        $task = $this->createTask($taskParameters);
         $userAgentString = 'Foo User Agent';
 
         /* @var HttpAuthenticationMiddleware|Mock $httpAuthenticationMiddleware */
@@ -219,14 +226,14 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
         ];
     }
 
-    private function getHtmlValidationTaskType(): Type
+    private function createTask(array $parameters = []): Task
     {
-        $type = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
+        $taskTypeRetriever = self::$container->get(TaskTypeRetriever::class);
 
-        if (!$type instanceof Type) {
-            throw new \RuntimeException();
-        }
-
-        return $type;
+        return Task::create(
+            $taskTypeRetriever->retrieve(TypeInterface::TYPE_HTML_VALIDATION),
+            'http://example.com/',
+            (string) json_encode($parameters)
+        );
     }
 }
