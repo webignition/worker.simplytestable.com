@@ -2,38 +2,26 @@
 
 namespace App\Services;
 
+use Doctrine\Common\Cache\MemcachedCache;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 
 class HttpCacheMiddlewareFactory
 {
-    /**
-     * @var HttpCache
-     */
     private $cache;
 
-    /**
-     * @param HttpCache $cache
-     */
-    public function __construct(HttpCache $cache)
+    public function __construct(MemcachedCache $memcachedCache)
     {
-        $this->cache = $cache;
+        $this->cache = $memcachedCache;
     }
 
-    /**
-     * @return CacheMiddleware|null
-     */
-    public function create()
+    public function create(): CacheMiddleware
     {
-        if (!$this->cache->has()) {
-            return null;
-        }
-
         return new CacheMiddleware(
             new PrivateCacheStrategy(
                 new DoctrineCacheStorage(
-                    $this->cache->get()
+                    $this->cache
                 )
             )
         );
