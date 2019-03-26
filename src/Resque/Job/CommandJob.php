@@ -31,7 +31,7 @@ abstract class CommandJob extends Job
     /**
      * @param array $args
      *
-     * @return bool
+     * @return int
      * @throws \Exception
      */
     public function run($args)
@@ -43,7 +43,7 @@ abstract class CommandJob extends Job
         $returnCode = $command->run($input, $output);
 
         if ($returnCode === 0) {
-            return true;
+            return 0;
         }
 
         return $this->handleNonZeroReturnCode($returnCode, $output);
