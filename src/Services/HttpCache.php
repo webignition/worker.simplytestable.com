@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Doctrine\Common\Cache\MemcachedCache;
+use Memcached;
 
 class HttpCache
 {
@@ -11,17 +12,10 @@ class HttpCache
      */
     private $memcachedCache;
 
-    /**
-     * @var MemcachedService
-     */
-    private $memcachedService;
-
-    /**
-     * @param MemcachedService $memcachedService
-     */
-    public function __construct(MemcachedService $memcachedService)
+    public function __construct(Memcached $memcached)
     {
-        $this->memcachedService = $memcachedService;
+        $this->memcachedCache = new MemcachedCache();
+        $this->memcachedCache->setMemcached($memcached);
     }
 
     /**
@@ -29,14 +23,6 @@ class HttpCache
      */
     public function get()
     {
-        if (is_null($this->memcachedCache)) {
-            $memcached = $this->memcachedService->get();
-            if (!is_null($memcached)) {
-                $this->memcachedCache = new MemcachedCache();
-                $this->memcachedCache->setMemcached($memcached);
-            }
-        }
-
         return $this->memcachedCache;
     }
 

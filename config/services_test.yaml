@@ -38,3 +38,6 @@ services:
 
   App\Tests\Services\TaskTypeRetriever:
     public: true
+
+  App\Services\MemcachedService:
+    public: true
