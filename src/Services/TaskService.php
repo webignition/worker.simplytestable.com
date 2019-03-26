@@ -36,11 +36,12 @@ class TaskService
             'url' => $task->getUrl()
         ]);
 
-        if ($existingTask) {
+        if ($existingTask instanceof Task) {
             $this->setTaskType($existingTask, $type);
+            $task = $existingTask;
         }
 
-        return $existingTask ?? $task;
+        return $task;
     }
 
     /**
