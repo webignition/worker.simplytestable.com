@@ -10,17 +10,17 @@ class CancelRequestCollection
     private $cancelRequests;
 
     /**
-     * @param CancelRequest[]
+     * @param CancelRequest[] $cancelRequests
      */
-    public function __construct($createRequests)
+    public function __construct(array $cancelRequests)
     {
-        $this->cancelRequests = $createRequests;
+        $this->cancelRequests = $cancelRequests;
     }
 
     /**
      * @return CancelRequest[]
      */
-    public function getCancelRequests()
+    public function getCancelRequests(): array
     {
         return $this->cancelRequests;
     }

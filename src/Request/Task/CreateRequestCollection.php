@@ -10,9 +10,9 @@ class CreateRequestCollection
     private $createRequests;
 
     /**
-     * @param CreateRequest[]
+     * @param CreateRequest[] $createRequests
      */
-    public function __construct($createRequests)
+    public function __construct(array $createRequests)
     {
         $this->createRequests = $createRequests;
     }
@@ -20,7 +20,7 @@ class CreateRequestCollection
     /**
      * @return CreateRequest[]
      */
-    public function getCreateRequests()
+    public function getCreateRequests(): array
     {
         return $this->createRequests;
     }
