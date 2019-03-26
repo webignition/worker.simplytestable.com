@@ -91,7 +91,7 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "static-analysis": "./vendor/bin/phpstan analyse src --level=4 -c phpstan.src.neon",
+        "static-analysis": "./vendor/bin/phpstan analyse src --level=5 -c phpstan.src.neon",
         "static-analysis-tests": "./vendor/bin/phpstan analyse tests --level=7 -c phpstan.tests.neon",
         "test-unit": "./vendor/bin/phpunit --colors tests/Unit",
         "test-functional": "./vendor/bin/phpunit --colors tests/Functional/",

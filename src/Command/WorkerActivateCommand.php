@@ -56,7 +56,7 @@ class WorkerActivateCommand extends Command
             return self::RETURN_CODE_UNKNOWN_ERROR;
         }
 
-        if (strlen($activationResult) == 3) {
+        if (strlen((string) $activationResult) == 3) {
             $output->writeln('Activation failed, HTTP response '.$activationResult);
         } else {
             $output->writeln('Activation failed, CURL error '.$activationResult);
