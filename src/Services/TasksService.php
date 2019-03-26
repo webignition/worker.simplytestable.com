@@ -54,7 +54,7 @@ class TasksService
      */
     public function request($requestedLimit = null)
     {
-        $isWithinThreshold = $this->taskService->getInCompleteCount() <= $this->getLowerLimit();
+        $isWithinThreshold = $this->taskService->getInCompleteCount() <= $this->workerProcessCount;
         if (!$isWithinThreshold) {
             return false;
         }
@@ -79,14 +79,6 @@ class TasksService
         }
 
         return true;
-    }
-
-    /**
-     * @return int
-     */
-    private function getLowerLimit()
-    {
-        return $this->workerProcessCount;
     }
 
     /**
