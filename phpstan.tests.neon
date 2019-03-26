@@ -2,12 +2,9 @@ parameters:
   ignoreErrors:
     - message: '#^Service "[^"]+" is private.$#'
       path: %currentWorkingDirectory%/tests/
-    -
-      message: '#::createWebPage\(\) should return webignition\\WebResource\\WebPage\\WebPage#'
+
+    - message: '#::createWebPage\(\) should return webignition\\WebResource\\WebPage\\WebPage#'
       path: %currentWorkingDirectory%/tests/Unit/Services/CssSourceInspectorTest.php
-    -
-      message: '#should return webignition\\WebResource\\WebPage\\WebPage but returns webignition\\WebResourceInterfaces\\WebResourceInterface#'
-      path: %currentWorkingDirectory%/tests/
 
 includes:
   - phpstan.neon
