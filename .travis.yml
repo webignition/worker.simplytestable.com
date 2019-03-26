@@ -37,4 +37,7 @@ install:
   - composer config --global process-timeout 2000
 
 script:
-  - composer ci
+  - composer cs
+  - composer static-analysis
+  - composer static-analysis-tests
+  - composer test
