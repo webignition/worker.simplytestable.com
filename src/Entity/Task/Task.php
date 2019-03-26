@@ -3,7 +3,6 @@
 namespace App\Entity\Task;
 
 use App\Model\Source;
-use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use App\Model\Task\Parameters;
@@ -50,7 +49,7 @@ class Task implements \JsonSerializable
     private $state;
 
     /**
-     * @var Type
+     * @var TypeInterface
      *
      * @ORM\Column(name="tasktype", nullable=false)
      */
@@ -136,7 +135,7 @@ class Task implements \JsonSerializable
         return $this->state;
     }
 
-    public function getType(): Type
+    public function getType(): TypeInterface
     {
         return $this->type;
     }

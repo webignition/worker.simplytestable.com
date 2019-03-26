@@ -11,4 +11,5 @@ interface TypeInterface
     const TYPE_LINK_INTEGRITY_SINGLE_URL = 'link integrity single-url';
 
     public function getName(): string;
+    public function __toString(): string;
 }

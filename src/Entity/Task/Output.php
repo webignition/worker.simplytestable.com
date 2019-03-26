@@ -3,7 +3,6 @@
 namespace App\Entity\Task;
 
 use Doctrine\ORM\Mapping as ORM;
-use webignition\InternetMediaType\InternetMediaType;
 use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
 
 /**
@@ -29,7 +28,7 @@ class Output
     private $output;
 
     /**
-     * @var InternetMediaType
+     * @var InternetMediaTypeInterface
      * @ORM\Column(type="text", nullable=true)
      */
     private $contentType;
