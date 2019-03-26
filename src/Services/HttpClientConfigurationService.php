@@ -31,11 +31,7 @@ class HttpClientConfigurationService
         $this->cookieJar = $cookieJar;
     }
 
-    /**
-     * @param Task $task
-     * @param $userAgentString
-     */
-    public function configureForTask(Task $task, $userAgentString)
+    public function configureForTask(Task $task, string $userAgentString)
     {
         $parametersObject = $task->getParameters();
 
