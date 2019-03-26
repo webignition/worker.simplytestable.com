@@ -22,7 +22,7 @@ class CssValidatorOutputParserFlagsFactory
         $ignoreWarnings = $taskParameters->get('ignore-warnings');
         $ignoreVendorExtensionIssues = VExtLevel::LEVEL_IGNORE === $vendorExtensionSeverityLevel;
         $reportVendorExensionIssuesAsWarnings = VExtLevel::LEVEL_WARN === $vendorExtensionSeverityLevel;
-        $ignoreFalseDataUrlMessages = true;
+
 
         if ($ignoreWarnings) {
             $flagsToApply[] = Flags::IGNORE_WARNINGS;
@@ -36,9 +36,7 @@ class CssValidatorOutputParserFlagsFactory
             $flagsToApply[] = Flags::REPORT_VENDOR_EXTENSION_ISSUES_AS_WARNINGS;
         }
 
-        if ($ignoreFalseDataUrlMessages) {
-            $flagsToApply[] = Flags::IGNORE_FALSE_IMAGE_DATA_URL_MESSAGES;
-        }
+        $flagsToApply[] = Flags::IGNORE_FALSE_IMAGE_DATA_URL_MESSAGES;
 
         $flags = null;
 
