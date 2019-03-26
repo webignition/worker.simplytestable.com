@@ -6,5 +6,8 @@ parameters:
     - message: '#GuzzleHttp\\Exception\\GuzzleException is not subtype of Throwable#'
       path: %currentWorkingDirectory%/src/
 
+    - message: '#undefined method Resque_Redis::llen()#'
+      path: %currentWorkingDirectory%/src/Services/Resque/QueueService
+
 includes:
   - phpstan.neon
