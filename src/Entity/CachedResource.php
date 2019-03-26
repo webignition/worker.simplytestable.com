@@ -32,15 +32,19 @@ class CachedResource
     private $contentType = '';
 
     /**
-     * @var CachedResource|string
+     * @var resource|string
      *
      * @ORM\Column(type="blob")
      */
     private $body = '';
 
-    public static function create(string $requestHash, string $url, string $contentType, $body = ''): CachedResource
-    {
-        if (null === $body) {
+    public static function create(
+        string $requestHash,
+        string $url,
+        string $contentType,
+        ?string $body = ''
+    ): CachedResource {
+        if (empty($body)) {
             $body = '';
         }
 
@@ -87,7 +91,7 @@ class CachedResource
     /**
      * @param string $content
      *
-     * @return CachedResource
+     * @return resource
      */
     private function createStreamFromString(string $content)
     {
