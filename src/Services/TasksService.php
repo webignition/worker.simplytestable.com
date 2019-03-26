@@ -34,10 +34,7 @@ class TasksService
         $this->maxTasksRequestFactor = $maxTasksRequestFactor;
     }
 
-    /**
-     * @return int
-     */
-    public function getWorkerProcessCount()
+    public function getWorkerProcessCount(): int
     {
         return $this->workerProcessCount;
     }
@@ -45,7 +42,7 @@ class TasksService
     /**
      * @return int
      */
-    public function getMaxTasksRequestFactor()
+    public function getMaxTasksRequestFactor(): int
     {
         return $this->maxTasksRequestFactor;
     }
@@ -99,7 +96,7 @@ class TasksService
      */
     private function getUpperLimit()
     {
-        return (int)round($this->getWorkerProcessCount() * $this->getMaxTasksRequestFactor());
+        return (int)round($this->workerProcessCount * $this->getMaxTasksRequestFactor());
     }
 
     /**
@@ -107,7 +104,7 @@ class TasksService
      */
     private function getLowerLimit()
     {
-        return $this->getWorkerProcessCount();
+        return $this->workerProcessCount;
     }
 
     /**
