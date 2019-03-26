@@ -75,9 +75,9 @@ services:
 
     App\Services\TasksService:
       public: true
-      calls:
-        - [setWorkerProcessCount, ['%env(WORKER_PROCESS_COUNT)%']]
-        - [setMaxTasksRequestFactor, ['%env(MAX_TASKS_REQUEST_FACTOR)%']]
+      arguments:
+        $workerProcessCount: '%env(WORKER_PROCESS_COUNT)%'
+        $maxTasksRequestFactor: '%env(MAX_TASKS_REQUEST_FACTOR)%'
 
     GuzzleHttp\Cookie\CookieJarInterface:
       class: GuzzleHttp\Cookie\CookieJar

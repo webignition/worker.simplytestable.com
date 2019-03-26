@@ -11,52 +11,27 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptio
 
 class TasksService
 {
-    /**
-     * @var LoggerInterface
-     */
     private $logger;
-
-    /**
-     * @var ApplicationConfiguration
-     */
     private $applicationConfiguration;
-
-    /**
-     * @var TaskService
-     */
     private $taskService;
-
-    /**
-     * @var int
-     */
-    private $workerProcessCount = null;
-
-    /**
-     * @var int
-     */
-    private $maxTasksRequestFactor = null;
-
-    /**
-     * @var CoreApplicationHttpClient
-     */
     private $coreApplicationHttpClient;
+    private $workerProcessCount = 1;
+    private $maxTasksRequestFactor = 1;
 
-    /**
-     * @param LoggerInterface $logger
-     * @param ApplicationConfiguration $applicationConfiguration
-     * @param TaskService $taskService
-     * @param CoreApplicationHttpClient $coreApplicationHttpClient
-     */
     public function __construct(
         LoggerInterface $logger,
         ApplicationConfiguration $applicationConfiguration,
         TaskService $taskService,
-        CoreApplicationHttpClient $coreApplicationHttpClient
+        CoreApplicationHttpClient $coreApplicationHttpClient,
+        int $workerProcessCount,
+        int $maxTasksRequestFactor
     ) {
         $this->logger = $logger;
         $this->applicationConfiguration = $applicationConfiguration;
         $this->taskService = $taskService;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
+        $this->workerProcessCount = $workerProcessCount;
+        $this->maxTasksRequestFactor = $maxTasksRequestFactor;
     }
 
     /**

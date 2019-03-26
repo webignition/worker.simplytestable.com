@@ -51,7 +51,9 @@ class TasksServiceTest extends \PHPUnit\Framework\TestCase
             $services[LoggerInterface::class],
             $services[ApplicationConfiguration::class],
             $services[TaskService::class],
-            $services[CoreApplicationHttpClient::class]
+            $services[CoreApplicationHttpClient::class],
+            1,
+            1
         );
     }
 
