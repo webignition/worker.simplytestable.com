@@ -33,7 +33,7 @@ class Task implements \JsonSerializable
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    private $id = 0;
 
     /**
      * @var string
@@ -104,7 +104,7 @@ class Task implements \JsonSerializable
      */
     private $parametersObject;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
