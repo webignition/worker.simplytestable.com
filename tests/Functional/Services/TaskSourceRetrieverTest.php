@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services;
 use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\Source;
-use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
@@ -19,6 +18,7 @@ use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
 use App\Tests\Services\ObjectReflector;
+use App\Tests\Services\TaskTypeRetriever;
 use App\Tests\Services\TestTaskFactory;
 use App\Tests\UnhandledGuzzleException;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -33,6 +33,8 @@ use webignition\WebResource\WebPage\WebPage;
 
 class TaskSourceRetrieverTest extends AbstractBaseTestCase
 {
+    const TASK_URL = 'http://example.com/';
+
     /**
      * @var TaskSourceRetriever
      */
@@ -96,7 +98,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         /* @var Retriever $retriever */
         $retriever = self::$container->get('app.services.web-resource-retriever.web-page');
 
-        $task = Task::create($this->getHtmlValidationTaskType(), 'http://example.com');
+        $task = $this->createTask();
 
         $retrieveResult = $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
         $this->assertFalse($retrieveResult);
@@ -116,8 +118,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         /* @var Retriever $retriever */
         $retriever = self::$container->get('app.services.web-resource-retriever.web-page');
 
-        $url = 'http://example.com';
-        $task = Task::create($this->getHtmlValidationTaskType(), $url);
+        $task = $this->createTask();
 
         $this->assertEquals([], $task->getSources());
 
@@ -126,7 +127,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
         $this->assertEquals(
             [
-                $url => $expectedSource,
+                self::TASK_URL => $expectedSource,
             ],
             $task->getSources()
         );
@@ -138,7 +139,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             'disallowed content type' => [
                 'contentType' => 'text/plain',
                 'expectedSource' => new Source(
-                    'http://example.com',
+                    self::TASK_URL,
                     Source::TYPE_INVALID,
                     'invalid:invalid-content-type:text/plain'
                 )
@@ -146,7 +147,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             'unparseable content type' => [
                 'contentType' => 'f o o',
                 'expectedSource' => new Source(
-                    'http://example.com',
+                    self::TASK_URL,
                     Source::TYPE_INVALID,
                     'invalid:invalid-content-type:f o o'
                 )
@@ -228,8 +229,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             new Response(200, ['content-type' => $contentType], 'html content'),
         ]);
 
-        $url = 'http://example.com';
-        $task = Task::create($this->getHtmlValidationTaskType(), $url);
+        $task = $this->createTask();
 
         $this->assertEquals([], $task->getSources());
         $this->assertEquals([], $this->cachedResourceRepository->findAll());
@@ -239,7 +239,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
         /* @var CachedResource $cachedResource */
         $cachedResource = $this->cachedResourceRepository->findOneBy([
-            'url' => $url,
+            'url' => self::TASK_URL,
         ]);
 
         if ($cachedResource instanceof CachedResource) {
@@ -249,7 +249,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
             $this->assertEquals(
                 [
-                    $url => $expectedSource,
+                    self::TASK_URL => $expectedSource,
                 ],
                 $task->getSources()
             );
@@ -268,8 +268,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         /* @var Retriever $retriever */
         $retriever = self::$container->get($retrieverServiceId);
 
-        $url = 'http://example.com';
-        $task = Task::create($this->getHtmlValidationTaskType(), $url);
+        $task = $this->createTask();
 
         $this->assertEquals([], $task->getSources());
         $this->assertEquals([], $this->cachedResourceRepository->findAll());
@@ -279,7 +278,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
         /* @var CachedResource $cachedResource */
         $cachedResource = $this->cachedResourceRepository->findOneBy([
-            'url' => $url,
+            'url' => self::TASK_URL,
         ]);
 
         if ($cachedResource instanceof CachedResource) {
@@ -287,7 +286,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
             $this->assertEquals(
                 [
-                    $url => $expectedSource,
+                    self::TASK_URL => $expectedSource,
                 ],
                 $task->getSources()
             );
@@ -296,7 +295,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
             $this->assertEquals(
                 [
-                    $url => $expectedSource,
+                    self::TASK_URL => $expectedSource,
                 ],
                 $task->getSources()
             );
@@ -313,16 +312,15 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         $cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
         $cachedResourceManager = self::$container->get(CachedResourceManager::class);
 
-        $url = 'http://example.com';
-        $task = Task::create($this->getHtmlValidationTaskType(), $url);
+        $task = $this->createTask();
 
         $this->assertEquals([], $task->getSources());
 
-        $requestIdentifier = $requestIdentifierFactory->createFromTaskResource($task, $url);
+        $requestIdentifier = $requestIdentifierFactory->createFromTaskResource($task, self::TASK_URL);
         $requestHash = (string) $requestIdentifier;
         $resource = WebPage::createFromContent('html content');
 
-        $cachedResource = $cachedResourceFactory->create($requestHash, $url, $resource);
+        $cachedResource = $cachedResourceFactory->create($requestHash, self::TASK_URL, $resource);
         $cachedResourceManager->persist($cachedResource);
 
         $this->assertEquals([$cachedResource], $this->cachedResourceRepository->findAll());
@@ -334,7 +332,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
         $this->assertEquals(
             [
-                $url => $expectedSource,
+                self::TASK_URL => $expectedSource,
             ],
             $task->getSources()
         );
@@ -352,8 +350,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         /* @var Retriever $retriever */
         $retriever = self::$container->get($retrieverServiceId);
 
-        $url = 'http://example.com';
-        $task = Task::create($this->getHtmlValidationTaskType(), $url);
+        $task = $this->createTask();
 
         $this->assertEquals([], $task->getSources());
 
@@ -361,7 +358,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         $this->assertTrue($retrieveResult);
 
         /* @var Source $source */
-        $source = $task->getSources()[$url];
+        $source = $task->getSources()[self::TASK_URL];
 
         $this->assertEquals($expectedSourceData, $source->toArray());
     }
@@ -379,7 +376,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
                     $http404Response,
                 ],
                 'expectedSourceData' => [
-                    'url' => 'http://example.com',
+                    'url' => self::TASK_URL,
                     'type' => Source::TYPE_UNAVAILABLE,
                     'value' => 'http:404',
                     'context' => [],
@@ -388,7 +385,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
             'curl 28' => [
                 'httpFixtures' => array_fill(0, 12, $curl28ConnectException),
                 'expectedSourceData' => [
-                    'url' => 'http://example.com',
+                    'url' => self::TASK_URL,
                     'type' => Source::TYPE_UNAVAILABLE,
                     'value' => 'curl:28',
                     'context' => [],
@@ -410,20 +407,20 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
                     new Response(301, ['location' => 'http://example.com/6']),
                 ],
                 'expectedSourceData' => [
-                    'url' => 'http://example.com',
+                    'url' => self::TASK_URL,
                     'type' => Source::TYPE_UNAVAILABLE,
                     'value' => 'http:301',
                     'context' => [
                         'too_many_redirects' => true,
                         'is_redirect_loop' => false,
                         'history' => [
-                            'http://example.com',
+                            'http://example.com/',
                             'http://example.com/1',
                             'http://example.com/2',
                             'http://example.com/3',
                             'http://example.com/4',
                             'http://example.com/5',
-                            'http://example.com',
+                            'http://example.com/',
                             'http://example.com/1',
                             'http://example.com/2',
                             'http://example.com/3',
@@ -449,20 +446,20 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
                     new Response(301, ['location' => 'http://example.com/3']),
                 ],
                 'expectedSourceData' => [
-                    'url' => 'http://example.com',
+                    'url' => self::TASK_URL,
                     'type' => Source::TYPE_UNAVAILABLE,
                     'value' => 'http:301',
                     'context' => [
                         'too_many_redirects' => true,
                         'is_redirect_loop' => true,
                         'history' => [
-                            'http://example.com',
+                            'http://example.com/',
                             'http://example.com/1',
                             'http://example.com/2',
                             'http://example.com/3',
                             'http://example.com/1',
                             'http://example.com/2',
-                            'http://example.com',
+                            'http://example.com/',
                             'http://example.com/1',
                             'http://example.com/2',
                             'http://example.com/3',
@@ -478,7 +475,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
                     $unhandledGuzzleException,
                 ],
                 'expectedSourceData' => [
-                    'url' => 'http://example.com',
+                    'url' => self::TASK_URL,
                     'type' => Source::TYPE_UNAVAILABLE,
                     'value' => 'unknown:0',
                     'context' => [],
@@ -633,14 +630,14 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         ];
     }
 
-    private function getHtmlValidationTaskType(): Type
+    private function createTask(): Task
     {
-        $type = self::$container->get(TaskTypeService::class)->get(TypeInterface::TYPE_HTML_VALIDATION);
+        $taskTypeRetriever = self::$container->get(TaskTypeRetriever::class);
 
-        if (!$type instanceof Type) {
-            throw new \RuntimeException();
-        }
-
-        return $type;
+        return Task::create(
+            $taskTypeRetriever->retrieve(TypeInterface::TYPE_HTML_VALIDATION),
+            self::TASK_URL,
+            ''
+        );
     }
 }
