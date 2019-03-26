@@ -18,50 +18,19 @@ class HttpHandlerStackFactory
     const MIDDLEWARE_HISTORY_KEY = 'history';
     const MIDDLEWARE_RESPONSE_URL_FIXER_KEY = 'response-url-fixer';
 
-    /**
-     * @var HttpAuthenticationMiddleware
-     */
     private $httpAuthenticationMiddleware;
-
-    /**
-     * @var RequestHeadersMiddleware
-     */
     private $requestHeadersMiddleware;
-
-    /**
-     * @var HttpHistoryContainer
-     */
     private $historyContainer;
-
-    /**
-     * @var ResponseUriFixerFactory
-     */
     private $responseUriFixerFactory;
-
-    /**
-     * @var CacheMiddleware
-     */
     private $cacheMiddleware;
-
-    /**
-     * @var callable|null
-     */
     private $handler;
 
-    /**
-     * @param HttpAuthenticationMiddleware $httpAuthenticationMiddleware
-     * @param RequestHeadersMiddleware $requestHeadersMiddleware
-     * @param HttpHistoryContainer $historyContainer
-     * @param ResponseUriFixerFactory $responseUriFixerFactory
-     * @param CacheMiddleware|null $cacheMiddleware
-     * @param callable|null $handler
-     */
     public function __construct(
         HttpAuthenticationMiddleware $httpAuthenticationMiddleware,
         RequestHeadersMiddleware $requestHeadersMiddleware,
         HttpHistoryContainer $historyContainer,
         ResponseUriFixerFactory $responseUriFixerFactory,
-        CacheMiddleware $cacheMiddleware = null,
+        CacheMiddleware $cacheMiddleware,
         callable $handler = null
     ) {
         $this->httpAuthenticationMiddleware = $httpAuthenticationMiddleware;
@@ -72,10 +41,7 @@ class HttpHandlerStackFactory
         $this->handler = $handler;
     }
 
-    /**
-     * @return HandlerStack
-     */
-    public function create()
+    public function create(): HandlerStack
     {
         $handlerStack = HandlerStack::create($this->handler);
 
