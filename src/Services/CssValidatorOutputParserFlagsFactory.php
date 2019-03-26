@@ -48,10 +48,6 @@ class CssValidatorOutputParserFlagsFactory
             }
         }
 
-        if (null === $flags) {
-            $flags = Flags::NONE;
-        }
-
         return $flags;
     }
 }
