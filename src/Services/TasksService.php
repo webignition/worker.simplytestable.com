@@ -39,9 +39,6 @@ class TasksService
         return $this->workerProcessCount;
     }
 
-    /**
-     * @return int
-     */
     public function getMaxTasksRequestFactor(): int
     {
         return $this->maxTasksRequestFactor;
@@ -96,7 +93,7 @@ class TasksService
      */
     private function getUpperLimit()
     {
-        return (int)round($this->workerProcessCount * $this->getMaxTasksRequestFactor());
+        return (int)round($this->workerProcessCount * $this->maxTasksRequestFactor);
     }
 
     /**
