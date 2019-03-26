@@ -43,7 +43,7 @@ class ApplicationState
 
     public function get(): string
     {
-        if (is_null($this->state)) {
+        if (empty($this->state)) {
             $this->state = $this->readState();
         }
 
