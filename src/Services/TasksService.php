@@ -84,14 +84,6 @@ class TasksService
     /**
      * @return int
      */
-    private function getUpperLimit()
-    {
-        return (int)round($this->workerProcessCount * $this->maxTasksRequestFactor);
-    }
-
-    /**
-     * @return int
-     */
     private function getLowerLimit()
     {
         return $this->workerProcessCount;
@@ -104,7 +96,9 @@ class TasksService
      */
     private function getLimit($requestedLimit = null)
     {
-        $calculatedLimit = $this->getUpperLimit() - $this->taskService->getInCompleteCount();
+        $upperLimit = (int) round($this->workerProcessCount * $this->maxTasksRequestFactor);
+
+        $calculatedLimit = $upperLimit - $this->taskService->getInCompleteCount();
         if (is_null($requestedLimit)) {
             return $calculatedLimit;
         }
