@@ -24,8 +24,6 @@ class TasksServiceTest extends \PHPUnit\Framework\TestCase
             TaskService::class => $taskService,
         ]);
 
-        $tasksService->setWorkerProcessCount($workerProcessCount);
-
         $this->assertFalse($tasksService->request());
     }
 

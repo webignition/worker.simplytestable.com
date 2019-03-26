@@ -35,14 +35,6 @@ class TasksService
     }
 
     /**
-     * @param $limit
-     */
-    public function setWorkerProcessCount($limit)
-    {
-        $this->workerProcessCount = $limit;
-    }
-
-    /**
      * @param $factor
      */
     public function setMaxTasksRequestFactor($factor)
