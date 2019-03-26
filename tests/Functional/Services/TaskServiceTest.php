@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services;
 use App\Model\Task\Parameters;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypeService;
 use App\Tests\Services\TaskTypeRetriever;
 use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -132,8 +131,12 @@ class TaskServiceTest extends AbstractBaseTestCase
 
         $retrievedTask = $this->taskService->getById($id);
 
-        $this->assertEquals($id, $retrievedTask->getId());
-        $this->assertInstanceOf(Type::class, $retrievedTask->getType());
+        if ($retrievedTask instanceof Task) {
+            $this->assertEquals($id, $retrievedTask->getId());
+            $this->assertInstanceOf(Type::class, $retrievedTask->getType());
+        } else {
+            $this->fail('Task was retrieved by known id');
+        }
     }
 
     public function testGetIncompleteCount()
