@@ -111,9 +111,7 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
 
     private function createTask(): Task
     {
-        $taskTypeService = self::$container->get(TaskTypeService::class);
-
-        return Task::create($taskTypeService->get(Type::TYPE_HTML_VALIDATION), self::TASK_URL);
+        return Task::create($this->getTaskType(Type::TYPE_HTML_VALIDATION), self::TASK_URL);
     }
 
     private function setTaskSourceRetrieverOnWebPageTaskSourcePreparer(TaskSourceRetriever $taskSourceRetriever)
@@ -131,5 +129,16 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         parent::tearDown();
 
         \Mockery::close();
+    }
+
+    private function getTaskType(string $name): Type
+    {
+        $type = self::$container->get(TaskTypeService::class)->get($name);
+
+        if (!$type instanceof Type) {
+            throw new \RuntimeException();
+        }
+
+        return $type;
     }
 }

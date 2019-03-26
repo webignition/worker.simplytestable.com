@@ -6,6 +6,7 @@ use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\RequestIdentifier;
 use App\Model\Source;
+use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\SourceFactory;
 use App\Services\TaskService;
@@ -41,7 +42,7 @@ class TaskTest extends AbstractBaseTestCase
 
     public function testParentChildRelationship()
     {
-        $linkIntegrityTaskType = $this->taskTypeService->get(TypeInterface::TYPE_LINK_INTEGRITY);
+        $linkIntegrityTaskType = $this->getTaskType(TypeInterface::TYPE_LINK_INTEGRITY);
 
         $parentTask = Task::create($linkIntegrityTaskType, 'http://example.com');
         $parentTask->setState(Task::STATE_IN_PROGRESS);
@@ -78,7 +79,7 @@ class TaskTest extends AbstractBaseTestCase
 
         $task = $this->taskService->create(
             'http://example.com/',
-            $this->taskTypeService->get(TypeInterface::TYPE_HTML_VALIDATION),
+            $this->getTaskType(TypeInterface::TYPE_HTML_VALIDATION),
             ''
         );
 
@@ -155,5 +156,16 @@ class TaskTest extends AbstractBaseTestCase
         if ($retievedTask instanceof Task) {
             $this->assertEquals($expectedTaskSources, $retievedTask->getSources());
         }
+    }
+
+    private function getTaskType(string $name): Type
+    {
+        $type = $this->taskTypeService->get($name);
+
+        if (!$type instanceof Type) {
+            throw new \InvalidArgumentException();
+        }
+
+        return $type;
     }
 }

@@ -36,7 +36,11 @@ class TaskReportedCompletionEventListenerTest extends AbstractTaskEventListenerT
         }
 
         $this->assertNotNull($task->getId());
-        $this->assertNotNull($task->getOutput()->getId());
+
+        $output = $task->getOutput();
+        if ($output instanceof Output) {
+            $this->assertNotNull($output->getId());
+        }
 
         $eventDispatcher->dispatch(
             TaskEvent::TYPE_REPORTED_COMPLETION,
@@ -44,7 +48,11 @@ class TaskReportedCompletionEventListenerTest extends AbstractTaskEventListenerT
         );
 
         $this->assertNull($task->getId());
-        $this->assertNull($task->getOutput()->getId());
+
+        $output = $task->getOutput();
+        if ($output instanceof Output) {
+            $this->assertNull($output->getId());
+        }
     }
 
     /**

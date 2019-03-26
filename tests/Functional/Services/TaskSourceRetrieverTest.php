@@ -8,6 +8,7 @@ use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\Source;
 use App\Model\Task\Type;
+use App\Model\Task\TypeInterface;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\RequestIdentifierFactory;
@@ -95,7 +96,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         /* @var Retriever $retriever */
         $retriever = self::$container->get('app.services.web-resource-retriever.web-page');
 
-        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), 'http://example.com');
+        $task = Task::create($this->getHtmlValidationTaskType(), 'http://example.com');
 
         $retrieveResult = $this->taskSourceRetriever->retrieve($retriever, $task, $task->getUrl());
         $this->assertFalse($retrieveResult);
@@ -116,7 +117,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         $retriever = self::$container->get('app.services.web-resource-retriever.web-page');
 
         $url = 'http://example.com';
-        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+        $task = Task::create($this->getHtmlValidationTaskType(), $url);
 
         $this->assertEquals([], $task->getSources());
 
@@ -228,7 +229,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         ]);
 
         $url = 'http://example.com';
-        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+        $task = Task::create($this->getHtmlValidationTaskType(), $url);
 
         $this->assertEquals([], $task->getSources());
         $this->assertEquals([], $this->cachedResourceRepository->findAll());
@@ -268,7 +269,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         $retriever = self::$container->get($retrieverServiceId);
 
         $url = 'http://example.com';
-        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+        $task = Task::create($this->getHtmlValidationTaskType(), $url);
 
         $this->assertEquals([], $task->getSources());
         $this->assertEquals([], $this->cachedResourceRepository->findAll());
@@ -313,7 +314,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         $cachedResourceManager = self::$container->get(CachedResourceManager::class);
 
         $url = 'http://example.com';
-        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+        $task = Task::create($this->getHtmlValidationTaskType(), $url);
 
         $this->assertEquals([], $task->getSources());
 
@@ -352,7 +353,7 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
         $retriever = self::$container->get($retrieverServiceId);
 
         $url = 'http://example.com';
-        $task = Task::create($this->taskTypeService->get(Type::TYPE_HTML_VALIDATION), $url);
+        $task = Task::create($this->getHtmlValidationTaskType(), $url);
 
         $this->assertEquals([], $task->getSources());
 
@@ -630,5 +631,16 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
                 'expectedRequestAuthorizationHeaderValue' => 'foouser:foopassword',
             ],
         ];
+    }
+
+    private function getHtmlValidationTaskType(): Type
+    {
+        $type = self::$container->get(TaskTypeService::class)->get(TypeInterface::TYPE_HTML_VALIDATION);
+
+        if (!$type instanceof Type) {
+            throw new \RuntimeException();
+        }
+
+        return $type;
     }
 }

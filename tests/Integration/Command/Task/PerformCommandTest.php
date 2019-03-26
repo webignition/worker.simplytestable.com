@@ -79,11 +79,15 @@ class PerformCommandTest extends AbstractBaseTestCase
         $this->assertEquals($expectedTaskState, $task->getState());
 
         $output = $task->getOutput();
+
         $this->assertInstanceOf(Output::class, $output);
-        $this->assertEquals($expectedErrorCount, $output->getErrorCount());
-        $this->assertEquals(0, $output->getWarningCount());
-        $this->assertEquals('application/json', $output->getContentType());
-        $this->assertEquals($expectedDecodedOutput, json_decode($output->getOutput(), true));
+
+        if ($output instanceof Output) {
+            $this->assertEquals($expectedErrorCount, $output->getErrorCount());
+            $this->assertEquals(0, $output->getWarningCount());
+            $this->assertEquals('application/json', $output->getContentType());
+            $this->assertEquals($expectedDecodedOutput, json_decode((string) $output->getOutput(), true));
+        }
 
         $this->assertTrue(self::$container->get(QueueService::class)->contains(
             TaskReportCompletionJob::QUEUE_NAME,

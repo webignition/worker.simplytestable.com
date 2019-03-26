@@ -5,19 +5,7 @@ namespace App\Tests\Functional\Services;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\TaskTypeService;
-use App\Tests\Services\TestTaskFactory;
-use Doctrine\ORM\OptimisticLockException;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
-use App\Entity\Task\Task;
-use App\Services\HttpRetryMiddleware;
-use App\Services\TaskService;
 use App\Tests\Functional\AbstractBaseTestCase;
-use App\Tests\Factory\ConnectExceptionFactory;
-use App\Tests\Factory\HtmlValidatorFixtureFactory;
-use App\Tests\Services\HttpMockHandler;
-use App\Tests\Utility\File;
-use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class TaskTypeServiceTest extends AbstractBaseTestCase
 {
@@ -53,12 +41,19 @@ class TaskTypeServiceTest extends AbstractBaseTestCase
         $taskType = $this->taskTypeService->get($taskTypeName);
 
         $this->assertInstanceOf(Type::class, $taskType);
-        $this->assertEquals($expectedIsSelectable, $taskType->isSelectable());
 
-        if (empty($expectedChildTypeName)) {
-            $this->assertNull($taskType->getChildType());
-        } else {
-            $this->assertEquals($expectedChildTypeName, $taskType->getChildType()->getName());
+        if ($taskType instanceof Type) {
+            $this->assertEquals($expectedIsSelectable, $taskType->isSelectable());
+
+            if (empty($expectedChildTypeName)) {
+                $this->assertNull($taskType->getChildType());
+            } else {
+                $childType = $taskType->getChildType();
+
+                if ($childType instanceof Type) {
+                    $this->assertEquals($expectedChildTypeName, $childType->getName());
+                }
+            }
         }
     }
 

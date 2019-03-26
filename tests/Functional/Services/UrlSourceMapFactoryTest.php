@@ -51,18 +51,21 @@ class UrlSourceMapFactoryTest extends AbstractBaseTestCase
 
             $this->assertInstanceOf(SourceMapSource::class, $source);
 
-            if (null === $expectedSource->getMappedUri()) {
-                $this->assertNull($source->getMappedUri());
-            } else {
-                $this->assertRegExp($expectedSource->getMappedUri(), $source->getMappedUri());
+            if ($source instanceof SourceMapSource) {
+                if (null === $expectedSource->getMappedUri()) {
+                    $this->assertNull($source->getMappedUri());
+                } else {
+                    $mappedUri = (string) $source->getMappedUri();
 
-                $mappedUri = $source->getMappedUri();
-                $localPath = preg_replace('/^file:/', '', $mappedUri);
+                    $this->assertRegExp($expectedSource->getMappedUri(), $mappedUri);
 
-                $expectedSourceContent = $expectedSourceContents[$expectedSourceIndex];
-                $this->assertEquals($expectedSourceContent, file_get_contents($localPath));
+                    $localPath = (string) preg_replace('/^file:/', '', $mappedUri);
 
-                $this->assertEquals($expectedSource->getType(), $source->getType());
+                    $expectedSourceContent = $expectedSourceContents[$expectedSourceIndex];
+                    $this->assertEquals($expectedSourceContent, file_get_contents($localPath));
+
+                    $this->assertEquals($expectedSource->getType(), $source->getType());
+                }
             }
         }
 

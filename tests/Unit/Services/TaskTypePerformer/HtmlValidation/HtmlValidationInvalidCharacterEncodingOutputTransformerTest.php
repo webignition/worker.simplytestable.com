@@ -45,10 +45,10 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
 
         $task = new Task();
         $task->setOutput($output);
-        $this->assertEquals($decodedOutput, json_decode($output->getOutput(), true));
+        $this->assertEquals($decodedOutput, json_decode((string) $output->getOutput(), true));
 
         $this->transformer->perform($task);
-        $this->assertEquals($decodedOutput, json_decode($output->getOutput(), true));
+        $this->assertEquals($decodedOutput, json_decode((string) $output->getOutput(), true));
     }
 
     /**
@@ -60,13 +60,13 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
 
         $task = new Task();
         $task->setOutput($output);
-        $this->assertEquals($outputContent, json_decode($task->getOutput()->getOutput(), true));
+        $this->assertEquals($outputContent, json_decode((string) $output->getOutput(), true));
 
         $this->transformer->perform($task);
-        $this->assertEquals($expectedDecodedOutput, json_decode($task->getOutput()->getOutput(), true));
-
-        $this->transformer->perform($task);
-        $this->assertEquals($expectedDecodedOutput, json_decode($task->getOutput()->getOutput(), true));
+        $output = $task->getOutput();
+        if ($output instanceof Output) {
+            $this->assertEquals($expectedDecodedOutput, json_decode((string) $output->getOutput(), true));
+        }
     }
 
     public function performHasMessagesDataProvider()

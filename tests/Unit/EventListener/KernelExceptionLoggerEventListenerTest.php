@@ -6,6 +6,7 @@ use App\EventListener\KernelExceptionLoggerEventListener;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -64,7 +65,12 @@ class KernelExceptionLoggerEventListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNull($returnValue);
         $this->assertTrue($event->hasResponse());
-        $this->assertEquals($expectedResponseStatusCode, $event->getResponse()->getStatusCode());
+
+        $response = $event->getResponse();
+
+        if ($response instanceof Response) {
+            $this->assertEquals($expectedResponseStatusCode, $response->getStatusCode());
+        }
     }
 
     public function onKernelExceptionDataProvider(): array
@@ -96,7 +102,7 @@ class KernelExceptionLoggerEventListenerTest extends \PHPUnit\Framework\TestCase
     private function createGetResponseForExceptionEvent(
         Request $request,
         \Exception $exception,
-        ?int $requestType = KernelInterface::MASTER_REQUEST
+        int $requestType = KernelInterface::MASTER_REQUEST
     ): GetResponseForExceptionEvent {
         /* @var KernelInterface $kernel */
         $kernel = \Mockery::mock(KernelInterface::class);

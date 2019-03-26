@@ -26,7 +26,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
 
     public function testConfigureForTaskNoCookiesNoHttpAuthentication()
     {
-        $taskType = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
+        $taskType = $this->getHtmlValidationTaskType();
 
         $task = Task::create($taskType, 'http://example.com/');
         $userAgentString = 'Foo User Agent';
@@ -66,7 +66,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
      */
     public function testConfigureForTaskHasCookies(array $taskParameters, array $expectedCookieStrings)
     {
-        $taskType = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
+        $taskType = $this->getHtmlValidationTaskType();
 
         $task = Task::create($taskType, 'http://example.com/', (string) json_encode($taskParameters));
 
@@ -153,7 +153,7 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
         string $expectedHost,
         string $expectedCredentials
     ) {
-        $taskType = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
+        $taskType = $this->getHtmlValidationTaskType();
 
         $task = Task::create($taskType, 'http://example.com/', (string) json_encode($taskParameters));
         $userAgentString = 'Foo User Agent';
@@ -217,5 +217,16 @@ class HttpClientConfigurationServiceTest extends AbstractBaseTestCase
                 'expectedCredentials' => 'dXNlcm5hbWUgdmFsdWU6cGFzc3dvcmQgdmFsdWU='
             ],
         ];
+    }
+
+    private function getHtmlValidationTaskType(): Type
+    {
+        $type = self::$container->get(TaskTypeService::class)->get(Type::TYPE_HTML_VALIDATION);
+
+        if (!$type instanceof Type) {
+            throw new \RuntimeException();
+        }
+
+        return $type;
     }
 }
