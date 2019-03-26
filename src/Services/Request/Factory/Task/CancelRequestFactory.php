@@ -64,6 +64,6 @@ class CancelRequestFactory
             return null;
         }
 
-        return $this->taskService->getById($requestTaskId);
+        return $this->taskService->getById((int) $requestTaskId);
     }
 }

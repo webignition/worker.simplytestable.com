@@ -44,18 +44,11 @@ class TaskService
         return $task;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return Task
-     *
-     */
-    public function getById($id)
+    public function getById(int $id): ?Task
     {
-        /* @var $task Task */
+        /* @var Task $task */
         $task = $this->taskRepository->find($id);
-
-        if (empty($task)) {
+        if (!$task instanceof Task) {
             return null;
         }
 
