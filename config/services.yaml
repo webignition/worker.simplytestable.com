@@ -90,8 +90,8 @@ services:
     GuzzleHttp\HandlerStack:
       factory: 'App\Services\HttpHandlerStackFactory:create'
 
-    Kevinrob\GuzzleCache\CacheMiddleware:
-      factory: 'App\Services\HttpCacheMiddlewareFactory:create'
+#    Kevinrob\GuzzleCache\CacheMiddleware:
+#      factory: 'App\Services\HttpCacheMiddlewareFactory:create'
 
     webignition\HttpHistoryContainer\Container:
 
@@ -285,3 +285,12 @@ services:
         - method: setMemcached
           arguments:
             - '@Memcached'
+
+    Doctrine\Common\Cache\Cache:
+      alias: Doctrine\Common\Cache\MemcachedCache
+
+    Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage:
+
+    Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy:
+
+    Kevinrob\GuzzleCache\CacheMiddleware:
