@@ -54,7 +54,8 @@ class TasksService
      */
     public function request($requestedLimit = null)
     {
-        if (!$this->isWithinThreshold()) {
+        $isWithinThreshold = $this->taskService->getInCompleteCount() <= $this->getLowerLimit();
+        if (!$isWithinThreshold) {
             return false;
         }
 
@@ -78,14 +79,6 @@ class TasksService
         }
 
         return true;
-    }
-
-    /**
-     * @return bool
-     */
-    private function isWithinThreshold()
-    {
-        return $this->taskService->getInCompleteCount() <= $this->getLowerLimit();
     }
 
     /**
