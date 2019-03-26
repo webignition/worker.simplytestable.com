@@ -4,6 +4,7 @@ namespace App\Entity\Task;
 
 use App\Model\Source;
 use App\Model\Task\Type;
+use App\Model\Task\TypeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use App\Model\Task\Parameters;
 
@@ -108,7 +109,7 @@ class Task implements \JsonSerializable
         return $this->id;
     }
 
-    public static function create(Type $type, string $url, string $parameters = ''): Task
+    public static function create(TypeInterface $type, string $url, string $parameters = ''): Task
     {
         $task = new static();
 

@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Model\Task\Type;
 use App\Entity\Task\Task;
+use App\Model\Task\TypeInterface;
 use App\Repository\TaskRepository;
 use ReflectionClass;
 
@@ -25,7 +25,7 @@ class TaskService
         $this->taskRepository = $taskRepository;
     }
 
-    public function create(string $url, Type $type, string $parameters): Task
+    public function create(string $url, TypeInterface $type, string $parameters): Task
     {
         $task = Task::create($type, $url, $parameters);
 
@@ -68,10 +68,11 @@ class TaskService
         return $task;
     }
 
-    private function setTaskType(Task $task, Type $type)
+    private function setTaskType(Task $task, TypeInterface $type)
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $reflector = new ReflectionClass(Task::class);
+        /** @noinspection PhpUnhandledExceptionInspection */
         $property = $reflector->getProperty('type');
         $property->setAccessible(true);
         $property->setValue($task, $type);

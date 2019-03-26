@@ -11,9 +11,9 @@ use App\Model\Source;
 use App\Model\Task\Type;
 use App\Services\TaskSourceRetriever;
 use App\Services\TaskTypePreparer\WebPageTaskSourcePreparer;
-use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\ObjectReflector;
+use App\Tests\Services\TaskTypeRetriever;
 
 class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
 {
@@ -111,7 +111,9 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
 
     private function createTask(): Task
     {
-        return Task::create($this->getTaskType(Type::TYPE_HTML_VALIDATION), self::TASK_URL);
+        $taskTypeRetriever = self::$container->get(TaskTypeRetriever::class);
+
+        return Task::create($taskTypeRetriever->retrieve(Type::TYPE_HTML_VALIDATION), self::TASK_URL);
     }
 
     private function setTaskSourceRetrieverOnWebPageTaskSourcePreparer(TaskSourceRetriever $taskSourceRetriever)
@@ -129,16 +131,5 @@ class WebPageTaskSourcePreparerTest extends AbstractBaseTestCase
         parent::tearDown();
 
         \Mockery::close();
-    }
-
-    private function getTaskType(string $name): Type
-    {
-        $type = self::$container->get(TaskTypeService::class)->get($name);
-
-        if (!$type instanceof Type) {
-            throw new \RuntimeException();
-        }
-
-        return $type;
     }
 }
