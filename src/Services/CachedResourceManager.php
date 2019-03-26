@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Entity\CachedResource;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 
 class CachedResourceManager
 {
@@ -14,14 +14,14 @@ class CachedResourceManager
     private $entityManager;
 
     /**
-     * @var EntityRepository
+     * @var ObjectRepository
      */
-    private $entityRepository;
+    private $repository;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->entityRepository = $entityManager->getRepository(CachedResource::class);
+        $this->repository = $entityManager->getRepository(CachedResource::class);
     }
 
     public function persist(CachedResource $cachedResource)
@@ -32,7 +32,9 @@ class CachedResourceManager
 
     public function find(string $requestHash): ?CachedResource
     {
-        return $this->entityRepository->find($requestHash);
+        $cachedResource = $this->repository->find($requestHash);
+
+        return $cachedResource instanceof CachedResource ? $cachedResource : null;
     }
 
     public function remove(CachedResource $cachedResource)
