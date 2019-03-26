@@ -2,5 +2,9 @@ parameters:
   excludes_analyse:
     - %currentWorkingDirectory%/src/Migrations/*
 
+  ignoreErrors:
+    - message: '#GuzzleHttp\\Exception\\GuzzleException is not subtype of Throwable#'
+      path: %currentWorkingDirectory%/src/
+
 includes:
   - phpstan.neon
