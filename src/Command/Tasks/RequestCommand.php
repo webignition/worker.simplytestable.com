@@ -69,8 +69,13 @@ class RequestCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $limit = $input->getArgument('limit');
+        if (null !== $limit) {
+            $limit = (int) $limit;
+        }
+
         try {
-            if ($this->tasksService->request($input->getArgument('limit'))) {
+            if ($this->tasksService->request($limit)) {
                 return self::RETURN_CODE_OK;
             }
 

@@ -11,82 +11,35 @@ use webignition\GuzzleHttp\Exception\CurlException\Factory as GuzzleCurlExceptio
 
 class TasksService
 {
-    /**
-     * @var LoggerInterface
-     */
     private $logger;
-
-    /**
-     * @var ApplicationConfiguration
-     */
     private $applicationConfiguration;
-
-    /**
-     * @var TaskService
-     */
     private $taskService;
-
-    /**
-     * @var int
-     */
-    private $workerProcessCount = null;
-
-    /**
-     * @var int
-     */
-    private $maxTasksRequestFactor = null;
-
-    /**
-     * @var CoreApplicationHttpClient
-     */
     private $coreApplicationHttpClient;
+    private $workerProcessCount = 1;
+    private $maxTasksRequestFactor = 1;
 
-    /**
-     * @param LoggerInterface $logger
-     * @param ApplicationConfiguration $applicationConfiguration
-     * @param TaskService $taskService
-     * @param CoreApplicationHttpClient $coreApplicationHttpClient
-     */
     public function __construct(
         LoggerInterface $logger,
         ApplicationConfiguration $applicationConfiguration,
         TaskService $taskService,
-        CoreApplicationHttpClient $coreApplicationHttpClient
+        CoreApplicationHttpClient $coreApplicationHttpClient,
+        int $workerProcessCount,
+        int $maxTasksRequestFactor
     ) {
         $this->logger = $logger;
         $this->applicationConfiguration = $applicationConfiguration;
         $this->taskService = $taskService;
         $this->coreApplicationHttpClient = $coreApplicationHttpClient;
+        $this->workerProcessCount = $workerProcessCount;
+        $this->maxTasksRequestFactor = $maxTasksRequestFactor;
     }
 
-    /**
-     * @param $limit
-     */
-    public function setWorkerProcessCount($limit)
-    {
-        $this->workerProcessCount = $limit;
-    }
-
-    /**
-     * @param $factor
-     */
-    public function setMaxTasksRequestFactor($factor)
-    {
-        $this->maxTasksRequestFactor = $factor;
-    }
-
-    /**
-     * @return int
-     */
-    public function getWorkerProcessCount()
+    public function getWorkerProcessCount(): int
     {
         return $this->workerProcessCount;
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxTasksRequestFactor()
+    public function getMaxTasksRequestFactor(): int
     {
         return $this->maxTasksRequestFactor;
     }
@@ -99,9 +52,10 @@ class TasksService
      * @throws RequestException
      * @throws GuzzleException
      */
-    public function request($requestedLimit = null)
+    public function request(?int $requestedLimit = null): bool
     {
-        if (!$this->isWithinThreshold()) {
+        $isWithinThreshold = $this->taskService->getInCompleteCount() <= $this->workerProcessCount;
+        if (!$isWithinThreshold) {
             return false;
         }
 
@@ -111,7 +65,7 @@ class TasksService
             [
                 'worker_hostname' => $this->applicationConfiguration->getHostname(),
                 'worker_token' => $this->applicationConfiguration->getToken(),
-                'limit' => $this->getLimit($requestedLimit)
+                'limit' => $this->calculateLimit($requestedLimit)
             ]
         );
 
@@ -127,38 +81,11 @@ class TasksService
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    private function isWithinThreshold()
+    private function calculateLimit(?int $requestedLimit = null): int
     {
-        return $this->taskService->getInCompleteCount() <= $this->getLowerLimit();
-    }
+        $upperLimit = (int) round($this->workerProcessCount * $this->maxTasksRequestFactor);
 
-    /**
-     * @return int
-     */
-    private function getUpperLimit()
-    {
-        return (int)round($this->getWorkerProcessCount() * $this->getMaxTasksRequestFactor());
-    }
-
-    /**
-     * @return int
-     */
-    private function getLowerLimit()
-    {
-        return $this->getWorkerProcessCount();
-    }
-
-    /**
-     * @param int $requestedLimit
-     *
-     * @return int
-     */
-    private function getLimit($requestedLimit = null)
-    {
-        $calculatedLimit = $this->getUpperLimit() - $this->taskService->getInCompleteCount();
+        $calculatedLimit = $upperLimit - $this->taskService->getInCompleteCount();
         if (is_null($requestedLimit)) {
             return $calculatedLimit;
         }
@@ -170,13 +97,7 @@ class TasksService
         return min($requestedLimit, $calculatedLimit);
     }
 
-
-    /**
-     * @param HttpRequestException $requestException
-     *
-     * @return RequestException
-     */
-    private function createRequestException(HttpRequestException $requestException)
+    private function createRequestException(HttpRequestException $requestException): RequestException
     {
         $exceptionCode = null;
 
@@ -196,9 +117,6 @@ class TasksService
         );
     }
 
-    /**
-     * @param RequestException $requestException
-     */
     private function logHttpRequestException(RequestException $requestException)
     {
         $this->logger->error(sprintf(
