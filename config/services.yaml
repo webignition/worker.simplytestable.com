@@ -279,3 +279,9 @@ services:
           arguments:
             - '%memcached_host%'
             - '%memcached_port%'
+
+    Doctrine\Common\Cache\MemcachedCache:
+      calls:
+        - method: setMemcached
+          arguments:
+            - '@Memcached'
