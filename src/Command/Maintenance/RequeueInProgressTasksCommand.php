@@ -97,11 +97,8 @@ class RequeueInProgressTasksCommand extends Command
 
     private function getAgeInHours(InputInterface $input): int
     {
-        $age = $input->getOption('age-in-hours');
-        if (!is_int($age) || $age < self::DEFAULT_AGE_IN_HOURS) {
-            $age = self::DEFAULT_AGE_IN_HOURS;
-        }
+        $age = (int) $input->getOption('age-in-hours');
 
-        return (int) $age;
+        return $age < self::DEFAULT_AGE_IN_HOURS ? self::DEFAULT_AGE_IN_HOURS : $age;
     }
 }
