@@ -102,13 +102,7 @@ class TasksService
         return min($requestedLimit, $calculatedLimit);
     }
 
-
-    /**
-     * @param HttpRequestException $requestException
-     *
-     * @return RequestException
-     */
-    private function createRequestException(HttpRequestException $requestException)
+    private function createRequestException(HttpRequestException $requestException): RequestException
     {
         $exceptionCode = null;
 
@@ -128,9 +122,6 @@ class TasksService
         );
     }
 
-    /**
-     * @param RequestException $requestException
-     */
     private function logHttpRequestException(RequestException $requestException)
     {
         $this->logger->error(sprintf(
