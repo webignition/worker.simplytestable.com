@@ -6,11 +6,9 @@ use App\Entity\CachedResource;
 use App\Entity\Task\Task;
 use App\Model\RequestIdentifier;
 use App\Model\Source;
-use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Services\SourceFactory;
 use App\Services\TaskService;
-use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\TaskTypeRetriever;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,11 +26,6 @@ class TaskTest extends AbstractBaseTestCase
     private $taskService;
 
     /**
-     * @var TaskTypeService
-     */
-    private $taskTypeService;
-
-    /**
      * @var TaskTypeRetriever
      */
     private $taskTypeRetriever;
@@ -43,7 +36,6 @@ class TaskTest extends AbstractBaseTestCase
 
         $this->entityManager = self::$container->get(EntityManagerInterface::class);
         $this->taskService = self::$container->get(TaskService::class);
-        $this->taskTypeService = self::$container->get(TaskTypeService::class);
         $this->taskTypeRetriever = self::$container->get(TaskTypeRetriever::class);
     }
 

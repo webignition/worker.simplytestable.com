@@ -13,7 +13,6 @@ use App\Services\CachedResourceManager;
 use App\Services\RequestIdentifierFactory;
 use App\Services\SourceFactory;
 use App\Services\TaskSourceRetriever;
-use App\Services\TaskTypeService;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\HttpMockHandler;
@@ -56,11 +55,6 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
     private $httpMockHandler;
 
     /**
-     * @var TaskTypeService
-     */
-    private $taskTypeService;
-
-    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -73,7 +67,6 @@ class TaskSourceRetrieverTest extends AbstractBaseTestCase
 
         $entityManager = self::$container->get(EntityManagerInterface::class);
         $this->cachedResourceRepository = $entityManager->getRepository(CachedResource::class);
-        $this->taskTypeService = self::$container->get(TaskTypeService::class);
     }
 
     public function testRetrieveCannotAcquireLock()
