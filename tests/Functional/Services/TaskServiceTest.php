@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services;
 use App\Model\Task\Parameters;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
-use App\Services\TaskTypeService;
 use App\Tests\Services\TaskTypeRetriever;
 use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -125,7 +124,7 @@ class TaskServiceTest extends AbstractBaseTestCase
     public function testGetById()
     {
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
-        $id = (int) $task->getId();
+        $id = $task->getId();
 
         $entityManager = self::$container->get('doctrine.orm.entity_manager');
         $entityManager->detach($task);

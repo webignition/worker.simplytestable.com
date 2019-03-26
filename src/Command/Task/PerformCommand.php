@@ -60,14 +60,13 @@ class PerformCommand extends AbstractTaskCommand
             return $parentReturnCode;
         }
 
-        $taskId = $this->task->getId();
         $this->taskPerformer->perform($this->task);
 
         if ($this->resqueQueueService->isEmpty('tasks-request')) {
             $this->resqueQueueService->enqueue(new TasksRequestJob());
         }
 
-        $output->writeln('Performed [' . $taskId . ']');
+        $output->writeln('Performed [' . $this->task->getId() . ']');
 
         return 0;
     }

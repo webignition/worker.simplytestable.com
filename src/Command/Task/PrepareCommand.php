@@ -46,10 +46,9 @@ class PrepareCommand extends AbstractTaskCommand
             return $parentReturnCode;
         }
 
-        $taskId = $this->task->getId();
         $this->taskPreparer->prepare($this->task);
 
-        $output->writeln('Prepare started [' . $taskId . ']');
+        $output->writeln('Prepare started [' . $this->task->getId() . ']');
 
         return 0;
     }
