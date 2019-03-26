@@ -52,7 +52,7 @@ class TasksService
      * @throws RequestException
      * @throws GuzzleException
      */
-    public function request($requestedLimit = null)
+    public function request(?int $requestedLimit = null): bool
     {
         $isWithinThreshold = $this->taskService->getInCompleteCount() <= $this->workerProcessCount;
         if (!$isWithinThreshold) {
@@ -65,7 +65,7 @@ class TasksService
             [
                 'worker_hostname' => $this->applicationConfiguration->getHostname(),
                 'worker_token' => $this->applicationConfiguration->getToken(),
-                'limit' => $this->getLimit($requestedLimit)
+                'limit' => $this->calculateLimit($requestedLimit)
             ]
         );
 
@@ -81,12 +81,7 @@ class TasksService
         return true;
     }
 
-    /**
-     * @param int $requestedLimit
-     *
-     * @return int
-     */
-    private function getLimit($requestedLimit = null)
+    private function calculateLimit(?int $requestedLimit = null): int
     {
         $upperLimit = (int) round($this->workerProcessCount * $this->maxTasksRequestFactor);
 
