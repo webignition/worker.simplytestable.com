@@ -3,7 +3,7 @@ parameters:
     container_xml_path: '%rootDir%/../../../var/cache/test/srcApp_KernelTestDebugContainer.xml'
 
   ignoreErrors:
-    - message: '#should return webignition\\WebResource\\WebPage\\WebPage.+ but returns webignition\\WebResourceInterfaces\\WebResourceInterface#'
+    - message: '#should return webignition\\WebResource\\WebPage\\WebPage.* but returns webignition\\WebResourceInterfaces\\WebResourceInterface#'
       path: %currentWorkingDirectory%
 
 includes:
