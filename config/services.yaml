@@ -90,9 +90,6 @@ services:
     GuzzleHttp\HandlerStack:
       factory: 'App\Services\HttpHandlerStackFactory:create'
 
-#    Kevinrob\GuzzleCache\CacheMiddleware:
-#      factory: 'App\Services\HttpCacheMiddlewareFactory:create'
-
     webignition\HttpHistoryContainer\Container:
 
     App\Services\HttpClientService:
