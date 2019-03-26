@@ -42,7 +42,7 @@ abstract class AbstractTaskCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $taskId = $input->getArgument('id');
+        $taskId = (int) $input->getArgument('id');
 
         $this->task = $this->taskService->getById($taskId);
         if (empty($this->task)) {
