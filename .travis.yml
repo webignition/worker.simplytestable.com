@@ -28,6 +28,7 @@ before_install:
   - "mkdir -p ~/.composer"
   - cp .travis.composer.config.json ~/.composer/config.json
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - php -r "var_dump(class_exists('\Memcached'));"
   - mysql -e 'CREATE DATABASE myapp_test;'
   - chmod +x ./bin/console
 
