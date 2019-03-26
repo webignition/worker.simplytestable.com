@@ -26,8 +26,9 @@ class TaskReportedCompletionEventListener
             $this->entityManager->remove($task);
             $this->entityManager->remove($task->getOutput());
             $this->entityManager->flush();
-        } else {
-            /* @var TaskReportCompletionFailureEvent $taskReportCompletionEvent */
+        }
+
+        if ($taskReportCompletionEvent instanceof TaskReportCompletionFailureEvent) {
             $this->logger->error(
                 'task-report-completion failed: [' . $task->getId() . ']',
                 [
