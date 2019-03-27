@@ -4,37 +4,24 @@ namespace App\Services\Request\Factory\Task;
 
 use App\Request\Task\CreateRequest;
 use App\Request\Task\CreateRequestCollection;
+use App\Services\Request\Factory\AbstractPostRequestFactory;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CreateRequestCollectionFactory
+class CreateRequestCollectionFactory extends AbstractPostRequestFactory
 {
     const PARAMETER_TASKS = 'tasks';
 
-    /**
-     * @var ParameterBag
-     */
-    private $requestParameters;
-
-    /**
-     * @var CreateRequestFactory
-     */
     private $createRequestFactory;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param CreateRequestFactory $createRequestFactory
-     */
     public function __construct(RequestStack $requestStack, CreateRequestFactory $createRequestFactory)
     {
-        $this->requestParameters = $requestStack->getCurrentRequest()->request;
+        parent::__construct($requestStack);
+
         $this->createRequestFactory = $createRequestFactory;
     }
 
-    /**
-     * @return CreateRequestCollection
-     */
-    public function create()
+    public function create(): CreateRequestCollection
     {
         $createRequests = [];
         $requestTasks = $this->requestParameters->get(self::PARAMETER_TASKS);

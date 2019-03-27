@@ -3,25 +3,23 @@
 namespace App\Services\Request\Factory\Task;
 
 use App\Request\Task\CreateRequest;
+use App\Services\Request\Factory\AbstractPostRequestFactory;
 use App\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CreateRequestFactory
+class CreateRequestFactory extends AbstractPostRequestFactory
 {
     const PARAMETER_TYPE = 'type';
     const PARAMETER_URL = 'url';
     const PARAMETER_PARAMETERS = 'parameters';
 
-    /**
-     * @var ParameterBag
-     */
-    private $requestParameters;
     private $taskTypeService;
 
     public function __construct(RequestStack $requestStack, TaskTypeService $taskTypeService)
     {
-        $this->requestParameters = $requestStack->getCurrentRequest()->request;
+        parent::__construct($requestStack);
+
         $this->taskTypeService = $taskTypeService;
     }
 
