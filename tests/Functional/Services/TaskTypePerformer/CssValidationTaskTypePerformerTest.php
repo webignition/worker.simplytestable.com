@@ -38,6 +38,24 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->taskTypePerformer = self::$container->get(CssValidationTaskTypePerformer::class);
     }
 
+    public function testPerformAlreadyHasOutput()
+    {
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_CSS_VALIDATION,
+        ]));
+
+        $output = Output::create('', new InternetMediaType('application', 'json'));
+        $task->setOutput($output);
+        $this->assertSame($output, $task->getOutput());
+
+        $taskState = $task->getState();
+
+        $this->taskTypePerformer->perform($task);
+
+        $this->assertEquals($taskState, $task->getState());
+        $this->assertSame($output, $task->getOutput());
+    }
+
     public function testPerformUnableToRetrieveCachedWebPage()
     {
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
@@ -61,24 +79,6 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
         $this->expectException(UnableToPerformTaskException::class);
 
         $this->taskTypePerformer->perform($task);
-    }
-
-    public function testPerformAlreadyHasOutput()
-    {
-        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
-            'type' => TypeInterface::TYPE_CSS_VALIDATION,
-        ]));
-
-        $output = Output::create('', new InternetMediaType('application', 'json'));
-        $task->setOutput($output);
-        $this->assertSame($output, $task->getOutput());
-
-        $taskState = $task->getState();
-
-        $this->taskTypePerformer->perform($task);
-
-        $this->assertEquals($taskState, $task->getState());
-        $this->assertSame($output, $task->getOutput());
     }
 
     /**
