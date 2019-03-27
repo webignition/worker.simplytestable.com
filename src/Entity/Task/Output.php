@@ -48,10 +48,10 @@ class Output
     private $warningCount = 0;
 
     public static function create(
-        ?string $content = null,
-        ?InternetMediaTypeInterface $contentType = null,
-        ?int $errorCount = 0,
-        ?int $warningCount = 0
+        string $content,
+        InternetMediaTypeInterface $contentType,
+        int $errorCount = 0,
+        int $warningCount = 0
     ): Output {
         $output = new static();
 
@@ -68,14 +68,14 @@ class Output
         return $this->id;
     }
 
-    public function getOutput(): ?string
+    public function getOutput(): string
     {
         return $this->output;
     }
 
     public function getContentType(): string
     {
-        return (string)$this->contentType;
+        return (string) $this->contentType;
     }
 
     public function getErrorCount(): int

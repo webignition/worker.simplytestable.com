@@ -11,6 +11,7 @@ use App\Tests\Functional\Services\TaskTypePerformer\AbstractWebPageTaskTypePerfo
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
+use webignition\InternetMediaType\InternetMediaType;
 
 class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -105,7 +106,7 @@ class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
     {
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
 
-        $output = Output::create();
+        $output = Output::create('', new InternetMediaType('application', 'json'));
         $task->setOutput($output);
         $this->assertSame($output, $task->getOutput());
 

@@ -13,6 +13,7 @@ use App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory;
 use App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
+use webignition\InternetMediaType\InternetMediaType;
 
 class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -36,7 +37,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'type' => TypeInterface::TYPE_LINK_INTEGRITY,
         ]));
 
-        $output = Output::create();
+        $output = Output::create('', new InternetMediaType('application', 'json'));
         $task->setOutput($output);
         $this->assertSame($output, $task->getOutput());
 

@@ -8,6 +8,7 @@ use App\Entity\Task\Task;
 use App\Services\TaskOutputMessageFactory;
 use App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
+use webignition\InternetMediaType\InternetMediaType;
 
 class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUnit\Framework\TestCase
 {
@@ -41,7 +42,7 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
     {
         $decodedOutput = [];
 
-        $output = Output::create((string) json_encode($decodedOutput));
+        $output = Output::create((string) json_encode($decodedOutput), new InternetMediaType('application', 'json'));
 
         $task = new Task();
         $task->setOutput($output);
@@ -56,7 +57,7 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
      */
     public function testPerformHasMessages(array $outputContent, array $expectedDecodedOutput)
     {
-        $output = Output::create((string) json_encode($outputContent));
+        $output = Output::create((string) json_encode($outputContent), new InternetMediaType('application', 'json'));
 
         $task = new Task();
         $task->setOutput($output);

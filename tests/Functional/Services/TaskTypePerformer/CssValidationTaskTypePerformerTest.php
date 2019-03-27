@@ -42,7 +42,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'type' => TypeInterface::TYPE_CSS_VALIDATION,
         ]));
 
-        $output = Output::create();
+        $output = Output::create('', new InternetMediaType('application', 'json'));
         $task->setOutput($output);
         $this->assertSame($output, $task->getOutput());
 
