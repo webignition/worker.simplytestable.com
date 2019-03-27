@@ -47,7 +47,7 @@ class FailedSourceExaminer
             $outputContent = $this->taskOutputMessageFactory->createOutputMessageCollectionFromSource($primarySource);
 
             $task->setOutput(Output::create(
-                json_encode($outputContent),
+                (string) json_encode($outputContent),
                 new InternetMediaType('application', 'json'),
                 1
             ));
