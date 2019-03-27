@@ -4,11 +4,10 @@ namespace App\Services;
 
 use App\Entity\CachedResource;
 use App\Entity\Task\Task;
+use App\Model\Source;
 use GuzzleHttp\Psr7\Uri;
-use webignition\InternetMediaType\Parameter\Parser\AttributeParserException;
+use webignition\InternetMediaType\Parser\ParseException;
 use webignition\InternetMediaType\Parser\Parser as ContentTypeParser;
-use webignition\InternetMediaType\Parser\SubtypeParserException;
-use webignition\InternetMediaType\Parser\TypeParserException;
 use webignition\InternetMediaTypeInterface\InternetMediaTypeInterface;
 use webignition\WebResource\WebPage\WebPage;
 
@@ -29,44 +28,60 @@ class TaskCachedSourceWebPageRetriever
     {
         $sources = $task->getSources();
 
-        if (!empty($sources)) {
-            $primarySource = $sources[$task->getUrl()] ?? null;
-
-            if ($primarySource && $primarySource->isCachedResource()) {
-                $requestHash = $primarySource->getValue();
-                $cachedResource = $this->cachedResourceManager->find($requestHash);
-
-                if ($cachedResource) {
-                    $contentType = $this->getCachedResourceContentType($cachedResource);
-
-                    /* @var WebPage $webPage */
-                    /** @noinspection PhpUnhandledExceptionInspection */
-                    $webPage = WebPage::createFromContent(
-                        (string) stream_get_contents($cachedResource->getBody())
-                    );
-
-                    $webPage = $webPage->setContentType($contentType);
-                    $webPage = $webPage->setUri(new Uri($task->getUrl()));
-
-                    return $webPage;
-                }
-            }
+        if (empty($sources)) {
+            return null;
         }
 
-        return null;
+        $primarySource = $sources[$task->getUrl()] ?? null;
+
+        if (empty($primarySource) || ($primarySource instanceof Source && !$primarySource->isCachedResource())) {
+            return null;
+        }
+
+        $requestHash = $primarySource->getValue();
+        $cachedResource = $this->cachedResourceManager->find($requestHash);
+
+        if (empty($cachedResource)) {
+            return null;
+        }
+
+        $contentType = $this->getCachedResourceContentType($cachedResource);
+
+        if (empty($contentType)) {
+            return null;
+        }
+
+        /* @var WebPage $webPage */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $webPage = WebPage::createFromContent(
+            (string) stream_get_contents($cachedResource->getBody())
+        );
+
+        $webPage = $webPage->setContentType($contentType);
+        $webPage = $webPage->setUri(new Uri($task->getUrl()));
+
+        return $webPage;
     }
 
     private function getCachedResourceContentType(CachedResource $cachedResource): ?InternetMediaTypeInterface
     {
         $contentTypeString = $cachedResource->getContentType();
+        $contentType = null;
 
         try {
-            return $this->contentTypeParser->parse($contentTypeString);
-        } catch (AttributeParserException $e) {
-        } catch (SubtypeParserException $e) {
-        } catch (TypeParserException $e) {
+            $contentType = $this->contentTypeParser->parse($contentTypeString);
+        } catch (ParseException $parseException) {
+            // Do nothing
         }
 
-        return null;
+        if (empty($contentType)) {
+            return null;
+        }
+
+        if (!WebPage::models($contentType)) {
+            return null;
+        }
+
+        return $contentType;
     }
 }

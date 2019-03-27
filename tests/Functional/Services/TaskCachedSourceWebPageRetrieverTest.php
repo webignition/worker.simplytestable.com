@@ -12,10 +12,14 @@ use App\Model\Task\TypeInterface;
 use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\ContentTypeFactory;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TaskTypeRetriever;
 use App\Tests\Services\TestTaskFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use webignition\InternetMediaType\InternetMediaType;
+use webignition\InternetMediaType\Parser\ParseException;
 use webignition\WebResource\WebPage\WebPage;
+use webignition\InternetMediaType\Parser\Parser as ContentTypeParser;
 
 class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
 {
@@ -71,6 +75,80 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
         $task->addSource($source);
 
         $this->assertNull($this->taskCachedSourceWebPageRetriever->retrieve($task));
+    }
+
+    public function testRetrieveUnparseableCachedResourceContentType()
+    {
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+        $taskUrl = 'http://example.com';
+
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'url' => $taskUrl,
+            'type' => TypeInterface::TYPE_HTML_VALIDATION,
+        ]));
+
+
+        $webPageContent = 'web page content';
+
+        $testTaskFactory->addPrimaryCachedResourceSourceToTask(
+            $task,
+            $webPageContent,
+            new InternetMediaType('text', 'html')
+        );
+
+        $contentTypeParser = \Mockery::mock(ContentTypeParser::class);
+        $contentTypeParser
+            ->shouldReceive('parse')
+            ->with('text/html')
+            ->andThrow(new ParseException());
+
+        ObjectReflector::setProperty(
+            $this->taskCachedSourceWebPageRetriever,
+            TaskCachedSourceWebPageRetriever::class,
+            'contentTypeParser',
+            $contentTypeParser
+        );
+
+        $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
+
+        $this->assertNull($webPage);
+    }
+
+    public function testRetrieveNonWebPageCachedResourceContentType()
+    {
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+        $taskUrl = 'http://example.com';
+
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'url' => $taskUrl,
+            'type' => TypeInterface::TYPE_HTML_VALIDATION,
+        ]));
+
+
+        $webPageContent = 'web page content';
+
+        $testTaskFactory->addPrimaryCachedResourceSourceToTask(
+            $task,
+            $webPageContent,
+            new InternetMediaType('text', 'html')
+        );
+
+        $contentTypeParser = \Mockery::mock(ContentTypeParser::class);
+        $contentTypeParser
+            ->shouldReceive('parse')
+            ->with('text/html')
+            ->andReturn(new InternetMediaType('foo', 'bar'));
+
+        ObjectReflector::setProperty(
+            $this->taskCachedSourceWebPageRetriever,
+            TaskCachedSourceWebPageRetriever::class,
+            'contentTypeParser',
+            $contentTypeParser
+        );
+
+        $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
+
+        $this->assertNull($webPage);
     }
 
     /**
@@ -137,5 +215,12 @@ class TaskCachedSourceWebPageRetrieverTest extends AbstractBaseTestCase
             self::TASK_URL,
             ''
         );
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        \Mockery::close();
     }
 }
