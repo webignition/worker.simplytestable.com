@@ -25,7 +25,7 @@ class Output
      *
      * @ORM\Column(type="text", nullable=false)
      */
-    private $output = '';
+    private $content = '';
 
     /**
      * @var string
@@ -56,8 +56,8 @@ class Output
     ): Output {
         $output = new static();
 
-        $output->output = $content;
-        $output->contentType = (string) $contentType;
+        $output->content = $content;
+        $output->contentType = $contentType;
         $output->errorCount = $errorCount;
         $output->warningCount = $warningCount;
 
@@ -69,9 +69,9 @@ class Output
         return $this->id;
     }
 
-    public function getOutput(): string
+    public function getContent(): string
     {
-        return $this->output;
+        return $this->content;
     }
 
     public function getContentType(): string

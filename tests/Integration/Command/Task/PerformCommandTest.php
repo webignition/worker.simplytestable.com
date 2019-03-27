@@ -86,7 +86,7 @@ class PerformCommandTest extends AbstractBaseTestCase
             $this->assertEquals($expectedErrorCount, $output->getErrorCount());
             $this->assertEquals(0, $output->getWarningCount());
             $this->assertEquals('application/json', $output->getContentType());
-            $this->assertEquals($expectedDecodedOutput, json_decode((string) $output->getOutput(), true));
+            $this->assertEquals($expectedDecodedOutput, json_decode((string) $output->getContent(), true));
         }
 
         $this->assertTrue(self::$container->get(QueueService::class)->contains(

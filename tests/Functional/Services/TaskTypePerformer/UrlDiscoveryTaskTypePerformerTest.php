@@ -75,7 +75,7 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
 
             $this->assertEquals(
                 $expectedDecodedOutput,
-                json_decode((string) $output->getOutput(), true)
+                json_decode((string) $output->getContent(), true)
             );
         }
     }

@@ -158,7 +158,7 @@ class WebPageTaskInvalidSourceExaminerTest extends AbstractBaseTestCase
         $this->assertInstanceOf(Output::class, $taskOutput);
         $this->assertEquals(0, $taskOutput->getErrorCount());
         $this->assertEquals(0, $taskOutput->getWarningCount());
-        $this->assertEquals('', $taskOutput->getOutput());
+        $this->assertEquals('', $taskOutput->getContent());
     }
 
     public function examineSetsTaskAsSkippedDataProvider()

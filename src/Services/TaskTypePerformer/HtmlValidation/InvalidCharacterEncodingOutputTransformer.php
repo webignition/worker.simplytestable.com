@@ -35,7 +35,7 @@ class InvalidCharacterEncodingOutputTransformer
             return null;
         }
 
-        $decodedOutput = json_decode($output->getOutput(), true);
+        $decodedOutput = json_decode($output->getContent(), true);
         $messages = $decodedOutput['messages'] ?? null;
         if (empty($messages)) {
             return null;

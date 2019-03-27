@@ -48,7 +48,7 @@ class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
             $this->assertEquals('application/json', $output->getContentType());
             $this->assertEquals(1, $output->getErrorCount());
 
-            $outputContent = json_decode((string) $output->getOutput(), true);
+            $outputContent = json_decode((string) $output->getContent(), true);
             $outputMessage = $outputContent['messages'][0];
 
             $this->assertEquals($expectedOutputMessage, $outputMessage);
@@ -146,7 +146,7 @@ class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 
             $this->assertEquals(
                 $expectedDecodedOutput,
-                json_decode((string) $output->getOutput(), true)
+                json_decode((string) $output->getContent(), true)
             );
         }
     }
