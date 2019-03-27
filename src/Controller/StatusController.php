@@ -30,6 +30,6 @@ class StatusController extends AbstractController
 
     private function getLatestGitHash(): string
     {
-        return trim(shell_exec("git log | head -1 | awk {'print $2;'}"));
+        return trim((string) shell_exec("git log | head -1 | awk {'print $2;'}"));
     }
 }
