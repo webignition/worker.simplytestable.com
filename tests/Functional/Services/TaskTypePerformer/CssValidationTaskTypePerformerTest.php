@@ -6,8 +6,10 @@ namespace App\Tests\Functional\Services\TaskTypePerformer;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Exception\UnableToPerformTaskException;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
+use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\CssValidationTaskTypePerformer;
@@ -34,6 +36,31 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
     {
         parent::setUp();
         $this->taskTypePerformer = self::$container->get(CssValidationTaskTypePerformer::class);
+    }
+
+    public function testPerformUnableToRetrieveCachedWebPage()
+    {
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'type' => TypeInterface::TYPE_CSS_VALIDATION,
+        ]));
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, '<!DOCTYPE html>');
+
+        $taskCachedSourceWebPageRetriever = \Mockery::mock(TaskCachedSourceWebPageRetriever::class);
+        $taskCachedSourceWebPageRetriever
+            ->shouldReceive('retrieve')
+            ->with($task)
+            ->andReturn(null);
+
+        ObjectReflector::setProperty(
+            $this->taskTypePerformer,
+            CssValidationTaskTypePerformer::class,
+            'taskCachedSourceWebPageRetriever',
+            $taskCachedSourceWebPageRetriever
+        );
+
+        $this->expectException(UnableToPerformTaskException::class);
+
+        $this->taskTypePerformer->perform($task);
     }
 
     public function testPerformAlreadyHasOutput()
