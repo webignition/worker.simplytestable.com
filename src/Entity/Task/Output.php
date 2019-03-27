@@ -28,7 +28,7 @@ class Output
     private $output = '';
 
     /**
-     * @var InternetMediaTypeInterface
+     * @var string
      *
      * @ORM\Column(type="text", nullable=false)
      */
@@ -57,7 +57,7 @@ class Output
         $output = new static();
 
         $output->output = $content;
-        $output->contentType = $contentType;
+        $output->contentType = (string) $contentType;
         $output->errorCount = $errorCount;
         $output->warningCount = $warningCount;
 
@@ -76,7 +76,7 @@ class Output
 
     public function getContentType(): string
     {
-        return (string) $this->contentType;
+        return $this->contentType;
     }
 
     public function getErrorCount(): int
