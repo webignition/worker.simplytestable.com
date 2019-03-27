@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Exception\Services\TasksService\RequestException;
 use Symfony\Component\Console\Command\Command;
+use webignition\SymfonyConsole\TypedInput\TypedInput;
 
 class RequestCommand extends Command
 {
@@ -69,10 +70,10 @@ class RequestCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $limit = $input->getArgument('limit');
-        if (null !== $limit) {
-            $limit = (int) $limit;
-        }
+        $typedInput = new TypedInput($input);
+
+        $limit = $typedInput->getIntegerArgument('limit');
+        $limit = 0 === $limit ? null : $limit;
 
         try {
             if ($this->tasksService->request($limit)) {

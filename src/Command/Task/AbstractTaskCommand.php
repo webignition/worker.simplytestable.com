@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use webignition\SymfonyConsole\TypedInput\TypedInput;
 
 abstract class AbstractTaskCommand extends Command
 {
@@ -42,7 +43,8 @@ abstract class AbstractTaskCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $taskId = (int) $input->getArgument('id');
+        $typedInput = new TypedInput($input);
+        $taskId = $typedInput->getIntegerArgument('id');
 
         $this->task = $this->taskService->getById($taskId);
         if (empty($this->task)) {
