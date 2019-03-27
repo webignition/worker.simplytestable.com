@@ -52,12 +52,17 @@ class TaskService
             return null;
         }
 
-        $taskTypeName = $this->taskRepository->getTypeById($task->getId());
+        $taskTypeName = $this->taskRepository->getTypeById((int) $task->getId());
         if (empty($taskTypeName)) {
             return null;
         }
 
-        $this->setTaskType($task, $this->taskTypeService->get($taskTypeName));
+        $taskType = $this->taskTypeService->get($taskTypeName);
+        if (empty($taskType)) {
+            return null;
+        }
+
+        $this->setTaskType($task, $taskType);
 
         return $task;
     }
