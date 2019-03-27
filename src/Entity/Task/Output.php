@@ -23,15 +23,16 @@ class Output
     /**
      * @var string
      *
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(type="text", nullable=false)
      */
-    private $output;
+    private $output = '';
 
     /**
      * @var InternetMediaTypeInterface
-     * @ORM\Column(type="text", nullable=true)
+     *
+     * @ORM\Column(type="text", nullable=false)
      */
-    private $contentType;
+    private $contentType = '';
 
     /**
      * @var int
