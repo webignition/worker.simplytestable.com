@@ -48,10 +48,10 @@ class Output
     private $warningCount = 0;
 
     public static function create(
-        ?string $content = null,
-        ?InternetMediaTypeInterface $contentType = null,
-        ?int $errorCount = 0,
-        ?int $warningCount = 0
+        string $content,
+        InternetMediaTypeInterface $contentType,
+        int $errorCount = 0,
+        int $warningCount = 0
     ): Output {
         $output = new static();
 
