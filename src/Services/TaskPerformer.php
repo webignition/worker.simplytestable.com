@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Event\TaskEvent;
+use App\Exception\UnableToPerformTaskException;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Task\Task;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -29,15 +30,21 @@ class TaskPerformer
         }
 
         $taskEvent = new TaskEvent($task);
-        $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORM, $taskEvent);
-
         $nextEvent = TaskEvent::TYPE_PERFORMED;
 
-        if ($task->isIncomplete()) {
-            $nextEvent = TaskEvent::TYPE_PREPARED;
-        } else {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $task->setEndDateTime(new \DateTime());
+        try {
+            $this->eventDispatcher->dispatch(TaskEvent::TYPE_PERFORM, $taskEvent);
+
+            if ($task->isIncomplete()) {
+                $nextEvent = TaskEvent::TYPE_PREPARED;
+            } else {
+                /** @noinspection PhpUnhandledExceptionInspection */
+                $task->setEndDateTime(new \DateTime());
+            }
+        } catch (UnableToPerformTaskException $unableToPerformTaskException) {
+            // Throw by a performer when a task cached web page cannot be retrieved
+            $task->reset();
+            $nextEvent = TaskEvent::TYPE_CREATED;
         }
 
         $this->entityManager->persist($task);
