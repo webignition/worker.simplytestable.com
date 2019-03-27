@@ -96,6 +96,10 @@ class CachedResource
     private function createStreamFromString(string $content)
     {
         $stream = fopen('php://memory', 'r+');
+        if (false === $stream) {
+            throw new \RuntimeException('Unable to fopen php://memory');
+        }
+
         fwrite($stream, $content);
 
         return $stream;
