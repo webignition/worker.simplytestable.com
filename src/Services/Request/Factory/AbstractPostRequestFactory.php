@@ -2,7 +2,6 @@
 
 namespace App\Services\Request\Factory;
 
-use App\Request\VerifyRequest;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 
