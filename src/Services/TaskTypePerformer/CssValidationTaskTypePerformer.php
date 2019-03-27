@@ -143,7 +143,7 @@ class CssValidationTaskTypePerformer
 
             return $this->setTaskOutputAndState(
                 $task,
-                json_encode(array_values($messageList->getMessages())),
+                (string) json_encode(array_values($messageList->getMessages())),
                 Task::STATE_COMPLETED,
                 $messageList->getErrorCount(),
                 $messageList->getWarningCount()
@@ -152,7 +152,7 @@ class CssValidationTaskTypePerformer
 
         return $this->setTaskOutputAndState(
             $task,
-            json_encode([
+            (string) json_encode([
                 $this->getUnknownExceptionErrorOutput($task)
             ]),
             Task::STATE_FAILED_NO_RETRY_AVAILABLE,
