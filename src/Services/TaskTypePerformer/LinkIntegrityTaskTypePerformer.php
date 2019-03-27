@@ -109,7 +109,7 @@ class LinkIntegrityTaskTypePerformer
         $this->httpRetryMiddleware->enable();
 
         $task->setOutput(Output::create(
-            json_encode($linkIntegrityResultCollection),
+            (string) json_encode($linkIntegrityResultCollection),
             new InternetMediaType('application', 'json'),
             $linkIntegrityResultCollection->getErrorCount()
         ));

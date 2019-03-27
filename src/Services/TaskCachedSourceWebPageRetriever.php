@@ -42,7 +42,7 @@ class TaskCachedSourceWebPageRetriever
                     /* @var WebPage $webPage */
                     /** @noinspection PhpUnhandledExceptionInspection */
                     $webPage = WebPage::createFromContent(
-                        stream_get_contents($cachedResource->getBody())
+                        (string) stream_get_contents($cachedResource->getBody())
                     );
 
                     $webPage = $webPage->setContentType($contentType);

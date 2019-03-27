@@ -56,7 +56,9 @@ class InvalidCharacterEncodingOutputTransformer
         $characterEncoding = $this->getCharacterEncodingFromInvalidCharacterEncodingOutput($messageContent);
 
         $updatedOutput = Output::create(
-            json_encode($this->taskOutputMessageFactory->createInvalidCharacterEncodingOutput($characterEncoding)),
+            (string) json_encode(
+                $this->taskOutputMessageFactory->createInvalidCharacterEncodingOutput($characterEncoding)
+            ),
             new InternetMediaType('application', 'json'),
             1
         );

@@ -59,8 +59,8 @@ class TaskTypePerformer
         if (empty($docTypeString)) {
             $isMarkup = strip_tags($webPageContent) !== $webPageContent;
             $output = $isMarkup
-                ? json_encode($this->getMissingDocumentTypeOutput())
-                : json_encode($this->getIsNotMarkupOutput($webPageContent));
+                ? (string) json_encode($this->getMissingDocumentTypeOutput())
+                : (string) json_encode($this->getIsNotMarkupOutput($webPageContent));
 
             return $this->setTaskOutputAndState($task, $output, Task::STATE_FAILED_NO_RETRY_AVAILABLE, 1);
         }
@@ -72,7 +72,7 @@ class TaskTypePerformer
             if (!$doctypeValidator->isValid(DoctypeFactory::createFromDocTypeString($docTypeString))) {
                 return $this->setTaskOutputAndState(
                     $task,
-                    json_encode($this->createInvalidDocumentTypeOutput($docTypeString)),
+                    (string) json_encode($this->createInvalidDocumentTypeOutput($docTypeString)),
                     Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                     1
                 );
@@ -80,7 +80,7 @@ class TaskTypePerformer
         } catch (\InvalidArgumentException $invalidArgumentException) {
             return $this->setTaskOutputAndState(
                 $task,
-                json_encode($this->createInvalidDocumentTypeOutput($docTypeString)),
+                (string) json_encode($this->createInvalidDocumentTypeOutput($docTypeString)),
                 Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 1
             );
@@ -104,7 +104,7 @@ class TaskTypePerformer
 
         return $this->setTaskOutputAndState(
             $task,
-            json_encode([
+            (string) json_encode([
                 'messages' => array_values($messages->getMessages()),
             ]),
             $state,

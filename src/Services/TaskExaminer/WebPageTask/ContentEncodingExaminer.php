@@ -57,7 +57,7 @@ class ContentEncodingExaminer
             );
 
             $task->setOutput(Output::create(
-                json_encode($outputContent),
+                (string) json_encode($outputContent),
                 new InternetMediaType('application', 'json'),
                 1
             ));
