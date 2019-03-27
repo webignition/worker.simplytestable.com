@@ -63,7 +63,7 @@ class UrlDiscoveryTaskTypePerformer
         $finder->getUrlScopeComparer()->addEquivalentSchemes($this->equivalentSchemes);
 
         $task->setOutput(Output::create(
-            json_encode($finder->getUniqueUrls()),
+            (string) json_encode($finder->getUniqueUrls()),
             new InternetMediaType('application', 'json'),
             0
         ));
