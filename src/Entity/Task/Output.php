@@ -68,14 +68,14 @@ class Output
         return $this->id;
     }
 
-    public function getOutput(): ?string
+    public function getOutput(): string
     {
         return $this->output;
     }
 
     public function getContentType(): string
     {
-        return (string)$this->contentType;
+        return (string) $this->contentType;
     }
 
     public function getErrorCount(): int
