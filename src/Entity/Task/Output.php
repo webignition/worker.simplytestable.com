@@ -23,15 +23,16 @@ class Output
     /**
      * @var string
      *
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(type="text", nullable=false)
      */
-    private $output;
+    private $output = '';
 
     /**
-     * @var InternetMediaTypeInterface
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
+     *
+     * @ORM\Column(type="text", nullable=false)
      */
-    private $contentType;
+    private $contentType = '';
 
     /**
      * @var int
@@ -56,7 +57,7 @@ class Output
         $output = new static();
 
         $output->output = $content;
-        $output->contentType = $contentType;
+        $output->contentType = (string) $contentType;
         $output->errorCount = $errorCount;
         $output->warningCount = $warningCount;
 
@@ -75,7 +76,7 @@ class Output
 
     public function getContentType(): string
     {
-        return (string) $this->contentType;
+        return $this->contentType;
     }
 
     public function getErrorCount(): int
