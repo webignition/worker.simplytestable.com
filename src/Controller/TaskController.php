@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
+use App\Request\Task\CancelRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Model\TaskCollection;
 use App\Services\Request\Factory\Task\CancelRequestCollectionFactory;
@@ -75,7 +76,7 @@ class TaskController extends AbstractController
     {
         $cancelRequest = $cancelRequestFactory->create();
 
-        if (!$cancelRequest->isValid()) {
+        if (!$cancelRequest instanceof CancelRequest) {
             throw new BadRequestHttpException();
         }
 

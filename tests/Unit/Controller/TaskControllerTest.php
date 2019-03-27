@@ -21,11 +21,9 @@ class TaskControllerTest extends \PHPUnit\Framework\TestCase
 
         $taskController = $this->createTaskController();
 
-        $cancelRequest = new CancelRequest(null);
-
         $taskController->cancelAction(MockFactory::createCancelRequestFactory([
             'create' => [
-                'return' => $cancelRequest,
+                'return' => null,
             ],
         ]));
     }
