@@ -4,6 +4,7 @@
 namespace App\Tests\Unit\Services\Request\Factory\Task;
 
 use App\Model\Task\TypeInterface;
+use App\Request\Task\CreateRequest;
 use App\Services\Request\Factory\Task\CreateRequestFactory;
 use App\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\Request;
@@ -73,10 +74,14 @@ class CreateRequestFactoryTest extends \PHPUnit\Framework\TestCase
         $createRequestFactory = new CreateRequestFactory($requestStack, $taskTypeService);
         $createRequest = $createRequestFactory->create();
 
-        $this->assertEquals($expectedTaskType, $createRequest->getTaskType());
-        $this->assertEquals($expectedUrl, $createRequest->getUrl());
-        $this->assertEquals($expectedParameters, $createRequest->getParameters());
-        $this->assertEquals($expectedIsValid, $createRequest->isValid());
+        $this->assertInstanceOf(CreateRequest::class, $createRequest);
+
+        if ($createRequest instanceof CreateRequest) {
+            $this->assertEquals($expectedTaskType, $createRequest->getTaskType());
+            $this->assertEquals($expectedUrl, $createRequest->getUrl());
+            $this->assertEquals($expectedParameters, $createRequest->getParameters());
+            $this->assertEquals($expectedIsValid, $createRequest->isValid());
+        }
     }
 
     public function createDataProvider(): array
