@@ -1,8 +1,8 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Unit\Request\Task;
 
-use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
 use App\Request\Task\CreateRequest;
 
@@ -10,77 +10,43 @@ class CreateRequestTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider createDataProvider
-     *
-     * @param string $taskTypeName
-     * @param string $url
-     * @param string|null $parameters
-     * @param bool $expectedIsValid
-     * @param string|null $expectedTaskType
-     * @param string $expectedUrl
-     * @param string $expectedParameters
      */
     public function testCreate(
-        string $taskTypeName,
+        TypeInterface $type,
         string $url,
-        ?string $parameters,
-        bool $expectedIsValid,
-        ?string $expectedTaskType,
-        string $expectedUrl,
-        string $expectedParameters
+        string $parameters,
+        bool $expectedIsValid
     ) {
-        $taskType = empty($taskTypeName)
-            ? null
-            : new Type($taskTypeName, true, null);
-
-        $createRequest = new CreateRequest($url, $taskType, $parameters);
+        $createRequest = new CreateRequest($url, $type, $parameters);
 
         $this->assertEquals($expectedIsValid, $createRequest->isValid());
-        $this->assertEquals($expectedTaskType, $createRequest->getTaskType());
-        $this->assertEquals($expectedUrl, $createRequest->getUrl());
-        $this->assertEquals($expectedParameters, $createRequest->getParameters());
+        $this->assertSame($type, $createRequest->getTaskType());
+        $this->assertEquals($url, $createRequest->getUrl());
+        $this->assertEquals($parameters, $createRequest->getParameters());
     }
 
-    /**
-     * @return array
-     */
-    public function createDataProvider()
+    public function createDataProvider(): array
     {
+        $taskType = \Mockery::mock(TypeInterface::class);
+
         return [
-            'empty task type is invalid' => [
-                'taskTypeName' => '',
-                'url' => 'http://example.com/',
-                'parameters' => null,
-                'expectedIsValid' => false,
-                'expectedTaskType' => null,
-                'expectedUrl' => 'http://example.com/',
-                'expectedParameters' => '',
-            ],
             'empty url is invalid' => [
-                'taskTypeName' => TypeInterface::TYPE_HTML_VALIDATION,
+                'taskType' => $taskType,
                 'url' => '',
-                'parameters' => null,
+                'parameters' => '',
                 'expectedIsValid' => false,
-                'expectedTaskType' => TypeInterface::TYPE_HTML_VALIDATION,
-                'expectedUrl' => '',
-                'expectedParameters' => '',
             ],
             'valid' => [
-                'taskTypeName' => TypeInterface::TYPE_HTML_VALIDATION,
+                'taskType' => $taskType,
                 'url' => 'http://example.com/',
-                'parameters' => null,
+                'parameters' => '',
                 'expectedIsValid' => true,
-                'expectedTaskType' => TypeInterface::TYPE_HTML_VALIDATION,
-                'expectedUrl' => 'http://example.com/',
-                'expectedParameters' => '',
             ],
             'valid with parameters' => [
-                'taskTypeName' => TypeInterface::TYPE_HTML_VALIDATION,
+                'taskType' => $taskType,
                 'url' => 'http://example.com/',
                 'parameters' => 'foo',
                 'expectedIsValid' => true,
-                'expectedTaskType' => TypeInterface::TYPE_HTML_VALIDATION,
-                'expectedUrl' => 'http://example.com/',
-                'expectedParameters' => 'foo',
             ],
         ];
     }

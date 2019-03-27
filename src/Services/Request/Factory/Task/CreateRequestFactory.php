@@ -2,7 +2,6 @@
 
 namespace App\Services\Request\Factory\Task;
 
-use App\Model\Task\Type;
 use App\Request\Task\CreateRequest;
 use App\Services\TaskTypeService;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -18,10 +17,6 @@ class CreateRequestFactory
      * @var ParameterBag
      */
     private $requestParameters;
-
-    /**
-     * @var TaskTypeService
-     */
     private $taskTypeService;
 
     public function __construct(RequestStack $requestStack, TaskTypeService $taskTypeService)
@@ -30,40 +25,24 @@ class CreateRequestFactory
         $this->taskTypeService = $taskTypeService;
     }
 
-    /**
-     * @param ParameterBag $parameters
-     */
     public function setRequestParameters(ParameterBag $parameters)
     {
         $this->requestParameters = $parameters;
     }
 
-    /**
-     * @return CreateRequest
-     */
-    public function create()
+    public function create(): ?CreateRequest
     {
         $taskTypeValue = strtolower(trim($this->requestParameters->get(self::PARAMETER_TYPE)));
         $taskType = $this->taskTypeService->get($taskTypeValue);
 
-        if (!empty($taskType) && !$taskType->isSelectable()) {
-            $taskType = null;
+        if (empty($taskType) || ($taskType && !$taskType->isSelectable())) {
+            return null;
         }
 
         return new CreateRequest(
-            $this->getStringValueFromRequestParameters(self::PARAMETER_URL),
+            trim($this->requestParameters->get(self::PARAMETER_URL)),
             $taskType,
-            $this->getStringValueFromRequestParameters(self::PARAMETER_PARAMETERS)
+            trim($this->requestParameters->get(self::PARAMETER_PARAMETERS))
         );
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return string
-     */
-    private function getStringValueFromRequestParameters($key)
-    {
-        return trim($this->requestParameters->get($key));
     }
 }

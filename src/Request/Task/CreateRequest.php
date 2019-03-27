@@ -2,26 +2,15 @@
 
 namespace App\Request\Task;
 
-use App\Model\Task\Type;
+use App\Model\Task\TypeInterface;
 
 class CreateRequest
 {
-    /**
-     * @var string
-     */
     private $url;
-
-    /**
-     * @var Type
-     */
     private $taskType;
-
-    /**
-     * @var string
-     */
     private $parameters;
 
-    public function __construct(string $url, ?Type $taskType, ?string $parameters)
+    public function __construct(string $url, TypeInterface $taskType, string $parameters)
     {
         $this->url = trim($url);
         $this->taskType = $taskType;
@@ -30,10 +19,6 @@ class CreateRequest
 
     public function isValid(): bool
     {
-        if (empty($this->taskType)) {
-            return false;
-        }
-
         if (empty($this->url)) {
             return false;
         }
@@ -41,7 +26,7 @@ class CreateRequest
         return true;
     }
 
-    public function getTaskType(): ?Type
+    public function getTaskType(): TypeInterface
     {
         return $this->taskType;
     }

@@ -7,8 +7,8 @@ use App\Model\Task\Parameters;
 use App\Model\Task\TypeInterface;
 use App\Request\Task\CreateRequest;
 use App\Services\TaskFactory;
-use App\Services\TaskTypeService;
 use App\Tests\Functional\AbstractBaseTestCase;
+use App\Tests\Services\TaskTypeRetriever;
 
 class TaskFactoryTest extends AbstractBaseTestCase
 {
@@ -36,8 +36,8 @@ class TaskFactoryTest extends AbstractBaseTestCase
      */
     public function testCreate($taskTypeName, $url, $parameters)
     {
-        $taskTypeService = self::$container->get(TaskTypeService::class);
-        $taskType = $taskTypeService->get($taskTypeName);
+        $taskTypeRetriever = self::$container->get(TaskTypeRetriever::class);
+        $taskType = $taskTypeRetriever->retrieve($taskTypeName);
 
         $createRequest = new CreateRequest($url, $taskType, $parameters);
 
