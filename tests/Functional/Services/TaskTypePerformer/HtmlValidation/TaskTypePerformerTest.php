@@ -7,7 +7,10 @@ namespace App\Tests\Functional\Services\TaskTypePerformer\HtmlValidation;
 
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
+use App\Exception\UnableToPerformTaskException;
+use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Tests\Functional\Services\TaskTypePerformer\AbstractWebPageTaskTypePerformerTest;
+use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
@@ -116,6 +119,29 @@ class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 
         $this->assertEquals($taskState, $task->getState());
         $this->assertSame($output, $task->getOutput());
+    }
+
+    public function testPerformUnableToRetrieveCachedWebPage()
+    {
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $this->testTaskFactory->addPrimaryCachedResourceSourceToTask($task, '<!DOCTYPE html>');
+
+        $taskCachedSourceWebPageRetriever = \Mockery::mock(TaskCachedSourceWebPageRetriever::class);
+        $taskCachedSourceWebPageRetriever
+            ->shouldReceive('retrieve')
+            ->with($task)
+            ->andReturn(null);
+
+        ObjectReflector::setProperty(
+            $this->taskTypePerformer,
+            TaskTypePerformer::class,
+            'taskCachedSourceWebPageRetriever',
+            $taskCachedSourceWebPageRetriever
+        );
+
+        $this->expectException(UnableToPerformTaskException::class);
+
+        $this->taskTypePerformer->perform($task);
     }
 
     /**
