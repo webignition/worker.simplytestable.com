@@ -12,6 +12,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use webignition\SymfonyConsole\TypedInput\TypedInput;
 
 class RequeueInProgressTasksCommand extends Command
 {
@@ -56,8 +57,11 @@ class RequeueInProgressTasksCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $isDryRun = $input->getOption('dry-run') !== false;
-        $ageInHours = $this->getAgeInHours($input);
+        $typedInput = new TypedInput($input);
+
+        $isDryRun = $typedInput->getBooleanOption('dry-run');
+        $ageInHours = $typedInput->getIntegerOption('age-in-hours');
+        $ageInHours = $ageInHours > 0 ? $ageInHours : self::DEFAULT_AGE_IN_HOURS;
 
         if ($isDryRun) {
             $output->writeln('<comment>This is a DRY RUN, no data will be written</comment>');
@@ -93,12 +97,5 @@ class RequeueInProgressTasksCommand extends Command
         }
 
         $output->writeln('');
-    }
-
-    private function getAgeInHours(InputInterface $input): int
-    {
-        $age = (int) $input->getOption('age-in-hours');
-
-        return $age < self::DEFAULT_AGE_IN_HOURS ? self::DEFAULT_AGE_IN_HOURS : $age;
     }
 }
