@@ -9,6 +9,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use App\Entity\Task\Task;
+use GuzzleHttp\Psr7\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
@@ -40,6 +41,9 @@ class TaskCompletionReporter
             return true;
         }
 
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $endDateTime = $task->getEndDateTime() ?? new \DateTime();
+
         $request = $this->coreApplicationHttpClient->createPostRequest(
             'task_complete',
             [
@@ -48,7 +52,7 @@ class TaskCompletionReporter
                 'parameter_hash' => $task->getParametersHash(),
             ],
             [
-                'end_date_time' => $task->getEndDateTime()->format('c'),
+                'end_date_time' => $endDateTime->format('c'),
                 'output' => $taskOutput->getContent(),
                 'contentType' => $taskOutput->getContentType(),
                 'state' => 'task-' . $task->getState(),
@@ -67,29 +71,33 @@ class TaskCompletionReporter
             $failureType = TaskReportCompletionFailureEvent::FAILURE_TYPE_UNKNOWN;
             $statusCode = 0;
 
-            if ($curlExceptionFactory::isCurlException($connectException)) {
+            $curlException = $curlExceptionFactory::fromConnectException($connectException);
+            if ($curlException) {
                 $failureType = TaskReportCompletionFailureEvent::FAILURE_TYPE_CURL;
-                $statusCode = $curlExceptionFactory::fromConnectException($connectException)->getCurlCode();
+                $statusCode = $curlException->getCurlCode();
             }
 
             $this->dispatchFailureEvent($task, $failureType, $statusCode, (string) $request->getUri());
 
             return false;
         } catch (BadResponseException $badResponseException) {
+            $failureType = TaskReportCompletionFailureEvent::FAILURE_TYPE_UNKNOWN;
+            $failureCode = 0;
+
             $response = $badResponseException->getResponse();
 
-            if (410 === $response->getStatusCode()) {
-                $this->dispatchSuccessEvent($task);
+            if ($response instanceof Response) {
+                if (410 === $response->getStatusCode()) {
+                    $this->dispatchSuccessEvent($task);
 
-                return true;
+                    return true;
+                }
+
+                $failureType = TaskReportCompletionFailureEvent::FAILURE_TYPE_HTTP;
+                $failureCode = $response->getStatusCode();
             }
 
-            $this->dispatchFailureEvent(
-                $task,
-                TaskReportCompletionFailureEvent::FAILURE_TYPE_HTTP,
-                $response->getStatusCode(),
-                (string) $request->getUri()
-            );
+            $this->dispatchFailureEvent($task, $failureType, $failureCode, (string) $request->getUri());
 
             return false;
         }
