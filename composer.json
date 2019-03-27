@@ -96,9 +96,11 @@
         "static-analysis-tests": "./vendor/bin/phpstan analyse tests --level=7 -c phpstan.tests.neon",
         "test-unit": "./vendor/bin/phpunit --colors tests/Unit",
         "test-functional": "./vendor/bin/phpunit --colors tests/Functional/",
+        "test-integration": "./vendor/bin/phpunit --colors tests/Integration/",
         "test": [
             "@composer test-unit",
-            "@composer test-functional"
+            "@composer test-functional",
+            "@composer test-integration"
         ],
         "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php --ignore=src/Migrations src/ tests/",
         "ci": [

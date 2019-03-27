@@ -4,6 +4,7 @@
 namespace App\Tests\Unit\Services\Request\Factory\Task;
 
 use App\Entity\Task\Task;
+use App\Request\Task\CancelRequest;
 use App\Services\Request\Factory\Task\CancelRequestFactory;
 use App\Services\TaskService;
 use Symfony\Component\HttpFoundation\Request;
@@ -64,7 +65,9 @@ class CancelRequestFactoryTest extends \PHPUnit\Framework\TestCase
         $cancelRequestFactory = new CancelRequestFactory($requestStack, $taskService);
         $cancelRequest = $cancelRequestFactory->create();
 
-        $this->assertSame($task, $cancelRequest->getTask());
+        if ($cancelRequest instanceof CancelRequest) {
+            $this->assertSame($task, $cancelRequest->getTask());
+        }
     }
 
     /**
