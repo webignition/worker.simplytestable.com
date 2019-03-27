@@ -8,18 +8,13 @@ class CancelRequest
 {
     private $task;
 
-    public function __construct(?Task $task)
+    public function __construct(Task $task)
     {
         $this->task = $task;
     }
 
-    public function getTask(): ?Task
+    public function getTask(): Task
     {
         return $this->task;
-    }
-
-    public function isValid(): bool
-    {
-        return $this->task instanceof Task;
     }
 }
