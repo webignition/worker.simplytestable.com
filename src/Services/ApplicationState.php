@@ -55,7 +55,8 @@ class ApplicationState
         $state = self::STATE_NEW;
 
         if (file_exists($this->stateResourcePath)) {
-            $state = trim(file_get_contents($this->stateResourcePath));
+            $state = file_get_contents($this->stateResourcePath);
+            $state = $state === false ? '' : trim($state);
         }
 
         if (!$this->isAllowedState($state)) {
