@@ -94,7 +94,7 @@ class TasksService
             $requestedLimit = 1;
         }
 
-        return min($requestedLimit, $calculatedLimit);
+        return (int) min($requestedLimit, $calculatedLimit);
     }
 
     private function createRequestException(HttpRequestException $requestException): RequestException
