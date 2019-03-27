@@ -45,7 +45,7 @@ class TaskOutputMessageFactory
             $failureType = $source->getFailureType();
 
             if (Source::FAILURE_TYPE_CURL === $failureType) {
-                $message = $this->createMessageFromCurlCode($source->getFailureCode());
+                $message = $this->createMessageFromCurlCode((int) $source->getFailureCode());
                 $messageId .= 'curl-code-';
             }
 
