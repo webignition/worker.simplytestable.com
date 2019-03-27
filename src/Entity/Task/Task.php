@@ -230,6 +230,14 @@ class Task implements \JsonSerializable
         ]);
     }
 
+    public function reset()
+    {
+        $this->state = self::STATE_QUEUED;
+        $this->output = null;
+        $this->startDateTime = null;
+        $this->sources = [];
+    }
+
     public function jsonSerialize(): array
     {
         return [
