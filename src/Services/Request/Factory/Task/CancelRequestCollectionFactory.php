@@ -4,21 +4,14 @@ namespace App\Services\Request\Factory\Task;
 
 use App\Request\Task\CancelRequest;
 use App\Request\Task\CancelRequestCollection;
+use App\Services\Request\Factory\AbstractPostRequestFactory;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CancelRequestCollectionFactory
+class CancelRequestCollectionFactory extends AbstractPostRequestFactory
 {
     const PARAMETER_IDS = 'ids';
 
-    /**
-     * @var ParameterBag
-     */
-    private $requestParameters;
-
-    /**
-     * @var CancelRequestFactory
-     */
     private $cancelRequestFactory;
 
     /**
@@ -27,14 +20,12 @@ class CancelRequestCollectionFactory
      */
     public function __construct(RequestStack $requestStack, CancelRequestFactory $cancelRequestFactory)
     {
-        $this->requestParameters = $requestStack->getCurrentRequest()->request;
+        parent::__construct($requestStack);
+
         $this->cancelRequestFactory = $cancelRequestFactory;
     }
 
-    /**
-     * @return CancelRequestCollection
-     */
-    public function create()
+    public function create(): CancelRequestCollection
     {
         $cancelRequests = [];
         $requestTaskIds = $this->requestParameters->get(self::PARAMETER_IDS);

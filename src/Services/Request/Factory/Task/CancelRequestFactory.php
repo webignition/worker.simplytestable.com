@@ -4,20 +4,21 @@ namespace App\Services\Request\Factory\Task;
 
 use App\Entity\Task\Task;
 use App\Request\Task\CancelRequest;
+use App\Services\Request\Factory\AbstractPostRequestFactory;
 use App\Services\TaskService;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CancelRequestFactory
+class CancelRequestFactory extends AbstractPostRequestFactory
 {
     const PARAMETER_ID = 'id';
 
-    private $requestParameters;
     private $taskService;
 
     public function __construct(RequestStack $requestStack, TaskService $taskService)
     {
-        $this->requestParameters = $requestStack->getCurrentRequest()->request;
+        parent::__construct($requestStack);
+
         $this->taskService = $taskService;
     }
 
