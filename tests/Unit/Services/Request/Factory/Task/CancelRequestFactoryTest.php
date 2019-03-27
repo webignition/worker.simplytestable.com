@@ -1,9 +1,10 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Unit\Services\Request\Factory\Task;
 
-use Mockery\MockInterface;
 use App\Entity\Task\Task;
+use App\Request\Task\CancelRequest;
 use App\Services\Request\Factory\Task\CancelRequestFactory;
 use App\Services\TaskService;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,33 +13,21 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class CancelRequestFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider createDataProvider
-     *
-     * @param Request $request
-     * @param TaskService $taskService,
-     * @param Task $expectedTask
+     * @dataProvider createReturnsNullDataProvider
      */
-    public function testCreate(
-        Request $request,
-        TaskService $taskService,
-        $expectedTask
-    ) {
+    public function testCreateReturnsNull(Request $request, TaskService $taskService)
+    {
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
         $cancelRequestFactory = new CancelRequestFactory($requestStack, $taskService);
         $cancelRequest = $cancelRequestFactory->create();
 
-        $this->assertEquals($expectedTask, $cancelRequest->getTask());
+        $this->assertNull($cancelRequest);
     }
 
-    /**
-     * @return array
-     */
-    public function createDataProvider()
+    public function createReturnsNullDataProvider(): array
     {
-        $task = new Task();
-
         return [
             'empty task' => [
                 'request' => new Request(),
@@ -52,23 +41,13 @@ class CancelRequestFactoryTest extends \PHPUnit\Framework\TestCase
                 'taskService' => \Mockery::mock(TaskService::class),
                 'expectedTaskType' => null,
             ],
-            'valid task' => [
-                'request' => new Request([], [
-                    'id' => '1',
-                ]),
-                'taskService' => $this->createTaskService($task),
-                'expectedTaskType' => $task,
-            ],
         ];
     }
 
-    /**
-     * @param Task $task
-     *
-     * @return MockInterface|TaskService
-     */
-    private function createTaskService(Task $task)
+    public function testCreateSuccess()
     {
+        $task = \Mockery::mock(Task::class);
+
         $taskService = \Mockery::mock(TaskService::class);
 
         $taskService
@@ -76,7 +55,19 @@ class CancelRequestFactoryTest extends \PHPUnit\Framework\TestCase
             ->with(1)
             ->andReturn($task);
 
-        return $taskService;
+        $request = new Request([], [
+            'id' => '1',
+        ]);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $cancelRequestFactory = new CancelRequestFactory($requestStack, $taskService);
+        $cancelRequest = $cancelRequestFactory->create();
+
+        if ($cancelRequest instanceof CancelRequest) {
+            $this->assertSame($task, $cancelRequest->getTask());
+        }
     }
 
     /**
@@ -85,6 +76,7 @@ class CancelRequestFactoryTest extends \PHPUnit\Framework\TestCase
     protected function tearDown()
     {
         parent::tearDown();
+
         \Mockery::close();
     }
 }
