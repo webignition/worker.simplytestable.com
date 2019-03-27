@@ -161,7 +161,7 @@ class WebPageTaskFailedSourceExaminerTest extends AbstractBaseTestCase
         $this->assertInstanceOf(Output::class, $taskOutput);
         $this->assertEquals(1, $taskOutput->getErrorCount());
         $this->assertEquals(0, $taskOutput->getWarningCount());
-        $this->assertEquals(json_encode($expectedOutput), $taskOutput->getOutput());
+        $this->assertEquals(json_encode($expectedOutput), $taskOutput->getContent());
     }
 
     public function examineSetsTaskAsFailedDataProvider()

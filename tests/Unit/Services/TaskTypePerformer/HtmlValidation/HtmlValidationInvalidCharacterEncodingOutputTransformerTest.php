@@ -46,10 +46,10 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
 
         $task = new Task();
         $task->setOutput($output);
-        $this->assertEquals($decodedOutput, json_decode((string) $output->getOutput(), true));
+        $this->assertEquals($decodedOutput, json_decode((string) $output->getContent(), true));
 
         $this->transformer->perform($task);
-        $this->assertEquals($decodedOutput, json_decode((string) $output->getOutput(), true));
+        $this->assertEquals($decodedOutput, json_decode((string) $output->getContent(), true));
     }
 
     /**
@@ -61,12 +61,12 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
 
         $task = new Task();
         $task->setOutput($output);
-        $this->assertEquals($outputContent, json_decode((string) $output->getOutput(), true));
+        $this->assertEquals($outputContent, json_decode((string) $output->getContent(), true));
 
         $this->transformer->perform($task);
         $output = $task->getOutput();
         if ($output instanceof Output) {
-            $this->assertEquals($expectedDecodedOutput, json_decode((string) $output->getOutput(), true));
+            $this->assertEquals($expectedDecodedOutput, json_decode((string) $output->getContent(), true));
         }
     }
 

@@ -105,7 +105,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
             $this->assertEquals(
                 $expectedDecodedOutput,
-                json_decode((string) $output->getOutput(), true)
+                json_decode((string) $output->getContent(), true)
             );
         }
     }

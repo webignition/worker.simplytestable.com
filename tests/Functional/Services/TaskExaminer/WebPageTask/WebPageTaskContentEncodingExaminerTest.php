@@ -150,7 +150,7 @@ class WebPageTaskContentEncodingExaminerTest extends AbstractBaseTestCase
                         'type' => 'error',
                     ],
                 ],
-            ]), $taskOutput->getOutput());
+            ]), $taskOutput->getContent());
         }
     }
 
