@@ -64,8 +64,7 @@ class UrlDiscoveryTaskTypePerformer
 
         $task->setOutput(Output::create(
             (string) json_encode($finder->getUniqueUrls()),
-            new InternetMediaType('application', 'json'),
-            0
+            new InternetMediaType('application', 'json')
         ));
 
         $task->setState(Task::STATE_COMPLETED);
