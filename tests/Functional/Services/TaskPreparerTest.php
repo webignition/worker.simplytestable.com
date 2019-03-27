@@ -4,6 +4,7 @@
 namespace App\Tests\Functional\Services;
 
 use App\Event\TaskEvent;
+use App\Exception\UnableToPerformTaskException;
 use App\Exception\UnableToRetrieveResourceException;
 use App\Model\Task\Type;
 use App\Model\Task\TypeInterface;
@@ -247,6 +248,39 @@ class TaskPreparerTest extends AbstractBaseTestCase
             ->shouldReceive('dispatch')
             ->with(TaskEvent::TYPE_PREPARE, \Mockery::any())
             ->andThrow(new UnableToRetrieveResourceException());
+
+        $eventDispatcher
+            ->shouldReceive('dispatch')
+            ->with(TaskEvent::TYPE_CREATED, \Mockery::any());
+
+        ObjectReflector::setProperty(
+            $taskPreparer,
+            TaskPreparer::class,
+            'eventDispatcher',
+            $eventDispatcher
+        );
+
+        $taskPreparer->prepare($task);
+
+        $this->addToAssertionCount(\Mockery::getContainer()->mockery_getExpectationCount());
+    }
+
+    public function testPrepareUnableToPerformTaskException()
+    {
+        $taskValues = TestTaskFactory::createTaskValuesFromDefaults([
+            TestTaskFactory::DEFAULT_TASK_TYPE => Type::TYPE_HTML_VALIDATION,
+        ]);
+
+        $taskPreparer = self::$container->get(TaskPreparer::class);
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+
+        $task = $testTaskFactory->create($taskValues);
+
+        $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
+        $eventDispatcher
+            ->shouldReceive('dispatch')
+            ->with(TaskEvent::TYPE_PREPARE, \Mockery::any())
+            ->andThrow(new UnableToPerformTaskException());
 
         $eventDispatcher
             ->shouldReceive('dispatch')
