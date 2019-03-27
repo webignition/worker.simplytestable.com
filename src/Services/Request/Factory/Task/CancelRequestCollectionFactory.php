@@ -2,6 +2,7 @@
 
 namespace App\Services\Request\Factory\Task;
 
+use App\Request\Task\CancelRequest;
 use App\Request\Task\CancelRequestCollection;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -45,7 +46,7 @@ class CancelRequestCollectionFactory
                 ]));
                 $cancelRequest = $this->cancelRequestFactory->create();
 
-                if ($cancelRequest->isValid()) {
+                if ($cancelRequest instanceof CancelRequest) {
                     $cancelRequests[] = $cancelRequest;
                 }
             }
