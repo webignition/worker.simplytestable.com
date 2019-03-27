@@ -24,7 +24,7 @@ class ApplicationState
         $this->stateResourcePath = $stateResourcePath;
     }
 
-    public function set(?string $state): bool
+    public function set(string $state): bool
     {
         $state = trim($state);
 
