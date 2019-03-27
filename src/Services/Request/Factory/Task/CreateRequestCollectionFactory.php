@@ -2,6 +2,7 @@
 
 namespace App\Services\Request\Factory\Task;
 
+use App\Request\Task\CreateRequest;
 use App\Request\Task\CreateRequestCollection;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -43,7 +44,7 @@ class CreateRequestCollectionFactory
                 $this->createRequestFactory->setRequestParameters(new ParameterBag($requestTask));
                 $createRequest = $this->createRequestFactory->create();
 
-                if ($createRequest->isValid()) {
+                if ($createRequest instanceof CreateRequest && $createRequest->isValid()) {
                     $createRequests[] = $createRequest;
                 }
             }
