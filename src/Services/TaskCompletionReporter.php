@@ -49,7 +49,7 @@ class TaskCompletionReporter
             ],
             [
                 'end_date_time' => $task->getEndDateTime()->format('c'),
-                'output' => $taskOutput->getOutput(),
+                'output' => $taskOutput->getContent(),
                 'contentType' => $taskOutput->getContentType(),
                 'state' => 'task-' . $task->getState(),
                 'errorCount' => $taskOutput->getErrorCount(),

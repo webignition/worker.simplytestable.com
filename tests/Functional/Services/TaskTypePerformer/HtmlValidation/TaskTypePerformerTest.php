@@ -11,6 +11,7 @@ use App\Tests\Functional\Services\TaskTypePerformer\AbstractWebPageTaskTypePerfo
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\HtmlValidation\TaskTypePerformer;
 use App\Tests\Factory\HtmlValidatorFixtureFactory;
+use webignition\InternetMediaType\InternetMediaType;
 
 class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -47,7 +48,7 @@ class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
             $this->assertEquals('application/json', $output->getContentType());
             $this->assertEquals(1, $output->getErrorCount());
 
-            $outputContent = json_decode((string) $output->getOutput(), true);
+            $outputContent = json_decode((string) $output->getContent(), true);
             $outputMessage = $outputContent['messages'][0];
 
             $this->assertEquals($expectedOutputMessage, $outputMessage);
@@ -105,7 +106,7 @@ class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
     {
         $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
 
-        $output = Output::create();
+        $output = Output::create('', new InternetMediaType('application', 'json'));
         $task->setOutput($output);
         $this->assertSame($output, $task->getOutput());
 
@@ -145,7 +146,7 @@ class TaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 
             $this->assertEquals(
                 $expectedDecodedOutput,
-                json_decode((string) $output->getOutput(), true)
+                json_decode((string) $output->getContent(), true)
             );
         }
     }

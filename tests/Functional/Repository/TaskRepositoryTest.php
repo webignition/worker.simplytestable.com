@@ -11,6 +11,7 @@ use App\Model\Task\TypeInterface;
 use App\Repository\TaskRepository;
 use App\Tests\Functional\AbstractBaseTestCase;
 use App\Tests\Services\TestTaskFactory;
+use webignition\InternetMediaType\InternetMediaType;
 
 class TaskRepositoryTest extends AbstractBaseTestCase
 {
@@ -135,12 +136,12 @@ class TaskRepositoryTest extends AbstractBaseTestCase
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/output/1',
-                        'output' => Output::create('output1'),
+                        'output' => Output::create('output1', new InternetMediaType('application', 'json')),
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults(),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/output/2',
-                        'output' => Output::create('output2'),
+                        'output' => Output::create('output2', new InternetMediaType('application', 'json')),
                     ]),
                 ],
                 'expectedTaskIndices' => [
@@ -151,15 +152,15 @@ class TaskRepositoryTest extends AbstractBaseTestCase
                 'taskValuesCollection' => [
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/output/1',
-                        'output' => Output::create('output1'),
+                        'output' => Output::create('output1', new InternetMediaType('application', 'json')),
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/output/2',
-                        'output' => Output::create('output2'),
+                        'output' => Output::create('output2', new InternetMediaType('application', 'json')),
                     ]),
                     TestTaskFactory::createTaskValuesFromDefaults([
                         'url' => 'http://example.com/output/3',
-                        'output' => Output::create('output3'),
+                        'output' => Output::create('output3', new InternetMediaType('application', 'json')),
                     ]),
                 ],
                 'expectedTaskIndices' => [

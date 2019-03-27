@@ -42,7 +42,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'type' => TypeInterface::TYPE_CSS_VALIDATION,
         ]));
 
-        $output = Output::create();
+        $output = Output::create('', new InternetMediaType('application', 'json'));
         $task->setOutput($output);
         $this->assertSame($output, $task->getOutput());
 
@@ -105,7 +105,7 @@ class CssValidationTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
 
             $this->assertEquals(
                 $expectedDecodedOutput,
-                json_decode((string) $output->getOutput(), true)
+                json_decode((string) $output->getContent(), true)
             );
         }
     }

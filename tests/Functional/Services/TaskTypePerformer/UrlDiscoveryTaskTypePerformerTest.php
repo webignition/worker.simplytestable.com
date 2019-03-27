@@ -10,6 +10,7 @@ use App\Model\Task\TypeInterface;
 use App\Tests\Services\TestTaskFactory;
 use App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer;
 use App\Tests\Factory\HtmlDocumentFactory;
+use webignition\InternetMediaType\InternetMediaType;
 
 class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformerTest
 {
@@ -33,7 +34,7 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
             'type' => TypeInterface::TYPE_URL_DISCOVERY,
         ]));
 
-        $output = Output::create();
+        $output = Output::create('', new InternetMediaType('application', 'json'));
         $task->setOutput($output);
         $this->assertSame($output, $task->getOutput());
 
@@ -74,7 +75,7 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
 
             $this->assertEquals(
                 $expectedDecodedOutput,
-                json_decode((string) $output->getOutput(), true)
+                json_decode((string) $output->getContent(), true)
             );
         }
     }

@@ -23,15 +23,16 @@ class Output
     /**
      * @var string
      *
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(type="text", nullable=false)
      */
-    private $output;
+    private $content = '';
 
     /**
-     * @var InternetMediaTypeInterface
-     * @ORM\Column(type="text", nullable=true)
+     * @var string
+     *
+     * @ORM\Column(type="text", nullable=false)
      */
-    private $contentType;
+    private $contentType = '';
 
     /**
      * @var int
@@ -48,14 +49,14 @@ class Output
     private $warningCount = 0;
 
     public static function create(
-        ?string $content = null,
-        ?InternetMediaTypeInterface $contentType = null,
-        ?int $errorCount = 0,
-        ?int $warningCount = 0
+        string $content,
+        InternetMediaTypeInterface $contentType,
+        int $errorCount = 0,
+        int $warningCount = 0
     ): Output {
         $output = new static();
 
-        $output->output = $content;
+        $output->content = $content;
         $output->contentType = $contentType;
         $output->errorCount = $errorCount;
         $output->warningCount = $warningCount;
@@ -68,14 +69,14 @@ class Output
         return $this->id;
     }
 
-    public function getOutput(): ?string
+    public function getContent(): string
     {
-        return $this->output;
+        return $this->content;
     }
 
     public function getContentType(): string
     {
-        return (string)$this->contentType;
+        return $this->contentType;
     }
 
     public function getErrorCount(): int

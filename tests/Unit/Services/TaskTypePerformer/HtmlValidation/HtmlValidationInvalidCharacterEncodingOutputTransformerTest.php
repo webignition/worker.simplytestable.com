@@ -8,6 +8,7 @@ use App\Entity\Task\Task;
 use App\Services\TaskOutputMessageFactory;
 use App\Services\TaskTypePerformer\HtmlValidation\InvalidCharacterEncodingOutputTransformer;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
+use webignition\InternetMediaType\InternetMediaType;
 
 class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUnit\Framework\TestCase
 {
@@ -41,14 +42,14 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
     {
         $decodedOutput = [];
 
-        $output = Output::create((string) json_encode($decodedOutput));
+        $output = Output::create((string) json_encode($decodedOutput), new InternetMediaType('application', 'json'));
 
         $task = new Task();
         $task->setOutput($output);
-        $this->assertEquals($decodedOutput, json_decode((string) $output->getOutput(), true));
+        $this->assertEquals($decodedOutput, json_decode((string) $output->getContent(), true));
 
         $this->transformer->perform($task);
-        $this->assertEquals($decodedOutput, json_decode((string) $output->getOutput(), true));
+        $this->assertEquals($decodedOutput, json_decode((string) $output->getContent(), true));
     }
 
     /**
@@ -56,16 +57,16 @@ class HtmlValidationInvalidCharacterEncodingOutputTransformerTest extends \PHPUn
      */
     public function testPerformHasMessages(array $outputContent, array $expectedDecodedOutput)
     {
-        $output = Output::create((string) json_encode($outputContent));
+        $output = Output::create((string) json_encode($outputContent), new InternetMediaType('application', 'json'));
 
         $task = new Task();
         $task->setOutput($output);
-        $this->assertEquals($outputContent, json_decode((string) $output->getOutput(), true));
+        $this->assertEquals($outputContent, json_decode((string) $output->getContent(), true));
 
         $this->transformer->perform($task);
         $output = $task->getOutput();
         if ($output instanceof Output) {
-            $this->assertEquals($expectedDecodedOutput, json_decode((string) $output->getOutput(), true));
+            $this->assertEquals($expectedDecodedOutput, json_decode((string) $output->getContent(), true));
         }
     }
 
