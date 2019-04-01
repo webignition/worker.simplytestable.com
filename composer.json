@@ -110,7 +110,6 @@
         "ci": [
             "@composer cs",
             "@composer static-analysis",
-            "@composer static-analysis-tests",
             "@composer test"
         ]
     },

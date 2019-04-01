@@ -19,6 +19,7 @@ use App\Tests\Services\TestTaskFactory;
 use App\Services\Resque\QueueService;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Response;
+use Mockery;
 use Symfony\Component\Console\Output\NullOutput;
 use App\Tests\Functional\AbstractBaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -48,6 +49,7 @@ class PerformCommandTest extends AbstractBaseTestCase
         callable $setUp,
         array $httpFixtures,
         array $taskValues,
+        bool $expectedHasPrimarySource,
         string $expectedTaskState,
         int $expectedErrorCount,
         array $expectedDecodedOutput
@@ -63,10 +65,16 @@ class PerformCommandTest extends AbstractBaseTestCase
         $task = $testTaskFactory->create($taskValues);
 
         $sources = $task->getSources();
-        $primarySource = $sources[$task->getUrl()];
-        $primarySourceRequestHash = $primarySource->getValue();
+        $primarySourceRequestHash = null;
 
-        $this->assertNotNull($entityManager->find(CachedResource::class, $primarySourceRequestHash));
+        if ($expectedHasPrimarySource) {
+            $primarySource = $sources[$task->getUrl()];
+            $primarySourceRequestHash = $primarySource->getValue();
+
+            $this->assertNotNull($entityManager->find(CachedResource::class, $primarySourceRequestHash));
+        } else {
+            $this->assertEmpty($sources);
+        }
 
         $returnCode = $this->command->run(
             new ArrayInput([
@@ -96,7 +104,9 @@ class PerformCommandTest extends AbstractBaseTestCase
             ]
         ));
 
-        $this->assertNull($entityManager->find(CachedResource::class, $primarySourceRequestHash));
+        if ($expectedHasPrimarySource) {
+            $this->assertNull($entityManager->find(CachedResource::class, $primarySourceRequestHash));
+        }
     }
 
     public function runDataProvider(): array
@@ -121,6 +131,7 @@ class PerformCommandTest extends AbstractBaseTestCase
                         ],
                     ],
                 ]),
+                'expectedHasPrimarySource' => true,
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
@@ -146,6 +157,7 @@ class PerformCommandTest extends AbstractBaseTestCase
                         ],
                     ],
                 ]),
+                'expectedHasPrimarySource' => true,
                 'expectedTaskState' => Task::STATE_FAILED_NO_RETRY_AVAILABLE,
                 'expectedErrorCount' => 1,
                 'expectedDecodedOutput' => [
@@ -186,15 +198,13 @@ class PerformCommandTest extends AbstractBaseTestCase
                         ],
                     ],
                 ]),
+                'expectedHasPrimarySource' => true,
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [],
             ],
             'link integrity' => [
                 'setUp' => function () {
-                    CssValidatorFixtureFactory::set(
-                        CssValidatorFixtureFactory::load('no-messages')
-                    );
                 },
                 'httpFixtures' => [
                     new Response(200),
@@ -211,6 +221,7 @@ class PerformCommandTest extends AbstractBaseTestCase
                         ],
                     ],
                 ]),
+                'expectedHasPrimarySource' => true,
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
@@ -238,10 +249,34 @@ class PerformCommandTest extends AbstractBaseTestCase
                         ],
                     ],
                 ]),
+                'expectedHasPrimarySource' => true,
                 'expectedTaskState' => Task::STATE_COMPLETED,
                 'expectedErrorCount' => 0,
                 'expectedDecodedOutput' => [
                     'http://example.com/foo',
+                ],
+            ],
+            'link integrity single url' => [
+                'setUp' => function () {
+                },
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'taskValues' => TestTaskFactory::createTaskValuesFromDefaults([
+                    'url' => 'http://example.com/foo',
+                    'type' => TypeInterface::TYPE_LINK_INTEGRITY_SINGLE_URL,
+                    'parameters' => json_encode([
+                        'element' => '<a href="/foo"></a>'
+                    ]),
+                ]),
+                'expectedHasPrimarySource' => false,
+                'expectedTaskState' => Task::STATE_COMPLETED,
+                'expectedErrorCount' => 0,
+                'expectedDecodedOutput' => [
+                    'context' => '<a href="/foo"></a>',
+                    'state' => 200,
+                    'type' => 'http',
+                    'url' => 'http://example.com/foo',
                 ],
             ],
         ];
@@ -253,6 +288,6 @@ class PerformCommandTest extends AbstractBaseTestCase
     protected function tearDown()
     {
         parent::tearDown();
-        \Mockery::close();
+        Mockery::close();
     }
 }
