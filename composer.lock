@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c942de7b2a61c13650b7edc47b686259",
+    "content-hash": "3c1d8908a4891cc4a1bd2b11237f415d",
     "packages": [
         {
             "name": "algo26-matthias/idna-convert",
@@ -4197,23 +4197,23 @@
         },
         {
             "name": "webignition/css-validator-wrapper",
-            "version": "5.9",
+            "version": "5.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/css-validator-wrapper.git",
-                "reference": "ac5aa4b09439ae39c15650a248fa12c18a14481f"
+                "reference": "6077db21bacb403a701175c9911ccdebc478aee1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/ac5aa4b09439ae39c15650a248fa12c18a14481f",
-                "reference": "ac5aa4b09439ae39c15650a248fa12c18a14481f",
+                "url": "https://api.github.com/repos/webignition/css-validator-wrapper/zipball/6077db21bacb403a701175c9911ccdebc478aee1",
+                "reference": "6077db21bacb403a701175c9911ccdebc478aee1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2.0",
                 "webignition/absolute-url-deriver": ">=3,<4",
                 "webignition/css-validator-output-parser": ">=5.2,<6",
-                "webignition/ignored-url-verifier": ">=0.1,<1",
+                "webignition/ignored-url-verifier": ">=1,<2",
                 "webignition/resource-storage": ">=0.1,<1",
                 "webignition/uri": ">=0.3,<1",
                 "webignition/url-source-map": "^0.2.0",
@@ -4245,7 +4245,7 @@
                 "css",
                 "validator"
             ],
-            "time": "2019-02-26T17:06:33+00:00"
+            "time": "2019-04-01T16:33:45+00:00"
         },
         {
             "name": "webignition/disallowed-character-terminated-string",
@@ -4815,16 +4815,16 @@
         },
         {
             "name": "webignition/ignored-url-verifier",
-            "version": "0.1",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/ignored-url-verifier.git",
-                "reference": "96a4a04458196779194a6d8d8087fa7e299f9d08"
+                "reference": "03ea2e9fac35de9dda24a60909c2cd5466ade609"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/ignored-url-verifier/zipball/96a4a04458196779194a6d8d8087fa7e299f9d08",
-                "reference": "96a4a04458196779194a6d8d8087fa7e299f9d08",
+                "url": "https://api.github.com/repos/webignition/ignored-url-verifier/zipball/03ea2e9fac35de9dda24a60909c2cd5466ade609",
+                "reference": "03ea2e9fac35de9dda24a60909c2cd5466ade609",
                 "shasum": ""
             },
             "require": {
@@ -4847,7 +4847,7 @@
                 "MIT"
             ],
             "homepage": "https://github.com/webignition/ignored-url-verifier",
-            "time": "2019-02-15T17:50:56+00:00"
+            "time": "2019-04-01T15:04:01+00:00"
         },
         {
             "name": "webignition/internet-media-type",
