@@ -5,6 +5,7 @@ namespace App\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
+use App\Exception\UnableToPerformTaskException;
 use App\Model\Task\Type;
 use App\Services\CssValidatorErrorFactory;
 use App\Services\CssValidatorOutputParserFlagsFactory;
@@ -74,6 +75,7 @@ class CssValidationTaskTypePerformer
      *
      * @throws InvalidValidatorOutputException
      * @throws UnknownSourceException
+     * @throws UnableToPerformTaskException
      */
     public function __invoke(TaskEvent $taskEvent)
     {
@@ -89,6 +91,7 @@ class CssValidationTaskTypePerformer
      *
      * @throws InvalidValidatorOutputException
      * @throws UnknownSourceException
+     * @throws UnableToPerformTaskException
      */
     public function perform(Task $task)
     {
@@ -98,7 +101,12 @@ class CssValidationTaskTypePerformer
 
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
-        return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
+        $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
+        if (empty($webPage)) {
+            throw new UnableToPerformTaskException();
+        }
+
+        return $this->performValidation($task, $webPage);
     }
 
     /**

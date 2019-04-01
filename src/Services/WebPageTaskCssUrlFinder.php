@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Task\Task;
+use App\Exception\UnableToPerformTaskException;
 use App\Model\CssSourceUrl;
 use App\Model\Source;
 
@@ -26,10 +27,17 @@ class WebPageTaskCssUrlFinder
      * @param Task $task
      *
      * @return CssSourceUrl[]
+     *
+     * @throws UnableToPerformTaskException
      */
     public function find(Task $task): array
     {
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
+
+        if (empty($webPage)) {
+            throw new UnableToPerformTaskException();
+        }
+
         $webPageUrl = (string) $webPage->getBaseUrl();
 
         $cssSourceUrls = $this->cssSourceInspector->findStylesheetUrls($webPage);

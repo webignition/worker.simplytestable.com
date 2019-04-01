@@ -56,7 +56,7 @@ class Task implements \JsonSerializable
     private $type;
 
     /**
-     * @var Output
+     * @var Output|null
      *
      * @ORM\OneToOne(targetEntity="App\Entity\Task\Output", cascade={"persist"})
      */
@@ -70,14 +70,14 @@ class Task implements \JsonSerializable
     private $parameters;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $startDateTime;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ORM\Column(type="datetime", nullable=true)
      */
@@ -228,6 +228,14 @@ class Task implements \JsonSerializable
             Task::STATE_PREPARED,
             Task::STATE_IN_PROGRESS,
         ]);
+    }
+
+    public function reset()
+    {
+        $this->state = self::STATE_QUEUED;
+        $this->output = null;
+        $this->startDateTime = null;
+        $this->sources = [];
     }
 
     public function jsonSerialize(): array

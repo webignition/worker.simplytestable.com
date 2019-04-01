@@ -5,6 +5,7 @@ namespace App\Services\TaskTypePerformer\HtmlValidation;
 use App\Entity\Task\Output as TaskOutput;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
+use App\Exception\UnableToPerformTaskException;
 use App\Model\HtmlValidationMessageList;
 use App\Model\Task\Type;
 use App\Services\TaskCachedSourceWebPageRetriever;
@@ -32,6 +33,11 @@ class TaskTypePerformer
         $this->htmlValidatorWrapper = $htmlValidatorWrapper;
     }
 
+    /**
+     * @param TaskEvent $taskEvent
+     *
+     * @throws UnableToPerformTaskException
+     */
     public function __invoke(TaskEvent $taskEvent)
     {
         if (Type::TYPE_HTML_VALIDATION === (string) $taskEvent->getTask()->getType()) {
@@ -39,13 +45,25 @@ class TaskTypePerformer
         }
     }
 
+    /**
+     * @param Task $task
+     *
+     * @return null
+     *
+     * @throws UnableToPerformTaskException
+     */
     public function perform(Task $task)
     {
         if (!empty($task->getOutput())) {
             return null;
         }
 
-        return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
+        $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
+        if (empty($webPage)) {
+            throw new UnableToPerformTaskException();
+        }
+
+        return $this->performValidation($task, $webPage);
     }
 
     /**

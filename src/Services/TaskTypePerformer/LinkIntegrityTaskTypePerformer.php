@@ -5,6 +5,7 @@ namespace App\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
+use App\Exception\UnableToPerformTaskException;
 use App\Model\LinkIntegrityResult;
 use App\Model\LinkIntegrityResultCollection;
 use App\Model\Task\Type;
@@ -62,6 +63,11 @@ class LinkIntegrityTaskTypePerformer
         $this->httpRetryMiddleware = $httpRetryMiddleware;
     }
 
+    /**
+     * @param TaskEvent $taskEvent
+     *
+     * @throws UnableToPerformTaskException
+     */
     public function __invoke(TaskEvent $taskEvent)
     {
         if (Type::TYPE_LINK_INTEGRITY === (string) $taskEvent->getTask()->getType()) {
@@ -69,15 +75,27 @@ class LinkIntegrityTaskTypePerformer
         }
     }
 
+    /**
+     * @param Task $task
+     *
+     * @return null
+     *
+     * @throws UnableToPerformTaskException
+     */
     public function perform(Task $task)
     {
         if (!empty($task->getOutput())) {
             return null;
         }
 
+        $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
+        if (empty($webPage)) {
+            throw new UnableToPerformTaskException();
+        }
+
         $this->httpClientConfigurationService->configureForTask($task, self::USER_AGENT);
 
-        return $this->performValidation($task, $this->taskCachedSourceWebPageRetriever->retrieve($task));
+        return $this->performValidation($task, $webPage);
     }
 
     private function performValidation(Task $task, WebPage $webPage)

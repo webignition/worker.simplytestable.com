@@ -5,6 +5,7 @@ namespace App\Services\TaskTypePerformer;
 use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
+use App\Exception\UnableToPerformTaskException;
 use App\Model\Task\Type;
 use App\Services\TaskCachedSourceWebPageRetriever;
 use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
@@ -31,6 +32,11 @@ class UrlDiscoveryTaskTypePerformer
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
     }
 
+    /**
+     * @param TaskEvent $taskEvent
+     *
+     * @throws UnableToPerformTaskException
+     */
     public function __invoke(TaskEvent $taskEvent)
     {
         if (Type::TYPE_URL_DISCOVERY === (string) $taskEvent->getTask()->getType()) {
@@ -38,6 +44,13 @@ class UrlDiscoveryTaskTypePerformer
         }
     }
 
+    /**
+     * @param Task $task
+     *
+     * @return null
+     *
+     * @throws UnableToPerformTaskException
+     */
     public function perform(Task $task)
     {
         if (!empty($task->getOutput())) {
@@ -45,6 +58,9 @@ class UrlDiscoveryTaskTypePerformer
         }
 
         $webPage = $this->taskCachedSourceWebPageRetriever->retrieve($task);
+        if (empty($webPage)) {
+            throw new UnableToPerformTaskException();
+        }
 
         $configuration = new LinkUrlFinderConfiguration([
             LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE => $webPage,
@@ -68,5 +84,7 @@ class UrlDiscoveryTaskTypePerformer
         ));
 
         $task->setState(Task::STATE_COMPLETED);
+
+        return null;
     }
 }

@@ -4,6 +4,7 @@
 namespace App\Tests\Functional\Services;
 
 use App\Event\TaskEvent;
+use App\Exception\UnableToPerformTaskException;
 use App\Model\Source;
 use App\Model\Task\TypeInterface;
 use App\Services\SourceFactory;
@@ -37,10 +38,49 @@ class TaskPerformerTest extends AbstractBaseTestCase
         $this->taskPerformer = self::$container->get(TaskPerformer::class);
     }
 
+    public function testPerformUnableToPerformTaskException()
+    {
+        $testTaskFactory = self::$container->get(TestTaskFactory::class);
+
+        $task = $testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults());
+        $testTaskFactory->addPrimaryCachedResourceSourceToTask(
+            $task,
+            '<!doctype html>'
+        );
+
+        $this->assertEquals(Task::STATE_QUEUED, $task->getState());
+        $this->assertNull($task->getOutput());
+        $this->assertNotEmpty($task->getSources());
+
+        $eventDispatcher = \Mockery::mock(EventDispatcherInterface::class);
+
+        $eventDispatcher
+            ->shouldReceive('dispatch')
+            ->with(TaskEvent::TYPE_PERFORM, \Mockery::any())
+            ->andThrow(new UnableToPerformTaskException());
+
+        $eventDispatcher
+            ->shouldReceive('dispatch')
+            ->with(TaskEvent::TYPE_CREATED, \Mockery::any());
+
+        ObjectReflector::setProperty(
+            $this->taskPerformer,
+            TaskPerformer::class,
+            'eventDispatcher',
+            $eventDispatcher
+        );
+
+        $this->taskPerformer->perform($task);
+
+        $this->assertEquals(Task::STATE_QUEUED, $task->getState());
+        $this->assertNull($task->getOutput());
+        $this->assertEmpty($task->getSources());
+    }
+
     /**
-     * @dataProvider performDataProvider
+     * @dataProvider performSuccessDataProvider
      */
-    public function testPerform(
+    public function testPerformSuccess(
         callable $taskCreator,
         callable $setUp,
         array $expectedEventNames,
@@ -97,7 +137,7 @@ class TaskPerformerTest extends AbstractBaseTestCase
         $this->assertEquals($expectedFinishedStateName, $task->getState());
     }
 
-    public function performDataProvider(): array
+    public function performSuccessDataProvider(): array
     {
         return [
             'not fully performed' => [
