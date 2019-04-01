@@ -38,6 +38,3 @@ services:
 
   App\Tests\Services\TaskTypeRetriever:
     public: true
-
-  App\Services\TaskTypePerformer\LinkIntegritySingleUrlTaskTypePerformer:
-    public: true
