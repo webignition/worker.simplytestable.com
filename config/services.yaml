@@ -291,3 +291,9 @@ services:
     Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy:
 
     Kevinrob\GuzzleCache\CacheMiddleware:
+
+    webignition\UrlHealthChecker\Configuration:
+      $configurationValues:
+        user-agents: '%link_integrity_user_agents%'
+        http-method-list: ['GET']
+        retry-on-bad-response: false
