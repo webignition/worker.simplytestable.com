@@ -135,10 +135,6 @@ services:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 90 }
 
-    App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory:
-      arguments:
-        - '%link_integrity_user_agents%'
-
     App\Services\TaskTypePerformer\CssValidationTaskTypePerformer:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 100 }
@@ -291,3 +287,20 @@ services:
     Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy:
 
     Kevinrob\GuzzleCache\CacheMiddleware:
+
+    webignition\UrlHealthChecker\Configuration:
+      $configurationValues:
+        user-agents: '%link_integrity_user_agents%'
+        http-method-list: ['GET']
+        retry-on-bad-response: false
+
+    webignition\UrlHealthChecker\UrlHealthChecker:
+      calls:
+        - method: setHttpClient
+          arguments:
+            - '@GuzzleHttp\Client'
+        - method: setConfiguration
+          arguments:
+            - '@webignition\UrlHealthChecker\Configuration'
+
+    webignition\HtmlDocument\LinkChecker\LinkChecker:

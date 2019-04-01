@@ -32,7 +32,7 @@ class UrlSourceMapFactory
     public function createForTask(Task $task): SourceMap
     {
         $taskParameters = $task->getParameters();
-        $domainsToIgnore = $taskParameters->get('domains-to-ignore') ?? [];
+        $hostsToIgnore = $taskParameters->get('domains-to-ignore') ?? [];
 
         $sources = new SourceMap();
         $taskSources = $task->getSources();
@@ -46,7 +46,9 @@ class UrlSourceMapFactory
             }
 
             if ($taskSource->isCachedResource()) {
-                if ($this->ignoredUrlVerifier->isUrlIgnored($sourceUri, $domainsToIgnore)) {
+                if ($this->ignoredUrlVerifier->isUrlIgnored($sourceUri, [
+                    IgnoredUrlVerifier::EXCLUSIONS_HOSTS => $hostsToIgnore,
+                ])) {
                     $sources[$sourceUri] = new Source($sourceUri);
 
                     continue;

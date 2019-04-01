@@ -12,7 +12,6 @@ use App\Services\TaskCachedSourceWebPageRetriever;
 use App\Tests\Services\ObjectReflector;
 use App\Tests\Services\TestTaskFactory;
 use GuzzleHttp\Psr7\Response;
-use App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory;
 use App\Services\TaskTypePerformer\LinkIntegrityTaskTypePerformer;
 use App\Tests\Factory\ConnectExceptionFactory;
 use App\Tests\Factory\HtmlDocumentFactory;
@@ -186,7 +185,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'excluded urls' => [
                 'httpFixtures' => [],
                 'taskParameters' => [
-                    LinkCheckerConfigurationFactory::EXCLUDED_URLS_PARAMETER_NAME => [
+                    LinkIntegrityTaskTypePerformer::EXCLUDED_URLS_PARAMETER_NAME => [
                         'http://example.com/foo'
                     ],
                 ],
@@ -199,7 +198,7 @@ class LinkIntegrityTaskTypePerformerTest extends AbstractWebPageTaskTypePerforme
             'excluded domains' => [
                 'httpFixtures' => [],
                 'taskParameters' => [
-                    LinkCheckerConfigurationFactory::EXCLUDED_DOMAINS_PARAMETER_NAME => [
+                    LinkIntegrityTaskTypePerformer::EXCLUDED_DOMAINS_PARAMETER_NAME => [
                         'example.com'
                     ],
                 ],
