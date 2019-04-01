@@ -135,10 +135,6 @@ services:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 90 }
 
-    App\Services\TaskTypePerformer\LinkCheckerConfigurationFactory:
-      arguments:
-        - '%link_integrity_user_agents%'
-
     App\Services\TaskTypePerformer\CssValidationTaskTypePerformer:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 100 }

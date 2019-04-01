@@ -11,7 +11,6 @@ use App\Model\LinkIntegrityResultCollection;
 use App\Model\Task\Type;
 use App\Model\Task\Parameters as TaskParameters;
 use App\Services\HttpClientConfigurationService;
-use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
 use App\Services\TaskCachedSourceWebPageRetriever;
 use webignition\IgnoredUrlVerifier\IgnoredUrlVerifier;
@@ -27,46 +26,20 @@ class LinkIntegrityTaskTypePerformer
     const EXCLUDED_URLS_PARAMETER_NAME = 'excluded-urls';
     const EXCLUDED_DOMAINS_PARAMETER_NAME = 'excluded-domains';
 
-    /**
-     * @var HttpClientService
-     */
-    private $httpClientService;
-
-    /**
-     * @var HttpClientConfigurationService
-     */
     private $httpClientConfigurationService;
-
-    /**
-     * @var TaskCachedSourceWebPageRetriever
-     */
     private $taskCachedSourceWebPageRetriever;
-
-    /**
-     * @var LinkCheckerConfigurationFactory
-     */
-    private $linkCheckerConfigurationFactory;
-
-    /**
-     * @var HttpRetryMiddleware
-     */
     private $httpRetryMiddleware;
-
     private $linkChecker;
 
     public function __construct(
-        HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
-        LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory,
         HttpRetryMiddleware $httpRetryMiddleware,
         LinkChecker $linkChecker
     ) {
-        $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
 
-        $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
         $this->httpRetryMiddleware = $httpRetryMiddleware;
         $this->linkChecker = $linkChecker;
     }
