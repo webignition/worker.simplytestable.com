@@ -71,7 +71,7 @@ class TaskTypePerformer
      */
     private function performValidation(Task $task, WebPage $webPage)
     {
-        $webPageContent = $webPage->getContent();
+        $webPageContent = (string) $webPage->getContent();
         $docTypeString = DoctypeExtractor::extract($webPageContent);
 
         if (empty($docTypeString)) {
@@ -171,7 +171,7 @@ class TaskTypePerformer
         return $this->createErrorOutput($documentType, 'document-type-invalid');
     }
 
-    private function createErrorOutput(string $message, string $messageId, ?array $additionalData = []): array
+    private function createErrorOutput(string $message, string $messageId, array $additionalData = []): array
     {
         return [
             'messages' => [
