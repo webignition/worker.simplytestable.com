@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "472ab6af8f3b9513fc612c333d931a29",
+    "content-hash": "c942de7b2a61c13650b7edc47b686259",
     "packages": [
         {
             "name": "algo26-matthias/idna-convert",
@@ -4482,27 +4482,26 @@
         },
         {
             "name": "webignition/html-document-link-checker",
-            "version": "3.2",
+            "version": "4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-checker.git",
-                "reference": "15231bcaba63a4e367fdd871689d7153f56fd159"
+                "reference": "466236a118c6892e0321e3dcd166479dfb7de83d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/15231bcaba63a4e367fdd871689d7153f56fd159",
-                "reference": "15231bcaba63a4e367fdd871689d7153f56fd159",
+                "url": "https://api.github.com/repos/webignition/html-document-link-checker/zipball/466236a118c6892e0321e3dcd166479dfb7de83d",
+                "reference": "466236a118c6892e0321e3dcd166479dfb7de83d",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^6",
                 "php": ">=7.2",
-                "webignition/html-document-link-finder": ">=4,<5",
-                "webignition/url": ">=2,<3",
+                "webignition/uri": "^0.4.0",
                 "webignition/url-health-checker": "^2"
             },
             "require-dev": {
-                "mockery/mockery": "^1",
+                "phpstan/phpstan": "^0.11.5",
                 "phpunit/phpunit": "^7.0",
                 "squizlabs/php_codesniffer": "^3",
                 "webignition/http-history-container": ">=0.3,<1"
@@ -4532,7 +4531,7 @@
                 "html",
                 "link"
             ],
-            "time": "2018-10-12T11:54:37+00:00"
+            "time": "2019-04-01T16:10:26+00:00"
         },
         {
             "name": "webignition/html-document-link-finder",

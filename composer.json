@@ -32,7 +32,7 @@
         "webignition/guzzle-http-authentication-middleware": "0.5",
         "webignition/guzzle-request-headers-middleware": ">=0.1,<1",
         "webignition/guzzle-response-location-uri-fixer-middleware": ">=0.2,<1",
-        "webignition/html-document-link-checker": ">=3.2,<4",
+        "webignition/html-document-link-checker": ">=4,<5",
         "webignition/html-document-link-finder": ">=4.2,<5",
         "webignition/html-document-type": ">=0.1.1,<1.0",
         "webignition/html-validator-wrapper": ">=2,<3",
