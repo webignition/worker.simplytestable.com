@@ -297,3 +297,12 @@ services:
         user-agents: '%link_integrity_user_agents%'
         http-method-list: ['GET']
         retry-on-bad-response: false
+
+    webignition\UrlHealthChecker\UrlHealthChecker:
+      calls:
+        - method: setHttpClient
+          arguments:
+            - '@GuzzleHttp\Client'
+        - method: setConfiguration
+          arguments:
+            - '@webignition\UrlHealthChecker\Configuration'
