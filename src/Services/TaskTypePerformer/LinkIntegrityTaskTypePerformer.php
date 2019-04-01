@@ -13,6 +13,7 @@ use App\Services\HttpClientConfigurationService;
 use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
 use App\Services\TaskCachedSourceWebPageRetriever;
+use webignition\IgnoredUrlVerifier\IgnoredUrlVerifier;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
 use webignition\WebResource\WebPage\WebPage;
@@ -48,12 +49,15 @@ class LinkIntegrityTaskTypePerformer
      */
     private $httpRetryMiddleware;
 
+    private $linkChecker;
+
     public function __construct(
         HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory,
-        HttpRetryMiddleware $httpRetryMiddleware
+        HttpRetryMiddleware $httpRetryMiddleware,
+        LinkChecker $linkChecker
     ) {
         $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
@@ -61,6 +65,7 @@ class LinkIntegrityTaskTypePerformer
 
         $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
         $this->httpRetryMiddleware = $httpRetryMiddleware;
+        $this->linkChecker = $linkChecker;
     }
 
     /**
@@ -100,11 +105,6 @@ class LinkIntegrityTaskTypePerformer
 
     private function performValidation(Task $task, WebPage $webPage)
     {
-        $linkChecker = new LinkChecker(
-            $this->linkCheckerConfigurationFactory->create($task),
-            $this->httpClientService->getHttpClient()
-        );
-
         $linkIntegrityResultCollection = new LinkIntegrityResultCollection();
 
         $this->httpRetryMiddleware->disable();
@@ -113,7 +113,7 @@ class LinkIntegrityTaskTypePerformer
         foreach ($links as $link) {
             $link['url'] = rawurldecode($link['url']);
 
-            $linkState = $linkChecker->getLinkState($link['url']);
+            $linkState = $this->linkChecker->getLinkState($link['url']);
 
             if ($linkState) {
                 $linkIntegrityResultCollection->add(new LinkIntegrityResult(
@@ -148,5 +148,10 @@ class LinkIntegrityTaskTypePerformer
         $linkFinder->setConfiguration($linkFinderConfiguration);
 
         return $linkFinder->getAll();
+    }
+
+    private function createIgnoredUrlVerifier(Task $task)
+    {
+        $ignoredUrlVerifier = new IgnoredUrlVerifier();
     }
 }

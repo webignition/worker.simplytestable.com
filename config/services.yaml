@@ -306,3 +306,5 @@ services:
         - method: setConfiguration
           arguments:
             - '@webignition\UrlHealthChecker\Configuration'
+
+    webignition\HtmlDocument\LinkChecker\LinkChecker:
