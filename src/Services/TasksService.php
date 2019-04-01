@@ -99,15 +99,20 @@ class TasksService
 
     private function createRequestException(HttpRequestException $requestException): RequestException
     {
-        $exceptionCode = null;
+        $exceptionCode = 0;
 
-        if ($requestException instanceof ConnectException &&
-            GuzzleCurlExceptionFactory::isCurlException($requestException)
-        ) {
+        if ($requestException instanceof ConnectException) {
             $curlException = GuzzleCurlExceptionFactory::fromConnectException($requestException);
-            $exceptionCode = $curlException->getCurlCode();
+
+            if ($curlException) {
+                $exceptionCode = $curlException->getCurlCode();
+            }
         } else {
-            $exceptionCode = $requestException->getResponse()->getStatusCode();
+            $response = $requestException->getResponse();
+
+            if ($response) {
+                $exceptionCode = $response->getStatusCode();
+            }
         }
 
         return new RequestException(
@@ -119,9 +124,14 @@ class TasksService
 
     private function logHttpRequestException(RequestException $requestException)
     {
+        $previousException = $requestException->getPrevious();
+        $previousExceptionClass = $previousException
+            ? get_class($previousException)
+            : 'no previous exception';
+
         $this->logger->error(sprintf(
             'TasksService:request:%s [%s]',
-            get_class($requestException->getPrevious()),
+            $previousExceptionClass,
             $requestException->getCode()
         ));
     }

@@ -46,8 +46,9 @@ abstract class AbstractTaskCommand extends Command
         $typedInput = new TypedInput($input);
         $taskId = $typedInput->getIntegerArgument('id');
 
-        $this->task = $this->taskService->getById($taskId);
-        if (empty($this->task)) {
+        $task = $this->taskService->getById($taskId);
+
+        if (empty($task)) {
             $taskIdDoesNotExistMessage = sprintf('[%s] does not exist', $taskId);
 
             $this->logger->error(sprintf(
@@ -60,6 +61,8 @@ abstract class AbstractTaskCommand extends Command
 
             return self::RETURN_CODE_TASK_DOES_NOT_EXIST;
         }
+
+        $this->task = $task;
 
         return self::RETURN_CODE_OK;
     }

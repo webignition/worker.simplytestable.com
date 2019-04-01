@@ -53,7 +53,7 @@ class HttpClientConfigurationService
             $this->httpAuthenticationMiddleware->setCredentials(
                 CredentialsFactory::createBasicCredentials(
                     $httpAuthenticationUsername,
-                    $parametersObject->getHttpAuthenticationPassword()
+                    (string) $parametersObject->getHttpAuthenticationPassword()
                 )
             );
         }

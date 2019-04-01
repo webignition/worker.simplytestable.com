@@ -14,24 +14,9 @@ class WorkerService
     const STATE_AWAITING_ACTIVATION_VERIFICATION = 'awaiting-activation-verification';
     const STATE_NEW = 'new';
 
-    /**
-     * @var LoggerInterface
-     */
     private $logger;
-
-    /**
-     * @var CoreApplicationHttpClient
-     */
     private $coreApplicationHttpClient;
-
-    /**
-     * @var ApplicationState
-     */
     private $applicationState;
-
-    /**
-     * @var ApplicationConfiguration
-     */
     private $applicationConfiguration;
 
     public function __construct(
@@ -76,8 +61,8 @@ class WorkerService
         $this->logger->info("WorkerService::activate: Requesting activation with " . (string)$request->getUri());
 
         $response = null;
-        $responseCode = null;
-        $responsePhrase = null;
+        $responseCode = 0;
+        $responsePhrase = 'unknown';
         $hasHttpError = false;
         $hasCurlError = false;
 
@@ -88,13 +73,19 @@ class WorkerService
         } catch (BadResponseException $badResponseException) {
             $hasHttpError = true;
             $response = $badResponseException->getResponse();
-            $responseCode = $response->getStatusCode();
-            $responsePhrase = $response->getReasonPhrase();
+
+            if ($response) {
+                $responseCode = $response->getStatusCode();
+                $responsePhrase = $response->getReasonPhrase();
+            }
         } catch (ConnectException $connectException) {
             $hasCurlError = true;
             $curlException = GuzzleCurlExceptionFactory::fromConnectException($connectException);
-            $responseCode = $curlException->getCurlCode();
-            $responsePhrase = $curlException->getMessage();
+
+            if ($curlException) {
+                $responseCode = $curlException->getCurlCode();
+                $responsePhrase = $curlException->getMessage();
+            }
         }
 
         $this->logger->info(sprintf(

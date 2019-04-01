@@ -15,7 +15,7 @@ class Type implements TypeInterface, \JsonSerializable
     private $isSelectable;
 
     /**
-     * @var Type
+     * @var Type|null
      */
     private $childType;
 
