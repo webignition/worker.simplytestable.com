@@ -7,32 +7,32 @@ use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use App\Model\LinkIntegrityResult;
 use App\Model\Task\Type;
+use App\Model\Task\Parameters as TaskParameters;
 use App\Services\HttpClientConfigurationService;
-use App\Services\HttpClientService;
 use App\Services\HttpRetryMiddleware;
+use webignition\IgnoredUrlVerifier\IgnoredUrlVerifier;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
 
 class LinkIntegritySingleUrlTaskTypePerformer
 {
     const USER_AGENT = 'ST Web Resource Task Driver (http://bit.ly/RlhKCL)';
+    const EXCLUDED_URLS_PARAMETER_NAME = 'excluded-urls';
+    const EXCLUDED_DOMAINS_PARAMETER_NAME = 'excluded-domains';
 
-    private $httpClientService;
     private $httpClientConfigurationService;
-    private $linkCheckerConfigurationFactory;
     private $httpRetryMiddleware;
+    private $linkChecker;
 
     public function __construct(
-        HttpClientService $httpClientService,
         HttpClientConfigurationService $httpClientConfigurationService,
-        LinkCheckerConfigurationFactory $linkCheckerConfigurationFactory,
-        HttpRetryMiddleware $httpRetryMiddleware
+        HttpRetryMiddleware $httpRetryMiddleware,
+        LinkChecker $linkChecker
     ) {
-        $this->httpClientService = $httpClientService;
         $this->httpClientConfigurationService = $httpClientConfigurationService;
 
-        $this->linkCheckerConfigurationFactory = $linkCheckerConfigurationFactory;
         $this->httpRetryMiddleware = $httpRetryMiddleware;
+        $this->linkChecker = $linkChecker;
     }
 
     public function __invoke(TaskEvent $taskEvent)
@@ -55,31 +55,30 @@ class LinkIntegritySingleUrlTaskTypePerformer
 
     private function performValidation(Task $task)
     {
-        $linkChecker = new LinkChecker(
-            $this->linkCheckerConfigurationFactory->create($task),
-            $this->httpClientService->getHttpClient()
-        );
-
         $this->httpRetryMiddleware->disable();
 
         $url = $task->getUrl();
         $element = $task->getParameters()->get('element');
 
-        $outputContent = null;
+        $outputContent = '';
         $outputContentType = new InternetMediaType('application', 'json');
         $outputErrorCount = 0;
 
-        $linkState = $linkChecker->getLinkState($url);
+        $exclusions = $this->createUrlExclusions($task->getParameters());
 
-        if ($linkState) {
-            $linkInterityResult = new LinkIntegrityResult(
-                $url,
-                $element,
-                $linkState
-            );
+        if (!(new IgnoredUrlVerifier())->isUrlIgnored($url, $exclusions)) {
+            $linkState = $this->linkChecker->getLinkState($url);
 
-            $outputContent = $linkInterityResult;
-            $outputErrorCount = (int) $linkState->isError();
+            if ($linkState) {
+                $linkInterityResult = new LinkIntegrityResult(
+                    $url,
+                    $element,
+                    $linkState
+                );
+
+                $outputContent = $linkInterityResult;
+                $outputErrorCount = (int) $linkState->isError();
+            }
         }
 
         $task->setOutput(Output::create(
@@ -93,5 +92,26 @@ class LinkIntegritySingleUrlTaskTypePerformer
         $task->setState(Task::STATE_COMPLETED);
 
         return null;
+    }
+
+    private function createUrlExclusions(TaskParameters $parameters)
+    {
+        $excludedHosts = $parameters->get(self::EXCLUDED_DOMAINS_PARAMETER_NAME);
+        $excludedHosts = $excludedHosts ?? [];
+
+        $excludedUrls = $parameters->get(self::EXCLUDED_URLS_PARAMETER_NAME);
+        $excludedUrls = $excludedUrls ?? [];
+
+        return [
+            IgnoredUrlVerifier::EXCLUSIONS_SCHEMES => [
+                IgnoredUrlVerifier::URL_SCHEME_MAILTO,
+                IgnoredUrlVerifier::URL_SCHEME_ABOUT,
+                IgnoredUrlVerifier::URL_SCHEME_JAVASCRIPT,
+                IgnoredUrlVerifier::URL_SCHEME_FTP,
+                IgnoredUrlVerifier::URL_SCHEME_TEL,
+            ],
+            IgnoredUrlVerifier::EXCLUSIONS_HOSTS => $excludedHosts,
+            IgnoredUrlVerifier::EXCLUSIONS_URLS => $excludedUrls,
+        ];
     }
 }

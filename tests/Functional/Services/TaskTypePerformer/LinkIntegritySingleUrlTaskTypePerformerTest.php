@@ -48,6 +48,67 @@ class LinkIntegritySingleUrlTaskTypePerformerTest extends AbstractWebPageTaskTyp
     }
 
     /**
+     * @dataProvider performEmptyOutputDataProvider
+     */
+    public function testPerformEmptyOutput(string $url, array $parameters)
+    {
+        $task = $this->testTaskFactory->create(TestTaskFactory::createTaskValuesFromDefaults([
+            'url' => $url,
+            'type' => TypeInterface::TYPE_LINK_INTEGRITY_SINGLE_URL,
+            'parameters' => json_encode($parameters),
+        ]));
+
+        $output = Output::create((string) json_encode(''), new InternetMediaType('application', 'json'));
+
+        $this->taskTypePerformer->perform($task);
+
+        $this->assertEquals(Task::STATE_COMPLETED, $task->getState());
+        $this->assertEquals($output, $task->getOutput());
+    }
+
+    public function performEmptyOutputDataProvider(): array
+    {
+        return [
+            'excluded host' => [
+                'url' => 'http://example.com',
+                'parameters' => [
+                    LinkIntegritySingleUrlTaskTypePerformer::EXCLUDED_DOMAINS_PARAMETER_NAME => [
+                        'example.com',
+                    ],
+                ],
+            ],
+            'excluded url' => [
+                'url' => 'http://example.com',
+                'parameters' => [
+                    LinkIntegritySingleUrlTaskTypePerformer::EXCLUDED_URLS_PARAMETER_NAME => [
+                        'http://example.com/',
+                    ],
+                ],
+            ],
+            'excluded scheme: mailto' => [
+                'url' => 'mailto:user@example.com',
+                'parameters' => [],
+            ],
+            'excluded scheme: about' => [
+                'url' => 'about:blank',
+                'parameters' => [],
+            ],
+            'excluded scheme: javascript' => [
+                'url' => 'javascript:return true;',
+                'parameters' => [],
+            ],
+            'excluded scheme: ftp' => [
+                'url' => 'ftp://example.com',
+                'parameters' => [],
+            ],
+            'excluded scheme: tel' => [
+                'url' => 'tel:0123456789',
+                'parameters' => [],
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider performSuccessDataProvider
      */
     public function testPerformSuccess(
