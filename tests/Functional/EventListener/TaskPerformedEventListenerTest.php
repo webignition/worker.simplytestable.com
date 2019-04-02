@@ -88,16 +88,11 @@ class TaskPerformedEventListenerTest extends AbstractTaskEventListenerTest
 
                     return $childTask;
                 },
-                'resqueQueueServiceCreator' => function (int $taskId): MockInterface {
+                'resqueQueueServiceCreator' => function (): MockInterface {
                     $resqueQueueService = \Mockery::mock(QueueService::class);
 
                     $resqueQueueService
-                        ->shouldNotReceive('enqueue')
-                        ->withArgs(function (TaskReportCompletionJob $taskReportCompletionJob) use ($taskId) {
-                            $this->assertEquals(['id' => $taskId], $taskReportCompletionJob->args);
-
-                            return true;
-                        });
+                        ->shouldNotReceive('enqueue');
 
                     return $resqueQueueService;
                 },
