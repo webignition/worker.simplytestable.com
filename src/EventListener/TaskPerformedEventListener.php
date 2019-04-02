@@ -32,7 +32,10 @@ class TaskPerformedEventListener
     {
         $task = $taskEvent->getTask();
 
-        $this->resqueQueueService->enqueue(new TaskReportCompletionJob(['id' => $task->getId()]));
+        if (empty($task->getParentTask())) {
+            $this->resqueQueueService->enqueue(new TaskReportCompletionJob(['id' => $task->getId()]));
+        }
+
         $this->taskUnusedCachedResourceRemover->remove($task);
     }
 }
