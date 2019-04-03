@@ -6,11 +6,14 @@ use App\Entity\Task\Output;
 use App\Entity\Task\Task;
 use App\Event\TaskEvent;
 use App\Exception\UnableToPerformTaskException;
+use App\Model\Task\Parameters;
 use App\Model\Task\Type;
 use App\Services\TaskCachedSourceWebPageRetriever;
-use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkUrlFinderConfiguration;
+use Psr\Http\Message\UriInterface;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
+use webignition\Uri\ScopeComparer;
+use webignition\Uri\Uri;
 
 class UrlDiscoveryTaskTypePerformer
 {
@@ -18,6 +21,7 @@ class UrlDiscoveryTaskTypePerformer
     const DEFAULT_CHARACTER_ENCODING = 'UTF-8';
 
     private $taskCachedSourceWebPageRetriever;
+    private $linkFinder;
 
     /**
      * @var string[]
@@ -27,9 +31,12 @@ class UrlDiscoveryTaskTypePerformer
         'https'
     ];
 
-    public function __construct(TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever)
-    {
+    public function __construct(
+        TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
+        HtmlDocumentLinkUrlFinder $linkFinder
+    ) {
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
+        $this->linkFinder = $linkFinder;
     }
 
     /**
@@ -62,29 +69,50 @@ class UrlDiscoveryTaskTypePerformer
             throw new UnableToPerformTaskException();
         }
 
-        $configuration = new LinkUrlFinderConfiguration([
-            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE => $webPage,
-            LinkUrlFinderConfiguration::CONFIG_KEY_SOURCE_URL => (string) $webPage->getUri(),
-            LinkUrlFinderConfiguration::CONFIG_KEY_ELEMENT_SCOPE => 'a',
-            LinkUrlFinderConfiguration::CONFIG_KEY_IGNORE_FRAGMENT_IN_URL_COMPARISON => true,
-        ]);
+        $scopeComparer = new ScopeComparer();
+        $scopeComparer->addEquivalentSchemes($this->equivalentSchemes);
 
-        $urlScope = $task->getParameters()->get('scope');
-        if ($urlScope) {
-            $configuration->setUrlScope($urlScope);
+        $linkCollection = $this->linkFinder->getLinkCollection($webPage, (string) $webPage->getUri());
+        $linkCollection = $linkCollection->filterByElementName('a');
+
+        $uriScope = $this->createUriScope($task->getParameters());
+        if (!empty($uriScope)) {
+            $linkCollection = $linkCollection->filterByUriScope($scopeComparer, $uriScope);
         }
 
-        $finder = new HtmlDocumentLinkUrlFinder();
-        $finder->setConfiguration($configuration);
-        $finder->getUrlScopeComparer()->addEquivalentSchemes($this->equivalentSchemes);
+        $unqiueUris = $linkCollection->getUniqueUris();
+        $unqiueUriStrings = [];
+
+        foreach ($unqiueUris as $uri) {
+            $unqiueUriStrings[] = (string) $uri;
+        }
 
         $task->setOutput(Output::create(
-            (string) json_encode($finder->getUniqueUrls()),
+            (string) json_encode($unqiueUriStrings),
             new InternetMediaType('application', 'json')
         ));
 
         $task->setState(Task::STATE_COMPLETED);
 
         return null;
+    }
+
+    /**
+     * @param Parameters $parameters
+     *
+     * @return UriInterface[]
+     */
+    private function createUriScope(Parameters $parameters): array
+    {
+        $uriScope = [];
+        $scopeParameter = $parameters->get('scope');
+
+        if ($scopeParameter && is_array($scopeParameter)) {
+            foreach ($scopeParameter as $uriString) {
+                $uriScope[] = new Uri($uriString);
+            }
+        }
+
+        return $uriScope;
     }
 }
