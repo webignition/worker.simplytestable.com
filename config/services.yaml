@@ -143,6 +143,10 @@ services:
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 100 }
 
+    App\Services\TaskTypePerformer\LinkIntegritySingleUrlTaskTypePerformer:
+      tags:
+        - { name: kernel.event_listener, event: task.perform, priority: 100 }
+
     App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer:
       arguments:
         $scopeComparer: '@app.services.tasktypeperformer.urldiscovery.uriscopecomparer'
