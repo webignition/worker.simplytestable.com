@@ -17,7 +17,6 @@ use webignition\IgnoredUrlVerifier\IgnoredUrlVerifier;
 use webignition\InternetMediaType\InternetMediaType;
 use webignition\HtmlDocument\LinkChecker\LinkChecker;
 use webignition\WebResource\WebPage\WebPage;
-use webignition\HtmlDocumentLinkUrlFinder\Configuration as LinkFinderConfiguration;
 use webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder;
 
 class LinkIntegrityTaskTypePerformer
@@ -30,18 +29,21 @@ class LinkIntegrityTaskTypePerformer
     private $taskCachedSourceWebPageRetriever;
     private $httpRetryMiddleware;
     private $linkChecker;
+    private $linkFinder;
 
     public function __construct(
         HttpClientConfigurationService $httpClientConfigurationService,
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
         HttpRetryMiddleware $httpRetryMiddleware,
-        LinkChecker $linkChecker
+        LinkChecker $linkChecker,
+        HtmlDocumentLinkUrlFinder $linkFinder
     ) {
         $this->httpClientConfigurationService = $httpClientConfigurationService;
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
 
         $this->httpRetryMiddleware = $httpRetryMiddleware;
         $this->linkChecker = $linkChecker;
+        $this->linkFinder = $linkFinder;
     }
 
     /**
@@ -87,9 +89,9 @@ class LinkIntegrityTaskTypePerformer
 
         $this->httpRetryMiddleware->disable();
 
-        $links = $this->findWebPageLinks($webPage);
-        foreach ($links as $link) {
-            $url = rawurldecode($link['url']);
+        $linkCollection = $this->linkFinder->getLinkCollection($webPage, (string) $webPage->getUri());
+        foreach ($linkCollection as $link) {
+            $url = rawurldecode((string) $link->getUri());
 
             if (!(new IgnoredUrlVerifier())->isUrlIgnored($url, $exclusions)) {
                 $linkState = $this->linkChecker->getLinkState($url);
@@ -97,7 +99,7 @@ class LinkIntegrityTaskTypePerformer
                 if ($linkState) {
                     $linkIntegrityResultCollection->add(new LinkIntegrityResult(
                         $url,
-                        $link['element'],
+                        $link->getElementAsString(),
                         $linkState
                     ));
                 }
@@ -115,19 +117,6 @@ class LinkIntegrityTaskTypePerformer
         $task->setState(Task::STATE_COMPLETED);
 
         return null;
-    }
-
-    private function findWebPageLinks(WebPage $webPage): array
-    {
-        $linkFinderConfiguration = new LinkFinderConfiguration([
-            LinkFinderConfiguration::CONFIG_KEY_SOURCE => $webPage,
-            LinkFinderConfiguration::CONFIG_KEY_SOURCE_URL => (string)$webPage->getUri(),
-        ]);
-
-        $linkFinder = new HtmlDocumentLinkUrlFinder();
-        $linkFinder->setConfiguration($linkFinderConfiguration);
-
-        return $linkFinder->getAll();
     }
 
     private function createIgnoredUrlVerifierExclusions(TaskParameters $parameters)
