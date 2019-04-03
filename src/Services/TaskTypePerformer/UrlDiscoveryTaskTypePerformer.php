@@ -22,21 +22,16 @@ class UrlDiscoveryTaskTypePerformer
 
     private $taskCachedSourceWebPageRetriever;
     private $linkFinder;
-
-    /**
-     * @var string[]
-     */
-    private $equivalentSchemes = [
-        'http',
-        'https'
-    ];
+    private $scopeComparer;
 
     public function __construct(
         TaskCachedSourceWebPageRetriever $taskCachedSourceWebPageRetriever,
-        HtmlDocumentLinkUrlFinder $linkFinder
+        HtmlDocumentLinkUrlFinder $linkFinder,
+        ScopeComparer $scopeComparer
     ) {
         $this->taskCachedSourceWebPageRetriever = $taskCachedSourceWebPageRetriever;
         $this->linkFinder = $linkFinder;
+        $this->scopeComparer = $scopeComparer;
     }
 
     /**
@@ -69,15 +64,12 @@ class UrlDiscoveryTaskTypePerformer
             throw new UnableToPerformTaskException();
         }
 
-        $scopeComparer = new ScopeComparer();
-        $scopeComparer->addEquivalentSchemes($this->equivalentSchemes);
-
         $linkCollection = $this->linkFinder->getLinkCollection($webPage, (string) $webPage->getUri());
         $linkCollection = $linkCollection->filterByElementName('a');
 
         $uriScope = $this->createUriScope($task->getParameters());
         if (!empty($uriScope)) {
-            $linkCollection = $linkCollection->filterByUriScope($scopeComparer, $uriScope);
+            $linkCollection = $linkCollection->filterByUriScope($this->scopeComparer, $uriScope);
         }
 
         $unqiueUris = $linkCollection->getUniqueUris();

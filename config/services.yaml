@@ -144,6 +144,8 @@ services:
         - { name: kernel.event_listener, event: task.perform, priority: 100 }
 
     App\Services\TaskTypePerformer\UrlDiscoveryTaskTypePerformer:
+      arguments:
+        $scopeComparer: '@app.services.tasktypeperformer.urldiscovery.uriscopecomparer'
       tags:
         - { name: kernel.event_listener, event: task.perform, priority: 100 }
 
@@ -306,3 +308,10 @@ services:
     webignition\HtmlDocument\LinkChecker\LinkChecker:
 
     webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder:
+
+    app.services.tasktypeperformer.urldiscovery.uriscopecomparer:
+      class: webignition\Uri\ScopeComparer
+      calls:
+        - method: addEquivalentSchemes
+          arguments:
+            - ['http', 'https']
