@@ -126,7 +126,7 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
                     'https://www.example.com/foo/anchor1',
                 ],
             ],
-            'has scope, no sources' => [
+            'has scope' => [
                 'taskParameters' => [
                     'scope' => [
                         'http://example.com',
@@ -138,6 +138,14 @@ class UrlDiscoveryTaskTypePerformerTest extends AbstractWebPageTaskTypePerformer
                     'http://example.com/foo/anchor1',
                     'http://www.example.com/foo/anchor2',
                     'https://www.example.com/foo/anchor1',
+                ],
+            ],
+            'http and https are equivalent' => [
+                'taskParameters' => [],
+                'webPageContent' => HtmlDocumentFactory::load('http-and-https-urls'),
+                'expectedDecodedOutput' => [
+                    'https://example.com/1',
+                    'http://example.com/2',
                 ],
             ],
         ];
