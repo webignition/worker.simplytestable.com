@@ -33,7 +33,7 @@
         "webignition/guzzle-request-headers-middleware": ">=0.1,<1",
         "webignition/guzzle-response-location-uri-fixer-middleware": ">=0.2,<1",
         "webignition/html-document-link-checker": ">=4,<5",
-        "webignition/html-document-link-finder": ">=4.2,<5",
+        "webignition/html-document-link-finder": ">=5,<6",
         "webignition/html-document-type": ">=0.1.1,<1.0",
         "webignition/html-validator-wrapper": ">=2,<3",
         "webignition/http-history-container": ">=0.7,<1",

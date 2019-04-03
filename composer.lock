@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3c1d8908a4891cc4a1bd2b11237f415d",
+    "content-hash": "0ead20a546ac08523ae46d14639d703d",
     "packages": [
         {
             "name": "algo26-matthias/idna-convert",
@@ -4535,16 +4535,16 @@
         },
         {
             "name": "webignition/html-document-link-finder",
-            "version": "4.2",
+            "version": "5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/html-document-link-url-finder.git",
-                "reference": "e9e2a7d7d8e1206f5646ecc5d1e66bd59457f084"
+                "reference": "247820dd8c7d68ddd7f61c21dfc51fa7ed46bfbf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/e9e2a7d7d8e1206f5646ecc5d1e66bd59457f084",
-                "reference": "e9e2a7d7d8e1206f5646ecc5d1e66bd59457f084",
+                "url": "https://api.github.com/repos/webignition/html-document-link-url-finder/zipball/247820dd8c7d68ddd7f61c21dfc51fa7ed46bfbf",
+                "reference": "247820dd8c7d68ddd7f61c21dfc51fa7ed46bfbf",
                 "shasum": ""
             },
             "require": {
@@ -4555,6 +4555,8 @@
             },
             "require-dev": {
                 "mockery/mockery": "^1",
+                "phpstan/phpstan": "^0.11.5",
+                "phpstan/phpstan-mockery": "^0.11.0",
                 "phpunit/phpunit": "^7",
                 "squizlabs/php_codesniffer": "^3"
             },
@@ -4583,7 +4585,7 @@
                 "linkifier",
                 "validation"
             ],
-            "time": "2019-01-09T19:04:52+00:00"
+            "time": "2019-04-03T10:47:51+00:00"
         },
         {
             "name": "webignition/html-document-type",
